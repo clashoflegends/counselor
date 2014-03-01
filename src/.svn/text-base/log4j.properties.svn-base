@@ -1,0 +1,36 @@
+#==========================================================
+# Autor: Walter D'Avila Neto 
+# Email: walter.neto.infotec@petrobras.com.br
+# 'for more verbose logging change 'info' to 'debug' ...
+#==========================================================
+
+# --------------------------------------------------------------------------------
+# rootLooger eh o default log level para os pacotes nao especificados ..
+# Portanto apenas ERROR debug level deve ser configurado para rootlogger!
+# --------------------------------------------------------------------------------
+log4j.rootLogger=info, stdout, logfile
+#log4j.rootLogger=info, logfile
+
+log4j.appender.logfile=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.logfile.File=counselor.log
+log4j.appender.logfile.DatePattern='.'yyyy-MM-dd'.log'
+log4j.appender.logfile.layout=org.apache.log4j.PatternLayout
+#log4j.appender.logfile.maxBackupIndex=1
+#log4j.appender.logfile.maxFileSize=1KB
+# test comment
+# -----------------------------------------------------------------------------------------------------------------------------------
+# Eventualmente caso nao esteja saindo nada no Console defina console no rootLogger ou no nivel desejado ..
+# Idelamente nao se usa 'console' para para coisas especificas da sua aplicacao, pois tenho certeza que voce usa o Log corretamente !!
+# Em outras palavaras stdout (console output) somente para coisas nao tratadas pela aplicacao... (rootLogger)
+# Arquivos em Ambiente de desenvolvimento
+# ------------------------------------------------------------------------------------------------------------------------------------
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+#log4j.appender.stdout.layout.ConversionPattern=%d{dd/MM/yyyy HH:mm:ss,SSS} [%t] %-5p %c - %m%n
+log4j.appender.stdout.layout.ConversionPattern=%d %p [%c] - <%m>%n
+
+
+log4j.logger.com.mchange=WARN
+log4j.logger.org.apache=WARN
+
+

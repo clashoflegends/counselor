@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/59/%20counselor/src/control/services
+END
+AcaoConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/103/%20counselor/src/control/services/AcaoConverter.java
+END
+MapaDragListener.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/63/%20counselor/src/control/services/MapaDragListener.java
+END
+PartidaConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/103/%20counselor/src/control/services/PartidaConverter.java
+END
+ArtefatoConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/102/%20counselor/src/control/services/ArtefatoConverter.java
+END
+FinancasConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/128/%20counselor/src/control/services/FinancasConverter.java
+END
+NacaoConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/102/%20counselor/src/control/services/NacaoConverter.java
+END
+ExercitoConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/128/%20counselor/src/control/services/ExercitoConverter.java
+END
+CenarioConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/!svn/ver/129/%20counselor/src/control/services/CenarioConverter.java
+END
+PersonagemConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/!svn/ver/129/%20counselor/src/control/services/PersonagemConverter.java
+END
+CidadeConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/127/%20counselor/src/control/services/CidadeConverter.java
+END
+FiltroConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/45/%20counselor/src/control/services/FiltroConverter.java
+END
+LocalConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/!svn/ver/127/%20counselor/src/control/services/LocalConverter.java
+END
+FeiticoConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/!svn/ver/51/%20counselor/src/control/services/FeiticoConverter.java
+END
+TipoTropaConverter.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/!svn/ver/34/%20counselor/src/control/services/TipoTropaConverter.java
+END

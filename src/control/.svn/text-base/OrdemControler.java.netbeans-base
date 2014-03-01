@@ -1,0 +1,280 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package control;
+
+import baseLib.GenericoComboBoxModel;
+import baseLib.GenericoComboObject;
+import baseLib.GenericoTableModel;
+import business.facade.CidadeFacade;
+import business.facade.PersonagemFacade;
+import control.services.*;
+import control.support.ControlBase;
+import gui.subtabs.SubTabOrdem;
+import java.awt.event.*;
+import java.io.Serializable;
+import java.util.SortedMap;
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import model.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import persistence.BundleManager;
+import persistence.SettingsManager;
+
+/**
+ *
+ * @author gurgel
+ */
+public class OrdemControler extends ControlBase implements Serializable, ActionListener, ListSelectionListener, ItemListener {
+
+    private static final Log log = LogFactory.getLog(OrdemControler.class);
+    private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
+    private SubTabOrdem tabGui;
+    private int indexModelOrdem;
+    private GenericoComboBoxModel ordemComboModel;
+    private Personagem personagem;
+    private PersonagemFacade personagemFacade = new PersonagemFacade();
+
+    public OrdemControler(SubTabOrdem tabOrdens) {
+        this.tabGui = tabOrdens;
+        //registerDispatchManager();
+    }
+
+    public ComboBoxModel getArtefatoComboModel(int tipo) {
+        return ArtefatoConverter.getArtefatoComboModel(tipo, getPersonagem());
+    }
+
+    /*
+     * tipo = 0, todas as magias tipo = 1, todas que ele nao tem tipo = 2, todas
+     * que ele nao tem, mas pode ter pq tem o pre-requisito para aprender
+     */
+    public ComboBoxModel getFeiticoComboModel(int filtro) {
+        return FeiticoConverter.getFeiticoComboModel(filtro, getPersonagem());
+    }
+
+    public ComboBoxModel getFeiticoComboModelByOrdem(Ordem ordemSelecionada, boolean cbAll) {
+        GenericoComboBoxModel model;
+        if (ordemSelecionada == null || getPersonagem() == null || ordemSelecionada.getComboId().equals("0")) {
+            model = PersonagemConverter.getFeiticoComboModel(null, null);
+        } else if (cbAll) {
+            model = PersonagemConverter.getFeiticoComboModel(ordemSelecionada, null);
+        } else {
+            model = PersonagemConverter.getFeiticoComboModel(ordemSelecionada, getPersonagem());
+        }
+        return model;
+    }
+
+    public ComboBoxModel getNacaoComboModel() {
+        GenericoComboBoxModel model;
+        if (getPersonagem() == null) {
+            model = NacaoConverter.getNacaoComboModel(null);
+        } else {
+            model = NacaoConverter.getNacaoComboModel(getPersonagem().getNacao());
+        }
+        return model;
+    }
+
+    public String getParametroDisplay(int indexParametro) {
+        return PersonagemConverter.getParametroDisplay(getPersonagem(), indexModelOrdem, indexParametro);
+    }
+
+    public ComboBoxModel getCidadeComboModel(int tipo) {
+        return CidadeConverter.getCidadeComboModel(tipo, getPersonagem().getNacao());
+    }
+
+    public ComboBoxModel getPersonagensComboModel(int tipo) {
+        return PersonagemConverter.getPersonagensComboModel(tipo, getPersonagem());
+    }
+
+    public ComboBoxModel getProdutoComboModel(int tipo) {
+        return CenarioConverter.getInstance().getProdutoComboModel(tipo);
+    }
+
+    public PersonagemOrdem getPersonagemOrdem() {
+        return PersonagemConverter.getPersonagemOrdem(getPersonagem(), indexModelOrdem);
+    }
+
+    public ComboBoxModel getTaticasComboModel() {
+        return CenarioConverter.getInstance().getTaticaComboModel();
+    }
+
+    public ComboBoxModel getTropaTipoComboModel(int tipo) {
+        //tipo=0 then ALL; =1 then by city=char race
+        if (tipo == 0) {
+            return CenarioConverter.getInstance().getTropaTipoComboModel();
+        } else {
+            Raca racaPersonagem = personagemFacade.getNacaoRaca(getPersonagem());
+            CidadeFacade cid = new CidadeFacade();
+            Raca racaCidade = cid.getRaca(personagemFacade.getCidade(getPersonagem()));
+            return CenarioConverter.getInstance().getTropaTipoComboModel(racaCidade, racaPersonagem);
+        }
+    }
+
+    public GenericoTableModel getTropaTipoTableModel(Personagem personagem, SortedMap<String, Integer> vlInicial, int filtro) {
+        GenericoTableModel model = ExercitoConverter.getTropaTipoTableModel(personagem, vlInicial, filtro);
+        return model;
+    }
+
+    public GenericoTableModel getTropaTipoTableModel(Exercito guarnicao, SortedMap<String, Integer> vlInicial, int filtro) {
+        GenericoTableModel model = ExercitoConverter.getTropaTipoTableModel(guarnicao, vlInicial, filtro);
+        return model;
+    }
+
+    public GenericoTableModel getOrdemTableModel(Personagem personagem) {
+        if (personagem == null) {
+            return (null);
+        } else {
+            GenericoTableModel ordemModel = OrdemConverter.getOrdemModel(personagem);
+            return (ordemModel);
+        }
+    }
+
+    public GenericoComboBoxModel getOrdemComboModel(Personagem personagem, int ordemAtiva, boolean allOrders) {
+        if (personagem == null) {
+            return (null);
+        } else {
+            Ordem[] items = PersonagemConverter.getOrdemComboModel(personagem, ordemAtiva, allOrders);
+            GenericoComboBoxModel model = new GenericoComboBoxModel(items);
+            this.ordemComboModel = model;
+            return model;
+        }
+    }
+
+    public int getOrdemComboIndex(Personagem personagem, int index) {
+        try {
+            Ordem ordem = PersonagemConverter.getOrdem(personagem, index);
+            return this.ordemComboModel.getIndexByDisplay(ordem.getComboDisplay());
+        } catch (NullPointerException ex) {
+            return 0;
+        }
+    }
+
+    private SubTabOrdem getTabGui() {
+        return this.tabGui;
+    }
+
+    public String getPersonagemLocal() {
+        return personagemFacade.getCoordenadas(getPersonagem());
+    }
+
+    private void doSalvaAction() {
+        //recupera os parametros da ordem
+        //{Ordem, List parametroId, List ParametroDisplay}
+        PersonagemOrdem po = getTabGui().getOrdemQuadro();
+        po.setPersonagem(getPersonagem());
+        getDispatchManager().sendDispatchForChar(getPersonagem().getOrdem(indexModelOrdem), po);
+        String[] ordemDisplay = PersonagemConverter.setOrdem(getPersonagem(), indexModelOrdem, po);
+        getTabGui().setValueAt(ordemDisplay, indexModelOrdem);
+    }
+
+    public String getOrdemAjuda(Ordem ordemSelecionada) {
+        return AcaoConverter.getAjuda(ordemSelecionada);
+    }
+
+    private Personagem getPersonagem() {
+        return personagem;
+    }
+
+    public void setPersonagem(Personagem personagem) {
+        this.personagem = personagem;
+    }
+
+    /**
+     * Alguem acionou o botao para gravar ordens(JButton)
+     *
+     * @param e
+     */
+    @Override
+    public void actionPerformed(ActionEvent actionEvent) {
+        if (actionEvent.getSource() instanceof JTable) {
+            log.info(labels.getString("OPS.JTABLE.EVENT"));
+        } else if (actionEvent.getSource() instanceof JButton) {
+            JButton button = (JButton) actionEvent.getSource();
+            if ("jbOk".equals(button.getActionCommand())) {
+                try {
+                    doSalvaAction();
+                    getTabGui().doFindNextActionSlot();
+                } catch (NullPointerException ex) {
+                    //nao faz nada, ordens nao disponiveis...
+                }
+            } else if ("jbHelp".equals(button.getActionCommand())) {
+                //exibir ajuda.
+                getTabGui().doDisplayAjuda();
+            } else if ("jbClear".equals(button.getActionCommand())) {
+                getDispatchManager().sendDispatchForChar(getPersonagem().getOrdem(indexModelOrdem), null);
+                String[] ordemDisplay = PersonagemConverter.setOrdem(getPersonagem(), indexModelOrdem, null);
+                getTabGui().setValueAt(ordemDisplay, indexModelOrdem);
+            }
+        } else if (actionEvent.getSource() instanceof JComboBox) {
+            JComboBox jcMagia = (JComboBox) actionEvent.getSource();
+            if ("jcMagia".equals(jcMagia.getActionCommand())) {
+                try {
+                    getTabGui().setOrdemParametrosMagia((GenericoComboObject) jcMagia.getModel().getSelectedItem());
+                } catch (NullPointerException ex) {
+                    //nao faz nada, ordens nao disponiveis...
+                }
+            }
+        } else {
+            log.info(labels.getString("OPS.GENERAL.EVENT"));
+        }
+    }
+
+    /**
+     * Listener para a troca na combo de ordem...
+     *
+     * @param event
+     */
+    @Override
+    public void itemStateChanged(ItemEvent event) {
+        //Object source = event.getItemSelectable();
+        if (event.getSource() instanceof JCheckBox) {
+            JCheckBox cb = (JCheckBox) event.getSource();
+            //Now that we know which button was pushed, find out
+            //whether it was selected or deselected.
+            if ("cbOrdersAll".equals(cb.getActionCommand())) {
+                //nao faz diferenca se esta selecionado ou nao.
+                //&& event.getStateChange() == ItemEvent.DESELECTED
+                // eh apenas o refresh da combo.
+                getTabGui().doMudaOrdem(this.indexModelOrdem);
+            } else if ("cbOrdersDetach".equals(cb.getActionCommand())) {
+                //criar floating window para ordens
+                getTabGui().doDetachOrders(true);
+            }
+        }
+        if (event.getSource() instanceof JComboBox && event.getStateChange() == ItemEvent.SELECTED) {
+            JComboBox cb = (JComboBox) event.getSource();
+            try {
+                if ("cbOrdem".equals(cb.getActionCommand())) {
+                    getTabGui().setOrdemParametrosQuadro((GenericoComboObject) cb.getModel().getSelectedItem());
+                }
+            } catch (ClassCastException ex) {
+            }
+        }
+    }
+
+    /**
+     * listener para a tabela de ordens.
+     *
+     * @param event
+     */
+    @Override
+    public void valueChanged(ListSelectionEvent event) {
+        if (event.getValueIsAdjusting()) {
+            return;
+        }
+        ListSelectionModel lsm = (ListSelectionModel) event.getSource();
+        if (!lsm.isSelectionEmpty()) {
+            JTable table = this.getTabGui().getOrdemLista();
+            //pega o index da table
+            int rowIndex = lsm.getAnchorSelectionIndex();
+            //convete o index da table para o index do model
+            this.indexModelOrdem = table.convertRowIndexToModel(rowIndex);
+            getTabGui().doMudaOrdem(this.indexModelOrdem);
+            //segue daki
+            //agora pega a ordem e carrega o quadro de ordens.
+        }
+    }
+}
