@@ -100,6 +100,17 @@ public class CenarioConverter implements Serializable {
             java.lang.Boolean.class, java.lang.Boolean.class,
             java.lang.Boolean.class, java.lang.Boolean.class,
             java.lang.Boolean.class, java.lang.Boolean.class,
+            java.lang.Boolean.class, java.lang.Boolean.class,
+            java.lang.Boolean.class, java.lang.Boolean.class,
+            java.lang.Boolean.class, java.lang.Boolean.class,
+            java.lang.Boolean.class, java.lang.Boolean.class,
+            java.lang.Boolean.class, java.lang.Boolean.class,
+            java.lang.Boolean.class, java.lang.Boolean.class,
+            java.lang.Boolean.class, java.lang.Boolean.class,
+            java.lang.Boolean.class, java.lang.Boolean.class,
+            java.lang.Boolean.class, java.lang.Boolean.class,
+            java.lang.Boolean.class, java.lang.Boolean.class,
+            java.lang.Boolean.class, java.lang.Boolean.class,
             java.lang.Boolean.class, java.lang.Boolean.class
         });
         final boolean[] edit = new boolean[]{false, false, true, true, true, true, true, true, true, true};
