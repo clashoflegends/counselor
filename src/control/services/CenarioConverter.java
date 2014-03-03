@@ -6,6 +6,7 @@ package control.services;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
+import baseLib.GenericoTableModelPerCell;
 import business.facade.CenarioFacade;
 import business.services.ComparatorFactory;
 import java.io.Serializable;
@@ -90,7 +91,7 @@ public class CenarioConverter implements Serializable {
     }
 
     public static GenericoTableModel getPackageModel(List<Habilidade> packages, List<Nacao> nacoes) {
-        GenericoTableModel model = new GenericoTableModel(
+        GenericoTableModelPerCell model = new GenericoTableModelPerCell(
                 getPackageColNames(),
                 getPackageAsArray(packages, nacoes),
                 new Class[]{
@@ -113,8 +114,7 @@ public class CenarioConverter implements Serializable {
             java.lang.Boolean.class, java.lang.Boolean.class,
             java.lang.Boolean.class, java.lang.Boolean.class
         });
-        final boolean[] edit = new boolean[]{false, false, true, true, true, true, true, true, true, true};
-        model.setEditable(edit);
+        model.setEditable(getPackageEditable(packages, nacoes));
         return model;
     }
 
@@ -131,23 +131,66 @@ public class CenarioConverter implements Serializable {
 
     private static Object[][] getPackageAsArray(List<Habilidade> listaExibir, List<Nacao> nacoes) {
         if (listaExibir.isEmpty()) {
-            Object[][] ret = {{"", "", ""}};
+            Object[][] ret = {{"", ""}};
             return (ret);
         } else {
             int ii = 0;
             Object[][] ret = new Object[listaExibir.size()][getPackageColNames().length];
             ComparatorFactory.getComparatorComboDisplaySorter(listaExibir);
+            // Converte habilidades para um Array[] 
             for (Habilidade hab : listaExibir) {
-                // Converte TipoTropa para um Array[] 
                 int nn = 0;
                 ret[ii][nn++] = hab;
                 ret[ii][nn++] = hab.getCost();
                 for (Nacao nacao : nacoes) {
-                    ret[ii][nn++] = nacao.hasHabilidade(hab.getCodigo());
+                    ret[ii][nn++] = (Boolean) nacao.hasHabilidade(hab.getCodigo());
                 }
                 ii++;
             }
             return (ret);
+        }
+    }
+
+    private static boolean[][] getPackageEditable(List<Habilidade> listaExibir, List<Nacao> nacoes) {
+        if (listaExibir.isEmpty()) {
+            boolean[][] ret = {{false, false}};
+            return (ret);
+        } else {
+            int ii = 0;
+            boolean[][] editMap = new boolean[listaExibir.size()][getPackageColNames().length];
+            ComparatorFactory.getComparatorComboDisplaySorter(listaExibir);
+            // Converte habilidades para um Array[] 
+            for (Habilidade hab : listaExibir) {
+                List<Habilidade> filters = new ArrayList<Habilidade>();
+                for (Habilidade superAbilities : hab.getHabilidades().values()) {
+                    //add hab filters
+                    if (superAbilities.isFilter()) {
+                        filters.add(superAbilities);
+                    }
+                }
+                int nn = 0;
+                editMap[ii][nn++] = false;
+                editMap[ii][nn++] = false;
+                for (Nacao nacao : nacoes) {
+                    //if hab filter matches nation filter
+                    if (filters.isEmpty()) {
+                        editMap[ii][nn] = true;
+                    } else {
+                        for (Habilidade habilidade : nacao.getHabilidades().values()) {
+                            //only shows if nation has the same filter
+                            if (filters.contains(habilidade)) {
+                                editMap[ii][nn] = true;
+                                break;
+                            } else {
+                                editMap[ii][nn] = false;
+                            }
+                        }
+                    }
+                    nn++;
+                }
+                ii++;
+            }
+            return (editMap);
         }
     }
 }

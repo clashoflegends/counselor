@@ -148,7 +148,7 @@ public class WorldFacade implements Serializable {
     }
 
     public boolean isStartupPackages() {
-        return WorldManager.getInstance().getPartida().hasStartupPackages();
+        return WorldManager.getInstance().getPartida().isStartupPackages();
     }
 
     public boolean hasEmissario() {

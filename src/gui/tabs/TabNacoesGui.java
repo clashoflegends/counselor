@@ -318,7 +318,7 @@ public class TabNacoesGui extends TabBase implements Serializable {
             hab += String.format("- %s\n", elem.getNome());
         }
         for (Habilidade elem : nacaoFacade.getHabilidades(nacao)) {
-            if (!elem.isPackage()) {
+            if (!elem.isHidden()) {
                 hab += String.format("- %s\n", elem.getNome());
             }
         }
