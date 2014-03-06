@@ -403,7 +403,7 @@ public class CidadeConverter implements Serializable {
         if (!cenarioFacade.hasOrdensCidade(WorldFacade.getInstance().getCenario())) {
             return info;
         } else {
-            return cidadeFacade.getResultado(cidade) + info;
+            return cidadeFacade.getResultado(cidade) + "\n" + info;
         }
     }
 }
