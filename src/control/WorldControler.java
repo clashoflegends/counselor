@@ -760,6 +760,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                 return true; //dont try email
             } else {
+                SysApoio.showDialogError(labels.getString("ERROR"), labels.getString("ENVIAR.ERRO"));
                 this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                 return false;
             }
