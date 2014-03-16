@@ -367,27 +367,7 @@ public class CidadeConverter implements Serializable {
     }
 
     public static List<String> getInfo(Cidade cidade) {
-        StringRet ret = new StringRet();
-        if (cidade != null) {
-            ret.add(String.format(labels.getString("CIDADE.CAPITAL.DA.NACAO"),
-                    cidade.getComboDisplay(),
-                    SysApoio.iif(cidade.isCapital(), labels.getString("(CAPITAL)"), ""),
-                    nacaoFacade.getNome(cidade.getNacao())));
-            ret.addTab(String.format("%s: %s", labels.getString("TAMANHO"), BaseMsgs.cidadeTamanho[cidade.getTamanho()]));
-            ret.addTab(String.format("%s: %s", labels.getString("FORTIFICACOES"), BaseMsgs.cidadeFortificacao[cidade.getFortificacao()]));
-            if (cidade.getLealdade() > 0) {
-                ret.addTab(String.format("%s: %s (%s)",
-                        labels.getString("LEALDADE"),
-                        cidade.getLealdade(),
-                        cidade.getLealdade() - cidade.getLealdadeAnterior()));
-            } else {
-                ret.addTab(String.format("%s: %s", labels.getString("LEALDADE"), "?"));
-            }
-            ret.addTab(String.format("%s: %s", labels.getString("CIDADE.DOCAS"), BaseMsgs.cidadeDocas[cidade.getDocas()]));
-            ret.addTab(String.format("%s: %s", labels.getString("OCULTO"), cidadeFacade.getOculto(cidade)));
-            ret.addTab(String.format("%s: %s", labels.getString("SITIADO"), cidadeFacade.getSitiado(cidade)));
-        }
-        return ret.getList();
+        return cidadeFacade.getInfo(cidade);
     }
 
     private static List<Produto> getResourceList() {

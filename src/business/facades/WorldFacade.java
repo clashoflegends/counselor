@@ -4,12 +4,16 @@
  */
 package business.facades;
 
+import baseLib.BaseModel;
 import business.BussinessException;
 import business.facade.CenarioFacade;
 import control.MapaControler;
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import model.*;
@@ -111,8 +115,20 @@ public class WorldFacade implements Serializable {
         return WorldManager.getInstance().getPersonagens().values().iterator();
     }
 
+    public Collection<Cidade> getCidades() {
+        return WorldManager.getInstance().getCidades().values();
+    }
+
     public SortedMap<String, Personagem> listPersonagens() {
         return WorldManager.getInstance().getPersonagens();
+    }
+
+    public List<BaseModel> getActors() {
+        final int initialCapacity = WorldManager.getInstance().getPersonagens().size() + WorldManager.getInstance().getCidades().size();
+        final List<BaseModel> ret = new ArrayList<BaseModel>(initialCapacity);
+        ret.addAll(WorldManager.getInstance().getCidades().values());
+        ret.addAll(WorldManager.getInstance().getPersonagens().values());
+        return ret;
     }
 
     public SortedMap<String, Ordem> getOrdens() {
