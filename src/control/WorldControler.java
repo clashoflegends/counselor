@@ -14,7 +14,6 @@ import business.facade.CidadeFacade;
 import business.facade.OrdemFacade;
 import business.facade.PersonagemFacade;
 import business.facades.WorldFacade;
-import control.services.PersonagemConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.MainAboutBox;
@@ -562,31 +561,35 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      */
     private int setOrdens(Comando comando) {
         int ret = 0;
-        SortedMap<String, Personagem> listPers = WorldFacade.getInstance().listPersonagens();
-        for (Iterator<Personagem> lista = listPers.values().iterator(); lista.hasNext();) {
-            Personagem personagem = lista.next();
-            personagem.remAcoes();
+        SortedMap<String, BaseModel> listPers = new TreeMap<String, BaseModel>();
+        List<BaseModel> actors = WorldFacade.getInstance().getActors();
+        //limpa todas as ordens
+        for (BaseModel actor : WorldFacade.getInstance().getActors()) {
+            actor.remAcoes();
+            listPers.put(actor.getCodigo(), actor);
         }
         //limpa financas.
         getDispatchManager().sendDispatchForMsg(DispatchManager.CLEAR_FINANCES_FORECAST, "");
 
         try {
             //carrega as ordens personagem por personagem
+            final OrdemFacade ordemFacade = new OrdemFacade();
             for (ComandoDetail comandoDetail : comando.getOrdens()) {
-                Personagem personagem = listPers.get(comandoDetail.getPersonagemCodigo());
+                BaseModel actor = listPers.get(comandoDetail.getActorCodigo());
                 Ordem ordem = WorldFacade.getInstance().getOrdem(comandoDetail.getOrdemCodigo());
                 try {
                     //just to catch the NullPointerException
                     ordem.getNome();
-                    int indexOrdem = personagem.getAcaoSize();
+                    int indexOrdem = actor.getAcaoSize();
                     //recupera os parametros da ordem
                     PersonagemOrdem po = new PersonagemOrdem();
-                    po.setNome(personagem.getNome());
+                    po.setNome(actor.getNome());
                     po.setOrdem(ordem);
                     po.setParametrosDisplay(comandoDetail.getParametroDisplay());
                     po.setParametrosId(comandoDetail.getParametroId());
+                    //atualiza financas e outras dependencias
                     getDispatchManager().sendDispatchForChar(null, po);
-                    String[] ordemDisplay = PersonagemConverter.setOrdem(personagem, indexOrdem, po);
+                    ordemFacade.setOrdem(actor, indexOrdem, po);
                     //atualiza GUI
 //                    this.getGui().getTabPersonagem().setValueFor(ordemDisplay, personagem.getNome(), indexOrdem);
                     ret++;
@@ -599,7 +602,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             log.info(e);
         }
         SettingsManager.getInstance().setTableColumnAdjust(SysProperties.getProps("TableColumnAdjust", "0").equalsIgnoreCase("0"));
-        getDispatchManager().sendDispatchForMsg(DispatchManager.CHARACTER_RELOAD, "");
+        getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_RELOAD, "");
         SettingsManager.getInstance().setTableColumnAdjust(true);
         return ret;
     }

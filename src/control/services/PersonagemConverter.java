@@ -375,8 +375,8 @@ public class PersonagemConverter implements Serializable {
      * (Litoral), Aldeia de Rhodes da nação Persia.
      */
     public static String getResultado(Personagem personagem) {
-        Cenario cenario = WorldFacade.getInstance().getCenario();
-        return personagemFacade.getResultado(personagem, cenario) + getPericias(personagem);
+        //Cenario cenario = WorldFacade.getInstance().getCenario();
+        return personagemFacade.getResultado(personagem) + getPericias(personagem);
     }
 
     public static String getPericias(Personagem personagem) {
@@ -477,11 +477,10 @@ public class PersonagemConverter implements Serializable {
      * @param lista = primeiro elemento da lista é a ordem, demais sao os
      * parametros
      */
-    public static String[] setOrdem(Personagem personagem, int index, PersonagemOrdem pOrdem) {
-        ordemFacade.setOrdem(personagem, index, pOrdem);
-        return ordemFacade.getOrdemDisplay(personagem, index, WorldFacade.getInstance().getCenario(), WorldFacade.getInstance().getJogadorAtivo());
-    }
-
+//    public static String[] setOrdem(Personagem personagem, int index, PersonagemOrdem pOrdem) {
+//        ordemFacade.setOrdem(personagem, index, pOrdem);
+//        return ordemFacade.getOrdemDisplay(personagem, index, WorldFacade.getInstance().getCenario(), WorldFacade.getInstance().getJogadorAtivo());
+//    }
 //    public static Ordem getOrdem(Personagem personagem, int indexOrdem) {
 //        return ordemFacade.getOrdem(personagem, indexOrdem);
 //    }

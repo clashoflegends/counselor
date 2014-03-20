@@ -42,12 +42,12 @@ public class PersonagemControler extends ControlBase implements Serializable, Ac
 
     public PersonagemControler(TabPersonagensGui tabPersonagensGui) {
         this.tabGui = tabPersonagensGui;
-        registerDispatchManagerForMsg(DispatchManager.CHARACTER_RELOAD);
+        registerDispatchManagerForMsg(DispatchManager.ACTIONS_RELOAD);
     }
 
     @Override
     public void receiveDispatch(int msgName, String txt) {
-        if (msgName == DispatchManager.CHARACTER_RELOAD) {
+        if (msgName == DispatchManager.ACTIONS_RELOAD) {
             getTabGui().doLoadChars();
         }
     }

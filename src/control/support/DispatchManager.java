@@ -34,7 +34,7 @@ public class DispatchManager implements Serializable {
     public static final int LOCAL_CITY_REDRAW = 5;
     public static final int LOCAL_RANGE_CLICK = 6;
     public static final int PACKAGE_RELOAD = 7;
-    public static final int CHARACTER_RELOAD = 8;
+    public static final int ACTIONS_RELOAD = 8;
 
     private DispatchManager() {
     }

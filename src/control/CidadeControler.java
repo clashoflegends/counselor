@@ -42,6 +42,7 @@ public class CidadeControler extends ControlBase implements Serializable, Action
 
     public CidadeControler(TabCidadesGui tabGui) {
         this.tabCidadesGui = tabGui;
+        registerDispatchManagerForMsg(DispatchManager.ACTIONS_RELOAD);
 //        registerDispatchManagerForMsg(DispatchManager.LOCAL_CITY_REDRAW);
     }
 
@@ -68,6 +69,13 @@ public class CidadeControler extends ControlBase implements Serializable, Action
     @Override
     public void receiveDispatch(int msgName, Local local) {
         if (msgName == DispatchManager.LOCAL_CITY_REDRAW) {
+            getTabGui().setMainModel(getMainTableModel(getTabGui().getFiltro()));
+        }
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, String txt) {
+        if (msgName == DispatchManager.ACTIONS_RELOAD) {
             getTabGui().setMainModel(getMainTableModel(getTabGui().getFiltro()));
         }
     }
