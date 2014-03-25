@@ -109,7 +109,7 @@ public class PackageControler extends ControlBase implements Serializable, Table
                 int rowIndex = lsm.getAnchorSelectionIndex();
                 int modelIndex = table.convertRowIndexToModel(rowIndex);
                 Habilidade hab = (Habilidade) listaExibida.get(modelIndex);
-                getTabGui().doMudaAcao(hab);
+                getTabGui().doMudaPackage(hab);
                 //PENDING atualizar table mensagens
             }
         } catch (IndexOutOfBoundsException ex) {

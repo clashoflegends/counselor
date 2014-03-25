@@ -32,7 +32,7 @@ import persistence.local.WorldManager;
  * @author gurgel
  */
 public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui {
-
+    
     private static final Log log = LogFactory.getLog(TabPersonagensGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private PersonagemControler personagemControl;
@@ -53,7 +53,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         setIcone("/images/hex_personagem.gif");
         setTitle(titulo);
         setDica(dica);
-
+        
         iniciaConfig();
     }
 
@@ -190,7 +190,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     private void iniciaConfig() {
         //Cria o Controle da lista de Personagem
         personagemControl = new PersonagemControler(this);
-
+        
         stOrdens = new SubTabOrdem(this, getMapaControler());
 
         //configura grid de personagens
@@ -205,20 +205,20 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         //adiciona listeners
         comboFiltro.addActionListener(personagemControl);
         jtMainLista.getSelectionModel().addListSelectionListener(personagemControl);
-
+        
         doAddTabs();
-
+        
         doLoadChars();
     }
-
+    
     public Personagem getPersonagem() {
         return personagemAtivo;
     }
-
+    
     public void setPersonagem(Personagem personagem) {
         this.personagemAtivo = personagem;
     }
-
+    
     public JTable getMainLista() {
         return jtMainLista;
     }
@@ -234,7 +234,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         //seta primeira linha da tablemaster como selecionado e forca a carga dos detalhes.
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);
     }
-
+    
     @Override
     public void setValueAt(String[] ordemDisplay, int ordIndex) {
         this.jtMainLista.getModel().setValueAt(ordemDisplay[0] + ordemDisplay[1],
@@ -258,18 +258,18 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         TableModel model = personagemControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
         this.setMainModel(model);
     }
-
+    
     public void doPersonagemClear() {
         this.doTagHide();
         stOrdens.doOrdemClear();
     }
-
+    
     private void doConfigTabs() {
         stResults.setText(personagemControl.getResultado());
         doTabMagicItem();
         doTabSpells();
     }
-
+    
     private void doTabSpells() {
         if (personagemFacade.isMago(personagemAtivo)) {
             stSpells.setListModel(personagemControl.getFeiticoTableModel());
@@ -277,7 +277,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
             stSpells.setListModelClear();
         }
     }
-
+    
     private void doTabMagicItem() {
         if (personagemFacade.hasArtefatos(getPersonagem())) {
             stMagicItems.setListModel(personagemControl.getArtefatoTableModel());
@@ -288,9 +288,10 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
             detalhesPersonagem.remove(stMagicItems);
         }
     }
-
+    
     private void doAddTabs() {
         //config tabs
+        stResults.setFontText(detalhesPersonagem.getFont());
         detalhesPersonagem.addTab(labels.getString("ACAO"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/hex_personagem.gif")),
                 stOrdens, labels.getString("ORDERNS.TOOLTIP"));
@@ -303,7 +304,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
                     stSpells, labels.getString("FEITICOS.TOOLTIP"));
         }
     }
-
+    
     public void doPersonagemMuda(Personagem personagem) {
         setPersonagem(personagem);
         getMapaControler().printTag(personagemFacade.getLocal(personagem));

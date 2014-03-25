@@ -38,7 +38,7 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
         this.addTabBase(new TabNacoesGui(labels.getString("NACOES"), labels.getString("NACOES"), mapaControl));
         this.addTabBase(new TabFinancasGui(labels.getString("FINANCAS"), labels.getString("FINANCAS"), mapaControl));
         if (WorldFacade.getInstance().isStartupPackages() && WorldFacade.getInstance().getTurno() == 0) {
-            this.addTabBase(new TabPackagesGui(labels.getString("STARTUP"), labels.getString("STARTUP.DISPONIVEL")));
+            this.addTabBase(new TabPackagesGui(labels.getString("STARTUP"), labels.getString("STARTUP.DISPONIVEL"), mapaControl));
         }
         this.addTabBase(new TabPartidaGui(labels.getString("PARTIDA"), labels.getString("PARTIDA.TOOLTIP")));
         this.addTabBase(new TabAcoesGui(labels.getString("ACOES"), labels.getString("ACOES.DISPONIVEL")));

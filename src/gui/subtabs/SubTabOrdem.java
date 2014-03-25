@@ -423,6 +423,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
         jtListaOrdens.setAutoCreateRowSorter(true);
 
         //configura jDialog
+        stAjuda.setFontMonospaced();
         dAjuda.add(stAjuda);
         dAjuda.setTitle(labels.getString("AJUDA"));
         dAjuda.setAlwaysOnTop(true);
@@ -737,7 +738,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
             cNovo = jtTemp;
         } else if (controle.equals(COORDENADA)) {            //Coordenada
             //Novo combobox com locais dentro do range
-            int range = 9999;
+            final int range = 9999;
             String vlDefault = null;
             try {
                 vlDefault = ordemGravada.getParametrosId().get(nuParametro);
@@ -749,7 +750,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
             cNovo = jpTemp;
         } else if (controle.equals(COORDENADAW)) {            //Coordenada
             //Novo combobox com locais dentro do range
-            int range = 9999;
+            final int range = 9999;
             String vlDefault = null;
             try {
                 vlDefault = ordemGravada.getParametrosId().get(nuParametro);
@@ -761,7 +762,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
             cNovo = jpTemp;
         } else if (controle.equals(COORDENADA_8)) {            //Coordenada-8
             //Novo combobox com locais dentro do range
-            int range = 8;
+            final int range = 8;
             String vlDefault = null;
             try {
                 vlDefault = ordemGravada.getParametrosId().get(nuParametro);
@@ -773,7 +774,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
             cNovo = jpTemp;
         } else if (controle.equals(COORDENADA_8W)) {            //Coordenada-8
             //Novo combobox com locais dentro do range
-            int range = 8;
+            final int range = 8;
             String vlDefault = null;
             try {
                 vlDefault = ordemGravada.getParametrosId().get(nuParametro);
@@ -786,7 +787,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
         } else if (controle.equals(COORDENADA_12)) {
             //Coordenada-12
             //Novo combobox com locais dentro do range
-            int range = 12;
+            final int range = 12;
             String vlDefault = null;
             try {
                 vlDefault = ordemGravada.getParametrosId().get(nuParametro);

@@ -21,6 +21,7 @@ import java.io.Serializable;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
+import model.Cenario;
 import model.Cidade;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,10 +38,13 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     private static final Log log = LogFactory.getLog(TabCidadesGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private CidadeControler cidadeControl;
+//    private SubTabConfigActor stRename = new SubTabConfigActor();
     private SubTabTextArea stResults = new SubTabTextArea();
     private SubTabBaseList stPersonagens = new SubTabBaseList();
     private SubTabBaseList stProdutos = new SubTabBaseList();
     private SubTabOrdem stOrdens;
+    private CenarioFacade cenarioFacade = new CenarioFacade();
+    private Cenario cenario;
 
     /**
      * Creates new form TabCidadesGui
@@ -144,8 +148,8 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
                     .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(qtCidades)
                     .addComponent(jLabel5))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(detalhesCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -173,6 +177,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     // End of variables declaration//GEN-END:variables
 
     private void initConfig() {
+        cenario = WorldFacade.getInstance().getCenario();
         stOrdens = new SubTabOrdem(this, getMapaControler());
         jtMainLista.setAutoCreateColumnsFromModel(true);
         jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -190,6 +195,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
 
         TableModel model = cidadeControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
         this.setMainModel(model);
+        stResults.setFontText(detalhesCidade.getFont());
         doAddTabs();
     }
 
@@ -225,8 +231,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
 
     private void doAddTabs() {
         //config tabs
-        CenarioFacade cenarioFacade = new CenarioFacade();
-        if (cenarioFacade.hasOrdensCidade(WorldFacade.getInstance().getCenario())) {
+        if (cenarioFacade.hasOrdensCidade(cenario)) {
             detalhesCidade.addTab(labels.getString("ACAO"),
                     new javax.swing.ImageIcon(getClass().getResource("/images/right.gif")),
                     stOrdens, labels.getString("ORDERNS.TOOLTIP"));
@@ -234,7 +239,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
                     new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png")),
                     stResults, labels.getString("RESULTADOS.TOOLTIP"));
         }
-        if (cenarioFacade.hasResourceManagement(WorldFacade.getInstance().getCenario())) {
+        if (cenarioFacade.hasResourceManagement(cenario)) {
             detalhesCidade.addTab(labels.getString("ESTOQUES"),
                     new javax.swing.ImageIcon(getClass().getResource("/images/financas.gif")),
                     stProdutos, labels.getString("ESTOQUE.TOOLTIP"));
@@ -242,7 +247,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         detalhesCidade.addTab(labels.getString("PRESENCAS"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/hex_personagem.gif")),
                 stPersonagens, labels.getString("PRESENCA.TOOLTIP"));
-        if (!cenarioFacade.hasOrdensCidade(WorldFacade.getInstance().getCenario())) {
+        if (!cenarioFacade.hasOrdensCidade(cenario)) {
             //resultados no final.
             detalhesCidade.addTab(labels.getString("RESULTADOS"),
                     new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png")),
@@ -266,6 +271,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         stProdutos.setListModel(CidadeConverter.getProdutoModel(cidade));
         stPersonagens.setListModel(CidadeConverter.getPresencasModel(cidade));
         stResults.setText(cidadeControl.getResultados(cidade));
+//        stRename.doMudaActor(cidade);
         stOrdens.doMudaActor(cidade);
     }
 }

@@ -12,7 +12,6 @@ package gui;
 
 import baseLib.SysApoio;
 import gui.components.ButtonLink;
-import gui.subtabs.SubTabTextArea;
 import java.io.Serializable;
 import javax.swing.GroupLayout;
 import org.apache.commons.logging.Log;
@@ -26,7 +25,7 @@ import persistence.SettingsManager;
  */
 public class MainAboutBox extends TabBase implements Serializable {
 
-    private static final Log log = LogFactory.getLog(SubTabTextArea.class);
+    private static final Log log = LogFactory.getLog(MainAboutBox.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
     /**
