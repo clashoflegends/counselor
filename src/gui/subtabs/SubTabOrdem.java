@@ -600,8 +600,8 @@ public class SubTabOrdem extends TabBase implements Serializable {
                         IBaseModel par = temp.getCoordenadaSelected();
                         tempId = par.getComboId();
                         tempDisplay = par.getComboDisplay();
-                    } else if (parametrosCombos.get(ii) instanceof subTabRelacionamentos) {
-                        subTabRelacionamentos temp = (subTabRelacionamentos) parametrosCombos.get(ii);
+                    } else if (parametrosCombos.get(ii) instanceof SubTabRelacionamentos) {
+                        SubTabRelacionamentos temp = (SubTabRelacionamentos) parametrosCombos.get(ii);
                         tempId = temp.getParametrosId();
                         tempDisplay = temp.getParametrosDisplay();
                     }
@@ -859,7 +859,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
             } catch (Exception e) {
                 //do nothing if ANY exception happened
             }
-            subTabRelacionamentos jpTemp = new subTabRelacionamentos(vlDefault, getActor().getNacao(),
+            SubTabRelacionamentos jpTemp = new SubTabRelacionamentos(vlDefault, getActor().getNacao(),
                     getActor().getNacaoComboModel(), isAllSelected());
             cNovo = jpTemp;
         } else if (controle.equals(NOME)) {//Nome

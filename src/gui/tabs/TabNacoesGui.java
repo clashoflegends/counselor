@@ -6,9 +6,14 @@
 package gui.tabs;
 
 import business.facade.NacaoFacade;
+import business.facades.WorldFacade;
 import control.MapaControler;
 import control.NacaoControler;
 import gui.TabBase;
+import gui.services.IAcaoGui;
+import gui.subtabs.SubTabBaseList;
+import gui.subtabs.SubTabOrdem;
+import gui.subtabs.SubTabTextArea;
 import java.io.Serializable;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -25,43 +30,24 @@ import persistence.SettingsManager;
  *
  * @author gurgel
  */
-public class TabNacoesGui extends TabBase implements Serializable {
+public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
 
     private static final Log log = LogFactory.getLog(TabNacoesGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private NacaoControler nacaoControl;
+    private SubTabTextArea stResults = new SubTabTextArea();
+    private SubTabBaseList stDiplomacy = new SubTabBaseList();
+    private SubTabBaseList stTroops = new SubTabBaseList();
+    private SubTabOrdem stOrdens;
 
     public TabNacoesGui(String titulo, String dica, MapaControler mapaControl) {
         initComponents();
         //Basico
-        setIcone("/images/cp_acampamento.gif");
+        setIcone("/images/nation-icon.png");
         setTitle(titulo);
         setDica(dica);
         this.setMapaControler(mapaControl);
-        //configura grid
-        jtMainLista.setAutoCreateColumnsFromModel(true);
-        jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jtMainLista.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jtMainLista.setAutoCreateRowSorter(true);
-        jtRelacionamento.setAutoCreateColumnsFromModel(true);
-        jtRelacionamento.setAutoCreateRowSorter(true);
-        jtRelacionamento.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jtRelacionamento.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jtTropas.setAutoCreateColumnsFromModel(true);
-        jtTropas.setAutoCreateRowSorter(true);
-        jtTropas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jtTropas.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        comboFiltro.setName("comboFiltro");
-        comboFiltro.setSelectedIndex(this.getFiltroDefault());
-        //Cria o Controle da lista 
-        nacaoControl = new NacaoControler(this);
-
-        //adiciona listeners
-        comboFiltro.addActionListener(nacaoControl);
-        jtMainLista.getSelectionModel().addListSelectionListener(nacaoControl);
-
-        TableModel model = nacaoControl.getMainTableModel(this.getFiltro());
-        this.setMainModel(model);
+        initConfig();
     }
 
     /**
@@ -75,17 +61,12 @@ public class TabNacoesGui extends TabBase implements Serializable {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jtRelacionamento = new javax.swing.JTable();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txDescricao = new javax.swing.JTextPane();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         comboFiltro = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         qtNacoes = new javax.swing.JLabel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jtTropas = new javax.swing.JTable();
+        detalhesNacao = new javax.swing.JTabbedPane();
 
         jtMainLista.setAutoCreateRowSorter(true);
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
@@ -116,38 +97,6 @@ public class TabNacoesGui extends TabBase implements Serializable {
         });
         jtMainLista.setName(""); // NOI18N
         jScrollPane3.setViewportView(jtMainLista);
-
-        jtRelacionamento.setAutoCreateRowSorter(true);
-        jtRelacionamento.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
-            },
-            new String [] {
-                "Nome", "Relacionamento"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jtRelacionamento.setName(""); // NOI18N
-        jScrollPane2.setViewportView(jtRelacionamento);
-
-        jScrollPane1.setViewportView(txDescricao);
 
         jLabel2.setText(labels.getString("TOTAL:")); // NOI18N
 
@@ -184,30 +133,13 @@ public class TabNacoesGui extends TabBase implements Serializable {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jtTropas.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane4.setViewportView(jtTropas);
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+            .addComponent(detalhesNacao)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -216,11 +148,7 @@ public class TabNacoesGui extends TabBase implements Serializable {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 106, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE))
+                .addComponent(detalhesNacao, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -236,19 +164,14 @@ public class TabNacoesGui extends TabBase implements Serializable {
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox comboFiltro;
+    private javax.swing.JTabbedPane detalhesNacao;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTable jtMainLista;
-    private javax.swing.JTable jtRelacionamento;
-    private javax.swing.JTable jtTropas;
     private javax.swing.JLabel qtNacoes;
-    private javax.swing.JTextPane txDescricao;
     // End of variables declaration//GEN-END:variables
 
     public JTable getMainLista() {
@@ -256,9 +179,9 @@ public class TabNacoesGui extends TabBase implements Serializable {
     }
 
     public final void setMainModel(TableModel model) {
-        this.txDescricao.setText("");
-        this.setRelacionamentoModel(null);
-        this.setTropaModel(null);
+        stResults.setText("");
+        stDiplomacy.setListModelClear();
+        stTroops.setListModelClear();
         this.jtMainLista.setModel(model);
         this.calcColumnWidths(jtMainLista);
         this.updateGui();
@@ -274,44 +197,14 @@ public class TabNacoesGui extends TabBase implements Serializable {
         this.qtNacoes.setText(getMainLista().getRowCount() + "");
     }
 
-    private void setRelacionamentoModel(TableModel model) {
-        if (model == null) {
-            jtRelacionamento.setModel(new javax.swing.table.DefaultTableModel(
-                    new Object[][]{
-                {"-", "-"}},
-                    new String[]{
-                labels.getString("NACAO"), labels.getString("RELACIONAMENTO")
-            }));
-        } else {
-            this.jtRelacionamento.setModel(model);
-            calcColumnWidths(jtRelacionamento);
-        }
-        this.updateGui();
-    }
-
-    private void setTropaModel(TableModel model) {
-        if (model == null) {
-            jtTropas.setModel(new javax.swing.table.DefaultTableModel(
-                    new Object[][]{
-                {"-", "-"}},
-                    new String[]{
-                labels.getString("TROPA"), labels.getString("CUSTO.MANUTENCAO")
-            }));
-        } else {
-            this.jtTropas.setModel(model);
-            calcColumnWidths(jtTropas);
-        }
-        this.updateGui();
-    }
-
     public void doMudaNacao(Nacao nacao) {
         try {
             getMapaControler().printTag(nacao.getCapital().getLocal());
         } catch (NullPointerException ex) {
             this.doTagHide();
         }
-        setRelacionamentoModel(nacaoControl.getRelacionamentoTableModel(nacao));
-        setTropaModel(nacaoControl.getTropaTableModel(nacao));
+        stDiplomacy.setListModel(nacaoControl.getRelacionamentoTableModel(nacao));
+        stTroops.setListModel(nacaoControl.getTropaTableModel(nacao));
         String hab = labels.getString("HABILIDADES.ESPECIAIS") + "\n";
         NacaoFacade nacaoFacade = new NacaoFacade();
         for (HabilidadeNacao elem : nacaoFacade.getHabilidadesNacao(nacao)) {
@@ -331,6 +224,49 @@ public class TabNacoesGui extends TabBase implements Serializable {
             //just skip
             hab += labels.getString("?");
         }
-        this.txDescricao.setText(hab);
+        stResults.setText(hab);
+    }
+
+    private void initConfig() {
+        stOrdens = new SubTabOrdem(this, getMapaControler());
+        //configura grid
+        jtMainLista.setAutoCreateColumnsFromModel(true);
+        jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jtMainLista.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jtMainLista.setAutoCreateRowSorter(true);
+        comboFiltro.setName("comboFiltro");
+        comboFiltro.setSelectedIndex(this.getFiltroDefault());
+        //Cria o Controle da lista 
+        nacaoControl = new NacaoControler(this);
+        stResults.setFontText(detalhesNacao.getFont());
+        addTabs();
+        //adiciona listeners
+        comboFiltro.addActionListener(nacaoControl);
+        jtMainLista.getSelectionModel().addListSelectionListener(nacaoControl);
+
+        TableModel model = nacaoControl.getMainTableModel(this.getFiltro());
+        this.setMainModel(model);
+    }
+
+    private void addTabs() {
+        if (WorldFacade.getInstance().isStartupPackages() && WorldFacade.getInstance().getTurno() == 0) {
+            detalhesNacao.addTab(labels.getString("STARTUP"),
+                    new javax.swing.ImageIcon(getClass().getResource("/images/package_icon.gif")),
+                    stOrdens, labels.getString("STARTUP.TOOLTIP"));
+        }
+        detalhesNacao.addTab(labels.getString("RESULTADOS"),
+                new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png")),
+                stResults, labels.getString("RESULTADOS.TOOLTIP"));
+        detalhesNacao.addTab(labels.getString("DIPLOMACY"),
+                new javax.swing.ImageIcon(getClass().getResource("/images/diplomacy.gif")),
+                stDiplomacy, labels.getString("DIPLOMACY.TOOLTIP"));
+        detalhesNacao.addTab(labels.getString("TROPAS"),
+                new javax.swing.ImageIcon(getClass().getResource("/images/hex_exercito.gif")),
+                stTroops, labels.getString("TROPAS.DISPONIVEL"));
+    }
+
+    @Override
+    public void setValueAt(String[] ordemDisplay, int ordIndex) {
+        //not implemented.
     }
 }

@@ -12,8 +12,10 @@ package gui.subtabs;
 
 import gui.TabBase;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.io.Serializable;
+import javax.swing.GroupLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
@@ -104,5 +106,11 @@ public class SubTabTextArea extends TabBase implements Serializable {
 
     public void setFontText(Font f) {
         jtaTextArea.setFont(f);
+    }
+
+    public void replace(Component oldComponent) {
+        GroupLayout parLayout = (GroupLayout) oldComponent.getParent().getLayout();
+        parLayout.replace(oldComponent, this);
+
     }
 }
