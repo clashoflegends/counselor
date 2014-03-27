@@ -7,7 +7,7 @@ package control;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import business.facade.NacaoFacade;
-import gui.subtabs.SubTabRelacionamentos;
+import gui.subtabs.SubTabRelacionamento;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.Serializable;
@@ -26,7 +26,7 @@ public class NacaoRelacionamentoControl implements ItemListener, Serializable {
 
     private static final Log log = LogFactory.getLog(NacaoRelacionamentoControl.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private SubTabRelacionamentos tabGui;
+    private SubTabRelacionamento tabGui;
     private Nacao nacaoBase;
     private NacaoFacade nacaoFacade = new NacaoFacade();
 
@@ -67,14 +67,14 @@ public class NacaoRelacionamentoControl implements ItemListener, Serializable {
     /**
      * @return the tabGui
      */
-    public SubTabRelacionamentos getTabGui() {
+    public SubTabRelacionamento getTabGui() {
         return tabGui;
     }
 
     /**
      * @param tabGui the tabGui to set
      */
-    public void setTabGui(SubTabRelacionamentos tabGui) {
+    public void setTabGui(SubTabRelacionamento tabGui) {
         this.tabGui = tabGui;
     }
 }

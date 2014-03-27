@@ -21,9 +21,9 @@ import persistence.SettingsManager;
  *
  * @author jmoura
  */
-public final class SubTabRelacionamentos extends TabBase implements Serializable {
+public final class SubTabRelacionamento extends TabBase implements Serializable {
 
-    private static final Log log = LogFactory.getLog(SubTabRelacionamentos.class);
+    private static final Log log = LogFactory.getLog(SubTabRelacionamento.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private NacaoRelacionamentoControl relControl = new NacaoRelacionamentoControl();
     NacaoFacade nacaoFacade = new NacaoFacade();
@@ -31,14 +31,14 @@ public final class SubTabRelacionamentos extends TabBase implements Serializable
     /**
      * don't use
      */
-    private SubTabRelacionamentos() {
+    private SubTabRelacionamento() {
         initComponents();
     }
 
     /**
      * Creates new form subTabRelacionamentos
      */
-    public SubTabRelacionamentos(String vlDefault, Nacao nacao, ComboBoxModel nacaoComboModel, boolean all) {
+    public SubTabRelacionamento(String vlDefault, Nacao nacao, ComboBoxModel nacaoComboModel, boolean all) {
         initComponents();
         relControl.setNacaoBase(nacao);
         relControl.setTabGui(this);
