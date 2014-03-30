@@ -32,7 +32,7 @@ public class CidadeConverter implements Serializable {
     private static final CidadeFacade cidadeFacade = new CidadeFacade();
     private static final ExercitoFacade exercitoFacade = new ExercitoFacade();
     private static final LocalFacade localFacade = new LocalFacade();
-    private static final NacaoFacade nacaoFacade = new NacaoFacade();
+    private static final OrdemFacade ordemFacade = new OrdemFacade();
     private static final PersonagemFacade personagemFacade = new PersonagemFacade();
     private static final ListFactory listFactory = new ListFactory();
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
@@ -380,7 +380,7 @@ public class CidadeConverter implements Serializable {
         if (!cenarioFacade.hasOrdensCidade(WorldFacade.getInstance().getCenario())) {
             return info;
         } else {
-            return cidadeFacade.getResultado(cidade) + "\n" + info;
+            return ordemFacade.getResultado(cidade) + "\n" + info;
         }
     }
 }

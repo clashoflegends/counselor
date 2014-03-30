@@ -66,7 +66,7 @@ public class NacaoConverter implements Serializable {
         cArray[ii++] = nacaoFacade.getRacaNome(nacao);
         cArray[ii++] = nacaoFacade.getPontos(nacao);
         cArray[ii++] = SysApoio.iif(nacaoFacade.isAtiva(nacao), labels.getString("ATIVA"), labels.getString("INATIVA"));
-        cArray[ii++] = nacaoFacade.getCapital(nacao);
+        cArray[ii++] = nacaoFacade.getCoordenadasCapital(nacao);
         cArray[ii++] = nacaoFacade.getJogadorDisplay(nacao);
         cArray[ii++] = nacaoFacade.getJogadorEmail(nacao);
         cArray[ii++] = nacaoFacade.getTropasQt(nacao);

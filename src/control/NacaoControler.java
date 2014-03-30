@@ -6,6 +6,8 @@ package control;
 
 import baseLib.GenericoTableModel;
 import control.services.NacaoConverter;
+import control.support.ControlBase;
+import control.support.DispatchManager;
 import gui.tabs.TabNacoesGui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,7 +28,7 @@ import persistence.SettingsManager;
  *
  * @author gurgel
  */
-public class NacaoControler implements Serializable, ActionListener, ListSelectionListener {
+public class NacaoControler extends ControlBase implements Serializable, ActionListener, ListSelectionListener {
 
     private static final Log log = LogFactory.getLog(NacaoControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
@@ -37,6 +39,7 @@ public class NacaoControler implements Serializable, ActionListener, ListSelecti
 
     public NacaoControler(TabNacoesGui tabGui) {
         this.tabNacaoGui = tabGui;
+        registerDispatchManagerForMsg(DispatchManager.ACTIONS_RELOAD);
     }
 
     public GenericoTableModel getMainTableModel(int filtro) {
@@ -65,6 +68,13 @@ public class NacaoControler implements Serializable, ActionListener, ListSelecti
 
     public TabNacoesGui getTabGui() {
         return tabNacaoGui;
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, String txt) {
+        if (msgName == DispatchManager.ACTIONS_RELOAD) {
+            getTabGui().setMainModel(getMainTableModel(getTabGui().getFiltro()));
+        }
     }
 
     @Override

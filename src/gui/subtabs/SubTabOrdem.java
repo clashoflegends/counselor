@@ -1167,6 +1167,11 @@ public class SubTabOrdem extends TabBase implements Serializable {
         doMudaActor();
     }
 
+    public void doMudaActor(Nacao nacao) {
+        this.actor = ActorInterfaceFactory.getInstance().getActorInterface(nacao);
+        doMudaActor();
+    }
+
     private void doMudaActor() {
         this.getMapaControler().remMovementTag();
         //ordens do actor

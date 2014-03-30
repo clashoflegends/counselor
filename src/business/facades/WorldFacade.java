@@ -92,6 +92,16 @@ public class WorldFacade implements Serializable {
         return ret;
     }
 
+    public List<Nacao> getNacoesJogadorAtivo() {
+        List<Nacao> ret = new ArrayList<Nacao>();
+        for (Nacao nacao : WorldManager.getInstance().getNacoes().values()) {
+            if (WorldManager.getInstance().getPartida().getJogadorAtivo() == nacao.getOwner()) {
+                ret.add(nacao);
+            }
+        }
+        return ret;
+    }
+
     public boolean isJogadorAtivoEliminado(Jogador jogadorAtivo) {
         boolean ret = true;
         for (Nacao nacao : WorldManager.getInstance().getNacoes().values()) {
@@ -124,8 +134,10 @@ public class WorldFacade implements Serializable {
     }
 
     public List<BaseModel> getActors() {
-        final int initialCapacity = WorldManager.getInstance().getPersonagens().size() + WorldManager.getInstance().getCidades().size();
+        final int initialCapacity = 25 + WorldManager.getInstance().getPersonagens().size()
+                + WorldManager.getInstance().getCidades().size();
         final List<BaseModel> ret = new ArrayList<BaseModel>(initialCapacity);
+        ret.addAll(WorldManager.getInstance().getNacoesJogadorAtivo());
         ret.addAll(WorldManager.getInstance().getCidades().values());
         ret.addAll(WorldManager.getInstance().getPersonagens().values());
         return ret;
@@ -165,6 +177,10 @@ public class WorldFacade implements Serializable {
 
     public boolean isStartupPackages() {
         return WorldManager.getInstance().getPartida().isStartupPackages();
+    }
+
+    public boolean isNationPackages() {
+        return WorldManager.getInstance().getPartida().isNationPackages();
     }
 
     public boolean hasEmissario() {

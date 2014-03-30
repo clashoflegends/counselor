@@ -11,6 +11,7 @@ import business.BussinessException;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
+import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
 import business.facade.PersonagemFacade;
 import business.facades.WorldFacade;
@@ -45,7 +46,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private boolean saved = false;
     private boolean savedWorld = false;
     private MainResultWindowGui gui = null;
-    private AcaoFacade acaoFacade = new AcaoFacade();
+    private final AcaoFacade acaoFacade = new AcaoFacade();
+    private final OrdemFacade ordemFacade = new OrdemFacade();
+    private final CidadeFacade cidadeFacade = new CidadeFacade();
+    private final NacaoFacade nacaoFacade = new NacaoFacade();
+    private final CenarioFacade cenarioFacade = new CenarioFacade();
+    private final PersonagemFacade personagemFacade = new PersonagemFacade();
 
     public WorldControler(MainResultWindowGui aGui) {
         this.gui = aGui;
@@ -345,19 +351,21 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private String listaOrdens() {
-        CenarioFacade cenarioFacade = new CenarioFacade();
-        if (cenarioFacade.hasOrdensCidade(WorldFacade.getInstance().getCenario())) {
-            return listaOrdensBySequence() + "\n\n" + listaOrdensByCity() + "\n\n" + listaOrdensByPers();
-        } else if (SysProperties.getProps("CopyActionsOrder", "1").equals("1")) {
-            return listaOrdensBySequence() + "\n\n" + listaOrdensByPers();
-        } else {
-            return listaOrdensByPers();
+        String ret = listaOrdensBySequence() + "\n\n";
+        if (cenarioFacade.hasOrdensNacao(WorldFacade.getInstance().getPartida())) {
+            ret += listaOrdensByNation() + "\n\n";
         }
+        if (cenarioFacade.hasOrdensCidade(WorldFacade.getInstance().getCenario())) {
+            ret += listaOrdensByCity() + "\n\n";
+        }
+        if (!SysProperties.getProps("CopyActionsOrder", "1").equals("1")) {
+            ret += listaOrdensByPers() + "\n\n";
+        }
+        return ret;
     }
 
     private String listaOrdensByPers() {
         String ret = labels.getString("TITLE.LIST.BYCHAR") + ":\n";
-        PersonagemFacade personagemFacade = new PersonagemFacade();
         Jogador jogadorAtivo = WorldFacade.getInstance().getJogadorAtivo();
         //lista todos os personagens
         for (Iterator<Personagem> iter = WorldFacade.getInstance().getPersonagens(); iter.hasNext();) {
@@ -393,17 +401,33 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private String listaOrdensByCity() {
         String ret = labels.getString("TITLE.LIST.BYCITY") + ":\n";
-        CidadeFacade cidadeFacade = new CidadeFacade();
-        Jogador jogadorAtivo = WorldFacade.getInstance().getJogadorAtivo();
+        final Jogador jogadorAtivo = WorldFacade.getInstance().getJogadorAtivo();
         //lista todos as cidades
         for (Cidade cidade : WorldFacade.getInstance().getCidades()) {
             if (jogadorAtivo.isNacao(cidade.getNacao())) {
-                ret += cidadeFacade.getInfoTitle(cidade);
+                for (String msg : cidadeFacade.getInfoTitle(cidade)) {
+                    ret += msg;
+                }
                 ret += "\n";
-                ret += cidadeFacade.getResultado(cidade);
+                ret += ordemFacade.getResultado(cidade);
                 ret += getActorOrdersString(cidade);
                 ret += "\n";
             }
+        }
+        return ret;
+    }
+
+    private String listaOrdensByNation() {
+        String ret = labels.getString("TITLE.LIST.BYNATION") + ":\n";
+        //lista todos as cidades
+        for (Nacao nacao : WorldFacade.getInstance().getNacoesJogadorAtivo()) {
+            for (String msg : nacaoFacade.getInfoTitle(nacao)) {
+                ret += msg;
+            }
+            ret += "\n";
+            ret += ordemFacade.getResultado(nacao);
+            ret += getActorOrdersString(nacao);
+            ret += "\n";
         }
         return ret;
     }
@@ -562,7 +586,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private int setOrdens(Comando comando) {
         int ret = 0;
         SortedMap<String, BaseModel> listPers = new TreeMap<String, BaseModel>();
-        List<BaseModel> actors = WorldFacade.getInstance().getActors();
         //limpa todas as ordens
         for (BaseModel actor : WorldFacade.getInstance().getActors()) {
             actor.remAcoes();
@@ -573,7 +596,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
         try {
             //carrega as ordens personagem por personagem
-            final OrdemFacade ordemFacade = new OrdemFacade();
             for (ComandoDetail comandoDetail : comando.getOrdens()) {
                 BaseModel actor = listPers.get(comandoDetail.getActorCodigo());
                 Ordem ordem = WorldFacade.getInstance().getOrdem(comandoDetail.getOrdemCodigo());
@@ -658,7 +680,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         //salva o arquivo
         try {
             String filename = PersistFactory.getWorldDao().save(world, fc.getSelectedFile());
-            this.getGui().setStatusMsg(String.format(labels.getString("WORLD.SALVAS"), world.getLocais().size(), fc.getSelectedFile().getName()));
+            this.getGui().setStatusMsg(String.format(labels.getString("WORLD.SALVAS"), world.getLocais().size(), filename));
             this.savedWorld = true;
         } catch (PersistenceException ex) {
             log.fatal("Can't save???", ex);
@@ -668,7 +690,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private boolean doSaveActorActions(Jogador jogadorAtivo, Comando comando) {
         boolean missing = false;
         //lista todos os personagens, carregando para o xml
-        OrdemFacade ordemFacade = new OrdemFacade();
         for (BaseModel actor : WorldFacade.getInstance().getActors()) {
             if (!ordemFacade.isAtivo(jogadorAtivo, actor)) {
                 continue;
@@ -690,33 +711,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
         return missing;
     }
-//
-//    private boolean doSaveCharActions(Jogador jogadorAtivo, Comando comando) {
-//        boolean missing = false;
-//        //lista todos os personagens, carregando para o xml
-//        PersonagemFacade personagemFacade = new PersonagemFacade();
-//        OrdemFacade ordemFacade = new OrdemFacade();
-//        for (Personagem personagem : WorldFacade.getInstance().listPersonagens().values()) {
-//            if (!jogadorAtivo.isNacao(personagem.getNacao()) || !personagemFacade.isAtivo(personagem)) {
-//                continue;
-//            }
-//            if (personagem.getAcaoSize() > 0) {
-//                for (int index = 0; index < WorldFacade.getInstance().getOrdensQt(personagem); index++) {
-//                    if (ordemFacade.getOrdem(personagem, index) != null) {
-//                        comando.addComando(personagem, ordemFacade.getOrdem(personagem, index),
-//                                ordemFacade.getParametrosId(personagem, index),
-//                                ordemFacade.getParametrosDisplay(personagem, index));
-//                    } else {
-//                        missing = true;
-//                    }
-//                }
-//            } else {
-//                missing = true;
-//            }
-//
-//        }
-//        return missing;
-//    }
 
     private boolean doSavePackages(Comando comando) {
         boolean missing = true;
@@ -770,7 +764,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private void clearPackages(Nacao nacao) {
-        for (Habilidade habilidade : nacao.getHabilidades().values()) {
+        final List<Habilidade> list = new ArrayList<Habilidade>();
+        list.addAll(nacao.getHabilidades().values());
+        for (Habilidade habilidade : list) {
             if (habilidade.isPackage()) {
                 nacao.remHabilidade(habilidade);
             }

@@ -5,6 +5,7 @@
  */
 package gui.tabs;
 
+import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
 import business.facades.WorldFacade;
 import control.MapaControler;
@@ -39,6 +40,8 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     private SubTabBaseList stDiplomacy = new SubTabBaseList();
     private SubTabBaseList stTroops = new SubTabBaseList();
     private SubTabOrdem stOrdens;
+    private final NacaoFacade nacaoFacade = new NacaoFacade();
+    private final CenarioFacade cenarioFacade = new CenarioFacade();
 
     public TabNacoesGui(String titulo, String dica, MapaControler mapaControl) {
         initComponents();
@@ -189,7 +192,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);
     }
 
-    private int getFiltro() {
+    public int getFiltro() {
         return comboFiltro.getSelectedIndex();
     }
 
@@ -205,26 +208,8 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         }
         stDiplomacy.setListModel(nacaoControl.getRelacionamentoTableModel(nacao));
         stTroops.setListModel(nacaoControl.getTropaTableModel(nacao));
-        String hab = labels.getString("HABILIDADES.ESPECIAIS") + "\n";
-        NacaoFacade nacaoFacade = new NacaoFacade();
-        for (HabilidadeNacao elem : nacaoFacade.getHabilidadesNacao(nacao)) {
-            hab += String.format("- %s\n", elem.getNome());
-        }
-        for (Habilidade elem : nacaoFacade.getHabilidades(nacao)) {
-            if (!elem.isHidden()) {
-                hab += String.format("- %s\n", elem.getNome());
-            }
-        }
-        try {
-            for (String msg : nacaoFacade.getMensagens(nacao)) {
-//                hab += "\n\n\n" + msg.replace(',', '\n');
-                hab += "\n\n\n" + msg;
-            }
-        } catch (NullPointerException ex) {
-            //just skip
-            hab += labels.getString("?");
-        }
-        stResults.setText(hab);
+        setResults(nacao);
+        stOrdens.doMudaActor(nacao);
     }
 
     private void initConfig() {
@@ -249,7 +234,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     }
 
     private void addTabs() {
-        if (WorldFacade.getInstance().isStartupPackages() && WorldFacade.getInstance().getTurno() == 0) {
+        if (cenarioFacade.hasOrdensNacao(WorldFacade.getInstance().getPartida())) {
             detalhesNacao.addTab(labels.getString("STARTUP"),
                     new javax.swing.ImageIcon(getClass().getResource("/images/package_icon.gif")),
                     stOrdens, labels.getString("STARTUP.TOOLTIP"));
@@ -268,5 +253,30 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     @Override
     public void setValueAt(String[] ordemDisplay, int ordIndex) {
         //not implemented.
+    }
+
+    private void setResults(Nacao nacao) {
+        String hab = labels.getString("HABILIDADES.ESPECIAIS") + "\n";
+        for (HabilidadeNacao elem : nacaoFacade.getHabilidadesNacao(nacao)) {
+            hab += String.format("- %s\n", elem.getNome());
+        }
+        for (Habilidade elem : nacaoFacade.getHabilidades(nacao)) {
+            try {
+                if (!elem.isHidden()) {
+                    hab += String.format("- %s\n", elem.getNome());
+                }
+            } catch (NullPointerException ex) {
+            }
+        }
+        try {
+            for (String msg : nacaoFacade.getMensagens(nacao)) {
+//                hab += "\n\n\n" + msg.replace(',', '\n');
+                hab += "\n\n\n" + msg;
+            }
+        } catch (NullPointerException ex) {
+            //just skip
+            hab += labels.getString("?");
+        }
+        stResults.setText(hab);
     }
 }
