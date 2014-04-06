@@ -4,6 +4,7 @@
  */
 package business.facades;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.SortedMap;
@@ -19,7 +20,7 @@ import persistence.local.WorldManager;
  *
  * @author jmoura
  */
-public class ListFactory {
+public class ListFactory implements Serializable {
 
     private static final Log log = LogFactory.getLog(ListFactory.class);
 
