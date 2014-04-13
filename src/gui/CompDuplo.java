@@ -103,12 +103,13 @@ public class CompDuplo extends JPanel implements Serializable {
         cf.getParametros(compB, parId, parDisplay);
         String[] ret = {"", ""};
         for (String par : parDisplay) {
-            ret[0] += par + ";";
+            ret[0] += ";" + par;
         }
         for (String par : parId) {
-            ret[1] += par + ";";
+            ret[1] += ";" + par;
         }
-
+        ret[0] = ret[0].substring(1).trim();
+        ret[1] = ret[1].substring(1).trim();
         return ret;
     }
 }

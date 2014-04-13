@@ -72,6 +72,7 @@ public class ComponentFactory implements Serializable {
     private static final String NACAO_RELACIONAMENTO = "Nacao_Relacionamento";
     private static final String NOME = "Nome";
     private static final String NOVACIDADE = "NovaCidade";
+    private static final String NOMEGENDER = "NomeGender";
     private static final String NO_VALUE = "None";
     private static final String OURO = "Ouro";
     private static final String PERCENTAGE = "Percentage";
@@ -310,7 +311,23 @@ public class ComponentFactory implements Serializable {
                     SysApoio.createFormatterName("U*******************"));
             jtTemp.setColumns(20);
             cNovo = jtTemp;
-        } else if (controle.equals(NOVACIDADE)) {//Nome
+        } else if (controle.equals(NOMEGENDER)) {//Nome, Gender
+            //two in one (name + hex)
+            CompDuplo jtTemp = new CompDuplo();
+            String[] vlDisplay = new String[2];
+            if (vlInicialDisplay.contains(";")) {
+                vlDisplay = vlInicialDisplay.split(";");
+            }
+            String[] vlId = new String[2];
+            if (vlDefaultId.contains(";")) {
+                vlId = vlDefaultId.split(";");
+            }
+            final Component nome = this.getParametroComponent(NOME, vlDisplay[0], vlId[0], ordemSelecionada);
+            final Component hex = this.getParametroComponent(MALE_FEMALE, vlDisplay[1], vlId[1], ordemSelecionada);
+            jtTemp.replaceA(nome);
+            jtTemp.replaceB(hex);
+            cNovo = jtTemp;
+        } else if (controle.equals(NOVACIDADE)) {//Nome, Hex
             //two in one (name + hex)
             CompDuplo jtTemp = new CompDuplo();
             String[] vlDisplay = new String[2];

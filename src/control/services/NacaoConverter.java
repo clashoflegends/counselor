@@ -7,6 +7,7 @@ package control.services;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
 import baseLib.SysApoio;
+import business.facade.AcaoFacade;
 import business.facade.NacaoFacade;
 import business.facades.ListFactory;
 import business.facades.WorldFacade;
@@ -27,10 +28,12 @@ import persistence.SettingsManager;
  */
 public class NacaoConverter implements Serializable {
 
+    public static final int ORDEM_COL_INDEX_START = 5;
     public static final int FILTRO_PROPRIOS = 1;
     public static final int FILTRO_TODOS = 0;
     private static final Log log = LogFactory.getLog(NacaoConverter.class);
     private static final NacaoFacade nacaoFacade = new NacaoFacade();
+    private static final AcaoFacade acaoFacade = new AcaoFacade();
     private static final ListFactory listFactory = new ListFactory();
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
@@ -50,11 +53,12 @@ public class NacaoConverter implements Serializable {
             java.lang.Integer.class,
             java.lang.String.class,
             Local.class,
-            java.lang.String.class,
-            java.lang.String.class,
             java.lang.Integer.class,
             java.lang.Integer.class,
-            java.lang.Integer.class
+            java.lang.Integer.class,
+            java.lang.Integer.class,
+            java.lang.String.class,
+            java.lang.String.class
         });
         return nacaoModel;
     }
@@ -64,14 +68,15 @@ public class NacaoConverter implements Serializable {
         Object[] cArray = new Object[getNacaoColNames().length];
         cArray[ii++] = nacaoFacade.getNome(nacao);
         cArray[ii++] = nacaoFacade.getRacaNome(nacao);
-        cArray[ii++] = nacaoFacade.getPontos(nacao);
+        cArray[ii++] = nacaoFacade.getPontosVitoria(nacao);
         cArray[ii++] = SysApoio.iif(nacaoFacade.isAtiva(nacao), labels.getString("ATIVA"), labels.getString("INATIVA"));
         cArray[ii++] = nacaoFacade.getCoordenadasCapital(nacao);
-        cArray[ii++] = nacaoFacade.getJogadorDisplay(nacao);
-        cArray[ii++] = nacaoFacade.getJogadorEmail(nacao);
+        cArray[ii++] = acaoFacade.getPointsSetup(nacao);
         cArray[ii++] = nacaoFacade.getTropasQt(nacao);
         cArray[ii++] = nacaoFacade.getMoneySaldo(nacao);
         cArray[ii++] = nacaoFacade.getImpostos(nacao);
+        cArray[ii++] = nacaoFacade.getJogadorDisplay(nacao);
+        cArray[ii++] = nacaoFacade.getJogadorEmail(nacao);
         return cArray;
     }
 
@@ -82,11 +87,12 @@ public class NacaoConverter implements Serializable {
             labels.getString("PONTOS.VITORIA"),
             labels.getString("ATIVA"),
             labels.getString("CIDADE.CAPITAL"),
-            labels.getString("JOGADOR"),
-            labels.getString("JOGADOR.EMAIL"),
+            labels.getString("STARTUP.POINTS"),
             labels.getString("TROPAS"),
             labels.getString("TREASURY"),
-            labels.getString("IMPOSTOS")
+            labels.getString("IMPOSTOS"),
+            labels.getString("JOGADOR"),
+            labels.getString("JOGADOR.EMAIL")
         };
         return (colNames);
     }

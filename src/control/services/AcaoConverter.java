@@ -44,7 +44,8 @@ public class AcaoConverter implements Serializable {
             java.lang.Integer.class, java.lang.String.class,
             java.lang.String.class,
             java.lang.String.class, java.lang.String.class,
-            java.lang.Integer.class, java.lang.String.class, java.lang.String.class
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.String.class, java.lang.String.class
         });
         return feiticoModel;
     }
@@ -53,7 +54,8 @@ public class AcaoConverter implements Serializable {
         String[] colNames = {labels.getString("SEQUENCIA"), labels.getString("ACAO"),
             labels.getString("PERSONAGEM"),
             labels.getString("TIPO"), labels.getString("DIFICULDADE"),
-            labels.getString("CUSTO"), labels.getString("IMPROVE"), labels.getString("PARAMETRO")
+            labels.getString("CUSTO"), labels.getString("STARTUP.POINTS"),
+            labels.getString("IMPROVE"), labels.getString("PARAMETRO")
         };
         return (colNames);
     }
@@ -73,6 +75,7 @@ public class AcaoConverter implements Serializable {
                 ret[ii][nn++] = TitleFactory.getTipoOrdem(ordem);
                 ret[ii][nn++] = TitleFactory.getDificuldade(ordem);
                 ret[ii][nn++] = acaoFacade.getCusto(ordem);
+                ret[ii][nn++] = acaoFacade.getPointsSetup(ordem);
                 ret[ii][nn++] = acaoFacade.getImproveRank(ordem);
                 ret[ii][nn++] = ordem.getParametros();
                 ii++;

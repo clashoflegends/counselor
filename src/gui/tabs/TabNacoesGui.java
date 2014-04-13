@@ -5,13 +5,16 @@
  */
 package gui.tabs;
 
+import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
 import business.facades.WorldFacade;
 import control.MapaControler;
 import control.NacaoControler;
+import control.services.NacaoConverter;
 import gui.TabBase;
 import gui.services.IAcaoGui;
+import gui.services.LimitTableCellRenderer;
 import gui.subtabs.SubTabBaseList;
 import gui.subtabs.SubTabOrdem;
 import gui.subtabs.SubTabTextArea;
@@ -40,7 +43,9 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     private SubTabBaseList stDiplomacy = new SubTabBaseList();
     private SubTabBaseList stTroops = new SubTabBaseList();
     private SubTabOrdem stOrdens;
+    private LimitTableCellRenderer ltcr;
     private final NacaoFacade nacaoFacade = new NacaoFacade();
+    private static final AcaoFacade acaoFacade = new AcaoFacade();
     private final CenarioFacade cenarioFacade = new CenarioFacade();
 
     public TabNacoesGui(String titulo, String dica, MapaControler mapaControl) {
@@ -182,13 +187,19 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     }
 
     public final void setMainModel(TableModel model) {
+        //clear stuff
         stResults.setText("");
         stDiplomacy.setListModelClear();
         stTroops.setListModelClear();
+        //set model
         this.jtMainLista.setModel(model);
+        //confid red background
+        jtMainLista.getColumnModel().getColumn(NacaoConverter.ORDEM_COL_INDEX_START).setCellRenderer(ltcr);
+        //auto adjust columns
         this.calcColumnWidths(jtMainLista);
         this.updateGui();
         this.doTagHide();
+        //trigger change
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);
     }
 
@@ -228,8 +239,11 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         //adiciona listeners
         comboFiltro.addActionListener(nacaoControl);
         jtMainLista.getSelectionModel().addListSelectionListener(nacaoControl);
-
-        TableModel model = nacaoControl.getMainTableModel(this.getFiltro());
+        //rendered
+        if (WorldFacade.getInstance().isNationPackages()) {
+            ltcr = new LimitTableCellRenderer(WorldFacade.getInstance().getNationPackagesLimit());
+        }
+        final TableModel model = nacaoControl.getMainTableModel(this.getFiltro());
         this.setMainModel(model);
     }
 
@@ -252,7 +266,11 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
 
     @Override
     public void setValueAt(String[] ordemDisplay, int ordIndex) {
-        //not implemented.
+        //set how many points were selected
+        final int points = acaoFacade.getPointsSetup(stOrdens.getActor().getNacao());
+        this.jtMainLista.getModel().setValueAt(points,
+                nacaoControl.getModelRowIndex(),
+                NacaoConverter.ORDEM_COL_INDEX_START);
     }
 
     private void setResults(Nacao nacao) {

@@ -8,7 +8,6 @@ package gui.tabs;
 import control.AcaoControler;
 import gui.TabBase;
 import gui.subtabs.SubTabTextArea;
-import javax.swing.GroupLayout;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;

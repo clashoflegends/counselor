@@ -183,6 +183,10 @@ public class WorldFacade implements Serializable {
         return WorldManager.getInstance().getPartida().isNationPackages();
     }
 
+    public int getNationPackagesLimit() {
+        return WorldManager.getInstance().getPartida().getNationPackagesLimit();
+    }
+
     public boolean hasEmissario() {
         CenarioFacade cf = new CenarioFacade();
         return cf.hasDiplomat(getCenario());

@@ -44,8 +44,9 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
     }
 
     private void doSalvaAction() {
-        String[] ordemDisplay = getTabGui().getActor().doOrderSave(indexModelOrdem, getTabGui().getOrdemQuadro());
+        final String[] ordemDisplay = getTabGui().getActor().doOrderSave(indexModelOrdem, getTabGui().getOrdemQuadro());
         getTabGui().setValueAt(ordemDisplay, indexModelOrdem);
+        getTabGui().doFindNextActionSlot();
     }
 
     public ComboBoxModel getTaticasComboModel() {
@@ -74,7 +75,6 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             if ("jbOk".equals(button.getActionCommand())) {
                 try {
                     doSalvaAction();
-                    getTabGui().doFindNextActionSlot();
                 } catch (NullPointerException ex) {
                     //nao faz nada, ordens nao disponiveis...
                 }

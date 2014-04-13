@@ -34,7 +34,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private OrdemControler ordemControl;
     private OrdemControlerFloater ordemControlFloater;
-    ComponentFactory compFactory = new ComponentFactory();
+    private ComponentFactory compFactory = new ComponentFactory();
     private List<Component> parametrosCombos = new ArrayList();
     private List<JLabel> parametrosLabels = new ArrayList();
     private ActorInterface actor;

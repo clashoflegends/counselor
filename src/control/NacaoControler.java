@@ -32,10 +32,10 @@ public class NacaoControler extends ControlBase implements Serializable, ActionL
 
     private static final Log log = LogFactory.getLog(NacaoControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    ;
     private GenericoTableModel mainTableModel;
     private TabNacoesGui tabNacaoGui;
     private List listaExibida;
+    private int modelRowIndex = 0;
 
     public NacaoControler(TabNacoesGui tabGui) {
         this.tabNacaoGui = tabGui;
@@ -70,6 +70,10 @@ public class NacaoControler extends ControlBase implements Serializable, ActionL
         return tabNacaoGui;
     }
 
+    public int getModelRowIndex() {
+        return this.modelRowIndex;
+    }
+
     @Override
     public void receiveDispatch(int msgName, String txt) {
         if (msgName == DispatchManager.ACTIONS_RELOAD) {
@@ -100,8 +104,8 @@ public class NacaoControler extends ControlBase implements Serializable, ActionL
             if (!lsm.isSelectionEmpty()) {
                 //testes
                 int rowIndex = lsm.getAnchorSelectionIndex();
-                int modelIndex = table.convertRowIndexToModel(rowIndex);
-                Nacao nacao = (Nacao) listaExibida.get(modelIndex);
+                modelRowIndex = table.convertRowIndexToModel(rowIndex);
+                Nacao nacao = (Nacao) listaExibida.get(modelRowIndex);
                 getTabGui().doMudaNacao(nacao);
                 //PENDING atualizar table mensagens
             }
