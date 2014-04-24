@@ -58,6 +58,7 @@ public class ComponentFactory implements Serializable {
     private static final String COORDENADAW = "CoordenadaW";
     private static final String COORDENADA_12 = "Coordenada_12";
     private static final String COORDENADA_5 = "Coordenada_5";
+    private static final String COORDENADA_3 = "Coordenada_3";
     private static final String COORDENADA_8 = "Coordenada_8";
     private static final String COORDENADA_8W = "Coordenada_8W";
     private static final String COORDENADA_NAVIO = "Coordenada_Navio";
@@ -227,7 +228,13 @@ public class ComponentFactory implements Serializable {
             SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
                     range, isAllSelected(), false, this.getMapaControler());
             cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_5)) {            //Coordenada-8
+        } else if (controle.equals(COORDENADA_3)) {            //Coordenada-3
+            //Novo combobox com locais dentro do range
+            final int range = 3;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_5)) {            //Coordenada-5
             //Novo combobox com locais dentro do range
             final int range = 5;
             SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
