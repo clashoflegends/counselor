@@ -704,10 +704,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                         missing = true;
                     }
                 }
-            } else {
+            } else if (cenarioFacade.hasOrdens(WorldFacade.getInstance().getPartida(), actor)) {
                 missing = true;
             }
-
         }
         return missing;
     }
