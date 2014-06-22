@@ -64,7 +64,7 @@ public class PartidaConverter implements Serializable {
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.TURNO.MAX"), partida.getTurnoMax()+ ""});
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.MAXPERS"), cenario.getNumMaxPersonagem() + ""});
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.MAXMOV"), cenario.getNumMaxMovimento() + ""});
-        lista.add(new String[]{labels.getString("PARTIDA.LABEL.MINORDENS"), cenario.getNumOrdens() + ""});
+        lista.add(new String[]{labels.getString("PARTIDA.LABEL.MINORDENS"), cenario.getNumOrdensPers() + ""});
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.MAXORDENS"), cenario.getNumMaxOrdens() + ""});
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.MAXARTI"), cenario.getNumMaxArtefatos() + ""});
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.MONEY"), cenario.getMoney().getNome()});

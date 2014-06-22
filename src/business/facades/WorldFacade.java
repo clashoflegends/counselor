@@ -148,7 +148,7 @@ public class WorldFacade implements Serializable {
     }
 
     public int getOrdensQt(Personagem personagem) {
-        return getCenario().getNumOrdens() + personagem.getOrdensExtraQt();
+        return getCenario().getNumOrdensPers() + personagem.getOrdensExtraQt();
     }
 
     public int getOrdensQtMax() {
