@@ -42,7 +42,6 @@ public abstract class ActorInterface extends ControlBase implements Serializable
     private LocalFacade localFacade = new LocalFacade();
     private NacaoFacade nacaoFacade = new NacaoFacade();
     private final OrdemFacade ordemFacade = new OrdemFacade();
-    private final Cenario cenario = WorldFacade.getInstance().getCenario();
 
     public boolean isPersonagem() {
         return false;

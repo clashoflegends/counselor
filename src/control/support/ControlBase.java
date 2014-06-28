@@ -4,6 +4,7 @@
  */
 package control.support;
 
+import control.support.DispatchManager;
 import java.io.Serializable;
 import model.Local;
 import model.PersonagemOrdem;

@@ -125,7 +125,7 @@ public class ActorInterfaceCidade extends ActorInterface {
         if (getCidade() == null) {
             return (null);
         } else {
-            Ordem[] items = ordemFacade.getOrdensDisponiveis(WorldFacade.getInstance().getOrdens(), getCidade(), ordemAtiva, allOrders);
+            Ordem[] items = ordemFacade.getOrdensDisponiveis(WorldFacade.getInstance().getOrdens(), getCidade(), ordemAtiva, allOrders, WorldFacade.getInstance().isNationPackages());
             GenericoComboBoxModel model = new GenericoComboBoxModel(items);
             return model;
         }

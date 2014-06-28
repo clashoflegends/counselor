@@ -126,7 +126,7 @@ public class ActorInterfacePersonagem extends ActorInterface {
         if (getPersonagem() == null) {
             return (null);
         } else {
-            Ordem[] items = ordemFacade.getOrdensDisponiveis(WorldFacade.getInstance().getOrdens(), getPersonagem(), ordemAtiva, allOrders);
+            Ordem[] items = ordemFacade.getOrdensDisponiveis(WorldFacade.getInstance().getOrdens(), getPersonagem(), ordemAtiva, allOrders, WorldFacade.getInstance().isNationPackages());
             GenericoComboBoxModel model = new GenericoComboBoxModel(items);
             return model;
         }
