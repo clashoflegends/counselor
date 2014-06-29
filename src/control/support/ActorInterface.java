@@ -85,6 +85,8 @@ public abstract class ActorInterface extends ControlBase implements Serializable
             items = nacaoFacade.listPersonagemNacao(getNacao(), getPersonagem());
         } else if (tipo == 6) {
             items = localFacade.listPersonagemLocal(getLocal(), getPersonagem(), 4);
+        } else if (tipo == 7) {
+            items = localFacade.listPersonagemLocal(getLocal(), getNacao());
         } else {
             items = localFacade.listPersonagemLocal(getLocal(), getPersonagem(), 4);
         }

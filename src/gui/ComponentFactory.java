@@ -81,6 +81,7 @@ public class ComponentFactory implements Serializable {
     private static final String PERSONAGEM_LOCAL = "Personagem_Local";
     private static final String PERSONAGEM_LOCAL_SELF = "Personagem_Local_Self";
     private static final String PERSONAGEM_LOCAL_NACAO = "Personagem_Nacao_Local";
+    private static final String PERSONAGEM_LOCAL_NACAO_NONHERO = "Personagem_Nacao_Nonhero_Local";
     private static final String PERSONAGEM_LOCAL_NONACAO = "Personagem_Local_NoNacao";
     private static final String PERSONAGEM_NONACAO = "Personagem_NoNacao";
     private static final String PERSONAGEM_NACAO = "Personagem_Nacao";
@@ -380,6 +381,11 @@ public class ComponentFactory implements Serializable {
             //é um combo com o model com os personagens conhecidos no local da mesma nacao
             JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(3));
             cbTemp.setEditable(true);
+            cNovo = cbTemp;
+        } else if (controle.equals(PERSONAGEM_LOCAL_NACAO_NONHERO)) {
+            //é um combo com o model com os personagens conhecidos no local da mesma nacao nao heros
+            JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(7));
+//            cbTemp.setEditable(true);
             cNovo = cbTemp;
         } else if (controle.equals(PERSONAGEM_LOCAL_NONACAO)) {//Personagem-Local-NoNacao
             //é um combo com o model com os personagens conhecidos no local e de outra nacao
