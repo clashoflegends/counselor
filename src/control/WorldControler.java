@@ -358,7 +358,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         if (cenarioFacade.hasOrdensCidade(WorldFacade.getInstance().getCenario())) {
             ret += listaOrdensByCity() + "\n\n";
         }
-        if (!SysProperties.getProps("CopyActionsOrder", "1").equals("1")) {
+        if (SysProperties.getProps("CopyActionsOrder", "1").equals("1")) {
             ret += listaOrdensByPers() + "\n\n";
         }
         return ret;

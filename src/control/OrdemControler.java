@@ -127,6 +127,7 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
                     getTabGui().setOrdemParametrosQuadro((GenericoComboObject) cb.getModel().getSelectedItem());
                 }
             } catch (ClassCastException ex) {
+                log.debug("hum... suspicious");
             }
         }
     }

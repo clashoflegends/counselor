@@ -436,6 +436,17 @@ public class SubTabOrdem extends TabBase implements Serializable {
             //exibe a quantidade correta de parametros
             int qtParametroMax = ordemSelecionada.getParametrosIdeQtd();
             for (int nn = 0; nn < qtParametroMax; nn++) {
+                if (ordemSelecionada.getParametroIde(nn).equalsIgnoreCase("variado")) {
+                    JComboBox jcMagia = (JComboBox) parametrosCombos.get(nn - 1);
+                    if ("jcMagia".equals(jcMagia.getActionCommand())) {
+                        try {
+                            setOrdemParametrosMagia((GenericoComboObject) jcMagia.getModel().getSelectedItem());
+                        } catch (NullPointerException ex) {
+                            //nao faz nada, ordens nao disponiveis...
+                        }
+                    }
+                    continue;
+                }
                 //ajusta os labels
                 doParametroLabel((JLabel) parametrosLabels.get(nn), ordemSelecionada.getParametroIdeDisplay(nn));
                 //recupera valor display do parametro
