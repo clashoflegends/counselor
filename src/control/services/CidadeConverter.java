@@ -72,6 +72,8 @@ public class CidadeConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("ZONA.ECONOMICA"));
         classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("CUSTO.MANUTENCAO"));
+        classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("LEALDADE"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("LEALDADE.VARIACAO"));
@@ -126,6 +128,7 @@ public class CidadeConverter implements Serializable {
 
         cArray[ii++] = cidadeFacade.getArrecadacaoImpostos(cidade);
         cArray[ii++] = cidadeFacade.getProducao(cidade, WorldFacade.getInstance().getCenario().getMoney());
+        cArray[ii++] = cidadeFacade.getUpkeepMoney(cidade);
         cArray[ii++] = cidadeFacade.getLealdade(cidade);
         cArray[ii++] = cidadeFacade.getLealdadeDelta(cidade);
         cArray[ii++] = localFacade.getPersonagens(cidadeFacade.getLocal(cidade)).size();

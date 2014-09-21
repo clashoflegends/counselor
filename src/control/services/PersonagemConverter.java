@@ -58,8 +58,6 @@ public class PersonagemConverter implements Serializable {
         }
         colNames.add(labels.getString("LOCAL"));
         classes.add(Local.class);
-        colNames.add(labels.getString("NACAO"));
-        classes.add(java.lang.String.class);
         colNames.add(labels.getString("COMANDANTE"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("AGENTE"));
@@ -75,6 +73,10 @@ public class PersonagemConverter implements Serializable {
         colNames.add(labels.getString("DUELO"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("VITALIDADE"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("NACAO"));
+        classes.add(java.lang.String.class);
+        colNames.add(labels.getString("CUSTO.MANUTENCAO"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("CLIMA"));
         classes.add(java.lang.String.class);
@@ -100,7 +102,6 @@ public class PersonagemConverter implements Serializable {
             ii++;
         }
         cArray[ii++] = localFacade.getCoordenadas(local);
-        cArray[ii++] = personagemFacade.getNacaoNome(personagem);
         cArray[ii++] = personagem.getPericiaComandante();
         cArray[ii++] = personagem.getPericiaAgente();
         if (WorldFacade.getInstance().hasEmissario()) {
@@ -110,6 +111,8 @@ public class PersonagemConverter implements Serializable {
         cArray[ii++] = personagem.getPericiaFurtividade();
         cArray[ii++] = personagem.getDuelo();
         cArray[ii++] = personagem.getVida();
+        cArray[ii++] = personagemFacade.getNacaoNome(personagem);
+        cArray[ii++] = personagemFacade.getUpkeepMoney(personagem);
         cArray[ii++] = localFacade.getClima(local);
         cArray[ii++] = localFacade.getTerrenoNome(local);
         if (isProprio(personagem)) {
