@@ -88,6 +88,8 @@ public class CidadeConverter implements Serializable {
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("CIDADE.DEFESA"));
         classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("COMIDA.GIVEN"));
+        classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("OCULTO"));
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("CIDADE.CAPITAL"));
@@ -136,6 +138,7 @@ public class CidadeConverter implements Serializable {
         cArray[ii++] = cidadeFacade.getDocasNome(cidade);
         cArray[ii++] = cidadeFacade.getFortificacaoNome(cidade);
         cArray[ii++] = cidadeFacade.getDefesa(cidade);
+        cArray[ii++] = cidadeFacade.getFoodGiven(cidade);
         cArray[ii++] = cidadeFacade.getOculto(cidade);
         cArray[ii++] = cidadeFacade.getCapital(cidade);
         cArray[ii++] = cidadeFacade.getSitiado(cidade);

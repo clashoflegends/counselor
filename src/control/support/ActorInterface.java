@@ -117,17 +117,17 @@ public abstract class ActorInterface extends ControlBase implements Serializable
 
     public GenericoTableModel getOrdemModel() {
         GenericoTableModel model = new GenericoTableModel(
-                new String[]{labels.getString("ACAO"), labels.getString("PARAMETRO")},
+                new String[]{labels.getString("ACAO"), labels.getString("PARAMETRO"), labels.getString("TIPO")},
                 getOrdemAsArray(),
                 new Class[]{
-            java.lang.String.class, java.lang.String.class
+            java.lang.String.class, java.lang.String.class, java.lang.String.class
         });
         return model;
     }
 
     private String[][] getOrdemAsArray() {
         int ii = 0;
-        String[][] ret = new String[getAcaoMax()][2];
+        String[][] ret = new String[getAcaoMax()][3];
         for (ii = 0; ii < ret.length; ii++) {
             ret[ii] = getOrdemDisplay(ii);
             ret[ii][1] = ret[ii][1].replace('[', ' ').replace(']', ' ').trim();
