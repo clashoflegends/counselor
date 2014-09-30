@@ -233,15 +233,15 @@ public class CidadeConverter implements Serializable {
                 getProdutoColNames(),
                 getProdutosAsArray(cidade),
                 new Class[]{
-            java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+            java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
         });
         return produtoModel;
     }
 
     private static String[] getProdutoColNames() {
         //String[] colNames = {"Produto", "Produção", "Estoque", "Total"};
-        String[] colNames = {labels.getString("PRODUTO"),
-            labels.getString("PRODUCAO"), labels.getString("ESTOQUE"), labels.getString("TOTAL")
+        String[] colNames = {labels.getString("PRODUTO"), labels.getString("TOTAL"),
+            labels.getString("ESTOQUE"), labels.getString("PRODUCAO"), labels.getString("VENDA")
         };
         return (colNames);
     }
@@ -256,10 +256,13 @@ public class CidadeConverter implements Serializable {
                 int i = 0;
                 final int estoque = cidadeFacade.getEstoque(cidade, produto);
                 final int producao = cidadeFacade.getProducao(cidade, produto);
+                Mercado mercado = WorldFacade.getInstance().getMercado();
+                int unit = mercado.getProdutoVlVenda(produto);
                 ret[ii][i++] = produto.getNome();
+                ret[ii][i++] = estoque + producao;
                 ret[ii][i++] = producao;
                 ret[ii][i++] = estoque;
-                ret[ii][i++] = estoque + producao;
+                ret[ii][i++] = (estoque + producao) * unit;
                 ii++;
                 //PENDING adicionar o clima
             }
