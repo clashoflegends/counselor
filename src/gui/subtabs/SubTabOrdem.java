@@ -463,6 +463,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
             jbOk.setEnabled(true);
         } catch (NullPointerException ex) {
             doDisableFields();
+            setOrdensModel(null);
         }
     }
 
