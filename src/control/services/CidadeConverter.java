@@ -240,8 +240,9 @@ public class CidadeConverter implements Serializable {
 
     private static String[] getProdutoColNames() {
         //String[] colNames = {"Produto", "Produção", "Estoque", "Total"};
-        String[] colNames = {labels.getString("PRODUTO"), labels.getString("TOTAL"),
-            labels.getString("ESTOQUE"), labels.getString("PRODUCAO"), labels.getString("VENDA")
+        String[] colNames = {labels.getString("PRODUTO"), labels.getString("TOTAL"), 
+            labels.getString("PRODUCAO"),
+            labels.getString("ESTOQUE"), labels.getString("VENDA")
         };
         return (colNames);
     }
