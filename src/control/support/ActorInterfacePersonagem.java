@@ -10,7 +10,7 @@ import baseLib.GenericoTableModel;
 import business.facade.CidadeFacade;
 import business.facade.OrdemFacade;
 import business.facade.PersonagemFacade;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import control.services.ArtefatoConverter;
 import control.services.CenarioConverter;
 import control.services.FeiticoConverter;
@@ -126,7 +126,7 @@ public class ActorInterfacePersonagem extends ActorInterface {
         if (getPersonagem() == null) {
             return (null);
         } else {
-            Ordem[] items = ordemFacade.getOrdensDisponiveis(WorldFacade.getInstance().getOrdens(), getPersonagem(), ordemAtiva, allOrders, WorldFacade.getInstance().isNationPackages());
+            Ordem[] items = ordemFacade.getOrdensDisponiveis(WorldFacadeCounselor.getInstance().getOrdens(), getPersonagem(), ordemAtiva, allOrders, WorldFacadeCounselor.getInstance().isNationPackages());
             GenericoComboBoxModel model = new GenericoComboBoxModel(items);
             return model;
         }
@@ -183,6 +183,6 @@ public class ActorInterfacePersonagem extends ActorInterface {
     @Override
     protected String[] getOrdemDisplay(int index) {
         return ordemFacade.getOrdemDisplay(getPersonagem(), index, getCenario(),
-                WorldFacade.getInstance().getJogadorAtivo());
+                WorldFacadeCounselor.getInstance().getJogadorAtivo());
     }
 }

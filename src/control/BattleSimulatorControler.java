@@ -8,7 +8,7 @@ import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.IBaseModel;
 import business.facade.BattleSimFacade;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import control.services.AcaoConverter;
 import control.services.ExercitoConverter;
 import gui.BattleSimulator;
@@ -147,7 +147,7 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
 
     public GenericoComboBoxModel getTerrenoComboModel() {
         List<IBaseModel> lista = new ArrayList<IBaseModel>();
-        for (IBaseModel elem : WorldFacade.getInstance().getCenario().getTerrenos().values()) {
+        for (IBaseModel elem : WorldFacadeCounselor.getInstance().getCenario().getTerrenos().values()) {
             lista.add(elem);
         }
         GenericoComboBoxModel model = new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]));

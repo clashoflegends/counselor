@@ -14,7 +14,7 @@ import business.facade.CidadeFacade;
 import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
 import business.facade.PersonagemFacade;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.MainAboutBox;
@@ -124,7 +124,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      */
     private File doSave(JButton jbTemp) throws HeadlessException {
         File ret = null;
-        Partida partida = WorldFacade.getInstance().getPartida();
+        Partida partida = WorldFacadeCounselor.getInstance().getPartida();
         Jogador jogadorAtivo = partida.getJogadorAtivo();
         Comando comando = new Comando();
         comando.setInfos(partida);
@@ -191,7 +191,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         File ret = null;
         try {
             ret = fc.getSelectedFile();
-            WorldFacade.getInstance().doSaveOrdens(comando, ret);
+            WorldFacadeCounselor.getInstance().doSaveOrdens(comando, ret);
             this.getGui().setStatusMsg(String.format(labels.getString("ORDENS.SALVAS"), comando.size(), fc.getSelectedFile().getName()));
             this.saved = true;
         } catch (BussinessException ex) {
@@ -298,7 +298,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             try {
                 File file = fc.getSelectedFile();
                 log.info(labels.getString("OPENING: ") + file.getName());
-                WorldFacade.getInstance().doStart(file);
+                WorldFacadeCounselor.getInstance().doStart(file);
                 log.info(labels.getString("INICIALIZANDO.GUI"));
                 getGui().iniciaConfig();
                 this.getGui().setStatusMsg(labels.getString("OPENING: ") + file.getName());
@@ -324,7 +324,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 //            autoLoad = SysProperties.getProps("loadDir") + autoLoad;
             try {
                 log.info(labels.getString("AUTOLOADING.OPENING") + autoLoad);
-                WorldFacade.getInstance().doStart(new File(autoLoad));
+                WorldFacadeCounselor.getInstance().doStart(new File(autoLoad));
                 getGui().iniciaConfig();
                 String autoLoadActions = SysProperties.getProps("autoLoadActions", "none");
                 if (!autoLoadActions.equals("none")) {
@@ -352,10 +352,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private String listaOrdens() {
         String ret = listaOrdensBySequence() + "\n\n";
-        if (cenarioFacade.hasOrdensNacao(WorldFacade.getInstance().getPartida())) {
+        if (cenarioFacade.hasOrdensNacao(WorldFacadeCounselor.getInstance().getPartida())) {
             ret += listaOrdensByNation() + "\n\n";
         }
-        if (cenarioFacade.hasOrdensCidade(WorldFacade.getInstance().getCenario())) {
+        if (cenarioFacade.hasOrdensCidade(WorldFacadeCounselor.getInstance().getCenario())) {
             ret += listaOrdensByCity() + "\n\n";
         }
         if (SysProperties.getProps("CopyActionsOrder", "1").equals("1")) {
@@ -366,15 +366,15 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private String listaOrdensByPers() {
         String ret = labels.getString("TITLE.LIST.BYCHAR") + ":\n";
-        Jogador jogadorAtivo = WorldFacade.getInstance().getJogadorAtivo();
+        Jogador jogadorAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
         //lista todos os personagens
-        for (Iterator<Personagem> iter = WorldFacade.getInstance().getPersonagens(); iter.hasNext();) {
+        for (Iterator<Personagem> iter = WorldFacadeCounselor.getInstance().getPersonagens(); iter.hasNext();) {
             Personagem personagem = iter.next();
             if (jogadorAtivo.isNacao(personagem.getNacao())) {
                 //ret += personagemFacade.getNome(personagem);
                 //ret += "\t@" + personagemFacade.getCoordenadas(personagem) + "\n";
                 ret += personagemFacade.getResultadoLocal(personagem);
-                List<String[]> pericias = personagemFacade.getPericias(personagem, WorldFacade.getInstance().getCenario());
+                List<String[]> pericias = personagemFacade.getPericias(personagem, WorldFacadeCounselor.getInstance().getCenario());
                 int aTipo = 0, aTitulo = 1, aNatural = 2, aFinal = 3;
                 for (String[] sPericias : pericias) {
                     if (sPericias[aTitulo].equals("") && sPericias[aNatural].equals(sPericias[aFinal])) {
@@ -401,9 +401,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private String listaOrdensByCity() {
         String ret = labels.getString("TITLE.LIST.BYCITY") + ":\n";
-        final Jogador jogadorAtivo = WorldFacade.getInstance().getJogadorAtivo();
+        final Jogador jogadorAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
         //lista todos as cidades
-        for (Cidade cidade : WorldFacade.getInstance().getCidades()) {
+        for (Cidade cidade : WorldFacadeCounselor.getInstance().getCidades()) {
             if (jogadorAtivo.isNacao(cidade.getNacao())) {
                 for (String msg : cidadeFacade.getInfoTitle(cidade)) {
                     ret += msg;
@@ -420,7 +420,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private String listaOrdensByNation() {
         String ret = labels.getString("TITLE.LIST.BYNATION") + ":\n";
         //lista todos as cidades
-        for (Nacao nacao : WorldFacade.getInstance().getNacoesJogadorAtivo()) {
+        for (Nacao nacao : WorldFacadeCounselor.getInstance().getNacoesJogadorAtivo()) {
             for (String msg : nacaoFacade.getInfoTitle(nacao)) {
                 ret += msg;
             }
@@ -458,10 +458,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private String listaOrdensBySequence() {
         String ret = labels.getString("TITLE.LIST.BYSEQ") + ":\n";
-        Jogador jogadorAtivo = WorldFacade.getInstance().getJogadorAtivo();
+        Jogador jogadorAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
         SortedMap<Integer, List<PersonagemOrdem>> ordens = new TreeMap<Integer, List<PersonagemOrdem>>();
         //list all actions from all actors
-        for (BaseModel actor : WorldFacade.getInstance().getActors()) {
+        for (BaseModel actor : WorldFacadeCounselor.getInstance().getActors()) {
             if (jogadorAtivo.isNacao(actor.getNacao())) {
                 for (PersonagemOrdem po : actor.getAcoes().values()) {
                     if (po != null) {
@@ -501,32 +501,32 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     public String getCenarioNome() {
-        return WorldFacade.getInstance().getCenarioNome();
+        return WorldFacadeCounselor.getInstance().getCenarioNome();
     }
 
     public String getJogadorAtivoNome() {
-        return WorldFacade.getInstance().getJogadorAtivoNome();
+        return WorldFacadeCounselor.getInstance().getJogadorAtivoNome();
     }
 
     public String getNacoesJogadorAtivoNome() {
-        return WorldFacade.getInstance().getNacoesJogadorAtivoNome();
+        return WorldFacadeCounselor.getInstance().getNacoesJogadorAtivoNome();
     }
 
     public int getNacoesJogadorAtivoQtd() {
-        return WorldFacade.getInstance().getJogadorAtivo().getNacoes().size();
+        return WorldFacadeCounselor.getInstance().getJogadorAtivo().getNacoes().size();
     }
 
     public String getPartidaNome() {
-        return WorldFacade.getInstance().getPartidaNome();
+        return WorldFacadeCounselor.getInstance().getPartidaNome();
     }
 
     public int getTurno() {
-        return WorldFacade.getInstance().getTurno();
+        return WorldFacadeCounselor.getInstance().getTurno();
     }
 
     public String getDeadline() {
         try {
-            return WorldFacade.getInstance().getPartida().getDeadline().toDateTimeString();
+            return WorldFacadeCounselor.getInstance().getPartida().getDeadline().toDateTimeString();
         } catch (NullPointerException e) {
             return "?";
         }
@@ -534,7 +534,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     public int getDeadlineDaysRemaining() {
         try {
-            return WorldFacade.getInstance().getPartida().getDeadline().getDaysDiffToNow();
+            return WorldFacadeCounselor.getInstance().getPartida().getDeadline().getDaysDiffToNow();
         } catch (NullPointerException e) {
             return 0;
         }
@@ -554,7 +554,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 throw new IllegalStateException(labels.getString("SERIAL.VIOLATION") + file.getName());
             }
             //verificar se o turno 'e correto
-            Partida partida = WorldFacade.getInstance().getPartida();
+            Partida partida = WorldFacadeCounselor.getInstance().getPartida();
             if (comando.getTurno() != partida.getTurno()) {
                 throw new IllegalStateException(labels.getString("TURNO.ERRADO") + file.getName());
             }
@@ -587,7 +587,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         int ret = 0;
         SortedMap<String, BaseModel> listPers = new TreeMap<String, BaseModel>();
         //limpa todas as ordens
-        for (BaseModel actor : WorldFacade.getInstance().getActors()) {
+        for (BaseModel actor : WorldFacadeCounselor.getInstance().getActors()) {
             actor.remAcoes();
             listPers.put(actor.getCodigo(), actor);
         }
@@ -598,7 +598,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             //carrega as ordens personagem por personagem
             for (ComandoDetail comandoDetail : comando.getOrdens()) {
                 BaseModel actor = listPers.get(comandoDetail.getActorCodigo());
-                Ordem ordem = WorldFacade.getInstance().getOrdem(comandoDetail.getOrdemCodigo());
+                Ordem ordem = WorldFacadeCounselor.getInstance().getOrdem(comandoDetail.getOrdemCodigo());
                 try {
                     //just to catch the NullPointerException
                     ordem.getNome();
@@ -630,11 +630,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     public boolean isGameOver() {
-        return WorldFacade.getInstance().isGameOver();
+        return WorldFacadeCounselor.getInstance().isGameOver();
     }
 
     public boolean isJogadorAtivoEliminado() {
-        return WorldFacade.getInstance().isJogadorAtivoEliminado(WorldManager.getInstance().getPartida().getJogadorAtivo());
+        return WorldFacadeCounselor.getInstance().isJogadorAtivoEliminado(WorldManager.getInstance().getPartida().getJogadorAtivo());
     }
 
     /**
@@ -690,7 +690,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private boolean doSaveActorActions(Jogador jogadorAtivo, Comando comando) {
         boolean missing = false;
         //lista todos os personagens, carregando para o xml
-        for (BaseModel actor : WorldFacade.getInstance().getActors()) {
+        for (BaseModel actor : WorldFacadeCounselor.getInstance().getActors()) {
             if (!ordemFacade.isAtivo(jogadorAtivo, actor)) {
                 continue;
             }
@@ -704,7 +704,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                         missing = true;
                     }
                 }
-            } else if (cenarioFacade.hasOrdens(WorldFacade.getInstance().getPartida(), actor)) {
+            } else if (cenarioFacade.hasOrdens(WorldFacadeCounselor.getInstance().getPartida(), actor)) {
                 missing = true;
             }
         }
@@ -713,7 +713,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private boolean doSavePackages(Comando comando) {
         boolean missing = true;
-        if (WorldFacade.getInstance().isStartupPackages() && WorldFacade.getInstance().getTurno() == 0) {
+        if (WorldFacadeCounselor.getInstance().isStartupPackages() && WorldFacadeCounselor.getInstance().getTurno() == 0) {
             for (Nacao nacao : WorldManager.getInstance().getNacoesJogadorAtivo()) {
                 comando.addPackage(nacao, getPackages(nacao));
                 missing = false;
@@ -744,7 +744,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             try {
                 nacao = findNacao(idNacao);
                 clearPackages(nacao);
-                nacao.addHabilidades(WorldFacade.getInstance().getHabilidades(packages.get(idNacao)));
+                nacao.addHabilidades(WorldFacadeCounselor.getInstance().getHabilidades(packages.get(idNacao)));
             } catch (NullPointerException ex) {
                 log.fatal("Something wrong loading packages.");
             }
@@ -774,7 +774,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private boolean doSendViaPost(File attachment) {
         try {
-            Partida partida = WorldFacade.getInstance().getPartida();
+            Partida partida = WorldFacadeCounselor.getInstance().getPartida();
             int ret = WebCounselorManager.getInstance().doSendViaPost(attachment, partida, listaOrdens());
 
             if (ret == WebCounselorManager.OK) {

@@ -11,7 +11,7 @@ import business.facade.CidadeFacade;
 import business.facade.ExercitoFacade;
 import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import control.services.ArtefatoConverter;
 import control.services.CenarioConverter;
 import control.services.FeiticoConverter;
@@ -122,7 +122,7 @@ public class ActorInterfaceNacao extends ActorInterface {
         if (getNacao() == null) {
             return (null);
         } else {
-            Ordem[] items = ordemFacade.getOrdensDisponiveis(WorldFacade.getInstance().getOrdens(), getNacao(), ordemAtiva, allOrders, WorldFacade.getInstance().isNationPackages());
+            Ordem[] items = ordemFacade.getOrdensDisponiveis(WorldFacadeCounselor.getInstance().getOrdens(), getNacao(), ordemAtiva, allOrders, WorldFacadeCounselor.getInstance().isNationPackages());
             GenericoComboBoxModel model = new GenericoComboBoxModel(items);
             return model;
         }
@@ -147,8 +147,8 @@ public class ActorInterfaceNacao extends ActorInterface {
         ordemFacade.setOrdem(getNacao(), index, pOrdem);
         return ordemFacade.getOrdemDisplay(
                 getNacao(), index,
-                WorldFacade.getInstance().getCenario(),
-                WorldFacade.getInstance().getJogadorAtivo());
+                WorldFacadeCounselor.getInstance().getCenario(),
+                WorldFacadeCounselor.getInstance().getJogadorAtivo());
     }
 
     @Override
@@ -178,6 +178,6 @@ public class ActorInterfaceNacao extends ActorInterface {
 
     @Override
     protected String[] getOrdemDisplay(int index) {
-        return ordemFacade.getOrdemDisplay(getNacao(), index, getCenario(), WorldFacade.getInstance().getJogadorAtivo());
+        return ordemFacade.getOrdemDisplay(getNacao(), index, getCenario(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
     }
 }

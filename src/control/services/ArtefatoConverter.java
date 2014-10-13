@@ -9,7 +9,7 @@ import baseLib.GenericoTableModel;
 import business.facade.ArtefatoFacade;
 import business.facade.PersonagemFacade;
 import business.facades.ListFactory;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -178,19 +178,19 @@ public class ArtefatoConverter implements Serializable {
         if (filtro.equalsIgnoreCase("all")) {
             ret.addAll(listFactory.listArtefatos());
         } else if (filtro.equalsIgnoreCase("own")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Nacao nacao : jAtivo.getNacoes().values()) {
                 ret.addAll(artefatoFacade.getArtefatos(listFactory.listArtefatos(), nacao));
             }
         } else if (filtro.equalsIgnoreCase("allies")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Nacao nacao : listFactory.listNacoes().values()) {
                 if (jAtivo.isJogadorAliado(nacao) && !jAtivo.isNacao(nacao)) {
                     ret.addAll(artefatoFacade.getArtefatos(listFactory.listArtefatos(), nacao));
                 }
             }
         } else if (filtro.equalsIgnoreCase("enemies")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Nacao nacao : listFactory.listNacoes().values()) {
                 if (!jAtivo.isJogadorAliado(nacao) && !jAtivo.isNacao(nacao)) {
                     ret.addAll(artefatoFacade.getArtefatos(listFactory.listArtefatos(), nacao));

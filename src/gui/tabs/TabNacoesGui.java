@@ -8,7 +8,7 @@ package gui.tabs;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
 import control.NacaoControler;
 import control.services.NacaoConverter;
@@ -240,15 +240,15 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         comboFiltro.addActionListener(nacaoControl);
         jtMainLista.getSelectionModel().addListSelectionListener(nacaoControl);
         //rendered
-        if (WorldFacade.getInstance().isNationPackages()) {
-            ltcr = new LimitTableCellRenderer(WorldFacade.getInstance().getNationPackagesLimit());
+        if (WorldFacadeCounselor.getInstance().isNationPackages()) {
+            ltcr = new LimitTableCellRenderer(WorldFacadeCounselor.getInstance().getNationPackagesLimit());
         }
         final TableModel model = nacaoControl.getMainTableModel(this.getFiltro());
         this.setMainModel(model);
     }
 
     private void addTabs() {
-        if (cenarioFacade.hasOrdensNacao(WorldFacade.getInstance().getPartida())) {
+        if (cenarioFacade.hasOrdensNacao(WorldFacadeCounselor.getInstance().getPartida())) {
             detalhesNacao.addTab(labels.getString("STARTUP"),
                     new javax.swing.ImageIcon(getClass().getResource("/images/package_icon.gif")),
                     stOrdens, labels.getString("STARTUP.TOOLTIP"));

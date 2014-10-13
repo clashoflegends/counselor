@@ -14,7 +14,7 @@ import business.MovimentoPersonagem;
 import business.facade.ExercitoFacade;
 import business.facade.LocalFacade;
 import business.facades.ListFactory;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import control.services.LocalConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
@@ -64,19 +64,19 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     private MapMenuManager mapMenuManager;
 
     public MapaControler(JPanel form) {
-        mapaManager = new MapaManager(WorldFacade.getInstance().getCenario(), form);
+        mapaManager = new MapaManager(WorldFacadeCounselor.getInstance().getCenario(), form);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_REDRAW);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_RANGE_CLICK);
         //inicialize locais
         WorldBuilderMenuManager.getInstance().doCanvasReset(mapaManager.getMapMaxSize(listFactory.listLocais().values()));
         WorldBuilderMenuManager.getInstance().setLocais(listFactory.listLocais());
         WorldBuilderMenuManager.getInstance().setNacoes(listFactory.listNacoes());
-        WorldBuilderMenuManager.getInstance().setTerrenos(WorldFacade.getInstance().getCenario().getTerrenos());
+        WorldBuilderMenuManager.getInstance().setTerrenos(WorldFacadeCounselor.getInstance().getCenario().getTerrenos());
         mapMenuManager = new MapMenuManager();
         mapMenuManager.doCanvasReset(mapaManager.getMapMaxSize(listFactory.listLocais().values()));
         mapMenuManager.setLocais(listFactory.listLocais());
         mapMenuManager.setNacoes(listFactory.listNacoes());
-        mapMenuManager.setTerrenos(WorldFacade.getInstance().getCenario().getTerrenos());
+        mapMenuManager.setTerrenos(WorldFacadeCounselor.getInstance().getCenario().getTerrenos());
     }
 
     public ImageIcon getTagImage() {

@@ -7,7 +7,7 @@ package gui.tabs;
 
 import baseLib.GenericoComboObject;
 import business.facade.CenarioFacade;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import control.CidadeControler;
 import control.MapaControler;
 import control.services.CidadeConverter;
@@ -177,7 +177,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     // End of variables declaration//GEN-END:variables
 
     private void initConfig() {
-        cenario = WorldFacade.getInstance().getCenario();
+        cenario = WorldFacadeCounselor.getInstance().getCenario();
         stOrdens = new SubTabOrdem(this, getMapaControler());
         jtMainLista.setAutoCreateColumnsFromModel(true);
         jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

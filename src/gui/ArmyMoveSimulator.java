@@ -4,7 +4,7 @@
  */
 package gui;
 
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import gui.subtabs.SubTabDirecaoExercito;
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
@@ -29,7 +29,7 @@ public class ArmyMoveSimulator extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocal(local);
         configUi();
-        SubTabDirecaoExercito jtabDirecao = new SubTabDirecaoExercito(local, 14, waterMovement, WorldFacade.getInstance().getMapaControler());
+        SubTabDirecaoExercito jtabDirecao = new SubTabDirecaoExercito(local, 14, waterMovement, WorldFacadeCounselor.getInstance().getMapaControler());
         GroupLayout parLayout = (GroupLayout) jpQuadro.getLayout();
         parLayout.replace(jPanel1, jtabDirecao);
     }

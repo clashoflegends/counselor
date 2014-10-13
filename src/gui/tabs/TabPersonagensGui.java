@@ -9,7 +9,7 @@ import baseLib.GenericoComboObject;
 import baseLib.SysProperties;
 import business.facade.JogadorFacade;
 import business.facade.PersonagemFacade;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
 import control.PersonagemControler;
 import control.services.FiltroConverter;
@@ -298,7 +298,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         detalhesPersonagem.addTab(labels.getString("RESULTADOS"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png")),
                 stResults, labels.getString("RESULTADOS.TOOLTIP"));
-        if (WorldFacade.getInstance().isSpells()) {
+        if (WorldFacadeCounselor.getInstance().isSpells()) {
             detalhesPersonagem.addTab(labels.getString("FEITICOS"),
                     new javax.swing.ImageIcon(getClass().getResource("/images/middle.gif")),
                     stSpells, labels.getString("FEITICOS.TOOLTIP"));
@@ -311,12 +311,12 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         doConfigTabs();
         //verifica se o personagem pode receber ordens...
         JogadorFacade jogadorFacade = new JogadorFacade();
-        if (jogadorFacade.isMine(personagem, WorldFacade.getInstance().getJogadorAtivo())
+        if (jogadorFacade.isMine(personagem, WorldFacadeCounselor.getInstance().getJogadorAtivo())
                 && personagemFacade.isAtivo(personagem)) {
             //eh do personagem ativo e meu
             if (SysProperties.getProps("OverrideElimination", "0").equals("1")
-                    || (!WorldFacade.getInstance().isGameOver()
-                    && !WorldFacade.getInstance().isJogadorAtivoEliminado(WorldFacade.getInstance().getJogadorAtivo()))) {
+                    || (!WorldFacadeCounselor.getInstance().isGameOver()
+                    && !WorldFacadeCounselor.getInstance().isJogadorAtivoEliminado(WorldFacadeCounselor.getInstance().getJogadorAtivo()))) {
                 //can receive orders
                 stOrdens.doMudaActor(personagem);
             } else {

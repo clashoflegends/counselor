@@ -7,7 +7,7 @@ package control;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.IBaseModel;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.tabs.TabWorldBuilderGui;
@@ -53,7 +53,7 @@ public class WorldBuilderControl extends ControlBase implements Serializable, Ac
 
     private static GenericoComboBoxModel getTerrenoComboModel() {
         List<IBaseModel> lista = new ArrayList<IBaseModel>();
-        for (IBaseModel elem : WorldFacade.getInstance().getCenario().getTerrenos().values()) {
+        for (IBaseModel elem : WorldFacadeCounselor.getInstance().getCenario().getTerrenos().values()) {
             lista.add(elem);
         }
         GenericoComboBoxModel model = new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]));

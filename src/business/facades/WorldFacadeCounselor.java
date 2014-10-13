@@ -27,20 +27,20 @@ import persistence.local.WorldManager;
  *
  * @author gurgel
  */
-public class WorldFacade implements Serializable {
+public class WorldFacadeCounselor implements Serializable {
 
-    private static final Log log = LogFactory.getLog(WorldFacade.class);
-    private static WorldFacade instance;
+    private static final Log log = LogFactory.getLog(WorldFacadeCounselor.class);
+    private static WorldFacadeCounselor instance;
     private MapaControler mapaControler;
 
-    private WorldFacade() {
+    private WorldFacadeCounselor() {
     }
 
-    public static synchronized WorldFacade getInstance() {
-        if (WorldFacade.instance == null) {
-            WorldFacade.instance = new WorldFacade();
+    public static synchronized WorldFacadeCounselor getInstance() {
+        if (WorldFacadeCounselor.instance == null) {
+            WorldFacadeCounselor.instance = new WorldFacadeCounselor();
         }
-        return WorldFacade.instance;
+        return WorldFacadeCounselor.instance;
     }
 
 

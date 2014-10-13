@@ -10,7 +10,7 @@ import baseLib.SysApoio;
 import business.facade.AcaoFacade;
 import business.facade.NacaoFacade;
 import business.facades.ListFactory;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.*;
 import model.Jogador;
@@ -184,7 +184,7 @@ public class NacaoConverter implements Serializable {
             if (filtro == FILTRO_TODOS) {
                 ret.add(nacao);
             } else if (filtro == FILTRO_PROPRIOS) {
-                Jogador jativo = WorldFacade.getInstance().getJogadorAtivo();
+                Jogador jativo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
                 Jogador jnacao = null;
                 if (nacao.getOwner() != null) {
                     jnacao = nacaoFacade.getOwner(nacao);

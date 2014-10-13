@@ -8,7 +8,7 @@ import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
 import business.facade.*;
 import business.facades.ListFactory;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -129,7 +129,7 @@ public class CidadeConverter implements Serializable {
         cArray[ii++] = cidadeFacade.getCoordenadas(cidade);
 
         cArray[ii++] = cidadeFacade.getArrecadacaoImpostos(cidade);
-        cArray[ii++] = cidadeFacade.getProducao(cidade, WorldFacade.getInstance().getCenario().getMoney());
+        cArray[ii++] = cidadeFacade.getProducao(cidade, WorldFacadeCounselor.getInstance().getCenario().getMoney());
         cArray[ii++] = cidadeFacade.getUpkeepMoney(cidade);
         cArray[ii++] = cidadeFacade.getLealdade(cidade);
         cArray[ii++] = cidadeFacade.getLealdadeDelta(cidade);
@@ -207,7 +207,7 @@ public class CidadeConverter implements Serializable {
             } else if (elem.getClass().getSimpleName().equals("Exercito")) {
                 Exercito exercito = (Exercito) elem;
                 int i = 0;
-                ret[ii][i++] = exercitoFacade.getComandanteTitulo(exercito, WorldFacade.getInstance().getCenario());
+                ret[ii][i++] = exercitoFacade.getComandanteTitulo(exercito, WorldFacadeCounselor.getInstance().getCenario());
                 ret[ii][i++] = exercitoFacade.getNacaoNome(exercito);
                 ret[ii][i++] = exercitoFacade.getDescricaoTamanho(exercito);
                 ii++;
@@ -257,7 +257,7 @@ public class CidadeConverter implements Serializable {
                 int i = 0;
                 final int estoque = cidadeFacade.getEstoque(cidade, produto);
                 final int producao = cidadeFacade.getProducao(cidade, produto);
-                Mercado mercado = WorldFacade.getInstance().getMercado();
+                Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
                 int unit = mercado.getProdutoVlVenda(produto);
                 ret[ii][i++] = produto.getNome();
                 ret[ii][i++] = estoque + producao;
@@ -292,7 +292,7 @@ public class CidadeConverter implements Serializable {
         if (filtro.equalsIgnoreCase("all")) {
             ret.addAll(listFactory.listCidades().values());
         } else if (filtro.equalsIgnoreCase("own")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Cidade cidade : listFactory.listCidades().values()) {
                 try {
                     if (jAtivo.isNacao(cidade.getNacao())) {
@@ -302,7 +302,7 @@ public class CidadeConverter implements Serializable {
                 }
             }
         } else if (filtro.equalsIgnoreCase("allies")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Cidade cidade : listFactory.listCidades().values()) {
                 try {
                     if (jAtivo.isJogadorAliado(cidade.getNacao()) && !jAtivo.isNacao(cidade.getNacao())) {
@@ -312,7 +312,7 @@ public class CidadeConverter implements Serializable {
                 }
             }
         } else if (filtro.equalsIgnoreCase("enemies")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Cidade cidade : listFactory.listCidades().values()) {
                 try {
                     if (!jAtivo.isJogadorAliado(cidade.getNacao()) && !jAtivo.isNacao(cidade.getNacao())) {
@@ -379,15 +379,15 @@ public class CidadeConverter implements Serializable {
 
     private static List<Produto> getResourceList() {
         List<Produto> list = new ArrayList<Produto>();
-        list.addAll(WorldFacade.getInstance().getCenario().getProdutos().values());
-        list.remove(WorldFacade.getInstance().getCenario().getMoney());
+        list.addAll(WorldFacadeCounselor.getInstance().getCenario().getProdutos().values());
+        list.remove(WorldFacadeCounselor.getInstance().getCenario().getMoney());
         return list;
     }
 
     public static String getResultados(Cidade cidade) {
         final CenarioFacade cenarioFacade = new CenarioFacade();
         final String info = LocalConverter.getInfo(cidadeFacade.getLocal(cidade));
-        if (!cenarioFacade.hasOrdensCidade(WorldFacade.getInstance().getCenario())) {
+        if (!cenarioFacade.hasOrdensCidade(WorldFacadeCounselor.getInstance().getCenario())) {
             return info;
         } else {
             return ordemFacade.getResultado(cidade) + "\n" + info;

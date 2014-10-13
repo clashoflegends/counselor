@@ -8,7 +8,7 @@ import utils.StringRet;
 import baseLib.*;
 import business.facade.*;
 import business.facades.ListFactory;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,7 +48,7 @@ public class PersonagemConverter implements Serializable {
     }
 
     private static String[] getPersonagemColNames(List<Class> classes) {
-        int qtOrdens = WorldFacade.getInstance().getOrdensQtMax();
+        int qtOrdens = WorldFacadeCounselor.getInstance().getOrdensQtMax();
         List<String> colNames = new ArrayList<String>(30);
         colNames.add(labels.getString("NOME"));
         classes.add(java.lang.String.class);
@@ -62,7 +62,7 @@ public class PersonagemConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("AGENTE"));
         classes.add(java.lang.Integer.class);
-        if (WorldFacade.getInstance().hasEmissario()) {
+        if (WorldFacadeCounselor.getInstance().hasEmissario()) {
             colNames.add(labels.getString("EMISSARIO"));
             classes.add(java.lang.Integer.class);
         }
@@ -88,7 +88,7 @@ public class PersonagemConverter implements Serializable {
     }
 
     private static Object[] personagemToArray(Personagem personagem) {
-        int qtOrdens = WorldFacade.getInstance().getOrdensQtMax();
+        int qtOrdens = WorldFacadeCounselor.getInstance().getOrdensQtMax();
         int ii = 0;
         String[] temp;
         Object[] cArray = new Object[getPersonagemColNames(new ArrayList<Class>(30)).length];
@@ -97,14 +97,14 @@ public class PersonagemConverter implements Serializable {
         //inicia array
         cArray[ii++] = personagemFacade.getNome(personagem);
         for (int nn = 0; nn < qtOrdens; nn++) {
-            temp = ordemFacade.getOrdemDisplay(personagem, nn, WorldFacade.getInstance().getCenario(), WorldFacade.getInstance().getJogadorAtivo());
+            temp = ordemFacade.getOrdemDisplay(personagem, nn, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
             cArray[ORDEM_COL_INDEX_START + nn] = temp[0] + temp[1];
             ii++;
         }
         cArray[ii++] = localFacade.getCoordenadas(local);
         cArray[ii++] = personagem.getPericiaComandante();
         cArray[ii++] = personagem.getPericiaAgente();
-        if (WorldFacade.getInstance().hasEmissario()) {
+        if (WorldFacadeCounselor.getInstance().hasEmissario()) {
             cArray[ii++] = personagem.getPericiaEmissario();
         }
         cArray[ii++] = personagem.getPericiaMago();
@@ -128,7 +128,7 @@ public class PersonagemConverter implements Serializable {
     public static boolean isProprio(Personagem personagem) {
         boolean ret = false;
         try {
-            Jogador jativo = WorldFacade.getInstance().getPartida().getJogadorAtivo();
+            Jogador jativo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
             Jogador jpersonagem = personagem.getNacao().getOwner();
             //log.info(jativo + "/" + jpersonagem);
             if (jativo == jpersonagem) {
@@ -213,7 +213,7 @@ public class PersonagemConverter implements Serializable {
         //se personagem==null, entao lista todas as magias possiveis
         if (personagem == null) {
             //retorna uma lista de feiticos, filtrada pela ordem
-            items = personagemFacade.listFeiticoByOrdem(ordem, WorldFacade.getInstance().getCenario().getFeiticos());
+            items = personagemFacade.listFeiticoByOrdem(ordem, WorldFacadeCounselor.getInstance().getCenario().getFeiticos());
         } else {
             //retorna uma lista de Personagem.PersonagemFeitico
             items = personagemFacade.listFeiticoByOrdem(ordem, personagem);
@@ -293,7 +293,7 @@ public class PersonagemConverter implements Serializable {
         if (filtro.equalsIgnoreCase("all")) {
             ret.addAll(listFactory.listPersonagens());
         } else if (filtro.equalsIgnoreCase("own")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Personagem personagem : listFactory.listPersonagens()) {
                 try {
                     if (jAtivo.isNacao(personagem.getNacao())) {
@@ -303,7 +303,7 @@ public class PersonagemConverter implements Serializable {
                 }
             }
         } else if (filtro.equalsIgnoreCase("capital")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Personagem personagem : listFactory.listPersonagens()) {
                 try {
                     if (jAtivo.isNacao(personagem.getNacao())) {
@@ -315,7 +315,7 @@ public class PersonagemConverter implements Serializable {
                 }
             }
         } else if (filtro.equalsIgnoreCase("army")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Personagem personagem : listFactory.listPersonagens()) {
                 try {
                     if (jAtivo.isNacao(personagem.getNacao())) {
@@ -327,7 +327,7 @@ public class PersonagemConverter implements Serializable {
                 }
             }
         } else if (filtro.equalsIgnoreCase("allies")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Personagem personagem : listFactory.listPersonagens()) {
                 try {
                     if (jAtivo.isJogadorAliado(personagem.getNacao()) && !jAtivo.isNacao(personagem.getNacao())) {
@@ -337,7 +337,7 @@ public class PersonagemConverter implements Serializable {
                 }
             }
         } else if (filtro.equalsIgnoreCase("enemies")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Personagem personagem : listFactory.listPersonagens()) {
                 try {
                     if (!jAtivo.isJogadorAliado(personagem.getNacao()) && !jAtivo.isNacao(personagem.getNacao())) {
@@ -352,9 +352,9 @@ public class PersonagemConverter implements Serializable {
 
     public static List listaOrdens() {
         List ret = new ArrayList();
-        Jogador jogadorAtivo = WorldFacade.getInstance().getJogadorAtivo();
+        Jogador jogadorAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
         //lista todos os personagens, carregando para o xml
-        for (Iterator<Personagem> iter = WorldFacade.getInstance().getPersonagens(); iter.hasNext();) {
+        for (Iterator<Personagem> iter = WorldFacadeCounselor.getInstance().getPersonagens(); iter.hasNext();) {
             Personagem personagem = iter.next();
             if (jogadorAtivo.isNacao(personagem.getNacao())) {
                 for (int index = 0; index < personagem.getAcaoSize(); index++) {
@@ -378,14 +378,14 @@ public class PersonagemConverter implements Serializable {
      * (Litoral), Aldeia de Rhodes da nação Persia.
      */
     public static String getResultado(Personagem personagem) {
-        //Cenario cenario = WorldFacade.getInstance().getCenario();
+        //Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         return personagemFacade.getResultado(personagem) + getPericias(personagem);
     }
 
     public static String getPericias(Personagem personagem) {
         String mask1 = "   %s %d(%d)\n";
         String mask2 = "   %s %d\n";
-        Cenario cenario = WorldFacade.getInstance().getCenario();
+        Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         String ret = "";
         if (personagem.getPericiaAgenteNatural() > 0) {
             if (personagem.getPericiaAgente() != personagem.getPericiaAgenteNatural()) {
@@ -482,7 +482,7 @@ public class PersonagemConverter implements Serializable {
      */
 //    public static String[] setOrdem(Personagem personagem, int index, PersonagemOrdem pOrdem) {
 //        ordemFacade.setOrdem(personagem, index, pOrdem);
-//        return ordemFacade.getOrdemDisplay(personagem, index, WorldFacade.getInstance().getCenario(), WorldFacade.getInstance().getJogadorAtivo());
+//        return ordemFacade.getOrdemDisplay(personagem, index, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
 //    }
 //    public static Ordem getOrdem(Personagem personagem, int indexOrdem) {
 //        return ordemFacade.getOrdem(personagem, indexOrdem);

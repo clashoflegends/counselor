@@ -8,7 +8,7 @@ import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
 import business.facade.*;
 import business.facades.ListFactory;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.*;
 import model.*;
@@ -35,7 +35,7 @@ public class ExercitoConverter implements Serializable {
     private static final LocalFacade localFacade = new LocalFacade();
     private static final CidadeFacade cidadeFacade = new CidadeFacade();
     private static final CenarioFacade cenarioFacade = new CenarioFacade();
-    private static final Cenario cenario = WorldFacade.getInstance().getCenario();
+    private static final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
 
     public static String getDisplayDetalhes(Exercito exercito) {
         if (exercito == null) {
@@ -73,12 +73,12 @@ public class ExercitoConverter implements Serializable {
                     ret += String.format(labels.getString("ESQUADRA.AVISTADO"),
                             exercitoFacade.getDescricaoTamanho(elem),
                             exercitoFacade.getNacaoNome(elem),
-                            exercitoFacade.getComandanteTitulo(elem, WorldFacade.getInstance().getCenario()));
+                            exercitoFacade.getComandanteTitulo(elem, WorldFacadeCounselor.getInstance().getCenario()));
                 } else {
                     ret += String.format(labels.getString("EXERCITO.AVISTADO"),
                             exercitoFacade.getDescricaoTamanho(elem),
                             exercitoFacade.getNacaoNome(elem),
-                            exercitoFacade.getComandanteTitulo(elem, WorldFacade.getInstance().getCenario()));
+                            exercitoFacade.getComandanteTitulo(elem, WorldFacadeCounselor.getInstance().getCenario()));
                 }
                 ret += "\n";
             }
@@ -119,7 +119,7 @@ public class ExercitoConverter implements Serializable {
     private static Object[] toArray(Exercito exercito) {
         int ii = 0;
         Object[] cArray = new Object[getExercitoColNames().length];
-        cArray[ii++] = exercitoFacade.getComandanteTitulo(exercito, WorldFacade.getInstance().getCenario());
+        cArray[ii++] = exercitoFacade.getComandanteTitulo(exercito, WorldFacadeCounselor.getInstance().getCenario());
         cArray[ii++] = exercitoFacade.getNacaoNome(exercito);
         Local local = exercitoFacade.getLocal(exercito);
         cArray[ii++] = localFacade.getCoordenadas(local);
@@ -287,7 +287,7 @@ public class ExercitoConverter implements Serializable {
         if (filtro.equalsIgnoreCase("all")) {
             ret.addAll(listFactory.listExercitos().values());
         } else if (filtro.equalsIgnoreCase("own")) {
-            Jogador jativo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jativo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Exercito exercito : listFactory.listExercitos().values()) {
                 try {
                     if (jativo.isNacao(exercito.getNacao())) {
@@ -297,7 +297,7 @@ public class ExercitoConverter implements Serializable {
                 }
             }
         } else if (filtro.equalsIgnoreCase("armymy")) {
-            Jogador jativo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jativo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Exercito exercito : listFactory.listExercitos().values()) {
                 try {
                     if (jativo.isNacao(exercito.getNacao()) && !exercitoFacade.isEsquadra(exercito)) {
@@ -307,7 +307,7 @@ public class ExercitoConverter implements Serializable {
                 }
             }
         } else if (filtro.equalsIgnoreCase("navymy")) {
-            Jogador jativo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jativo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Exercito exercito : listFactory.listExercitos().values()) {
                 try {
                     if (jativo.isNacao(exercito.getNacao()) && exercitoFacade.isEsquadra(exercito)) {
@@ -317,7 +317,7 @@ public class ExercitoConverter implements Serializable {
                 }
             }
         } else if (filtro.equalsIgnoreCase("garrisonmy")) {
-            Jogador jativo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jativo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Exercito exercito : listFactory.listExercitos().values()) {
                 try {
                     if (jativo.isNacao(exercito.getNacao()) && exercitoFacade.isGuarnicao(exercito)) {
@@ -327,7 +327,7 @@ public class ExercitoConverter implements Serializable {
                 }
             }
         } else if (filtro.equalsIgnoreCase("allies")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Exercito exercito : listFactory.listExercitos().values()) {
                 try {
                     if (jAtivo.isJogadorAliado(exercito.getNacao()) && !jAtivo.isNacao(exercito.getNacao())) {
@@ -337,7 +337,7 @@ public class ExercitoConverter implements Serializable {
                 }
             }
         } else if (filtro.equalsIgnoreCase("enemies")) {
-            Jogador jAtivo = WorldFacade.getInstance().getJogadorAtivo();
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Exercito exercito : listFactory.listExercitos().values()) {
                 try {
                     if (!jAtivo.isJogadorAliado(exercito.getNacao()) && !jAtivo.isNacao(exercito.getNacao())) {
@@ -494,7 +494,7 @@ public class ExercitoConverter implements Serializable {
     private static Object[] battleToArray(ExercitoSim exercito) {
         int ii = 0;
         Object[] cArray = new Object[getExercitoColNames().length];
-        cArray[ii++] = exercitoFacade.getComandanteTitulo(exercito, WorldFacade.getInstance().getCenario());
+        cArray[ii++] = exercitoFacade.getComandanteTitulo(exercito, WorldFacadeCounselor.getInstance().getCenario());
         cArray[ii++] = exercitoFacade.getAtaqueExercito(exercito, true);
         cArray[ii++] = exercitoFacade.getDefesaExercito(exercito, true);
         cArray[ii++] = exercitoFacade.getAtaqueExercito(exercito, false);

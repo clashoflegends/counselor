@@ -12,7 +12,7 @@ import business.facade.LocalFacade;
 import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
 import business.facades.ListFactory;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import control.services.CenarioConverter;
 import control.services.CidadeConverter;
 import control.services.NacaoConverter;
@@ -108,11 +108,11 @@ public abstract class ActorInterface extends ControlBase implements Serializable
     }
 
     protected Jogador getJogadorAtivo() {
-        return WorldFacade.getInstance().getJogadorAtivo();
+        return WorldFacadeCounselor.getInstance().getJogadorAtivo();
     }
 
     protected Cenario getCenario() {
-        return WorldFacade.getInstance().getCenario();
+        return WorldFacadeCounselor.getInstance().getCenario();
     }
 
     public GenericoTableModel getOrdemModel() {

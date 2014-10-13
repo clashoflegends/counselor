@@ -7,7 +7,7 @@ package gui;
 
 import baseLib.SysApoio;
 import baseLib.SysProperties;
-import business.facades.WorldFacade;
+import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
 import control.WorldControler;
 import gui.tabs.TabPersonagensGui;
@@ -328,7 +328,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         }
 
         MapaControler mapaControl = new MapaControler(this);
-        WorldFacade.getInstance().setMapaControler(mapaControl);
+        WorldFacadeCounselor.getInstance().setMapaControler(mapaControl);
         MainMapaGui mapaGui = new MainMapaGui(mapaControl);
         //Monta área do mapa
         this.splitMainPanel.setRightComponent(mapaGui);
