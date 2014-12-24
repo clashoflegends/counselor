@@ -32,8 +32,6 @@ public class ArtefatoControler implements Serializable, ActionListener, ListSele
 
     private static final Log log = LogFactory.getLog(ArtefatoControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-
-    ;
     private GenericoTableModel mainTableModel;
     private TabArtefatosGui tabGui;
     private List listaExibida;
@@ -64,6 +62,7 @@ public class ArtefatoControler implements Serializable, ActionListener, ListSele
         return tabGui;
     }
 
+    @Override
     public void actionPerformed(ActionEvent event) {
         if (event.getSource() instanceof JTable) {
             log.info(labels.getString("OPS.JTABLE.EVENT"));
@@ -75,6 +74,7 @@ public class ArtefatoControler implements Serializable, ActionListener, ListSele
         }
     }
 
+    @Override
     public void valueChanged(ListSelectionEvent event) {
         if (event.getValueIsAdjusting()) {
             return;
