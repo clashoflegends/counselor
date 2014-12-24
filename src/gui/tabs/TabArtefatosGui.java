@@ -15,6 +15,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import model.Artefato;
+import model.Habilidade;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
@@ -196,7 +197,7 @@ public class TabArtefatosGui extends TabBase implements Serializable {
     }
 
     public final void setMainModel(TableModel model) {
-        this.setHistoria("");
+        this.setAreaText();
         this.jtMainLista.setModel(model);
         jtMainLista.doLayout();
         this.calcColumnWidths(jtMainLista);
@@ -213,16 +214,24 @@ public class TabArtefatosGui extends TabBase implements Serializable {
         this.qtArtefatos.setText(getMainLista().getRowCount() + "");
     }
 
-    public void setHistoria(String historia) {
-        this.listaHistoria.setText(historia);
+    private void setAreaText(Artefato artefato) {
+        String temp = String.format("%s\n\n- %s:", artefato.getHistoria(), labels.getString("ITEM.SECONDARY"));
+        for (Habilidade habilidade : artefato.getHabilidades().values()) {
+            temp += "\n" + habilidade.getNome();
+        }
+        this.listaHistoria.setText(temp);
+    }
+
+    private void setAreaText() {
+        this.listaHistoria.setText("");
     }
 
     public void doMudaArtefato(Artefato artefato) {
         try {
             getMapaControler().printTag(artefato.getLocal());
-            setHistoria(artefato.getHistoria());
+            setAreaText(artefato);
         } catch (NullPointerException ex) {
-            setHistoria("");
+            setAreaText();
             this.doTagHide();
         }
     }
