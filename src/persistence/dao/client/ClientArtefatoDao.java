@@ -22,15 +22,23 @@ public class ClientArtefatoDao implements IArtefatoDao, Serializable {
 
     private static final Log log = LogFactory.getLog(ClientArtefatoDao.class);
 
+    @Override
     public SortedMap<String, Artefato> list(Partida partida) throws PersistenceException {
         return WorldManager.getInstance().getArtefatos();
     }
 
+    @Override
     public Artefato get(int id) throws PersistenceException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void clear() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Artefato get(int id, Partida partida) throws PersistenceException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
