@@ -29,10 +29,8 @@ public class ListFactory implements Serializable {
         try {
             return localDao.list(null);
         } catch (PersistenceException ex) {
-            log.fatal("texto..", ex);
-            System.exit(-1);
+            throw new UnsupportedOperationException("text...", ex);
         }
-        return null;
     }
 
     public Local getLocal(String Coordenada) {
@@ -61,10 +59,8 @@ public class ListFactory implements Serializable {
         try {
             return personagemDao.list(null).values();
         } catch (PersistenceException ex) {
-            log.fatal("texto..", ex);
-            System.exit(-1);
+            throw new UnsupportedOperationException("text...", ex);
         }
-        return null;
     }
 
     public SortedMap<String, Nacao> listNacoes() {
@@ -92,10 +88,8 @@ public class ListFactory implements Serializable {
             IExercitoDao exercitoDao = PersistFactory.getExercitoDao();
             return exercitoDao.list(WorldManager.getInstance().getPartida());
         } catch (PersistenceException ex) {
-            log.fatal("texto..", ex);
-            System.exit(-1);
+            throw new UnsupportedOperationException("text...", ex);
         }
-        return null;
     }
 
     private Jogador getJogador(int id) {
@@ -103,10 +97,8 @@ public class ListFactory implements Serializable {
         try {
             return jogadorDao.get(id);
         } catch (PersistenceException ex) {
-            log.fatal("texto..", ex);
-            System.exit(-1);
+            throw new UnsupportedOperationException("text...", ex);
         }
-        return null;
     }
 
     private Produto getProduto(int id) {
@@ -114,10 +106,8 @@ public class ListFactory implements Serializable {
         try {
             return produtoDao.get(id);
         } catch (PersistenceException ex) {
-            log.fatal("texto..", ex);
-            System.exit(-1);
+            throw new UnsupportedOperationException("text...", ex);
         }
-        return null;
     }
 
     public SortedMap<String, Ordem> listAcoes() {
@@ -135,10 +125,8 @@ public class ListFactory implements Serializable {
         try {
             return aliancaDao.list();
         } catch (PersistenceException ex) {
-            log.fatal("texto..", ex);
-            System.exit(-1);
+            throw new UnsupportedOperationException("text...", ex);
         }
-        return null;
     }
 
     private Alianca getAliancas(int id) {
@@ -146,10 +134,8 @@ public class ListFactory implements Serializable {
         try {
             return aliancaDao.get(id);
         } catch (PersistenceException ex) {
-            log.fatal("texto..", ex);
-            System.exit(-1);
+            throw new UnsupportedOperationException("text...", ex);
         }
-        return null;
     }
 
     public List<Feitico> listFeiticos() {
