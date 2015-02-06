@@ -25,6 +25,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,6 +87,11 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     public ImageIcon printMapaGeral() {
         final Jogador jogadorAtivo = WorldManager.getInstance().getPartida().getJogadorAtivo();
         return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), jogadorAtivo));
+    }
+
+    public BufferedImage getMap() {
+        final Jogador jogadorAtivo = WorldManager.getInstance().getPartida().getJogadorAtivo();
+        return mapaManager.printMapaGeral(listFactory.listLocais().values(), jogadorAtivo);
     }
 
     public MainMapaGui getTabGui() {

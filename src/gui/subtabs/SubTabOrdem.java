@@ -8,7 +8,7 @@ import control.support.ActorInterfaceFactory;
 import control.MapaControler;
 import control.OrdemControler;
 import control.OrdemControlerFloater;
-import gui.ComponentFactory;
+import gui.services.ComponentFactory;
 import gui.TabBase;
 import gui.services.IAcaoGui;
 import java.awt.Component;

@@ -23,9 +23,12 @@ import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import model.*;
 import org.apache.commons.logging.Log;
@@ -71,6 +74,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doSave(jbTemp);
             } else if ("jbSaveWorld".equals(jbTemp.getActionCommand())) {
                 doSaveWorld(jbTemp);
+            } else if ("jbExportMap".equals(jbTemp.getActionCommand())) {
+                doMapSave(jbTemp);
             } else if ("jbCopy".equals(jbTemp.getActionCommand())) {
                 doCopy();
             } else if ("jbSend".equals(jbTemp.getActionCommand())) {
@@ -200,6 +205,25 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.getGui().setStatusMsg(ex.getMessage());
         }
         return ret;
+    }
+
+    private void doMapSave(JButton jbTemp) {
+        //define nome default
+        Partida partida = WorldManager.getInstance().getPartida();
+        String nomeArquivo = String.format(labels.getString("FILENAME.MAP"),
+                partida.getId(), partida.getTurno(), partida.getJogadorAtivo().getLogin());
+
+        fc.setSelectedFile(new File(nomeArquivo));
+        //seta filters
+        fc.resetChoosableFileFilters();
+        fc.setFileFilter(PathFactory.getFilterImages());
+        //exibe dialogo
+
+        if (fc.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
+            saveMapFile();
+        } else {
+            this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
+        }
     }
 
     private void doAbout() throws HeadlessException {
@@ -684,6 +708,18 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.savedWorld = true;
         } catch (PersistenceException ex) {
             log.fatal("Can't save???", ex);
+        }
+    }
+
+    public void saveMapFile() {
+        try {
+            // Save image
+            BufferedImage buffered = WorldFacadeCounselor.getInstance().getMapaControler().getMap();
+            ImageIO.write(buffered, "png", fc.getSelectedFile());
+            this.getGui().setStatusMsg(String.format(labels.getString("MAPA.SALVAS"), fc.getSelectedFile().getName()));
+        } catch (IOException ex) {
+            log.fatal("IOException Problem", ex);
+            this.getGui().setStatusMsg(labels.getString("IO.ERROR"));
         }
     }
 

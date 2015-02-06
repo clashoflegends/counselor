@@ -44,6 +44,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbLoad.addActionListener(wc);
         jbSave.addActionListener(wc);
         jbSaveWorld.addActionListener(wc);
+        jbMap.addActionListener(wc);
         jbCopy.addActionListener(wc);
         jbSend.addActionListener(wc);
         jbAbout.addActionListener(wc);
@@ -72,6 +73,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbSaveWorld = new javax.swing.JButton();
         jbSave = new javax.swing.JButton();
         jbCopy = new javax.swing.JButton();
+        jbMap = new javax.swing.JButton();
         jbSend = new javax.swing.JButton();
         jbAbout = new javax.swing.JButton();
         splitMainPanel = new javax.swing.JSplitPane();
@@ -112,70 +114,87 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
+        jbOpen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/open icon.gif"))); // NOI18N
         jbOpen.setText(labels.getString("ABRIR.TURNO")); // NOI18N
         jbOpen.setToolTipText(labels.getString("ABRIR.TURNO.TOOLTIP")); // NOI18N
         jbOpen.setActionCommand("jbOpen");
         jbOpen.setFocusable(false);
-        jbOpen.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbOpen.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jbOpen.setName("jbOpen"); // NOI18N
         jbOpen.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbOpen);
 
+        jbLoad.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/load icon.png"))); // NOI18N
         jbLoad.setText(labels.getString("CARREGAR.ACOES")); // NOI18N
         jbLoad.setToolTipText(labels.getString("CARREGAR.ACOES.TOOLTIP")); // NOI18N
         jbLoad.setActionCommand("jbLoad");
         jbLoad.setEnabled(false);
         jbLoad.setFocusable(false);
-        jbLoad.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbLoad.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jbLoad.setName("jbLoad"); // NOI18N
         jbLoad.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbLoad);
 
+        jbSaveWorld.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/disk icon.jpg"))); // NOI18N
         jbSaveWorld.setText(labels.getString("SALVAR.WORLD")); // NOI18N
         jbSaveWorld.setToolTipText(labels.getString("SALVAR.WORLD.TOOLTIP")); // NOI18N
         jbSaveWorld.setActionCommand("jbSaveWorld");
         jbSaveWorld.setEnabled(false);
         jbSaveWorld.setFocusable(false);
-        jbSaveWorld.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbSaveWorld.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jbSaveWorld.setName("jbSaveWorld"); // NOI18N
         jbSaveWorld.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbSaveWorld);
 
+        jbSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/notebook edit.png"))); // NOI18N
         jbSave.setText(labels.getString("SALVAR.ACOES")); // NOI18N
         jbSave.setToolTipText(labels.getString("SALVAR.ACOES.TOOLTIP")); // NOI18N
         jbSave.setActionCommand("jbSave");
         jbSave.setEnabled(false);
         jbSave.setFocusable(false);
-        jbSave.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbSave.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jbSave.setName("jbSave"); // NOI18N
         jbSave.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbSave);
 
+        jbCopy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/copy icon.png"))); // NOI18N
         jbCopy.setText(labels.getString("COPIAR.ACOES")); // NOI18N
         jbCopy.setToolTipText(labels.getString("COPIAR.ACOES.TOOLTIP")); // NOI18N
         jbCopy.setActionCommand("jbCopy");
         jbCopy.setEnabled(false);
         jbCopy.setFocusable(false);
-        jbCopy.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbCopy.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jbCopy.setName("jbCopy"); // NOI18N
         jbCopy.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbCopy);
 
+        jbMap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/world_icon.gif"))); // NOI18N
+        jbMap.setText(labels.getString("SALVAR.MAPA")); // NOI18N
+        jbMap.setToolTipText(labels.getString("SALVAR.MAPA.TOOLTIP")); // NOI18N
+        jbMap.setActionCommand("jbExportMap");
+        jbMap.setFocusable(false);
+        jbMap.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jbMap.setName("jbExportMap"); // NOI18N
+        jbMap.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jbMap);
+
+        jbSend.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/green ok 2.png"))); // NOI18N
         jbSend.setText(labels.getString("ENVIAR.ACOES")); // NOI18N
         jbSend.setToolTipText(labels.getString("ENVIAR.ACOES.TOOLTIP")); // NOI18N
         jbSend.setActionCommand("jbSend");
         jbSend.setEnabled(false);
         jbSend.setFocusable(false);
-        jbSend.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbSend.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jbSend.setName("jbSend"); // NOI18N
         jbSend.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbSend);
 
+        jbAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/about icon.png"))); // NOI18N
         jbAbout.setText(labels.getString("MENU.ABOUT")); // NOI18N
         jbAbout.setToolTipText(labels.getString("SALVAR.ACOES.TOOLTIP")); // NOI18N
         jbAbout.setActionCommand("jbAbout");
         jbAbout.setFocusable(false);
-        jbAbout.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbAbout.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jbAbout.setName("jbAbout"); // NOI18N
         jbAbout.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbAbout);
@@ -202,7 +221,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(labelMoney, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
                     .addComponent(labelJogador, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)))
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 782, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 782, Short.MAX_VALUE)
         );
         infoPanelLayout.setVerticalGroup(
             infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -275,6 +294,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JButton jbAbout;
     private javax.swing.JButton jbCopy;
     private javax.swing.JButton jbLoad;
+    private javax.swing.JButton jbMap;
     private javax.swing.JButton jbOpen;
     private javax.swing.JButton jbSave;
     private javax.swing.JButton jbSaveWorld;
@@ -346,6 +366,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             jbSaveWorld.setEnabled(false);
             jbSaveWorld.setVisible(false);
         }
+        jbMap.setEnabled(true);
         jbCopy.setEnabled(true);
         jbSend.setEnabled(true);
         jbAbout.setEnabled(true);
