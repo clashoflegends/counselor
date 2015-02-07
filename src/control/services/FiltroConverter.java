@@ -55,7 +55,7 @@ public class FiltroConverter implements Serializable {
                 lista.add(nacao);
             }
         }
-        GenericoComboBoxModel model = new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]));
+        GenericoComboBoxModel model = new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]), true);
         return model;
     }
 }
