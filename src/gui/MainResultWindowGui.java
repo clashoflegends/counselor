@@ -114,7 +114,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        jbOpen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/open icon.gif"))); // NOI18N
+        jbOpen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/open actions.png"))); // NOI18N
         jbOpen.setText(labels.getString("ABRIR.TURNO")); // NOI18N
         jbOpen.setToolTipText(labels.getString("ABRIR.TURNO.TOOLTIP")); // NOI18N
         jbOpen.setActionCommand("jbOpen");
@@ -124,7 +124,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbOpen.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbOpen);
 
-        jbLoad.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/load icon.png"))); // NOI18N
+        jbLoad.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/open results.png"))); // NOI18N
         jbLoad.setText(labels.getString("CARREGAR.ACOES")); // NOI18N
         jbLoad.setToolTipText(labels.getString("CARREGAR.ACOES.TOOLTIP")); // NOI18N
         jbLoad.setActionCommand("jbLoad");
@@ -146,7 +146,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbSaveWorld.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbSaveWorld);
 
-        jbSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/notebook edit.png"))); // NOI18N
+        jbSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save.png"))); // NOI18N
         jbSave.setText(labels.getString("SALVAR.ACOES")); // NOI18N
         jbSave.setToolTipText(labels.getString("SALVAR.ACOES.TOOLTIP")); // NOI18N
         jbSave.setActionCommand("jbSave");
@@ -157,7 +157,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbSave.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbSave);
 
-        jbCopy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/copy icon.png"))); // NOI18N
+        jbCopy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/copy.png"))); // NOI18N
         jbCopy.setText(labels.getString("COPIAR.ACOES")); // NOI18N
         jbCopy.setToolTipText(labels.getString("COPIAR.ACOES.TOOLTIP")); // NOI18N
         jbCopy.setActionCommand("jbCopy");
@@ -168,7 +168,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbCopy.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbCopy);
 
-        jbMap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/world_icon.gif"))); // NOI18N
+        jbMap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save map.png"))); // NOI18N
         jbMap.setText(labels.getString("SALVAR.MAPA")); // NOI18N
         jbMap.setToolTipText(labels.getString("SALVAR.MAPA.TOOLTIP")); // NOI18N
         jbMap.setActionCommand("jbExportMap");
@@ -178,7 +178,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbMap.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbMap);
 
-        jbSend.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/green ok 2.png"))); // NOI18N
+        jbSend.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/submit.png"))); // NOI18N
         jbSend.setText(labels.getString("ENVIAR.ACOES")); // NOI18N
         jbSend.setToolTipText(labels.getString("ENVIAR.ACOES.TOOLTIP")); // NOI18N
         jbSend.setActionCommand("jbSend");
@@ -189,7 +189,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbSend.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbSend);
 
-        jbAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/about icon.png"))); // NOI18N
+        jbAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/about.png"))); // NOI18N
         jbAbout.setText(labels.getString("MENU.ABOUT")); // NOI18N
         jbAbout.setToolTipText(labels.getString("SALVAR.ACOES.TOOLTIP")); // NOI18N
         jbAbout.setActionCommand("jbAbout");

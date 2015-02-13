@@ -174,7 +174,7 @@
             <Component class="javax.swing.JButton" name="jbOpen">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/open icon.gif"/>
+                  <Image iconType="3" name="/images/open actions.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                   <ResourceString bundle="gui/strings/labels.properties" key="ABRIR.TURNO" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
@@ -192,7 +192,7 @@
             <Component class="javax.swing.JButton" name="jbLoad">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/load icon.png"/>
+                  <Image iconType="3" name="/images/open results.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                   <ResourceString bundle="gui/strings/labels.properties" key="CARREGAR.ACOES" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
@@ -230,7 +230,7 @@
             <Component class="javax.swing.JButton" name="jbSave">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/notebook edit.png"/>
+                  <Image iconType="3" name="/images/save.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                   <ResourceString bundle="gui/strings/labels.properties" key="SALVAR.ACOES" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
@@ -249,7 +249,7 @@
             <Component class="javax.swing.JButton" name="jbCopy">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/copy icon.png"/>
+                  <Image iconType="3" name="/images/copy.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                   <ResourceString bundle="gui/Bundle.properties" key="COPIAR.ACOES" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
@@ -268,7 +268,7 @@
             <Component class="javax.swing.JButton" name="jbMap">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/world_icon.gif"/>
+                  <Image iconType="3" name="/images/save map.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                   <ResourceString bundle="labels.properties" key="SALVAR.MAPA" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
@@ -286,7 +286,7 @@
             <Component class="javax.swing.JButton" name="jbSend">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/green ok 2.png"/>
+                  <Image iconType="3" name="/images/submit.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                   <ResourceString bundle="gui/Bundle.properties" key="ENVIAR.ACOES" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
@@ -305,7 +305,7 @@
             <Component class="javax.swing.JButton" name="jbAbout">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/about icon.png"/>
+                  <Image iconType="3" name="/images/about.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                   <ResourceString bundle="gui/Bundle.properties" key="MENU.ABOUT" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
