@@ -28,7 +28,7 @@ public class TabPartidaGui extends TabBase {
     public TabPartidaGui(String titulo, String dica) {
         initComponents();
         //Basico
-        setIcone("/images/config.jpg");
+        setIcone("/images/data_gear.png");
         setTitle(titulo);
         setDica(dica);
         //Cria o Controle da lista 
