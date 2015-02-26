@@ -29,31 +29,106 @@ public class TipoTropaConverter implements Serializable {
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private static final ListFactory listFactory = new ListFactory();
 
+    public static String[][] listFiltro() {
+        String[][] ret = new String[7][2];
+        int ii = 0;
+        ret[ii][0] = labels.getString("FILTRO.TODOS"); //Display
+        ret[ii++][1] = "Todos"; //Id
+        ret[ii][0] = labels.getString("TROPA.FILTRO.CAVALARIA"); //Display
+        ret[ii++][1] = "Fast"; //Id
+        ret[ii][0] = labels.getString("TROPA.FILTRO.INFANTARIA"); //Display
+        ret[ii++][1] = "Regular"; //Id
+        ret[ii][0] = labels.getString("TROPA.FILTRO.LAND"); //Display
+        ret[ii++][1] = "Land"; //Id
+        ret[ii][0] = labels.getString("TROPA.FILTRO.BARCOS"); //Display
+        ret[ii++][1] = "Barcos"; //Id
+        ret[ii][0] = labels.getString("TROPA.FILTRO.SIEGE"); //Display
+        ret[ii++][1] = "Siege"; //Id
+        ret[ii][0] = labels.getString("TROPA.FILTRO.TRASNFER"); //Display
+        ret[ii++][1] = "Trasnfer"; //Id
+        return ret;
+    }
+
     public static List<TipoTropa> listaByFiltro(String filtro) {
         List<TipoTropa> ret = new ArrayList();
-        for (TipoTropa tpTropa : listFactory.listTropas()) {
-            if (filtro.equalsIgnoreCase("Todos")) {
-                //todos
+        if (filtro.equalsIgnoreCase("Todos")) {
+            //todos
+            for (TipoTropa tpTropa : listFactory.listTropas()) {
                 ret.add(tpTropa);
-            } else if (filtro.equalsIgnoreCase("Cavalaria") && tpTropa.isFastMovement()) {
-                ret.add(tpTropa);
-            } else if (filtro.equalsIgnoreCase("Barcos") && tpTropa.isBarcos()) {
-                ret.add(tpTropa);
+            }
+        } else if (filtro.equalsIgnoreCase("Fast")) {
+            for (TipoTropa tpTropa : listFactory.listTropas()) {
+                if (tpTropa.isFastMovement()) {
+                    ret.add(tpTropa);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("Regular")) {
+            for (TipoTropa tpTropa : listFactory.listTropas()) {
+                if (!tpTropa.isFastMovement()) {
+                    ret.add(tpTropa);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("Trasnfer")) {
+            for (TipoTropa tpTropa : listFactory.listTropas()) {
+                if (tpTropa.isTransferable()) {
+                    ret.add(tpTropa);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("Siege")) {
+            for (TipoTropa tpTropa : listFactory.listTropas()) {
+                if (tpTropa.isSiege()) {
+                    ret.add(tpTropa);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("Land")) {
+            for (TipoTropa tpTropa : listFactory.listTropas()) {
+                if (!tpTropa.isBarcos()) {
+                    ret.add(tpTropa);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("Barcos")) {
+            for (TipoTropa tpTropa : listFactory.listTropas()) {
+                if (tpTropa.isBarcos()) {
+                    ret.add(tpTropa);
+                }
             }
         }
         return ret;
     }
 
-    public static String[][] listFiltro() {
+    public static String[][] listFiltroLW() {
         String[][] ret = new String[3][2];
         int ii = 0;
         ret[ii][0] = labels.getString("FILTRO.TODOS"); //Display
         ret[ii++][1] = "Todos"; //Id
-        ret[ii][0] = labels.getString("TROPA.FILTRO.CAVALARIA"); //Display
-        ret[ii++][1] = "Cavalaria"; //Id
+        ret[ii][0] = labels.getString("TROPA.FILTRO.LAND"); //Display
+        ret[ii++][1] = "Land"; //Id
         ret[ii][0] = labels.getString("TROPA.FILTRO.BARCOS"); //Display
         ret[ii++][1] = "Barcos"; //Id
         return ret;
+    }
+
+    public static List<TipoTropa> listaByFiltroCasualty(String filtro) {
+        List<TipoTropa> tropas = new ArrayList();
+        if (filtro.equalsIgnoreCase("Todos")) {
+            //todos
+            for (TipoTropa tpTropa : listFactory.listTropas()) {
+                tropas.add(tpTropa);
+            }
+        } else if (filtro.equalsIgnoreCase("Land")) {
+            for (TipoTropa tpTropa : listFactory.listTropas()) {
+                if (!tpTropa.isBarcos()) {
+                    tropas.add(tpTropa);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("Barcos")) {
+            for (TipoTropa tpTropa : listFactory.listTropas()) {
+                if (tpTropa.isBarcos()) {
+                    tropas.add(tpTropa);
+                }
+            }
+        }
+        return tropas;
     }
 
     public static GenericoTableModel getTropaModel(List<TipoTropa> lista) {
@@ -61,17 +136,17 @@ public class TipoTropaConverter implements Serializable {
                 getTipoTropaColNames(),
                 getTipoTropaAsArray(lista),
                 new Class[]{
-                    java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class
-                });
+            java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class
+        });
         return model;
     }
 
@@ -106,28 +181,84 @@ public class TipoTropaConverter implements Serializable {
         }
     }
 
+    public static GenericoTableModel getCasualtyModel(List<TipoTropa> listaExibida, Terreno terreno) {
+        GenericoTableModel model = new GenericoTableModel(
+                getCasualtyColNames(),
+                getCasualtyAsArray(listaExibida, terreno),
+                new Class[]{
+            java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class
+        });
+        return model;
+    }
+
+    private static String[] getCasualtyColNames() {
+        String[] colNames = {
+            labels.getString("TROPA.NOME"),
+            labels.getString("TROPA.MOVIMENTACAO"),
+            labels.getString("TROPA.ATAQUE"), labels.getString("TROPA.DEFESA"),
+            labels.getString("TROPA.RECRUIT.MONEY"), labels.getString("TROPA.UPKEEP.MONEY"),
+            labels.getString("TROPA.UPKEEP.FOOD"),
+            labels.getString("TROPA.RECRUIT.TIME"), labels.getString("TROPA.MOVIMENTO")
+        };
+        return (colNames);
+    }
+
+    private static Object[][] getCasualtyAsArray(List<TipoTropa> listaExibir, Terreno terreno) {
+        if (listaExibir.isEmpty()) {
+            Object[][] ret = {{"", ""}};
+            return (ret);
+        } else {
+            int ii = 0;
+            Object[][] ret = new Object[listaExibir.size()][getCasualtyColNames().length];
+            for (TipoTropa tpTropa : listaExibir) {
+                // Converte TipoTropa para um Array[] 
+                int nn = 0;
+                ret[ii][nn++] = tpTropa.getNome();
+                ret[ii][nn++] = getTerrenoValue(tpTropa.getMovimentoTerreno(), terreno);
+                ret[ii][nn++] = getTerrenoValue(tpTropa.getAtaqueTerreno(), terreno);
+                ret[ii][nn++] = getTerrenoValue(tpTropa.getDefesaTerreno(), terreno);
+                ret[ii][nn++] = tpTropa.getRecruitCostMoney();
+                ret[ii][nn++] = tpTropa.getUpkeepMoney();
+                ret[ii][nn++] = tpTropa.getUpkeepFood();
+                ret[ii][nn++] = tpTropa.getRecruitCostTime();
+                ret[ii][nn++] = tpTropa.getMovimento();
+                ii++;
+            }
+            return (ret);
+        }
+    }
+
     public static GenericoTableModel getTerrainTableModel(List<TipoTropa> lista, int tipo) {
         final String[] colNames = getTerrainColNames(lista.get(0));
         GenericoTableModel model = new GenericoTableModel(
                 colNames,
                 getTerrainAsArray(lista, tipo, colNames.length),
                 new Class[]{
-                    java.lang.String.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class
-                });
+            java.lang.String.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class
+        });
         return model;
     }
 
@@ -159,12 +290,7 @@ public class TipoTropaConverter implements Serializable {
                 int nn = 0;
                 ret[ii][nn++] = tpTropa.getNome();
                 for (Terreno terreno : listaTerreno.keySet()) {
-                    // Converte TipoTropa para um Array[] 
-                    if (listaTerreno.get(terreno) != 999) {
-                        ret[ii][nn++] = listaTerreno.get(terreno);
-                    } else {
-                        ret[ii][nn++] = 0;
-                    }
+                    ret[ii][nn++] = getTerrenoValue(listaTerreno, terreno);
                 }
                 ii++;
             }
@@ -178,22 +304,22 @@ public class TipoTropaConverter implements Serializable {
                 colNames,
                 getHabilidadeAsArray(tpTropa.getHabilidades().values()),
                 new Class[]{
-                    java.lang.String.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class
-                });
+            java.lang.String.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class,
+            java.lang.Integer.class, java.lang.Integer.class
+        });
         return model;
     }
 
@@ -219,5 +345,16 @@ public class TipoTropaConverter implements Serializable {
             }
             return (ret);
         }
+    }
+
+    private static int getTerrenoValue(SortedMap<Terreno, Integer> listaTerreno, Terreno terreno) {
+        int ret;
+        // Converte TipoTropa para um Array[] 
+        if (listaTerreno.get(terreno) != 999) {
+            ret = listaTerreno.get(terreno);
+        } else {
+            ret = 0;
+        }
+        return ret;
     }
 }

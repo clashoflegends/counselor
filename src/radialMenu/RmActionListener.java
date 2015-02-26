@@ -11,6 +11,7 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.ArmyMoveSimulator;
 import gui.BattleSimulator;
+import gui.TroopsCasualtiesList;
 import gui.components.DialogTextArea;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -201,6 +202,9 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
             case LOCAL_INFO:
                 showLocalInfo(rb);
                 break;
+            case LOCAL_CASUALTIES:
+                showLocalCasualties(rb);
+                break;
             case RANGE_PLOT:
                 showRangePlot(rb);
                 break;
@@ -221,6 +225,12 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
         } else {
             hexInfo = SysApoio.showDialogPopup(title, text, rb);
         }
+    }
+
+    private void showLocalCasualties(RadialButton rb) {
+        TroopsCasualtiesList casualtiesSim = new TroopsCasualtiesList(rb.getLocal());
+        casualtiesSim.setLocationRelativeTo(rb);
+        casualtiesSim.setVisible(true);
     }
 
     private void createBattleSim(RadialButton rb) {

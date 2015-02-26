@@ -60,6 +60,7 @@ public class MapMenuManager implements Serializable {
             menu = doConfigOption(MapMenuRadialActions.LOCAL_INFO);
             menu = doConfigOption(MapMenuRadialActions.RANGE_PLOT);
             menu = doConfigOption(MapMenuRadialActions.COMBAT_SIMULATOR);
+            menu = doConfigOption(MapMenuRadialActions.LOCAL_CASUALTIES);
             menu = doConfigOption(MapMenuRadialActions.ARMY_MOVEMENT_SIMULATOR);
             menu = doConfigOption(MapMenuRadialActions.NAVY_MOVEMENT_SIMULATOR);
 //            doCreateTerrainSubMenu(menu);

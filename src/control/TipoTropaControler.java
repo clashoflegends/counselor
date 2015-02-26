@@ -71,6 +71,7 @@ public class TipoTropaControler implements Serializable, ActionListener, ListSel
         return new GenericoComboBoxModel(TipoTropaConverter.listFiltro());
     }
 
+    @Override
     public void actionPerformed(ActionEvent event) {
         if (event.getSource() instanceof JTable) {
             log.info(labels.getString("OPS.JTABLE.EVENT"));
@@ -83,6 +84,7 @@ public class TipoTropaControler implements Serializable, ActionListener, ListSel
         }
     }
 
+    @Override
     public void valueChanged(ListSelectionEvent event) {
         if (event.getValueIsAdjusting()) {
             return;
