@@ -5,12 +5,15 @@
 package control.services;
 
 import baseLib.GenericoTableModel;
+import baseLib.IBaseModel;
 import business.facades.ListFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeSet;
 import model.Habilidade;
 import model.Terreno;
 import model.TipoTropa;
@@ -126,6 +129,30 @@ public class TipoTropaConverter implements Serializable {
                 if (tpTropa.isBarcos()) {
                     tropas.add(tpTropa);
                 }
+            }
+        }
+        return tropas;
+    }
+
+    public static IBaseModel[] listFiltroTroopHab() {
+        List<IBaseModel> lista = new ArrayList<IBaseModel>();
+        Set<Habilidade> habList = new TreeSet<Habilidade>();
+        for (TipoTropa tpTropa : listFactory.listTropas()) {
+            for (Habilidade habilidade : tpTropa.getHabilidades().values()) {
+                habList.add(habilidade);
+            }
+        }
+        for (Habilidade habilidade : habList) {
+            lista.add(habilidade);
+        }
+        return lista.toArray(new IBaseModel[0]);
+    }
+
+    public static List<TipoTropa> listaByFiltroHab(String filtro) {
+        List<TipoTropa> tropas = new ArrayList();
+        for (TipoTropa tpTropa : listFactory.listTropas()) {
+            if (tpTropa.hasHabilidade(filtro)) {
+                tropas.add(tpTropa);
             }
         }
         return tropas;
