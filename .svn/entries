@@ -11,8 +11,8 @@ https://counselor.googlecode.com/svn
 62
 joaogurgelmoura@gmail.com
 has-props
-
-
+has-prop-mods
+svn:special svn:externals svn:needs-lock
 
 
 
