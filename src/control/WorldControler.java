@@ -133,15 +133,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         Jogador jogadorAtivo = partida.getJogadorAtivo();
         Comando comando = new Comando();
         comando.setInfos(partida);
-        boolean missingAction = doSaveActorActions(jogadorAtivo, comando);
+        BaseModel missingAction = doSaveActorActions(jogadorAtivo, comando);
         boolean missingPackage = doSavePackages(comando);
         if (comando.size() == 0) {
             SysApoio.showDialogAlert(labels.getString("NONE.ORDERS"));
             this.getGui().setStatusMsg(labels.getString("NONE.ORDERS"));
         } else {
-            if (missingAction) {
-                SysApoio.showDialogAlert(labels.getString("MISSING.ORDERS"));
-                this.getGui().setStatusMsg(labels.getString("MISSING.ORDERS"));
+            if (missingAction != null) {
+                final String msg = String.format(labels.getString("MISSING.ORDERS"), missingAction.getNome());
+                SysApoio.showDialogAlert(msg);
+                this.getGui().setStatusMsg(msg);
             }
             if (missingPackage) {
                 SysApoio.showDialogAlert(labels.getString("MISSING.PACKAGE"));
@@ -583,9 +584,17 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 throw new IllegalStateException(labels.getString("TURNO.ERRADO") + file.getName());
             }
             int qtPackageCarregadas = this.setPackage(comando.getPackages());
-            int qtOrdensCarregadas = this.setOrdens(comando);
+            List<String> errorMsgs = new ArrayList<String>();
+            int qtOrdensCarregadas = this.setOrdens(comando, errorMsgs);
             this.getGui().setStatusMsg(String.format("%d %s %s", qtOrdensCarregadas, labels.getString("ORDENS.CARREGADAS"), file.getName()));
-            //SysApoio.showDialogError(String.format("%d %s %s", qtOrdensCarregadas, labels.getString("ORDENS.CARREGADAS"), file.getName()));
+            if (!errorMsgs.isEmpty()) {
+                String msg = "";
+                for (String line : errorMsgs) {
+                    msg += line + "\n";
+                }
+                SysApoio.showDialogError(String.format("%d %s %s\n%s",
+                        errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(), msg));
+            }
         } catch (IllegalStateException ex) {
             SysApoio.showDialogError(ex.getMessage());
             this.getGui().setStatusMsg(ex.getMessage());
@@ -607,7 +616,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @param comando
      * @return
      */
-    private int setOrdens(Comando comando) {
+    private int setOrdens(Comando comando, List<String> errorMsgs) {
         int ret = 0;
         SortedMap<String, BaseModel> listPers = new TreeMap<String, BaseModel>();
         //limpa todas as ordens
@@ -617,7 +626,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
         //limpa financas.
         getDispatchManager().sendDispatchForMsg(DispatchManager.CLEAR_FINANCES_FORECAST, "");
-
         try {
             //carrega as ordens personagem por personagem
             for (ComandoDetail comandoDetail : comando.getOrdens()) {
@@ -640,8 +648,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 //                    this.getGui().getTabPersonagem().setValueFor(ordemDisplay, personagem.getNome(), indexOrdem);
                     ret++;
                 } catch (NullPointerException ex) {
+                    errorMsgs.add(comandoDetail.getOrdemDisplay());
                     //nao faz nada, ordens nao disponiveis...
-                    log.fatal("problems loading actions: " + comandoDetail.getOrdemCodigo());
+                    log.fatal("problems loading actions: " + comandoDetail.getOrdemDisplay());
                 }
             }
         } catch (Exception e) {
@@ -723,7 +732,33 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private boolean doSaveActorActions(Jogador jogadorAtivo, Comando comando) {
+    private BaseModel doSaveActorActions(Jogador jogadorAtivo, Comando comando) {
+        //lista todos os personagens, carregando para o xml
+        final int nationPackagesLimit = WorldFacadeCounselor.getInstance().getNationPackagesLimit();
+        for (BaseModel actor : WorldFacadeCounselor.getInstance().getActors()) {
+            if (!ordemFacade.isAtivo(jogadorAtivo, actor)) {
+                continue;
+            }
+            if (actor.getAcaoSize() > 0) {
+                for (int index = 0; index < actor.getOrdensQt(); index++) {
+                    if (ordemFacade.getOrdem(actor, index) != null) {
+                        comando.addComando(actor, ordemFacade.getOrdem(actor, index),
+                                ordemFacade.getParametrosId(actor, index),
+                                ordemFacade.getParametrosDisplay(actor, index));
+                    } else if (actor.isNacao() && acaoFacade.isPointsSetupUnderLimit(actor, nationPackagesLimit)) {
+                        return actor;
+                    } else {
+                        return actor;
+                    }
+                }
+            } else if (cenarioFacade.hasOrdens(WorldFacadeCounselor.getInstance().getPartida(), actor)) {
+                return actor;
+            }
+        }
+        return null;
+    }
+
+    private boolean doSaveActorActionsOLD(Jogador jogadorAtivo, Comando comando) {
         boolean missing = false;
         //lista todos os personagens, carregando para o xml
         for (BaseModel actor : WorldFacadeCounselor.getInstance().getActors()) {

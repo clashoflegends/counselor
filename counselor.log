@@ -1,567 +1,76 @@
 Starting...
-Counselor version: 412
-Commons version: 2,037
+Counselor version: 415
+Commons version: 2,049
 Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
+AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
 Starting GUI
+problems loading actions: 485
+problems loading actions: 555
 Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Oopps...
-java.lang.ArrayIndexOutOfBoundsException: 3
-	at control.services.TipoTropaConverter.listFiltro(TipoTropaConverter.java:88)
-	at control.TipoTropaControler.listFiltro(TipoTropaControler.java:71)
-	at gui.tabs.TabTipoTropasGui.<init>(TabTipoTropasGui.java:60)
-	at gui.MainDadosGui.<init>(MainDadosGui.java:45)
-	at gui.MainResultWindowGui.iniciaConfig(MainResultWindowGui.java:356)
-	at control.WorldControler.doAutoLoad(WorldControler.java:352)
-	at gui.MainResultWindowGui.<init>(MainResultWindowGui.java:51)
-	at client.PbmApplication.createAndShowGUI(PbmApplication.java:60)
-	at client.PbmApplication.init(PbmApplication.java:44)
-	at baseLib.Application.startOnEDT(Application.java:355)
-	at baseLib.Application.access$100(Application.java:77)
-	at baseLib.Application$Handler.run(Application.java:636)
-	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:251)
-	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:727)
-	at java.awt.EventQueue.access$200(EventQueue.java:103)
-	at java.awt.EventQueue$3.run(EventQueue.java:688)
-	at java.awt.EventQueue$3.run(EventQueue.java:686)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
-	at java.awt.EventQueue.dispatchEvent(EventQueue.java:697)
-	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:242)
-	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:161)
-	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:150)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:146)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:138)
-	at java.awt.EventDispatchThread.run(EventDispatchThread.java:91)
-java.lang.ArrayIndexOutOfBoundsException: 3
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_168_48.murazorgames.rr.egf
-Starting GUI
-Starting GUI
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-java.lang.NullPointerException
-java.lang.NullPointerException
-java.lang.NullPointerException
-java.lang.NullPointerException
-java.lang.NullPointerException
-java.lang.NullPointerException
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 412
-Commons version: 2,037
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 413
-Commons version: 2,038
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 413
-Commons version: 2,038
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 413
-Commons version: 2,038
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 413
-Commons version: 2,038
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Oopps...
-java.lang.ArrayIndexOutOfBoundsException: 6
-	at control.services.TipoTropaConverter.getCasualtyAsArray(TipoTropaConverter.java:232)
-	at control.services.TipoTropaConverter.getCasualtyModel(TipoTropaConverter.java:187)
-	at control.CasualtyControler.getMainTableModel(CasualtyControler.java:59)
-	at gui.subtabs.SubTabCasualtyGui.<init>(SubTabCasualtyGui.java:49)
-	at gui.TroopsCasualtiesList.<init>(TroopsCasualtiesList.java:31)
-	at radialMenu.RmActionListener.showLocalCasualties(RmActionListener.java:231)
-	at radialMenu.RmActionListener.doMapMenuActions(RmActionListener.java:206)
-	at radialMenu.RmActionListener.actionPerformed(RmActionListener.java:119)
-	at radialMenu.RmActionListener.mouseClicked(RmActionListener.java:72)
-	at java.awt.AWTEventMulticaster.mouseClicked(AWTEventMulticaster.java:270)
-	at java.awt.Component.processMouseEvent(Component.java:6508)
-	at javax.swing.JComponent.processMouseEvent(JComponent.java:3321)
-	at java.awt.Component.processEvent(Component.java:6270)
-	at java.awt.Container.processEvent(Container.java:2229)
-	at java.awt.Component.dispatchEventImpl(Component.java:4861)
-	at java.awt.Container.dispatchEventImpl(Container.java:2287)
-	at java.awt.Component.dispatchEvent(Component.java:4687)
-	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4832)
-	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4501)
-	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4422)
-	at java.awt.Container.dispatchEventImpl(Container.java:2273)
-	at java.awt.Window.dispatchEventImpl(Window.java:2719)
-	at java.awt.Component.dispatchEvent(Component.java:4687)
-	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:729)
-	at java.awt.EventQueue.access$200(EventQueue.java:103)
-	at java.awt.EventQueue$3.run(EventQueue.java:688)
-	at java.awt.EventQueue$3.run(EventQueue.java:686)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
-	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:87)
-	at java.awt.EventQueue$4.run(EventQueue.java:702)
-	at java.awt.EventQueue$4.run(EventQueue.java:700)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
-	at java.awt.EventQueue.dispatchEvent(EventQueue.java:699)
-	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:242)
-	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:161)
-	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:150)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:146)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:138)
-	at java.awt.EventDispatchThread.run(EventDispatchThread.java:91)
-java.lang.ArrayIndexOutOfBoundsException: 6
-Starting...
-Counselor version: 413
-Commons version: 2,038
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Oopps...
-java.lang.ArrayIndexOutOfBoundsException: 6
-	at control.services.TipoTropaConverter.getCasualtyAsArray(TipoTropaConverter.java:232)
-	at control.services.TipoTropaConverter.getCasualtyModel(TipoTropaConverter.java:187)
-	at control.CasualtyControler.getMainTableModel(CasualtyControler.java:59)
-	at gui.subtabs.SubTabCasualtyGui.<init>(SubTabCasualtyGui.java:49)
-	at gui.TroopsCasualtiesList.<init>(TroopsCasualtiesList.java:31)
-	at radialMenu.RmActionListener.showLocalCasualties(RmActionListener.java:231)
-	at radialMenu.RmActionListener.doMapMenuActions(RmActionListener.java:206)
-	at radialMenu.RmActionListener.actionPerformed(RmActionListener.java:119)
-	at radialMenu.RmActionListener.mouseClicked(RmActionListener.java:72)
-	at java.awt.AWTEventMulticaster.mouseClicked(AWTEventMulticaster.java:270)
-	at java.awt.Component.processMouseEvent(Component.java:6508)
-	at javax.swing.JComponent.processMouseEvent(JComponent.java:3321)
-	at java.awt.Component.processEvent(Component.java:6270)
-	at java.awt.Container.processEvent(Container.java:2229)
-	at java.awt.Component.dispatchEventImpl(Component.java:4861)
-	at java.awt.Container.dispatchEventImpl(Container.java:2287)
-	at java.awt.Component.dispatchEvent(Component.java:4687)
-	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4832)
-	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4501)
-	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4422)
-	at java.awt.Container.dispatchEventImpl(Container.java:2273)
-	at java.awt.Window.dispatchEventImpl(Window.java:2719)
-	at java.awt.Component.dispatchEvent(Component.java:4687)
-	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:729)
-	at java.awt.EventQueue.access$200(EventQueue.java:103)
-	at java.awt.EventQueue$3.run(EventQueue.java:688)
-	at java.awt.EventQueue$3.run(EventQueue.java:686)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
-	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:87)
-	at java.awt.EventQueue$4.run(EventQueue.java:702)
-	at java.awt.EventQueue$4.run(EventQueue.java:700)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
-	at java.awt.EventQueue.dispatchEvent(EventQueue.java:699)
-	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:242)
-	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:161)
-	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:150)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:146)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:138)
-	at java.awt.EventDispatchThread.run(EventDispatchThread.java:91)
-java.lang.ArrayIndexOutOfBoundsException: 6
-Starting...
-Counselor version: 413
-Commons version: 2,038
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Oopps...
-java.lang.ArrayIndexOutOfBoundsException: 6
-	at control.services.TipoTropaConverter.getCasualtyAsArray(TipoTropaConverter.java:230)
-	at control.services.TipoTropaConverter.getCasualtyModel(TipoTropaConverter.java:185)
-	at control.CasualtyControler.getMainTableModel(CasualtyControler.java:59)
-	at gui.subtabs.SubTabCasualtyGui.<init>(SubTabCasualtyGui.java:49)
-	at gui.TroopsCasualtiesList.<init>(TroopsCasualtiesList.java:31)
-	at radialMenu.RmActionListener.showLocalCasualties(RmActionListener.java:231)
-	at radialMenu.RmActionListener.doMapMenuActions(RmActionListener.java:206)
-	at radialMenu.RmActionListener.actionPerformed(RmActionListener.java:119)
-	at radialMenu.RmActionListener.mouseClicked(RmActionListener.java:72)
-	at java.awt.AWTEventMulticaster.mouseClicked(AWTEventMulticaster.java:270)
-	at java.awt.Component.processMouseEvent(Component.java:6508)
-	at javax.swing.JComponent.processMouseEvent(JComponent.java:3321)
-	at java.awt.Component.processEvent(Component.java:6270)
-	at java.awt.Container.processEvent(Container.java:2229)
-	at java.awt.Component.dispatchEventImpl(Component.java:4861)
-	at java.awt.Container.dispatchEventImpl(Container.java:2287)
-	at java.awt.Component.dispatchEvent(Component.java:4687)
-	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4832)
-	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4501)
-	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4422)
-	at java.awt.Container.dispatchEventImpl(Container.java:2273)
-	at java.awt.Window.dispatchEventImpl(Window.java:2719)
-	at java.awt.Component.dispatchEvent(Component.java:4687)
-	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:729)
-	at java.awt.EventQueue.access$200(EventQueue.java:103)
-	at java.awt.EventQueue$3.run(EventQueue.java:688)
-	at java.awt.EventQueue$3.run(EventQueue.java:686)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
-	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:87)
-	at java.awt.EventQueue$4.run(EventQueue.java:702)
-	at java.awt.EventQueue$4.run(EventQueue.java:700)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
-	at java.awt.EventQueue.dispatchEvent(EventQueue.java:699)
-	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:242)
-	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:161)
-	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:150)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:146)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:138)
-	at java.awt.EventDispatchThread.run(EventDispatchThread.java:91)
-java.lang.ArrayIndexOutOfBoundsException: 6
-Starting...
-Counselor version: 413
-Commons version: 2,038
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 413
-Commons version: 2,038
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_168_49.murazorgames.rr.egf
-Starting GUI
-Starting GUI
-Starting...
-Counselor version: 413
-Commons version: 2,038
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 413
-Commons version: 2,038
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 414
-Commons version: 2,041
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_168_49.murazorgames.rr.egf
-Starting GUI
-Starting GUI
-Starting...
-Counselor version: 414
-Commons version: 2,041
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_168_49.murazorgames.rr.egf
-Starting GUI
-Starting GUI
-Starting...
-Counselor version: 414
-Commons version: 2,041
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 414
-Commons version: 2,041
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 414
-Commons version: 2,041
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 414
-Commons version: 2,041
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Oopps...
-java.lang.ClassCastException: javax.swing.ScrollPaneLayout$UIResource cannot be cast to javax.swing.GroupLayout
-	at gui.tabs.TabTipoTropasGui.<init>(TabTipoTropasGui.java:62)
-	at gui.MainDadosGui.<init>(MainDadosGui.java:45)
-	at gui.MainResultWindowGui.iniciaConfig(MainResultWindowGui.java:356)
-	at control.WorldControler.doAutoLoad(WorldControler.java:352)
-	at gui.MainResultWindowGui.<init>(MainResultWindowGui.java:51)
-	at client.PbmApplication.createAndShowGUI(PbmApplication.java:60)
-	at client.PbmApplication.init(PbmApplication.java:44)
-	at baseLib.Application.startOnEDT(Application.java:355)
-	at baseLib.Application.access$100(Application.java:77)
-	at baseLib.Application$Handler.run(Application.java:636)
-	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:251)
-	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:727)
-	at java.awt.EventQueue.access$200(EventQueue.java:103)
-	at java.awt.EventQueue$3.run(EventQueue.java:688)
-	at java.awt.EventQueue$3.run(EventQueue.java:686)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
-	at java.awt.EventQueue.dispatchEvent(EventQueue.java:697)
-	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:242)
-	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:161)
-	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:150)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:146)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:138)
-	at java.awt.EventDispatchThread.run(EventDispatchThread.java:91)
-java.lang.ClassCastException: javax.swing.ScrollPaneLayout$UIResource cannot be cast to javax.swing.GroupLayout
-Starting...
-Counselor version: 414
-Commons version: 2,041
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 414
-Commons version: 2,041
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 414
-Commons version: 2,041
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_168_49.murazorgames.rr.egf
-Starting GUI
-Starting GUI
-Starting...
-Counselor version: 414
-Commons version: 2,041
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 414
-Commons version: 2,041
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_168_49.murazorgames.rr.egf
-Starting GUI
-Starting GUI
 Starting...
 Counselor version: 415
-Commons version: 2,042
+Commons version: 2,049
 Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/jmoura/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.gurgel.rr.egf
+AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
 Starting GUI
 Interface carregada and exibida.
+Loading:orders_110_1.jpessoa2.rc.egf
+Starting...
+Counselor version: 415
+Commons version: 2,049
+Alterando modo de acesso: Client
+AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Loading:orders_110_1.jpessoa2.rc.egf
+problems loading actions: 485
+problems loading actions: 555
+Starting...
+Counselor version: 415
+Commons version: 2,049
+Alterando modo de acesso: Client
+AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Loading:orders_110_1.jpessoa2.rc.egf
+problems loading actions: 485
+Starting...
+Counselor version: 415
+Commons version: 2,049
+Alterando modo de acesso: Client
+AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Loading:orders_110_1.jpessoa2.rc.egf
+problems loading actions: Maphalub?m?z-FortTower
+problems loading actions: Maphalub?m?z-CriarAc
+Starting...
+Counselor version: 415
+Commons version: 2,049
+Alterando modo de acesso: Client
+AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Loading:orders_110_1.jpessoa2.rc.egf
+problems loading actions: Maphalub?m?z-FortTower
+problems loading actions: Maphalub?m?z-CriarAc
+Starting...
+Counselor version: 415
+Commons version: 2,049
+Alterando modo de acesso: Client
+AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Loading:orders_110_1.jpessoa2.rc.egf
+problems loading actions: Maphalub?m?z-FortTower
+problems loading actions: Maphalub?m?z-CriarAc
+Starting...
+Counselor version: 415
+Commons version: 2,049
+Alterando modo de acesso: Client
+AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Opening:game_110_0.jpessoa.rr.egf
+Starting GUI
+Starting GUI
