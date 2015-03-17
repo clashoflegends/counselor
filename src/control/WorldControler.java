@@ -745,8 +745,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                         comando.addComando(actor, ordemFacade.getOrdem(actor, index),
                                 ordemFacade.getParametrosId(actor, index),
                                 ordemFacade.getParametrosDisplay(actor, index));
-                    } else if (actor.isNacao() && acaoFacade.isPointsSetupUnderLimit(actor, nationPackagesLimit)) {
-                        return actor;
+                    } else if (actor.isNacao()) {
+                        //count points, not open slots
+                        if (acaoFacade.isPointsSetupUnderLimit(actor, nationPackagesLimit)) {
+                            return actor;
+                        }
                     } else {
                         return actor;
                     }
