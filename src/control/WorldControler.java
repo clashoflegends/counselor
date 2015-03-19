@@ -733,6 +733,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private BaseModel doSaveActorActions(Jogador jogadorAtivo, Comando comando) {
+        BaseModel ret = null;
         //lista todos os personagens, carregando para o xml
         final int nationPackagesLimit = WorldFacadeCounselor.getInstance().getNationPackagesLimit();
         for (BaseModel actor : WorldFacadeCounselor.getInstance().getActors()) {
@@ -748,17 +749,17 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     } else if (actor.isNacao()) {
                         //count points, not open slots
                         if (acaoFacade.isPointsSetupUnderLimit(actor, nationPackagesLimit)) {
-                            return actor;
+                            ret = actor;
                         }
                     } else {
-                        return actor;
+                        ret = actor;
                     }
                 }
             } else if (cenarioFacade.hasOrdens(WorldFacadeCounselor.getInstance().getPartida(), actor)) {
-                return actor;
+                ret = actor;
             }
         }
-        return null;
+        return ret;
     }
 
     private boolean doSaveActorActionsOLD(Jogador jogadorAtivo, Comando comando) {

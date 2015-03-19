@@ -1,468 +1,210 @@
 Starting...
-Counselor version: 418
-Commons version: 2,053
+Counselor version: 419
+Commons version: 2,060
 Alterando modo de acesso: Client
 AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
 Starting GUI
 Interface carregada and exibida.
-Loading:orders_110_1.jpessoa.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.jpessoa.rc.egf
-Opening:game_110_0.alexandre.rr.egf
+Opening:game_168_51.murazorgames.rr.egf
 Starting GUI
 Starting GUI
-Loading:orders_110_1.alexandre.rc.egf
-File not found:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.alexandre.rc.egf
-File not found:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.alexandre.rc.egf
-File not found:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.alexandre.rc.egf
-Opening:game_110_0.cbredolo.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.cbredolo.rc.egf
-problems loading actions: M�log-CriarAc
-problems loading actions: M�log-NomCom
+Loading:orders_168_52.murazorgames.rc.egf
+Oopps...
+java.lang.NullPointerException
+	at java.util.TreeMap.put(TreeMap.java:556)
+	at control.WorldControler.setOrdens(WorldControler.java:625)
+	at control.WorldControler.setComando(WorldControler.java:588)
+	at control.WorldControler.doLoad(WorldControler.java:116)
+	at control.WorldControler.actionPerformed(WorldControler.java:86)
+	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:2018)
+	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2341)
+	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:402)
+	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:259)
+	at javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:252)
+	at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:289)
+	at java.awt.Component.processMouseEvent(Component.java:6505)
+	at javax.swing.JComponent.processMouseEvent(JComponent.java:3321)
+	at java.awt.Component.processEvent(Component.java:6270)
+	at java.awt.Container.processEvent(Container.java:2229)
+	at java.awt.Component.dispatchEventImpl(Component.java:4861)
+	at java.awt.Container.dispatchEventImpl(Container.java:2287)
+	at java.awt.Component.dispatchEvent(Component.java:4687)
+	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4832)
+	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4492)
+	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4422)
+	at java.awt.Container.dispatchEventImpl(Container.java:2273)
+	at java.awt.Window.dispatchEventImpl(Window.java:2719)
+	at java.awt.Component.dispatchEvent(Component.java:4687)
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:729)
+	at java.awt.EventQueue.access$200(EventQueue.java:103)
+	at java.awt.EventQueue$3.run(EventQueue.java:688)
+	at java.awt.EventQueue$3.run(EventQueue.java:686)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
+	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:87)
+	at java.awt.EventQueue$4.run(EventQueue.java:702)
+	at java.awt.EventQueue$4.run(EventQueue.java:700)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:699)
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:242)
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:161)
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:150)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:146)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:138)
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:91)
+java.lang.NullPointerException
 Starting...
-Counselor version: 418
-Commons version: 2,053
+Counselor version: 419
+Commons version: 2,060
 Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
-Starting GUI
 Interface carregada and exibida.
-Opening:game_110_0.cbredolo.rr.egf
+Opening:game_168_51.murazorgames.rr.egf
 Starting GUI
 Starting GUI
-Loading:orders_110_1.cbredolo.rc.egf
-problems loading actions: M�log-CriarAc[[0421,                     ]]
-problems loading actions: M�log-NomCom[[Sorin IronFist      , Male]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.cbredolo.rc.egf
-Opening:game_110_0.clanlobonegro.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.clanlobonegro.rc.egf
-problems loading actions: Mill�z�-FortTower[[]]
-problems loading actions: Mill�z�-RecTropas[[500, Orc Heavy Infantry]]
-problems loading actions: Ziglad�n-FortTower[[]]
-problems loading actions: Ziglad�n-CriarAc[[1506, Alcubierre          ]]
-problems loading actions: Ziglad�n-NomCom[[Irkukay             , Male]]
-problems loading actions: Ziglad�n-NomRog[[Alikay              , Male]]
-problems loading actions: Ziglad�n-AumLealdade[[]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.clanlobonegro.rc.egf
-Opening:game_110_0.darrelllias.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.darrelllias.rc.egf
-problems loading actions: Muluk-Z�lar-NomCom[[                    , Male]]
-problems loading actions: Muluk-Z�lar-NomRog[[                    , Male]]
-problems loading actions: Muluk-Z�lar-RecTropas[[100, Orc Defender]]
-problems loading actions: Muluk-Z�lar-RecTropas[[100, Orc Defender]]
-problems loading actions: Izil�r-RecTropas[[100, Orc Defender]]
-problems loading actions: Izil�r-RecTropas[[100, Orc Defender]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.darrelllias.rc.egf
-Opening:game_110_0.davidkevorkian.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.davidkevorkian.rc.egf
-Opening:game_110_0.diletante.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.diletante.rc.egf
-problems loading actions: Zahak-Z�mu-AmplCP3[[]]
-problems loading actions: Zahak-Z�mu-AumLealdade[[]]
-problems loading actions: Ar�naigas-RecTropas[[, Silver Axes]]
-problems loading actions: Ar�naigas-RecTropas[[, Silver Axes]]
-problems loading actions: Ar�naigas-RecTropas[[, Silver Axes]]
-problems loading actions: Ar�naigas-AumLealdade[[]]
-problems loading actions: Assum�z-CriarAc[[2715,                     ]]
-problems loading actions: Assum�z-AumLealdade[[]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.diletante.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.diletante.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.diletante.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.diletante.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.diletante.rc.egf
+Loading:orders_168_52.murazorgames.rc.egf
+Oopps...
+java.lang.NullPointerException
+	at java.util.TreeMap.put(TreeMap.java:556)
+	at control.WorldControler.setOrdens(WorldControler.java:625)
+	at control.WorldControler.setComando(WorldControler.java:588)
+	at control.WorldControler.doLoad(WorldControler.java:116)
+	at control.WorldControler.actionPerformed(WorldControler.java:86)
+	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:2018)
+	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2341)
+	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:402)
+	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:259)
+	at javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:252)
+	at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:289)
+	at java.awt.Component.processMouseEvent(Component.java:6505)
+	at javax.swing.JComponent.processMouseEvent(JComponent.java:3321)
+	at java.awt.Component.processEvent(Component.java:6270)
+	at java.awt.Container.processEvent(Container.java:2229)
+	at java.awt.Component.dispatchEventImpl(Component.java:4861)
+	at java.awt.Container.dispatchEventImpl(Container.java:2287)
+	at java.awt.Component.dispatchEvent(Component.java:4687)
+	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4832)
+	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4492)
+	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4422)
+	at java.awt.Container.dispatchEventImpl(Container.java:2273)
+	at java.awt.Window.dispatchEventImpl(Window.java:2719)
+	at java.awt.Component.dispatchEvent(Component.java:4687)
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:729)
+	at java.awt.EventQueue.access$200(EventQueue.java:103)
+	at java.awt.EventQueue$3.run(EventQueue.java:688)
+	at java.awt.EventQueue$3.run(EventQueue.java:686)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
+	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:87)
+	at java.awt.EventQueue$4.run(EventQueue.java:702)
+	at java.awt.EventQueue$4.run(EventQueue.java:700)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:699)
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:242)
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:161)
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:150)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:146)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:138)
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:91)
+java.lang.NullPointerException
 Starting...
-Counselor version: 418
-Commons version: 2,053
+Counselor version: 419
+Commons version: 2,060
 Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
-Starting GUI
 Interface carregada and exibida.
-Opening:game_110_0.diletante.rr.egf
+Opening:game_168_51.murazorgames.rr.egf
 Starting GUI
 Starting GUI
-Loading:orders_110_1.diletante.rc.egf
+Loading:orders_168_52.murazorgames.rc.egf
+Oopps...
+java.lang.NullPointerException
+	at java.util.TreeMap.put(TreeMap.java:556)
+	at control.WorldControler.setOrdens(WorldControler.java:625)
+	at control.WorldControler.setComando(WorldControler.java:588)
+	at control.WorldControler.doLoad(WorldControler.java:116)
+	at control.WorldControler.actionPerformed(WorldControler.java:86)
+	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:2018)
+	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2341)
+	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:402)
+	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:259)
+	at javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:252)
+	at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:289)
+	at java.awt.Component.processMouseEvent(Component.java:6505)
+	at javax.swing.JComponent.processMouseEvent(JComponent.java:3321)
+	at java.awt.Component.processEvent(Component.java:6270)
+	at java.awt.Container.processEvent(Container.java:2229)
+	at java.awt.Component.dispatchEventImpl(Component.java:4861)
+	at java.awt.Container.dispatchEventImpl(Container.java:2287)
+	at java.awt.Component.dispatchEvent(Component.java:4687)
+	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4832)
+	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4492)
+	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4422)
+	at java.awt.Container.dispatchEventImpl(Container.java:2273)
+	at java.awt.Window.dispatchEventImpl(Window.java:2719)
+	at java.awt.Component.dispatchEvent(Component.java:4687)
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:729)
+	at java.awt.EventQueue.access$200(EventQueue.java:103)
+	at java.awt.EventQueue$3.run(EventQueue.java:688)
+	at java.awt.EventQueue$3.run(EventQueue.java:686)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
+	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:87)
+	at java.awt.EventQueue$4.run(EventQueue.java:702)
+	at java.awt.EventQueue$4.run(EventQueue.java:700)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$1.doIntersectionPrivilege(ProtectionDomain.java:76)
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:699)
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:242)
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:161)
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:150)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:146)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:138)
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:91)
+java.lang.NullPointerException
 Starting...
-Counselor version: 418
-Commons version: 2,053
+Counselor version: 419
+Commons version: 2,060
 Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
-Starting GUI
 Interface carregada and exibida.
-Loading:orders_110_1.jpessoa.rc.egf
-Opening:game_110_0.diletante.rr.egf
+Opening:game_168_51.murazorgames.rr.egf
 Starting GUI
 Starting GUI
-Loading:orders_110_1.diletante.rc.egf
+Loading:orders_168_52.murazorgames.rc.egf
 Starting...
-Counselor version: 418
-Commons version: 2,053
+Counselor version: 419
+Commons version: 2,060
 Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
-Starting GUI
 Interface carregada and exibida.
-Opening:game_110_0.diletante.rr.egf
+Opening:game_168_51.murazorgames.rr.egf
 Starting GUI
 Starting GUI
-Loading:orders_110_1.diletante.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.diletante.rc.egf
-Opening:game_110_0.drakaragm.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.drakaragm.rc.egf
-File not found:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.drakaragm.rc.egf
-File not found:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.drakaragm.rc.egf
-File not found:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.drakaragm.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.drakaragm.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.drakaragm.rc.egf
-Opening:game_110_0.alexandre.rr.egf
-Starting GUI
-Starting GUI
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.alexandre.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.alexandre.rc.egf
-Open command canceled by user.
-
-
-
-
+Loading:orders_168_52.murazorgames.rc.egf
 Starting...
-Counselor version: 418
-Commons version: 2,053
+Counselor version: 419
+Commons version: 2,060
 Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
-Starting GUI
 Interface carregada and exibida.
-Opening:game_110_0.alexandre.rr.egf
+Opening:game_168_51.murazorgames.rr.egf
 Starting GUI
 Starting GUI
-Loading:orders_110_1.alexandre.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.alexandre.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.alexandre.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.alexandre.rc.egf
-Actions submitted to the Judge => orders_110_1.alexandre.rc.egf
-Opening:game_110_0.diletante.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.diletante.rc.egf
-Opening:game_110_0.drakaragm.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.drakaragm.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.drakaragm.rc.egf
-Actions submitted to the Judge => orders_110_1.drakaragm.rc.egf
-Opening:game_110_0.ecomenale.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.ecomenale.rc.egf
-Open command canceled by user.
-Opening:game_110_0.elloborojo.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.elloborojo.rc.egf
-problems loading actions: G�luk-CriarAc[[0925,                     ]]
-problems loading actions: G�luk-AumLealdade[[]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.elloborojo.rc.egf
-Opening:game_110_0.fealonso.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.fealonso.rc.egf
-Opening:game_110_0.genechipman.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.genechipman.rc.egf
-problems loading actions: Alagh�n-CriarAc[[2024, Northcross          ]]
-problems loading actions: Alagh�n-FortTower[[]]
-problems loading actions: Zimarbath�n-RecTropas[[, Orc Striker]]
-problems loading actions: Zimarbath�n-RecTropas[[, Orc Striker]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.genechipman.rc.egf
-Opening:game_110_0.jaguilar.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.jaguilar.rc.egf
-Open command canceled by user.
-Loading:orders_110_1.jaguilar.rc.egf
-Opening:game_110_0.jpessoa.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.jpessoa.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.jpessoa.rc.egf
-Opening:game_110_0.mikehornung.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.mikehornung.rc.egf
-problems loading actions: Naer�s-RecTropas[[100, Giant Spiders]]
-problems loading actions: Naer�s-RecTropas[[100, Giant Spiders]]
-problems loading actions: Silcarn�-FortTower[[]]
-problems loading actions: Silcarn�-RecTropas[[100, Giant Spiders]]
-problems loading actions: Silcarn�-RecTropas[[100, Giant Spiders]]
-problems loading actions: Silcarn�-RecTropas[[100, Giant Spiders]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.mikehornung.rc.egf
-Opening:game_110_0.oracbob.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.oracbob.rc.egf
-Open command canceled by user.
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.oracbob.rc.egf
-Opening:game_110_0.ribeiroleonardo.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.ribeiroleonardo.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.ribeiroleonardo.rc.egf
-Opening:game_110_0.rodrigoreismaia.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.rodrigoreismaia.rc.egf
-problems loading actions: Khal?n-FortTower[[]]
-problems loading actions: Khal?n-FortFort[[]]
-problems loading actions: Khal?n-FortFort[[]]
-problems loading actions: Khal?n-NomCom[[Turkun              , Male]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.rodrigoreismaia.rc.egf
-Opening:game_110_0.rofazi.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.rofazi.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.rofazi.rc.egf
-Opening:game_110_0.skyade.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.skyade.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.skyade.rc.egf
-Opening:game_110_0.thomburnett.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.thomburnett.rc.egf
-problems loading actions: Nadal�n-RecTropas[[200, Broad Axes]]
-problems loading actions: Nadal�n-CriarAc[[0602,                     ]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.thomburnett.rc.egf
+Loading:orders_168_52.murazorgames.rc.egf
 Starting...
-Counselor version: 418
-Commons version: 2,053
+Counselor version: 419
+Commons version: 2,060
 Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
-Starting GUI
 Interface carregada and exibida.
-Loading:orders_110_1.jpessoa.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.jpessoa.rc.egf
+Opening:game_168_51.murazorgames.rr.egf
+Starting GUI
+Starting GUI
+Loading:orders_168_52.murazorgames.rc.egf
+Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\168_GoT13c_168\orders_168_52.murazorgames.rc.egf
 Starting...
-Counselor version: 418
-Commons version: 2,053
+Counselor version: 419
+Commons version: 2,060
 Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
-Starting GUI
 Interface carregada and exibida.
-Opening:game_110_0.alexandre.rr.egf
+Opening:game_168_51.murazorgames.rr.egf
 Starting GUI
 Starting GUI
-Loading:orders_110_1.alexandre.rc.egf
-problems loading actions: Ioârususân-MudImp[[99]]
-problems loading actions: Ioârususân-RecTropas[[, Goblin Fast Infantry]]
-problems loading actions: Ioârususân-NomCom[[                    , Male]]
-problems loading actions: Ioârususân-NomCom[[                    , Male]]
-problems loading actions: Ioârususân-NomRog[[                    , Male]]
-problems loading actions: Zinabâr-SendMoney[[Gram, 10,000]]
-problems loading actions: Zinabâr-RecTropas[[, Goblin Fast Infantry]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.alexandre.rc.egf
-Starting...
-Counselor version: 418
-Commons version: 2,053
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_110_0.cbredolo.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.cbredolo.rc.egf
-problems loading actions: Múlog-CriarAc[[0421,                     ]]
-problems loading actions: Múlog-NomCom[[Sorin IronFist      , Male]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.cbredolo.rc.egf
-Opening:game_110_0.clanlobonegro.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.clanlobonegro.rc.egf
-problems loading actions: Millôzê-FortTower[[]]
-problems loading actions: Millôzê-RecTropas[[500, Orc Heavy Infantry]]
-problems loading actions: Zigladân-FortTower[[]]
-problems loading actions: Zigladân-CriarAc[[1506, Alcubierre          ]]
-problems loading actions: Zigladân-NomCom[[Irkukay             , Male]]
-problems loading actions: Zigladân-NomRog[[Alikay              , Male]]
-problems loading actions: Zigladân-AumLealdade[[]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.clanlobonegro.rc.egf
-Opening:game_110_0.darrelllias.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.darrelllias.rc.egf
-problems loading actions: Muluk-Zûlar-NomCom[[                    , Male]]
-problems loading actions: Muluk-Zûlar-NomRog[[                    , Male]]
-problems loading actions: Muluk-Zûlar-RecTropas[[100, Orc Defender]]
-problems loading actions: Muluk-Zûlar-RecTropas[[100, Orc Defender]]
-problems loading actions: Izilâr-RecTropas[[100, Orc Defender]]
-problems loading actions: Izilâr-RecTropas[[100, Orc Defender]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.darrelllias.rc.egf
-Opening:game_110_0.davidkevorkian.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.davidkevorkian.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.davidkevorkian.rc.egf
-Opening:game_110_0.diletante.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.diletante.rc.egf
-problems loading actions: Zahak-Zûmu-AmplCP3[[]]
-problems loading actions: Zahak-Zûmu-AumLealdade[[]]
-problems loading actions: Arînaigas-RecTropas[[, Silver Axes]]
-problems loading actions: Arînaigas-RecTropas[[, Silver Axes]]
-problems loading actions: Arînaigas-RecTropas[[, Silver Axes]]
-problems loading actions: Arînaigas-AumLealdade[[]]
-problems loading actions: Assumêz-CriarAc[[2715,                     ]]
-problems loading actions: Assumêz-AumLealdade[[]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.diletante.rc.egf
-Opening:game_110_0.drakaragm.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.drakaragm.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.drakaragm.rc.egf
-Opening:game_110_0.ecomenale.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.ecomenale.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.ecomenale.rc.egf
-Opening:game_110_0.elloborojo.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.elloborojo.rc.egf
-problems loading actions: Gûluk-CriarAc[[0925,                     ]]
-problems loading actions: Gûluk-AumLealdade[[]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.elloborojo.rc.egf
-Opening:game_110_0.fealonso.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.fealonso.rc.egf
-problems loading actions: Nalâm-NomCom[[                    , Male]]
-problems loading actions: Nalâm-RecTropas[[500, Werebear - shifter]]
-problems loading actions: Nalâm-RecTropas[[500, Werebear - shifter]]
-problems loading actions: Nalâm-NomRog[[                    , Male]]
-problems loading actions: Nalâm-RecTropas[[500, Werebear - shifter]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.fealonso.rc.egf
-Opening:game_110_0.genechipman.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.genechipman.rc.egf
-problems loading actions: Alaghân-CriarAc[[2024, Northcross          ]]
-problems loading actions: Alaghân-FortTower[[]]
-problems loading actions: Zimarbathân-RecTropas[[, Orc Striker]]
-problems loading actions: Zimarbathân-RecTropas[[, Orc Striker]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.genechipman.rc.egf
-Opening:game_110_0.jaguilar.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.jaguilar.rc.egf
-problems loading actions: Hanolóran-RecTropas[[500, Goblin Infantry]]
-problems loading actions: Hanolóran-NomCom[[                    , Male]]
-problems loading actions: Hanolóran-NomRog[[                    , Male]]
-problems loading actions: Hanolóran-NomCom[[                    , Male]]
-problems loading actions: Hanolóran-IncTax[[]]
-problems loading actions: Nanâth-RecTropas[[400, Goblin Infantry]]
-problems loading actions: Nanâth-NomRog[[                    , Male]]
-problems loading actions: Nanâth-NomCom[[                    , Male]]
-problems loading actions: Nanâth-AumLealdade[[]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.jaguilar.rc.egf
-Opening:game_110_0.jpessoa.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.jpessoa.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.jpessoa.rc.egf
-Opening:game_110_0.mikehornung.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.mikehornung.rc.egf
-problems loading actions: Naerûs-RecTropas[[, Giant Spiders]]
-problems loading actions: Naerûs-RecTropas[[, Giant Spiders]]
-problems loading actions: Silcarnë-FortTower[[]]
-problems loading actions: Silcarnë-RecTropas[[, Giant Spiders]]
-problems loading actions: Silcarnë-RecTropas[[, Giant Spiders]]
-problems loading actions: Silcarnë-RecTropas[[, Giant Spiders]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.mikehornung.rc.egf
-Opening:game_110_0.oracbob.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.oracbob.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.oracbob.rc.egf
-Opening:game_110_0.ribeiroleonardo.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.ribeiroleonardo.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.ribeiroleonardo.rc.egf
-Opening:game_110_0.rodrigoreismaia.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.rodrigoreismaia.rc.egf
-problems loading actions: Khalân-FortTower[[]]
-problems loading actions: Khalân-FortFort[[]]
-problems loading actions: Khalân-FortFort[[]]
-problems loading actions: Khalân-NomCom[[Turkun              , Male]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.rodrigoreismaia.rc.egf
-Opening:game_110_0.rofazi.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.rofazi.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.rofazi.rc.egf
-Opening:game_110_0.skyade.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.skyade.rc.egf
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.skyade.rc.egf
-Opening:game_110_0.thomburnett.rr.egf
-Starting GUI
-Starting GUI
-Loading:orders_110_1.thomburnett.rc.egf
-problems loading actions: Nadalân-RecTropas[[200, Broad Axes]]
-problems loading actions: Nadalân-CriarAc[[0602,                     ]]
-Arquivo gravado:C:\Users\gurgel\Documents\tmpbm\Saves\110_WarDwarfOrc110\000\orders_110_1.thomburnett.rc.egf
-Starting...
-Counselor version: 418
-Commons version: 2,053
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_110_1.alexandre.rr.egf
-Starting GUI
-Starting GUI
-Starting...
-Counselor version: 418
-Commons version: 2,053
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 418
-Commons version: 2,053
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_110_1.alexandre.rr.egf
-Starting GUI
-Starting GUI
-Starting...
-Counselor version: 418
-Commons version: 2,053
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/000/game_110_0.jpessoa.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_110_1.jpessoa.rr.egf
-Starting GUI
-Starting GUI
-Opening:game_110_1.alexandre.rr.egf
-Starting GUI
-Starting GUI
+Loading:orders_168_52.murazorgames.rc.egf
