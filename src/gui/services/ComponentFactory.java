@@ -12,6 +12,7 @@ import control.MapaControler;
 import control.OrdemControler;
 import control.support.ActorInterface;
 import gui.subtabs.SubTabCoordenadas;
+import gui.subtabs.SubTabDirecao;
 import gui.subtabs.SubTabDirecaoExercito;
 import gui.subtabs.SubTabRelacionamento;
 import gui.subtabs.SubTabTropas;
@@ -64,6 +65,7 @@ public class ComponentFactory implements Serializable {
     private static final String COORDENADA_NAVIO = "Coordenada_Navio";
     private static final String DIRECAO = "Direcao";
     private static final String DIRECAO_EX = "Direcao_Ex";
+    private static final String DIRECAO_3 = "Direcao_3";
     private static final String EVASIVO = "Evasivo";
     private static final String MALE_FEMALE = "Male_Female";
     private static final String MAGIA_ALL = "Magia_All";
@@ -269,6 +271,11 @@ public class ComponentFactory implements Serializable {
             //PENDING: Fazer uma rosa dos ventos?
             SubTabDirecaoExercito jpTemp = new SubTabDirecaoExercito(
                     vlInicialDisplay, this.getActor(), this.getMapaControler(), ordemSelecionada, isAllSelected());
+            cNovo = jpTemp;
+        } else if (controle.equals(DIRECAO_3)) {    //Direcao-Ex
+            //PENDING: Fazer uma rosa dos ventos?
+            SubTabDirecao jpTemp = new SubTabDirecao(
+                    vlInicialDisplay, this.getActor().getLocal(), 3, false, this.getMapaControler(), isAllSelected());
             cNovo = jpTemp;
         } else if (controle.equals(EVASIVO)) {            //Evasivo
             //é um combo male/female
