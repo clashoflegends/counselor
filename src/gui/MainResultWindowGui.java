@@ -31,7 +31,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
     private static final Log log = LogFactory.getLog(MainResultWindowGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private WorldControler wc = new WorldControler(this);
+    private final WorldControler wc = new WorldControler(this);
     private TabPersonagensGui tabPersonagem;
 
     /**
@@ -172,6 +172,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbMap.setText(labels.getString("SALVAR.MAPA")); // NOI18N
         jbMap.setToolTipText(labels.getString("SALVAR.MAPA.TOOLTIP")); // NOI18N
         jbMap.setActionCommand("jbExportMap");
+        jbMap.setEnabled(false);
         jbMap.setFocusable(false);
         jbMap.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jbMap.setName("jbExportMap"); // NOI18N

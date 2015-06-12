@@ -277,6 +277,7 @@
                   <ResourceString bundle="labels.properties" key="SALVAR.MAPA.TOOLTIP" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="actionCommand" type="java.lang.String" value="jbExportMap"/>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="horizontalTextPosition" type="int" value="4"/>
                 <Property name="name" type="java.lang.String" value="jbExportMap" noResource="true"/>
