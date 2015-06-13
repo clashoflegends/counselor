@@ -61,6 +61,12 @@ public class MainAboutBox extends TabBase implements Serializable {
         lFacebookLink = new javax.swing.JLabel();
         lWebsiteTitle = new javax.swing.JLabel();
         lWebAdminLink = new javax.swing.JLabel();
+        lJavaTitle = new javax.swing.JLabel();
+        lJava = new javax.swing.JLabel();
+        lScreenTitle = new javax.swing.JLabel();
+        lScreen = new javax.swing.JLabel();
+        lOsTitle = new javax.swing.JLabel();
+        lOs = new javax.swing.JLabel();
 
         lAboutTitle.setFont(new java.awt.Font("Verdana", 0, 18)); // NOI18N
         lAboutTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -94,22 +100,50 @@ public class MainAboutBox extends TabBase implements Serializable {
 
         lWebAdminLink.setText("http://sites.google.com/site/clashlegends");
 
+        lJavaTitle.setText(labels.getString("ABOUT.JAVA.VERSION")); // NOI18N
+
+        lJava.setText("1.999");
+
+        lScreenTitle.setText(labels.getString("ABOUT.SCREEN.RESOLUTION")); // NOI18N
+
+        lScreen.setText("1.999");
+
+        lOsTitle.setText(labels.getString("ABOUT.OS.VERSION")); // NOI18N
+
+        lOs.setText("1.999");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lWebAdminLink)
+                    .addComponent(lWebsiteLink))
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(lFacebookLink, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(lAboutTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lCounselorTitle)
-                            .addComponent(lCommonsTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(lCommonsTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lJavaTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lScreenTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lOsTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lCommons)
-                            .addComponent(lClient))
+                            .addComponent(lClient)
+                            .addComponent(lJava)
+                            .addComponent(lScreen)
+                            .addComponent(lOs))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -124,18 +158,8 @@ public class MainAboutBox extends TabBase implements Serializable {
                             .addComponent(lWebsiteTitle))
                         .addContainerGap(82, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addComponent(lFacebookLink, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(lFacebookTitle))
-                        .addGap(0, 0, Short.MAX_VALUE))))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lWebAdminLink)
-                    .addComponent(lWebsiteLink))
-                .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(lFacebookTitle)
+                        .addGap(0, 277, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -159,9 +183,9 @@ public class MainAboutBox extends TabBase implements Serializable {
                 .addComponent(lModeratorLink)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lFacebookTitle)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lFacebookLink)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lFacebookLink)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lCounselorTitle)
                     .addComponent(lClient))
@@ -169,7 +193,19 @@ public class MainAboutBox extends TabBase implements Serializable {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lCommonsTitle)
                     .addComponent(lCommons))
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lJava)
+                    .addComponent(lJavaTitle))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lScreen)
+                    .addComponent(lScreenTitle))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lOs)
+                    .addComponent(lOsTitle))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -180,9 +216,7 @@ public class MainAboutBox extends TabBase implements Serializable {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -194,10 +228,16 @@ public class MainAboutBox extends TabBase implements Serializable {
     private javax.swing.JLabel lCounselorTitle;
     private javax.swing.JLabel lFacebookLink;
     private javax.swing.JLabel lFacebookTitle;
+    private javax.swing.JLabel lJava;
+    private javax.swing.JLabel lJavaTitle;
     private javax.swing.JLabel lMaillistLink;
     private javax.swing.JLabel lMaillistTitle;
     private javax.swing.JLabel lModeratorLink;
     private javax.swing.JLabel lModeratorTitle;
+    private javax.swing.JLabel lOs;
+    private javax.swing.JLabel lOsTitle;
+    private javax.swing.JLabel lScreen;
+    private javax.swing.JLabel lScreenTitle;
     private javax.swing.JLabel lWebAdminLink;
     private javax.swing.JLabel lWebadminTitle;
     private javax.swing.JLabel lWebsiteLink;
@@ -205,8 +245,12 @@ public class MainAboutBox extends TabBase implements Serializable {
     // End of variables declaration//GEN-END:variables
 
     private void config() {
-        lClient.setText("1." + SysApoio.getVersion("version_counselor"));
-        lCommons.setText("1." + SysApoio.getVersion("version_commons"));
+        log.info(System.getProperties().toString());
+        lClient.setText("1." + SysApoio.getVersionClash("version_counselor"));
+        lCommons.setText("1." + SysApoio.getVersionClash("version_commons"));
+        lJava.setText(SysApoio.getVersionJava());
+        lOs.setText(SysApoio.getVersionOs());
+        lScreen.setText(SysApoio.getScreenSize());
         lAboutTitle.setText(labels.getString("ABOUT.TITLE"));
         lWebsiteTitle.setText(labels.getString("ABOUT.WEB.TITLE"));
         lWebadminTitle.setText(labels.getString("ABOUT.WEBADMIN.TITLE"));

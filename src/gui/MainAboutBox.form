@@ -21,10 +21,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-          </Group>
+          <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -35,18 +32,37 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Component id="lWebAdminLink" min="-2" max="-2" attributes="0"/>
+                      <Component id="lWebsiteLink" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+              </Group>
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
+                          <Component id="lFacebookLink" min="-2" pref="208" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      </Group>
                       <Component id="lAboutTitle" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="lCounselorTitle" alignment="0" min="-2" max="-2" attributes="1"/>
                               <Component id="lCommonsTitle" max="32767" attributes="1"/>
+                              <Component id="lJavaTitle" max="32767" attributes="1"/>
+                              <Component id="lScreenTitle" max="32767" attributes="1"/>
+                              <Component id="lOsTitle" max="32767" attributes="1"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="lCommons" min="-2" max="-2" attributes="0"/>
                               <Component id="lClient" min="-2" max="-2" attributes="0"/>
+                              <Component id="lJava" min="-2" max="-2" attributes="0"/>
+                              <Component id="lScreen" min="-2" max="-2" attributes="0"/>
+                              <Component id="lOs" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
@@ -67,24 +83,10 @@
                           <EmptySpace pref="82" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
-                                  <Component id="lFacebookLink" min="-2" pref="208" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="lFacebookTitle" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <Component id="lFacebookTitle" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="277" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-              </Group>
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="lWebAdminLink" min="-2" max="-2" attributes="0"/>
-                      <Component id="lWebsiteLink" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -110,9 +112,9 @@
                   <Component id="lModeratorLink" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="lFacebookTitle" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
-                  <Component id="lFacebookLink" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
+                  <Component id="lFacebookLink" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="lCounselorTitle" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="lClient" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -123,6 +125,21 @@
                       <Component id="lCommons" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="lJava" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="lJavaTitle" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="lScreen" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="lScreenTitle" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="lOs" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="lOsTitle" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -211,6 +228,42 @@
         <Component class="javax.swing.JLabel" name="lWebAdminLink">
           <Properties>
             <Property name="text" type="java.lang.String" value="http://sites.google.com/site/clashlegends"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lJavaTitle">
+          <Properties>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="ABOUT.JAVA.VERSION" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lJava">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="1.999"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lScreenTitle">
+          <Properties>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="ABOUT.SCREEN.RESOLUTION" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lScreen">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="1.999"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lOsTitle">
+          <Properties>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="ABOUT.OS.VERSION" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lOs">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="1.999"/>
           </Properties>
         </Component>
       </SubComponents>

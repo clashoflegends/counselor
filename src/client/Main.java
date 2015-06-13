@@ -27,8 +27,8 @@ public class Main implements Serializable {
     public static void main(String[] args) {
         // Invokes Gui to display turn results
         log.info("Starting...");
-        log.info("Counselor version: " + SysApoio.getVersion("version_counselor"));
-        log.info("Commons version: " + SysApoio.getVersion("version_commons"));
+        log.info("Counselor version: " + SysApoio.getVersionClash("version_counselor"));
+        log.info("Commons version: " + SysApoio.getVersionClash("version_commons"));
         SettingsManager.getInstance().setConfigurationMode("Client");
         SettingsManager.getInstance().setLanguage(SysProperties.getProps("language", "en"));
         String autoload = SysProperties.getProps("autoLoad");
