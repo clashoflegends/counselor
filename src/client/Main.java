@@ -31,10 +31,10 @@ public class Main implements Serializable {
         log.info("Commons version: " + SysApoio.getVersionClash("version_commons"));
         SettingsManager.getInstance().setConfigurationMode("Client");
         SettingsManager.getInstance().setLanguage(SysProperties.getProps("language", "en"));
-        String autoload = SysProperties.getProps("autoLoad");
+        final String autoload = SysProperties.getProps("autoLoad");
         SettingsManager.getInstance().setWorldBuilder(SysProperties.getProps("worldBuilder", "0").equalsIgnoreCase("1"));
         SettingsManager.getInstance().setRadialMenu(SysProperties.getProps("newUi", "1").equalsIgnoreCase("1"));
         //load application
-        new PbmApplication(autoload).start(); //true to autoload results file
+        new PbmApplication(autoload).start(); //filename to autoload results file
     }
 }

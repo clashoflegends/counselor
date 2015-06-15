@@ -3,22 +3,34 @@ package gui.subtabs;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.SysProperties;
-import control.support.ActorInterface;
-import control.support.ActorInterfaceFactory;
 import control.MapaControler;
 import control.OrdemControler;
 import control.OrdemControlerFloater;
-import gui.services.ComponentFactory;
+import control.support.ActorInterface;
+import control.support.ActorInterfaceFactory;
 import gui.TabBase;
+import gui.services.ComponentFactory;
 import gui.services.IAcaoGui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.GroupLayout;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
-import model.*;
+import model.Cidade;
+import model.Feitico;
+import model.Nacao;
+import model.Ordem;
+import model.Personagem;
+import model.PersonagemFeitico;
+import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
@@ -34,14 +46,14 @@ public class SubTabOrdem extends TabBase implements Serializable {
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private OrdemControler ordemControl;
     private OrdemControlerFloater ordemControlFloater;
-    private ComponentFactory compFactory = new ComponentFactory();
-    private List<Component> parametrosCombos = new ArrayList();
-    private List<JLabel> parametrosLabels = new ArrayList();
+    private final ComponentFactory compFactory = new ComponentFactory();
+    private final List<Component> parametrosCombos = new ArrayList();
+    private final List<JLabel> parametrosLabels = new ArrayList();
     private ActorInterface actor;
-    private JDialog dAjuda = new JDialog(new JFrame(), false);
-    private JDialog dOrdem = new JDialog(new JFrame(), false);
-    private SubTabTextArea stAjuda = new SubTabTextArea();
-    private IAcaoGui parentTab;
+    private final JDialog dAjuda = new JDialog(new JFrame(), false);
+    private final JDialog dOrdem = new JDialog(new JFrame(), false);
+    private final SubTabTextArea stAjuda = new SubTabTextArea();
+    private final IAcaoGui parentTab;
 
     public SubTabOrdem(IAcaoGui parentTab, MapaControler mapaControl) {
         initComponents();
@@ -414,12 +426,12 @@ public class SubTabOrdem extends TabBase implements Serializable {
         if (model == null) {
             jtListaOrdens.setModel(new javax.swing.table.DefaultTableModel(
                     new Object[][]{
-                {null, null},
-                {null, null},
-                {null, null}},
+                        {null, null},
+                        {null, null},
+                        {null, null}},
                     new String[]{
-                labels.getString("ACAO"), labels.getString("PARAMETRO")
-            }));
+                        labels.getString("ACAO"), labels.getString("PARAMETRO")
+                    }));
         } else {
             this.jtListaOrdens.setModel(model);
 //            calcColumnWidths(jtListaOrdens);
@@ -554,11 +566,11 @@ public class SubTabOrdem extends TabBase implements Serializable {
         List<String> parDisplay = new ArrayList();
         //adiciona a ordem na primeira posicao
         //adiciona os parametros
-        for (int ii = 0; ii < parametrosCombos.size(); ii++) {
-            if (!((Component) parametrosCombos.get(ii)).isVisible()) {
+        for (Component parametrosCombo : parametrosCombos) {
+            if (!((Component) parametrosCombo).isVisible()) {
                 continue;
             }
-            compFactory.getParametros(parametrosCombos.get(ii), parId, parDisplay);
+            compFactory.getParametros(parametrosCombo, parId, parDisplay);
         }
         PersonagemOrdem po = new PersonagemOrdem();
         po.setNome(this.getActor().getNome());
@@ -725,7 +737,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
 //        } catch (NullPointerException ex) {
 //            actorOrdemGravada = null;
 //        }
-        String vlDefault = "";
+        String vlDefault;
         try {
             vlDefault = ordemGravada.getParametrosId().get(nuParametro);
         } catch (Exception ex) {

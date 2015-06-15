@@ -6,12 +6,29 @@ package control.services;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
-import business.facade.*;
+import business.facade.CenarioFacade;
+import business.facade.CidadeFacade;
+import business.facade.ExercitoFacade;
+import business.facade.LocalFacade;
 import business.facades.ListFactory;
 import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
-import java.util.*;
-import model.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import model.Cenario;
+import model.Cidade;
+import model.Exercito;
+import model.ExercitoSim;
+import model.Jogador;
+import model.Local;
+import model.Nacao;
+import model.Pelotao;
+import model.Personagem;
+import model.TipoTropa;
 import msgs.BaseMsgs;
 import msgs.TitleFactory;
 import org.apache.commons.logging.Log;
@@ -86,7 +103,7 @@ public class ExercitoConverter implements Serializable {
         return ret;
     }
 
-    private static Collection<Pelotao> listTropasTipoAll(Exercito exercito) {
+    private static List<Pelotao> listTropasTipoAll(Exercito exercito) {
         List<Pelotao> ret = new ArrayList<Pelotao>();
         for (TipoTropa tipoTropa : WorldManager.getInstance().getCenario().getTipoTropas().values()) {
             Pelotao pelotao;
@@ -106,7 +123,7 @@ public class ExercitoConverter implements Serializable {
         return ret;
     }
 
-    private static Collection<Pelotao> listTropasTipoTransfer(Exercito exercito) {
+    private static List<Pelotao> listTropasTipoTransfer(Exercito exercito) {
         List<Pelotao> ret = new ArrayList<Pelotao>();
         for (Pelotao pelotao : exercito.getPelotoes().values()) {
             if (pelotao.getTipoTropa().isTransferable()) {
@@ -144,16 +161,16 @@ public class ExercitoConverter implements Serializable {
     }
 
     public static GenericoTableModel getExercitoModel(List lista) {
-        GenericoTableModel exercitoModel =
-                new GenericoTableModel(getExercitoColNames(), getExercitosAsArray(lista),
-                new Class[]{
-            java.lang.String.class, java.lang.String.class, Local.class,
-            java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
-        });
+        GenericoTableModel exercitoModel
+                = new GenericoTableModel(getExercitoColNames(), getExercitosAsArray(lista),
+                        new Class[]{
+                            java.lang.String.class, java.lang.String.class, Local.class,
+                            java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
+                            java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
+                            java.lang.Integer.class, java.lang.Integer.class,
+                            java.lang.Integer.class, java.lang.Integer.class,
+                            java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+                        });
         return exercitoModel;
     }
 
@@ -230,9 +247,9 @@ public class ExercitoConverter implements Serializable {
     public static GenericoTableModel getPelotaoModel(Exercito exercito) {
         return new GenericoTableModel(getPelotaoColNames(), getPelotaoAsArray(exercito),
                 new Class[]{java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class,
-            java.lang.Integer.class, java.lang.Integer.class
-        });
+                    java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class,
+                    java.lang.Integer.class, java.lang.Integer.class
+                });
     }
 
     private static String[] getPelotaoColNames() {
@@ -355,8 +372,8 @@ public class ExercitoConverter implements Serializable {
                 getTropaTipoColNames(),
                 getTropaTiposAsArray(exercito, vlInicial, filtro),
                 new Class[]{
-            java.lang.String.class, java.lang.Integer.class
-        });
+                    java.lang.String.class, java.lang.Integer.class
+                });
         boolean[] edit = new boolean[]{false, true};
         model.setEditable(edit);
         return model;
@@ -375,12 +392,12 @@ public class ExercitoConverter implements Serializable {
      * @return
      */
     private static Object[][] getTropaTiposAsArray(Exercito exercito, SortedMap<String, Integer> vlInicial, int filtro) {
-        Collection<Pelotao> list;
+        List<Pelotao> list = new ArrayList<Pelotao>();
         if (filtro == 1) {
             try {
-                list = exercito.getPelotoes().values();
+                list.addAll(exercito.getPelotoes().values());
             } catch (NullPointerException ex) {
-                //no garrison at teh scene.
+                //no garrison at the scene.
                 list = new ArrayList<Pelotao>();
             }
         } else if (filtro == 2) {
@@ -388,6 +405,20 @@ public class ExercitoConverter implements Serializable {
         } else {
             list = listTropasTipoAll(exercito);
         }
+        //check if vlInicial is in list. If not, then add.
+        if (vlInicial != null) {
+            final SortedMap<String, Integer> setInicial = new TreeMap<String, Integer>(vlInicial);
+            for (Pelotao pelotao : list) {
+                setInicial.remove(pelotao.getTipoTropa().getCodigo());
+            }
+            //o que sobrou, addiciona a list
+            for (String key : setInicial.keySet()) {
+                final Pelotao pelotao = new Pelotao();
+                pelotao.setTipoTropa(WorldManager.getInstance().getCenario().getTipoTropas().get(key));
+                list.add(pelotao);
+            }
+        }
+        //finalize the model
         Object[][] ret = new Object[list.size()][getTropaTipoColNames().length];
         int ii = 0;
         for (Pelotao pelotao : list) {
@@ -456,14 +487,14 @@ public class ExercitoConverter implements Serializable {
     }
 
     public static GenericoTableModel getBattleModel(List<ExercitoSim> lista) {
-        GenericoTableModel exercitoModel =
-                new GenericoTableModel(getBattleColNames(), getBattleAsArray(lista),
-                new Class[]{
-            java.lang.String.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.String.class
-        });
+        GenericoTableModel exercitoModel
+                = new GenericoTableModel(getBattleColNames(), getBattleAsArray(lista),
+                        new Class[]{
+                            java.lang.String.class,
+                            java.lang.Integer.class, java.lang.Integer.class,
+                            java.lang.Integer.class, java.lang.Integer.class,
+                            java.lang.String.class
+                        });
         return exercitoModel;
     }
 

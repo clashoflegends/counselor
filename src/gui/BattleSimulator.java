@@ -30,10 +30,10 @@ import persistence.SettingsManager;
 public class BattleSimulator extends JFrame {
 
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private LocalFacade localFacade = new LocalFacade();
-    private CidadeFacade cidadeFacade = new CidadeFacade();
-    private BattleSimulatorControler battleSimControler;
-    private BattleSimFacade combSim = new BattleSimFacade();
+    private final LocalFacade localFacade = new LocalFacade();
+    private final CidadeFacade cidadeFacade = new CidadeFacade();
+    private final BattleSimulatorControler battleSimControler;
+    private final BattleSimFacade combSim = new BattleSimFacade();
 
     public BattleSimulator(Local local) {
         initComponents();
