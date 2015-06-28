@@ -567,6 +567,10 @@ public class ComponentFactory implements Serializable {
                 SubTabDirecaoExercito par = (SubTabDirecaoExercito) comp;
                 tempId = par.getDirecoesIdTipo();
                 tempDisplay = par.getDirecaoDisplay();
+            } else if (comp instanceof SubTabDirecao) {
+                SubTabDirecao par = (SubTabDirecao) comp;
+                tempId = par.getDirecoesIdTipo();
+                tempDisplay = par.getDirecaoDisplay();
             } else if (comp instanceof SubTabTropas) {
                 SubTabTropas par = (SubTabTropas) comp;
                 tempId = par.getTropasId();

@@ -16,11 +16,14 @@ import control.services.FiltroConverter;
 import control.services.PersonagemConverter;
 import gui.TabBase;
 import gui.services.IAcaoGui;
-import gui.subtabs.*;
+import gui.subtabs.SubTabBaseList;
+import gui.subtabs.SubTabOrdem;
+import gui.subtabs.SubTabTextArea;
 import java.io.Serializable;
-import javax.swing.*;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
-import model.*;
+import model.Personagem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
@@ -36,11 +39,11 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     private static final Log log = LogFactory.getLog(TabPersonagensGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private PersonagemControler personagemControl;
-    private PersonagemFacade personagemFacade = new PersonagemFacade();
+    private final PersonagemFacade personagemFacade = new PersonagemFacade();
     private Personagem personagemAtivo;
-    private SubTabTextArea stResults = new SubTabTextArea();
-    private SubTabBaseList stMagicItems = new SubTabBaseList();
-    private SubTabBaseList stSpells = new SubTabBaseList();
+    private final SubTabTextArea stResults = new SubTabTextArea();
+    private final SubTabBaseList stMagicItems = new SubTabBaseList();
+    private final SubTabBaseList stSpells = new SubTabBaseList();
     private SubTabOrdem stOrdens;
 
     /**

@@ -3,6 +3,7 @@ package gui.subtabs;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.SysProperties;
+import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
 import control.OrdemControler;
 import control.OrdemControlerFloater;
@@ -672,11 +673,20 @@ public class SubTabOrdem extends TabBase implements Serializable {
     }
 
     private void doMudaActor() {
-        this.getMapaControler().remMovementTag();
-        //ordens do actor
-        setOrdensModel(getActor().getOrdemTableModel());
-        //trigger selection and doMudaOrdem(0)
-        jtListaOrdens.getSelectionModel().setSelectionInterval(0, 0);
+        if (SysProperties.getProps("OverrideElimination", "0").equals("1")
+                || (!WorldFacadeCounselor.getInstance().isGameOver()
+                && !WorldFacadeCounselor.getInstance().isJogadorAtivoEliminado(WorldFacadeCounselor.getInstance().getJogadorAtivo()))) {
+            //can receive orders
+            this.getMapaControler().remMovementTag();
+            //ordens do actor
+            setOrdensModel(getActor().getOrdemTableModel());
+            //trigger selection and doMudaOrdem(0)
+            jtListaOrdens.getSelectionModel().setSelectionInterval(0, 0);
+        } else {
+            //eh gameover?
+            //forca selecao para vazio, limpando quadro de parametros
+            doOrdemClear();
+        }
     }
 
     public void doMudaOrdem(int indexOrdem) {

@@ -35,7 +35,7 @@ public class PersonagemControler extends ControlBase implements Serializable, Ac
     private static final Log log = LogFactory.getLog(PersonagemControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
-    private TabPersonagensGui tabGui;
+    private final TabPersonagensGui tabGui;
     private List<Personagem> listaExibida;
     private Personagem personagem;
     private int modelRowIndex = 0;
