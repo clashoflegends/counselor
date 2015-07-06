@@ -23,7 +23,7 @@ import persistence.local.WorldManager;
 public class RadialEvents {
 
     private static final Log log = LogFactory.getLog(RadialEvents.class);
-    private LocalFacade lf = new LocalFacade();
+    private final LocalFacade lf = new LocalFacade();
     private SortedMap<String, Local> locais;
 
     private void sendChange(int msg, Local local) {
