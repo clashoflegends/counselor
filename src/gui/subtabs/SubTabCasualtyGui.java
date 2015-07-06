@@ -26,7 +26,7 @@ public final class SubTabCasualtyGui extends TabBase {
 
     private static final Log log = LogFactory.getLog(TabTipoTropasGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private CasualtyControler controler;
+    private final CasualtyControler controler;
 
     public SubTabCasualtyGui(Local local) {
         initComponents();

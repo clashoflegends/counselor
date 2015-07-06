@@ -25,7 +25,7 @@ public final class SubTabTroopHabGui extends TabBase {
 
     private static final Log log = LogFactory.getLog(TabTipoTropasGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private TroopHabControler controler;
+    private final TroopHabControler controler;
 
     public SubTabTroopHabGui() {
         initComponents();

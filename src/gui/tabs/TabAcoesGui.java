@@ -26,7 +26,7 @@ public final class TabAcoesGui extends TabBase {
     private static final Log log = LogFactory.getLog(TabAcoesGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private AcaoControler acaoControl;
-    private SubTabTextArea stResults = new SubTabTextArea();
+    private final SubTabTextArea stResults = new SubTabTextArea();
 
     /**
      * Creates new form TabAcoesGui

@@ -27,7 +27,7 @@ public final class TabPackagesGui extends TabBase {
     private static final Log log = LogFactory.getLog(TabPackagesGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private PackageControler packageControl;
-    private SubTabTextArea stResults = new SubTabTextArea();
+    private final SubTabTextArea stResults = new SubTabTextArea();
 
     /**
      * Creates new form TabAcoesGui

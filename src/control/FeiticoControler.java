@@ -33,7 +33,7 @@ public class FeiticoControler implements Serializable, ActionListener, ListSelec
     private static final Log log = LogFactory.getLog(FeiticoControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();;
     private GenericoTableModel mainTableModel;
-    private TabFeiticosGui tabGui;
+    private final TabFeiticosGui tabGui;
     private List listaExibida;
 
     public FeiticoControler(TabFeiticosGui tabGui) {

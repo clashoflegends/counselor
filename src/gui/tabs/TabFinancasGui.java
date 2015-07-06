@@ -30,9 +30,9 @@ public final class TabFinancasGui extends TabBase implements Serializable {
     private static final Log log = LogFactory.getLog(TabFinancasGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private FinancasControler financasControl;
-    private SubTabBaseList stForecast = new SubTabBaseList();
-    private SubTabBaseList stBalance = new SubTabBaseList();
-    private SubTabBaseList stResources = new SubTabBaseList();
+    private final SubTabBaseList stForecast = new SubTabBaseList();
+    private final SubTabBaseList stBalance = new SubTabBaseList();
+    private final SubTabBaseList stResources = new SubTabBaseList();
 
     public TabFinancasGui(String titulo, String dica, MapaControler mapaControl) {
         initComponents();

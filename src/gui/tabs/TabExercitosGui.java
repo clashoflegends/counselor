@@ -32,7 +32,7 @@ public class TabExercitosGui extends TabBase implements Serializable {
 
     private static final Log log = LogFactory.getLog(TabExercitosGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private ExercitoControler exercitoControl;
+    private final ExercitoControler exercitoControl;
 
     /**
      * Creates new form TabExercitosGui

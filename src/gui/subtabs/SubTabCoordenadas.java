@@ -29,7 +29,7 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
 
     private static final Log log = LogFactory.getLog(SubTabCoordenadas.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private LocalFacade localFacade = new LocalFacade();
+    private final LocalFacade localFacade = new LocalFacade();
 
     public SubTabCoordenadas(String vlInicial, Local origem, int range, boolean all, boolean water, MapaControler mapaControl) {
         //water=true, lista todos os hexes, water=false, lista apenas os hexes de terra (nao agua)

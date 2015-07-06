@@ -25,7 +25,7 @@ public class TabOrdensGui extends TabBase implements Serializable {
 
     private static final Log log = LogFactory.getLog(TabOrdensGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();;
-    private OrdemJogadorControler nacaoOrdemControl;
+    private final OrdemJogadorControler nacaoOrdemControl;
 
     /** Creates new form TabAcoesGui */
     public TabOrdensGui(String titulo, String dica) {

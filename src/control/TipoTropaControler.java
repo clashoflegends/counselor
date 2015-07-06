@@ -34,7 +34,7 @@ public class TipoTropaControler implements Serializable, ActionListener, ListSel
     private static final Log log = LogFactory.getLog(TipoTropaControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
-    private TabTipoTropasGui tabGui;
+    private final TabTipoTropasGui tabGui;
     private List<TipoTropa> listaExibida;
 
     public TipoTropaControler(TabTipoTropasGui tabGui) {

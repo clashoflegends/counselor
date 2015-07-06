@@ -31,7 +31,7 @@ public class TroopHabControler implements Serializable, ActionListener {
     private static final Log log = LogFactory.getLog(TroopHabControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
-    private SubTabTroopHabGui tabGui;
+    private final SubTabTroopHabGui tabGui;
     private List<TipoTropa> listaExibida;
 
     public TroopHabControler(SubTabTroopHabGui tabGui) {

@@ -37,7 +37,7 @@ public class FinancasConverter implements Serializable {
     private static final NacaoFacade nacaoFacade = new NacaoFacade();
     private static final CenarioFacade cenarioFacade = new CenarioFacade();
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private static AcaoFacade acaoFacade = new AcaoFacade();
+    private static final AcaoFacade acaoFacade = new AcaoFacade();
     public static final int SIZE = 14;
 
     public static GenericoTableModel getExtratoTableModel(Nacao nacao) {

@@ -46,10 +46,10 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
 
     private static final Log log = LogFactory.getLog(BattleSimulatorControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private BattleSimulator tabGui;
-    private List<ExercitoSim> listaExibida = new ArrayList<ExercitoSim>();
+    private final BattleSimulator tabGui;
+    private final List<ExercitoSim> listaExibida = new ArrayList<ExercitoSim>();
     private ExercitoSim exercito;
-    private BattleSimFacade combSim = new BattleSimFacade();
+    private final BattleSimFacade combSim = new BattleSimFacade();
     private Terreno terreno;
     private int rowIndex = 0;
 

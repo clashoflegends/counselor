@@ -21,9 +21,9 @@ public class LocalTableCellRenderer extends DefaultTableCellRenderer implements 
 
     private static final Log log = LogFactory.getLog(LocalTableCellRenderer.class);
     private MapaControler mapaControler;
-    private LocalFacade localFacade = new LocalFacade();
-    private Color colorBgSelected = new Color(46, 106, 197), colorBgNotSelected = Color.WHITE;
-    private Color colorFgSelected = Color.WHITE, colorFgNotSelected = Color.BLACK;
+    private final LocalFacade localFacade = new LocalFacade();
+    private final Color colorBgSelected = new Color(46, 106, 197), colorBgNotSelected = Color.WHITE;
+    private final Color colorFgSelected = Color.WHITE, colorFgNotSelected = Color.BLACK;
 //    private Font fontSelected, fontNotSelected;
 
     public LocalTableCellRenderer(MapaControler aMapaControler, JTable table) {

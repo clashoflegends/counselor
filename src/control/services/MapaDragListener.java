@@ -17,7 +17,7 @@ public class MapaDragListener implements MouseMotionListener {
 
     private boolean beingDragged = false;
     private final boolean debugTile = false;
-    private MainMapaGui owner;
+    private final MainMapaGui owner;
 
     public MapaDragListener(MainMapaGui aThis) {
         this.owner = aThis;

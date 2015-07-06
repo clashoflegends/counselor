@@ -39,9 +39,9 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     private static final Log log = LogFactory.getLog(TabNacoesGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private NacaoControler nacaoControl;
-    private SubTabTextArea stResults = new SubTabTextArea();
-    private SubTabBaseList stDiplomacy = new SubTabBaseList();
-    private SubTabBaseList stTroops = new SubTabBaseList();
+    private final SubTabTextArea stResults = new SubTabTextArea();
+    private final SubTabBaseList stDiplomacy = new SubTabBaseList();
+    private final SubTabBaseList stTroops = new SubTabBaseList();
     private SubTabOrdem stOrdens;
     private LimitTableCellRenderer ltcr;
     private final NacaoFacade nacaoFacade = new NacaoFacade();

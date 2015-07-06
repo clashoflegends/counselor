@@ -19,7 +19,7 @@ public class CompDuplo extends JPanel implements Serializable {
     private static final Log log = LogFactory.getLog(CompDuplo.class);
     private Component compA;
     private Component compB;
-    private ComponentFactory cf = new ComponentFactory();
+    private final ComponentFactory cf = new ComponentFactory();
 
     /**
      * Creates new form SubTabTextArea

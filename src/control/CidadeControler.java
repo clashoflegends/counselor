@@ -37,7 +37,7 @@ public class CidadeControler extends ControlBase implements Serializable, Action
     private static final Log log = LogFactory.getLog(CidadeControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
-    private TabCidadesGui tabCidadesGui;
+    private final TabCidadesGui tabCidadesGui;
     private List listaExibida;
 
     public CidadeControler(TabCidadesGui tabGui) {

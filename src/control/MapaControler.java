@@ -60,9 +60,9 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     private MainMapaGui tabGui;
     private DialogTextArea hexInfo;
     private Local localAtual;
-    private List<JTable> tables = new ArrayList<JTable>();
+    private final List<JTable> tables = new ArrayList<JTable>();
     private RadialMenu rmActive;
-    private MapMenuManager mapMenuManager;
+    private final MapMenuManager mapMenuManager;
 
     public MapaControler(JPanel form) {
         mapaManager = new MapaManager(WorldFacadeCounselor.getInstance().getCenario(), form);

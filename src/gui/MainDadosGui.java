@@ -19,7 +19,7 @@ import persistence.SettingsManager;
 public class MainDadosGui extends javax.swing.JPanel implements Serializable {
 
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private TabPersonagensGui tabPersonagem;
+    private final TabPersonagensGui tabPersonagem;
 
     /**
      * Creates new form MainDadosGui

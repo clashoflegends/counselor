@@ -28,7 +28,7 @@ public class NacaoRelacionamentoControl implements ItemListener, Serializable {
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private SubTabRelacionamento tabGui;
     private Nacao nacaoBase;
-    private NacaoFacade nacaoFacade = new NacaoFacade();
+    private final NacaoFacade nacaoFacade = new NacaoFacade();
 
     @Override
     public void itemStateChanged(ItemEvent event) {

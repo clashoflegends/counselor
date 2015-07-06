@@ -39,8 +39,8 @@ public abstract class ActorInterface extends ControlBase implements Serializable
 
     private static final Log log = LogFactory.getLog(ActorInterfacePersonagem.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private LocalFacade localFacade = new LocalFacade();
-    private NacaoFacade nacaoFacade = new NacaoFacade();
+    private final LocalFacade localFacade = new LocalFacade();
+    private final NacaoFacade nacaoFacade = new NacaoFacade();
     private final OrdemFacade ordemFacade = new OrdemFacade();
 
     public boolean isPersonagem() {

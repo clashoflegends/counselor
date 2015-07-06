@@ -33,7 +33,7 @@ public class AcaoControler implements Serializable, ActionListener, ListSelectio
     private static final Log log = LogFactory.getLog(AcaoControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();;
     private GenericoTableModel mainTableModel;
-    private TabAcoesGui tabGui;
+    private final TabAcoesGui tabGui;
     private List listaExibida;
 
     public AcaoControler(TabAcoesGui tabGui) {

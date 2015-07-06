@@ -28,7 +28,7 @@ public class RadialButton extends JButton {
     private BaseModel baseModel;
     private Point position;
     private double initAngle = 0;
-    private List<RadialButton> subMenuItems = new ArrayList<RadialButton>();
+    private final List<RadialButton> subMenuItems = new ArrayList<RadialButton>();
     private boolean subMenu = false;
     private Enum radialAction;
 

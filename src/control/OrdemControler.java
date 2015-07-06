@@ -27,7 +27,7 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
 
     private static final Log log = LogFactory.getLog(OrdemControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private SubTabOrdem tabGui;
+    private final SubTabOrdem tabGui;
     private int indexModelOrdem;
 
     public OrdemControler(SubTabOrdem tabOrdens) {

@@ -30,7 +30,7 @@ public class OrdemJogadorControler implements Serializable, ListSelectionListene
     private static final Log log = LogFactory.getLog(OrdemJogadorControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();;
     private GenericoTableModel mainTableModel;
-    private TabOrdensGui tabGui;
+    private final TabOrdensGui tabGui;
     private List<Personagem> listaExibida;
 
     public OrdemJogadorControler(TabOrdensGui tabGui) {

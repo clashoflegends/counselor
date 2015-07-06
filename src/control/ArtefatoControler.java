@@ -33,7 +33,7 @@ public class ArtefatoControler implements Serializable, ActionListener, ListSele
     private static final Log log = LogFactory.getLog(ArtefatoControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
-    private TabArtefatosGui tabGui;
+    private final TabArtefatosGui tabGui;
     private List listaExibida;
 
     public ArtefatoControler(TabArtefatosGui tabGui) {

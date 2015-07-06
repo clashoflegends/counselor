@@ -38,8 +38,8 @@ public class PackageControler extends ControlBase implements Serializable, Table
     private static final Log log = LogFactory.getLog(PackageControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
-    private TabPackagesGui tabGui;
-    private List<Habilidade> listaExibida = new ArrayList();
+    private final TabPackagesGui tabGui;
+    private final List<Habilidade> listaExibida = new ArrayList();
 
     public PackageControler(TabPackagesGui tabGui) {
         this.tabGui = tabGui;

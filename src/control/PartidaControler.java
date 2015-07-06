@@ -25,7 +25,7 @@ public class PartidaControler implements Serializable {
     private static final Log log = LogFactory.getLog(PartidaControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
-    private TabPartidaGui tabGui;
+    private final TabPartidaGui tabGui;
 
     public PartidaControler(TabPartidaGui tabGui) {
         this.tabGui = tabGui;

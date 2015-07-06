@@ -23,7 +23,7 @@ public class TabPartidaGui extends TabBase {
 
     private static final Log log = LogFactory.getLog(TabPartidaGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private PartidaControler controler;
+    private final PartidaControler controler;
 
     public TabPartidaGui(String titulo, String dica) {
         initComponents();

@@ -23,8 +23,8 @@ public class DispatchManager implements Serializable {
 
     private static final Log log = LogFactory.getLog(DispatchManager.class);
     private static DispatchManager instance;
-    private List<ControlBase> controlers = new ArrayList<ControlBase>();
-    private SortedMap<Integer, HashSet<ControlBase>> lista = new TreeMap<Integer, HashSet<ControlBase>>();
+    private final List<ControlBase> controlers = new ArrayList<ControlBase>();
+    private final SortedMap<Integer, HashSet<ControlBase>> lista = new TreeMap<Integer, HashSet<ControlBase>>();
     //public MSGS
     public static final int SET_LABEL_MONEY = 0;
     public static final int CLEAR_FINANCES_FORECAST = 1;

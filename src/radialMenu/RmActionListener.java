@@ -40,7 +40,7 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private Local localMenu;
     private Enum currentAction = RadialActions.NONE;
-    private RadialEvents events = new RadialEvents();
+    private final RadialEvents events = new RadialEvents();
     private RadialButton rbActive;
     private DialogTextArea hexInfo;
 

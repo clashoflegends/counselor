@@ -28,7 +28,7 @@ public class DirecaoExercitoControler implements Serializable, ActionListener {
 
     private static final Log log = LogFactory.getLog(DirecaoExercitoControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private SubTabDirecaoExercito tabGui;
+    private final SubTabDirecaoExercito tabGui;
 
     public DirecaoExercitoControler(SubTabDirecaoExercito aThis) {
         tabGui = aThis;

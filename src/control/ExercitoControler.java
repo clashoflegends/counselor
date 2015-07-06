@@ -35,7 +35,7 @@ public class ExercitoControler implements Serializable, ActionListener, ListSele
 
     ;
     private GenericoTableModel mainTableModel;
-    private TabExercitosGui tabExercitosGui;
+    private final TabExercitosGui tabExercitosGui;
     private List listaExibida;
 
     public ExercitoControler(TabExercitosGui tabGui) {

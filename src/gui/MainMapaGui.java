@@ -46,10 +46,10 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     private JLabel tagLabel;
     private int lastDragPointy = 0;
     private int lastDragPointx = 0;
-    private List<JLabel> movTags = new ArrayList();
+    private final List<JLabel> movTags = new ArrayList();
     private int counter = 0;
     private int dx = 0, dy = 0;
-    private ImageFactory imageFactory;
+    private final ImageFactory imageFactory;
     private RadialMenu radialMenu;
 
     /**

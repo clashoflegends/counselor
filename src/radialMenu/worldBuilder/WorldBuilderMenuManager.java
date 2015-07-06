@@ -30,7 +30,7 @@ public class WorldBuilderMenuManager implements Serializable {
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private static WorldBuilderMenuManager instance;
     private static RmActionListener listener;
-    private ImageFactory imageFactory = new ImageFactory();
+    private final ImageFactory imageFactory = new ImageFactory();
     private RadialMenu rmWorldBuilder;
     private RadialMenu rmDirectionsCentre;
     private SortedMap<String, Local> locais;

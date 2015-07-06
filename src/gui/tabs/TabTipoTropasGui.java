@@ -27,7 +27,7 @@ public class TabTipoTropasGui extends TabBase {
 
     private static final Log log = LogFactory.getLog(TabTipoTropasGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private TipoTropaControler controler;
+    private final TipoTropaControler controler;
 
     public TabTipoTropasGui(String titulo, String dica) {
         initComponents();

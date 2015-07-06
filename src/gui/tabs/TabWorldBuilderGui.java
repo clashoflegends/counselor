@@ -26,7 +26,7 @@ public class TabWorldBuilderGui extends TabBase implements Serializable {
 
     private static final Log log = LogFactory.getLog(TabWorldBuilderGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private WorldBuilderControl builderControl;
+    private final WorldBuilderControl builderControl;
 
     /**
      * Creates new form TabExercitosGui

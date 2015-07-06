@@ -22,7 +22,7 @@ public class DirecaoControler implements Serializable, ActionListener {
 
     private static final Log log = LogFactory.getLog(DirecaoControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private SubTabDirecao tabGui;
+    private final SubTabDirecao tabGui;
 
     public DirecaoControler(SubTabDirecao aThis) {
         tabGui = aThis;

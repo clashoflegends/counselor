@@ -23,7 +23,7 @@ public class TropasSelectionControler implements Serializable, ActionListener {
     private static final Log log = LogFactory.getLog(TropasSelectionControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     ;
-    private SubTabTropas tabGui;
+    private final SubTabTropas tabGui;
 
     public TropasSelectionControler(SubTabTropas aThis) {
         tabGui = aThis;

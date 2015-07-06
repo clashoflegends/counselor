@@ -23,12 +23,12 @@ import org.apache.commons.logging.LogFactory;
 public class RadialMenu extends javax.swing.JPanel {
 
     private static final Log log = LogFactory.getLog(RadialMenu.class);
-    private List<RadialButton> rootMenu = new ArrayList<RadialButton>();
+    private final List<RadialButton> rootMenu = new ArrayList<RadialButton>();
     private double initAngle = 120;
     private Local local;
     private boolean direction;
     private RmActionListener optionListener;
-    private LocalFacade localFacade = new LocalFacade();
+    private final LocalFacade localFacade = new LocalFacade();
     private SortedMap<String, Local> locais; //TODO: quando extrair a criacao dos buttons daki, retirar o locais...
 
     /**

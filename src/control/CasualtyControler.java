@@ -35,9 +35,9 @@ public class CasualtyControler implements Serializable, ActionListener {
     private static final Log log = LogFactory.getLog(CasualtyControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
-    private SubTabCasualtyGui tabGui;
+    private final SubTabCasualtyGui tabGui;
     private List<TipoTropa> listaExibida;
-    private Local local;
+    private final Local local;
 
     public CasualtyControler(SubTabCasualtyGui tabGui, Local local) {
         this.tabGui = tabGui;

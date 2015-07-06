@@ -37,11 +37,11 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
     private static final Log log = LogFactory.getLog(FinancasControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
-    private TabFinancasGui tabGui;
+    private final TabFinancasGui tabGui;
     private List<Nacao> listaExibida;
-    private List<PersonagemOrdem> listaPersonagemOrdens = new ArrayList<PersonagemOrdem>();
+    private final List<PersonagemOrdem> listaPersonagemOrdens = new ArrayList<PersonagemOrdem>();
     private Nacao nacao;
-    private AcaoFacade acaoFacade = new AcaoFacade();
+    private final AcaoFacade acaoFacade = new AcaoFacade();
 
     public FinancasControler(TabFinancasGui tabGui) {
         this.tabGui = tabGui;

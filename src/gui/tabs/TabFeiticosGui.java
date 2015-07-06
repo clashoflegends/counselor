@@ -26,7 +26,7 @@ public final class TabFeiticosGui extends TabBase implements Serializable {
 
     private static final Log log = LogFactory.getLog(TabFeiticosGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private FeiticoControler feiticoControl;
+    private final FeiticoControler feiticoControl;
 
     /** Creates new form TabFeiticosGui */
     public TabFeiticosGui(String titulo, String dica) {

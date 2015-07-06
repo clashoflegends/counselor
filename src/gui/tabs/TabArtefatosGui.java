@@ -31,7 +31,7 @@ public class TabArtefatosGui extends TabBase implements Serializable {
     private static final Log log = LogFactory.getLog(TabArtefatosGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     ;
-    private ArtefatoControler artefatoControl;
+    private final ArtefatoControler artefatoControl;
 
     /**
      * Creates new form TabArtefatosGui

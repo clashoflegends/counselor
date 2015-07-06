@@ -39,11 +39,11 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private CidadeControler cidadeControl;
 //    private SubTabConfigActor stRename = new SubTabConfigActor();
-    private SubTabTextArea stResults = new SubTabTextArea();
-    private SubTabBaseList stPersonagens = new SubTabBaseList();
-    private SubTabBaseList stProdutos = new SubTabBaseList();
+    private final SubTabTextArea stResults = new SubTabTextArea();
+    private final SubTabBaseList stPersonagens = new SubTabBaseList();
+    private final SubTabBaseList stProdutos = new SubTabBaseList();
     private SubTabOrdem stOrdens;
-    private CenarioFacade cenarioFacade = new CenarioFacade();
+    private final CenarioFacade cenarioFacade = new CenarioFacade();
     private Cenario cenario;
 
     /**

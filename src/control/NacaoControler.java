@@ -33,7 +33,7 @@ public class NacaoControler extends ControlBase implements Serializable, ActionL
     private static final Log log = LogFactory.getLog(NacaoControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
-    private TabNacoesGui tabNacaoGui;
+    private final TabNacoesGui tabNacaoGui;
     private List listaExibida;
     private int modelRowIndex = 0;
 

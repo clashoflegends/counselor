@@ -26,7 +26,7 @@ public class MapMenuManager implements Serializable {
     private static final Log log = LogFactory.getLog(MapMenuManager.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private static RmActionListener listener;
-    private ImageFactory imageFactory = new ImageFactory();
+    private final ImageFactory imageFactory = new ImageFactory();
     private RadialMenu rmWorldBuilder;
     private SortedMap<String, Local> locais;
     private SortedMap<String, Nacao> nacoes;
