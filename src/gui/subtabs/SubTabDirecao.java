@@ -31,11 +31,11 @@ public final class SubTabDirecao extends TabBase implements Serializable {
 
     private static final Log log = LogFactory.getLog(SubTabDirecao.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private String direcaoDisplay = "", direcaoTipo = "nr";
+    private String direcaoDisplay = "";
     private List<String> direcoesId = new ArrayList();
     private final DirecaoControler dirExControl;
     private final Local origem;
-    private Local  destino;
+    private Local destino;
     private final LocalFacade localFacade = new LocalFacade();
     private Ordem ordem;
     private ActorInterface actor;
@@ -68,7 +68,7 @@ public final class SubTabDirecao extends TabBase implements Serializable {
         setListeners();
     }
 
-    public SubTabDirecao(String vlInicial,Local local, int limit, boolean waterMov, MapaControler mapaControl, boolean all) {
+    public SubTabDirecao(String vlInicial, Local local, int limit, boolean waterMov, MapaControler mapaControl, boolean all) {
         initComponents();
 
         setAll(all);
@@ -83,7 +83,7 @@ public final class SubTabDirecao extends TabBase implements Serializable {
         dirExControl = new DirecaoControler(this);
 
         //set initial tag
-//        this.doMovementTagsPaint(vlInicial);
+        this.doMovementTagsPaint(vlInicial);
         setListeners();
     }
 
@@ -266,12 +266,11 @@ public final class SubTabDirecao extends TabBase implements Serializable {
         for (String direcao : direcoesId) {
             ret += direcao + ";";
         }
-        ret += getDirecaoTipo();
         return ret;
     }
 
     public String getDirecaoDisplay() {
-        return direcaoDisplay + getDirecaoTipo();
+        return direcaoDisplay;
     }
 
     /**
@@ -286,20 +285,6 @@ public final class SubTabDirecao extends TabBase implements Serializable {
      */
     private void setDirecaoDisplay(String direcaoDisplay) {
         this.direcaoDisplay = direcaoDisplay;
-    }
-
-    /**
-     * @return the direcaoTipo
-     */
-    private String getDirecaoTipo() {
-        return direcaoTipo;
-    }
-
-    /**
-     * @param aDirecaoTipo the direcaoTipo to set
-     */
-    public void setDirecaoTipo(String aDirecaoTipo) {
-        this.direcaoTipo = aDirecaoTipo;
     }
 
     public void doApaga() {
