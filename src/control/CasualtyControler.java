@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
 import persistence.SettingsManager;
+import persistence.local.WorldManager;
 
 /**
  *
@@ -55,7 +56,7 @@ public class CasualtyControler implements Serializable, ActionListener {
             listaExibida = TipoTropaConverter.listaByFiltroCasualty(filtro);
         }
         //sort array
-        ComparatorFactory.getComparatorCasualtiesTipoTropaSorter(listaExibida, ConverterFactory.taticaToInt(tactic), local.getTerreno());
+        ComparatorFactory.getComparatorCasualtiesTipoTropaSorter(listaExibida, ConverterFactory.taticaToInt(tactic), local.getTerreno(), WorldManager.getInstance().getPartida().getId());
         this.mainTableModel = TipoTropaConverter.getCasualtyModel(listaExibida, local.getTerreno());
         return this.mainTableModel;
     }

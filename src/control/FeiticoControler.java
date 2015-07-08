@@ -31,7 +31,8 @@ import persistence.SettingsManager;
 public class FeiticoControler implements Serializable, ActionListener, ListSelectionListener {
 
     private static final Log log = LogFactory.getLog(FeiticoControler.class);
-    private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();;
+    private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
+    ;
     private GenericoTableModel mainTableModel;
     private final TabFeiticosGui tabGui;
     private List listaExibida;
@@ -54,6 +55,7 @@ public class FeiticoControler implements Serializable, ActionListener, ListSelec
         return tabGui;
     }
 
+    @Override
     public void actionPerformed(ActionEvent event) {
         if (event.getSource() instanceof JTable) {
             log.info(labels.getString("OPS.JTABLE.EVENT"));
@@ -66,6 +68,7 @@ public class FeiticoControler implements Serializable, ActionListener, ListSelec
         }
     }
 
+    @Override
     public void valueChanged(ListSelectionEvent event) {
         if (event.getValueIsAdjusting()) {
             return;
@@ -79,10 +82,10 @@ public class FeiticoControler implements Serializable, ActionListener, ListSelec
                 int modelIndex = table.convertRowIndexToModel(rowIndex);
                 Feitico feitico = (Feitico) listaExibida.get(modelIndex);
                 getTabGui().doMudaFeitico(feitico);
-            //PENDING atualizar table mensagens
+                //PENDING atualizar table mensagens
             }
         } catch (IndexOutOfBoundsException ex) {
-        //lista vazia?
+            //lista vazia?
         }
     }
 }

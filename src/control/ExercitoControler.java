@@ -32,8 +32,6 @@ public class ExercitoControler implements Serializable, ActionListener, ListSele
 
     private static final Log log = LogFactory.getLog(ExercitoControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-
-    ;
     private GenericoTableModel mainTableModel;
     private final TabExercitosGui tabExercitosGui;
     private List listaExibida;
