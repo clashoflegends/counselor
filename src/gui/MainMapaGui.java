@@ -200,8 +200,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     }
 
     public void clearMovementTags() {
-        for (Iterator<JLabel> it = movTags.iterator(); it.hasNext();) {
-            JLabel tag = it.next();
+        for (JLabel tag : movTags) {
             tag.setVisible(false);
             jLayeredPane1.remove(tag);
         }

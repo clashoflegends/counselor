@@ -104,9 +104,7 @@ public class FeiticoConverter implements Serializable {
         } else {
             int ii = 0;
             Object[][] ret = new Object[listaExibir.size()][getFeiticoColNames().length];
-            Iterator lista = listaExibir.iterator();
-            while (lista.hasNext()) {
-                Feitico feitico = (Feitico) lista.next();
+            for (Feitico feitico : listaExibir) {
                 // Converte um Feitico para um Array[] 
                 int nn = 0;
                 ret[ii][nn++] = feiticoFacade.getNome(feitico);
@@ -127,9 +125,7 @@ public class FeiticoConverter implements Serializable {
 
     public static List<Feitico> listaByFiltro(String filtro) {
         List ret = new ArrayList();
-        Iterator listaTotal = listFactory.listFeiticos().iterator();
-        while (listaTotal.hasNext()) {
-            Feitico feitico = (Feitico) listaTotal.next();
+        for (Feitico feitico : listFactory.listFeiticos()) {
             if (filtro.equalsIgnoreCase("Todos")
                     || feitico.getLivroFeitico().equalsIgnoreCase(filtro)) {
                 ret.add(feitico);
@@ -140,9 +136,7 @@ public class FeiticoConverter implements Serializable {
 
     private static String[][] listLivro() {
         SortedMap<String, String> itens = new TreeMap();
-        Iterator lista = listFactory.listFeiticos().iterator();
-        while (lista.hasNext()) {
-            Feitico feitico = (Feitico) lista.next();
+        for (Feitico feitico : listFactory.listFeiticos()) {
             itens.put(feitico.getLivroFeitico(), feitico.getLivroFeitico());
         }
         String[][] ret = new String[itens.size() + 1][2];
