@@ -27,13 +27,41 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import model.*;
+import javax.mail.internet.AddressException;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import model.Cidade;
+import model.Comando;
+import model.ComandoDetail;
+import model.Habilidade;
+import model.Jogador;
+import model.Local;
+import model.Nacao;
+import model.Ordem;
+import model.Partida;
+import model.Personagem;
+import model.PersonagemOrdem;
+import model.World;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.*;
+import persistence.BundleManager;
+import persistence.PathFactory;
+import persistence.PersistenceException;
+import persistence.SettingsManager;
+import persistence.SmtpManager;
+import persistence.WebCounselorManager;
+import persistence.XmlManager;
 import persistence.local.PersistFactory;
 import persistence.local.WorldManager;
 
@@ -689,9 +717,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         if (depois != null) {
             this.getGui().setStatusMsg(
                     String.format("%s: %s [$%s]",
-                    depois.getNome(),
-                    depois.getOrdem().getDescricao(),
-                    acaoFacade.getCusto(depois)));
+                            depois.getNome(),
+                            depois.getOrdem().getDescricao(),
+                            acaoFacade.getCusto(depois)));
         }
     }
 
@@ -895,7 +923,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
         try {
             SmtpManager email = new SmtpManager();
-            email.setToCc(from);
+            email.addToCc(from);
             email.setFrom(from);
             email.setBody(listaOrdensEmailBody(msg));
             String subject = null;
@@ -921,6 +949,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         } catch (PersistenceException ex) {
             this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO") + " => " + ex.getMessage());
             SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"));
+            return false;
+        } catch (AddressException ex) {
+            this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO.MALFORMED") + " => " + ex.getMessage());
+            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO.MALFORMED"));
             return false;
         }
     }
