@@ -323,8 +323,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         if (!SysProperties.getProps("SendOrderWebPopUp", "1").equals("1")) {
             doSendViaEmail(attachment, labels.getString("ENVIAR.FAILREASON.PROPERTYSET"));
         } else if (!doSendViaPost(attachment)) {
-            //success or wrong turn
-            String lastResponse = WebCounselorManager.getInstance().getLastResponseString();
+            //try to send via email
+            final String lastResponse = WebCounselorManager.getInstance().getLastResponseString();
             doSendViaEmail(attachment, lastResponse);
         } else {
             //fail msg displayed by doSendViaEmail
@@ -910,14 +910,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    public boolean doSendViaEmail(File attachment, String msg) {
+    private boolean doSendViaEmail(File attachment, String msg) {
         /* prepara o email, pede informacoes se properties
          * nao estao preenchidas salva novas informacoes no properties !
          * pergunta se quer receber uma copia? ! 
          * envia o email e avisa do recibo.
          */
         this.getGui().setStatusMsg(labels.getString("ENVIAR.JUDGE"));
-        String from = getEmail();
+        final String from = getEmail();
         if (from.equals("none")) {
             return false;
         }
