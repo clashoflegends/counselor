@@ -154,9 +154,17 @@ public class ExercitoConverter implements Serializable {
         cArray[ii++] = exercitoFacade.getDefesaExercito(exercito, false);
         if (cenarioFacade.hasShips(cenario)) {
             cArray[ii++] = exercitoFacade.getTransportesMinimo(exercito);
+            cArray[ii++] = exercitoFacade.getTransportesAvailable(exercito);
         } else {
             cArray[ii++] = "-";
         }
+        if (exercito.isMovimentacaoEvasiva()) {
+            cArray[ii++] = BaseMsgs.tipoMovimentacao[1];
+        } else {
+            cArray[ii++] = BaseMsgs.tipoMovimentacao[0];
+        }
+        cArray[ii++] = exercitoFacade.getTerreno(exercito);
+        cArray[ii++] = exercitoFacade.getClima(exercito);
         return cArray;
     }
 
@@ -169,7 +177,9 @@ public class ExercitoConverter implements Serializable {
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class,
-                            java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+                            java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
+                            java.lang.Integer.class, java.lang.String.class, java.lang.String.class,
+                            java.lang.String.class
                         });
         return exercitoModel;
     }
@@ -181,9 +191,11 @@ public class ExercitoConverter implements Serializable {
             labels.getString("COMIDA"), labels.getString("COMIDA.CONSUMO"), labels.getString("MORAL"),
             labels.getString("CUSTO.MANUTENCAO"), labels.getString("MAQUINAS.GUERRA"),
             labels.getString("TROPA.ATAQUE.NAVAL"), labels.getString("TROPA.DEFESA.NAVAL"),
-            labels.getString("TROPA.ATAQUE.TERRA"), labels.getString("TROPA.DEFESA.TERRA"), labels.getString("TRANSPORTE.MINIMO")
+            labels.getString("TROPA.ATAQUE.TERRA"), labels.getString("TROPA.DEFESA.TERRA"),
+            labels.getString("TRANSPORTE.MINIMO"),
+            labels.getString("TRANSPORTE.AVAILABLE"),
+            labels.getString("MOVIMENTACAO"), labels.getString("TERRENO"), labels.getString("CLIMA")
         };
-        //"Terreno", "Clima","Moral","Transportes necessários","Movimentação", "CavPes", "CavLev", "InfPes", "InfLev", "Arq", "Escravos","Navios de Guerra", "Transportes", 
         return (colNames);
     }
 
@@ -204,50 +216,11 @@ public class ExercitoConverter implements Serializable {
         }
     }
 
-    public static GenericoTableModel getInfoModel(Exercito exercito) {
-        return new GenericoTableModel(getInfoColNames(), getInfoAsArray(exercito),
-                new Class[]{java.lang.String.class, java.lang.String.class});
-    }
-
-    private static String[] getInfoColNames() {
-        String[] colNames = {labels.getString("NOME"), labels.getString("VALOR")};
-        return (colNames);
-    }
-
-    private static Object[][] getInfoAsArray(Exercito exercito) {
-        if (exercito == null) {
-            Object[][] ret = {{"", ""}};
-            return (ret);
-        } else {
-            int ii = 0;
-            Object[][] ret = new Object[5][getPelotaoColNames().length];
-            try {
-                ret[ii][0] = labels.getString("MORAL");
-                ret[ii++][1] = exercito.getMoral() + "";
-                if (cenarioFacade.hasShips(cenario)) {
-                    ret[ii][0] = labels.getString("TRANSPORTE.MINIMO");
-                    ret[ii++][1] = exercitoFacade.getTransportesMinimo(exercito) + "";
-                }
-                ret[ii][0] = labels.getString("MOVIMENTACAO");
-                if (exercito.isMovimentacaoEvasiva()) {
-                    ret[ii++][1] = BaseMsgs.tipoMovimentacao[1];
-                } else {
-                    ret[ii++][1] = BaseMsgs.tipoMovimentacao[0];
-                }
-                ret[ii][0] = labels.getString("TERRENO");
-                ret[ii++][1] = exercitoFacade.getTerreno(exercito);
-                ret[ii][0] = labels.getString("CLIMA");
-                ret[ii++][1] = exercitoFacade.getClima(exercito);
-            } catch (IndexOutOfBoundsException ex) {
-            }
-            return (ret);
-        }
-    }
-
     public static GenericoTableModel getPelotaoModel(Exercito exercito) {
         return new GenericoTableModel(getPelotaoColNames(), getPelotaoAsArray(exercito),
                 new Class[]{java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class,
                     java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class,
+                    java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
                     java.lang.Integer.class, java.lang.Integer.class
                 });
     }
@@ -256,8 +229,10 @@ public class ExercitoConverter implements Serializable {
         String[] colNames = {labels.getString("NOME"), labels.getString("QTD"),
             labels.getString("TREINO"), labels.getString("ARMA"),
             labels.getString("ARMADURA"), labels.getString("TIPO"),
-            labels.getString("TROPA.ATAQUE"), labels.getString("TROPA.DEFESA")};
-        //String[] colNames = {"Nome", "Quantidade", "Treino", "Arma", "Armadura", "Tipo"};
+            labels.getString("TROPA.ATAQUE"), labels.getString("TROPA.DEFESA"),
+            labels.getString("TRANSPORTE.CAPACITY"),
+            labels.getString("TRANSPORTE.CARGOUSED"), labels.getString("TRANSPORTE.MINIMO")};
+
         return (colNames);
     }
 
@@ -279,6 +254,9 @@ public class ExercitoConverter implements Serializable {
                 ret[ii][nn++] = pelotao.getNome();
                 ret[ii][nn++] = exercitoFacade.getAtaquePelotao(pelotao, exercito);
                 ret[ii][nn++] = exercitoFacade.getDefesaPelotao(pelotao, exercito);
+                ret[ii][nn++] = exercitoFacade.getTransportesCapacity(pelotao);
+                ret[ii][nn++] = (int) exercitoFacade.getTransportesCargoUsed(pelotao);
+                ret[ii][nn++] = exercitoFacade.getTransportesMinimo(pelotao);
                 ii++;
             }
             return (ret);
@@ -514,7 +492,7 @@ public class ExercitoConverter implements Serializable {
             return (ret);
         } else {
             int ii = 0;
-            Object[][] ret = new Object[listaExibir.size()][getExercitoColNames().length];
+            Object[][] ret = new Object[listaExibir.size()][getBattleColNames().length];
             for (ExercitoSim exercito : listaExibir) {
                 ret[ii++] = ExercitoConverter.battleToArray(exercito);
             }
@@ -524,7 +502,7 @@ public class ExercitoConverter implements Serializable {
 
     private static Object[] battleToArray(ExercitoSim exercito) {
         int ii = 0;
-        Object[] cArray = new Object[getExercitoColNames().length];
+        Object[] cArray = new Object[getBattleColNames().length];
         cArray[ii++] = exercitoFacade.getComandanteTitulo(exercito, WorldFacadeCounselor.getInstance().getCenario());
         cArray[ii++] = exercitoFacade.getAtaqueExercito(exercito, true);
         cArray[ii++] = exercitoFacade.getDefesaExercito(exercito, true);

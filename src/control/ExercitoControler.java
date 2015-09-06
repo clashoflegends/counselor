@@ -40,10 +40,6 @@ public class ExercitoControler implements Serializable, ActionListener, ListSele
         this.tabExercitosGui = tabGui;
     }
 
-    public GenericoTableModel getInfoTableModel(Exercito exercito) {
-        return ExercitoConverter.getInfoModel(exercito);
-    }
-
     public GenericoTableModel getMainTableModel(GenericoComboObject filtro) {
         Nacao nacao = null;
         try {

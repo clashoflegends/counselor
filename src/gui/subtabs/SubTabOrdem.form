@@ -372,6 +372,7 @@
                           <ResourceString bundle="gui/subtabs/Bundle.properties" key="PERSONAGEM.ORDENSALL.TOOLTIP" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
                         </Property>
                         <Property name="actionCommand" type="java.lang.String" value="cbOrdersAll" noResource="true"/>
+                        <Property name="focusable" type="boolean" value="false"/>
                         <Property name="name" type="java.lang.String" value="cbOrdersAll" noResource="true"/>
                       </Properties>
                     </Component>
@@ -384,6 +385,7 @@
                           <ResourceString bundle="gui/subtabs/Bundle.properties" key="PERSONAGEM.DETACH.TOOLTIP" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
                         </Property>
                         <Property name="actionCommand" type="java.lang.String" value="cbOrdersDetach" noResource="true"/>
+                        <Property name="focusable" type="boolean" value="false"/>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JButton" name="jbHelp">
@@ -399,6 +401,7 @@
                             <EmptyBorder bottom="3" left="3" right="3" top="3"/>
                           </Border>
                         </Property>
+                        <Property name="focusable" type="boolean" value="false"/>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JButton" name="jbClear">
@@ -414,6 +417,7 @@
                             <EmptyBorder bottom="3" left="3" right="3" top="3"/>
                           </Border>
                         </Property>
+                        <Property name="focusable" type="boolean" value="false"/>
                       </Properties>
                     </Component>
                   </SubComponents>

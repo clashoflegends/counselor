@@ -157,19 +157,23 @@ public class SubTabOrdem extends TabBase implements Serializable {
         cbOrdersAll.setText(labels.getString("ALL")); // NOI18N
         cbOrdersAll.setToolTipText(labels.getString("PERSONAGEM.ORDENSALL.TOOLTIP")); // NOI18N
         cbOrdersAll.setActionCommand("cbOrdersAll"); // NOI18N
+        cbOrdersAll.setFocusable(false);
         cbOrdersAll.setName("cbOrdersAll"); // NOI18N
 
         cbOrdersDetach.setText(labels.getString("DETACH")); // NOI18N
         cbOrdersDetach.setToolTipText(labels.getString("PERSONAGEM.DETACH.TOOLTIP")); // NOI18N
         cbOrdersDetach.setActionCommand("cbOrdersDetach"); // NOI18N
+        cbOrdersDetach.setFocusable(false);
 
         jbHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/help_icon.gif"))); // NOI18N
         jbHelp.setToolTipText(labels.getString("PERSONAGEM.AJUDA.TOOLTIP")); // NOI18N
         jbHelp.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        jbHelp.setFocusable(false);
 
         jbClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/erase.png"))); // NOI18N
         jbClear.setToolTipText(labels.getString("PERSONAGEM.ERASE.TOOLTIP")); // NOI18N
         jbClear.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        jbClear.setFocusable(false);
 
         javax.swing.GroupLayout jpOrdensLayout = new javax.swing.GroupLayout(jpOrdens);
         jpOrdens.setLayout(jpOrdensLayout);
