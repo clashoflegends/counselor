@@ -404,7 +404,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private String listaOrdens() {
-        String ret = listaOrdensBySequence() + "\n\n";
+        String ret = "";
+        if (WorldFacadeCounselor.getInstance().isStartupPackages() && WorldFacadeCounselor.getInstance().getTurno() == 0) {
+            ret += listaPackages() + "\n\n";
+        }
+        ret += listaOrdensBySequence() + "\n\n";
         if (cenarioFacade.hasOrdensNacao(WorldFacadeCounselor.getInstance().getPartida())) {
             ret += listaOrdensByNation() + "\n\n";
         }
@@ -507,6 +511,24 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             }
         }
         return ret;
+    }
+
+    private String listaPackages() {
+        String ret = "";
+        for (Nacao nacao : WorldManager.getInstance().getNacoesJogadorAtivo()) {
+            List<Habilidade> packages = getPackages(nacao);
+            if (!packages.isEmpty()) {
+                ret += String.format(labels.getString("STARTUP.NATION.TITLE") + "\n", nacao.getNome());
+                for (Habilidade elem : packages) {
+                    ret += String.format("%s (%s %s)\n", elem.getNome(), elem.getCost(), labels.getString("STARTUP.POINTS"));
+                }
+            }
+        }
+        if (ret.equals("")) {
+            return labels.getString("MISSING.PACKAGE");
+        } else {
+            return ret;
+        }
     }
 
     private String listaOrdensBySequence() {
@@ -815,15 +837,19 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private boolean doSavePackages(Comando comando) {
-        boolean missing = true;
         if (WorldFacadeCounselor.getInstance().isStartupPackages() && WorldFacadeCounselor.getInstance().getTurno() == 0) {
-            for (Nacao nacao : WorldManager.getInstance().getNacoesJogadorAtivo()) {
-                comando.addPackage(nacao, getPackages(nacao));
-                missing = false;
-                log.info(nacao.getNome() + " + " + getPackages(nacao));
-            }
+            return getPackagesAll(comando);
         } else {
             return false;
+        }
+    }
+
+    private boolean getPackagesAll(Comando comando) {
+        boolean missing = true;
+        for (Nacao nacao : WorldManager.getInstance().getNacoesJogadorAtivo()) {
+            comando.addPackage(nacao, getPackages(nacao));
+            missing = false;
+            log.info(nacao.getNome() + " + " + getPackages(nacao));
         }
         return missing;
     }
@@ -971,4 +997,5 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
         return from;
     }
+
 }
