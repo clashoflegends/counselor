@@ -30,7 +30,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import model.Exercito;
 import model.Jogador;
 import model.Local;
@@ -86,12 +90,12 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
 
     public ImageIcon printMapaGeral() {
         final Jogador jogadorAtivo = WorldManager.getInstance().getPartida().getJogadorAtivo();
-        return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), jogadorAtivo));
+        return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
     }
 
     public BufferedImage getMap() {
         final Jogador jogadorAtivo = WorldManager.getInstance().getPartida().getJogadorAtivo();
-        return mapaManager.printMapaGeral(listFactory.listLocais().values(), jogadorAtivo);
+        return mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo);
     }
 
     public MainMapaGui getTabGui() {
