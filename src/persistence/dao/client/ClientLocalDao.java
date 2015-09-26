@@ -23,7 +23,7 @@ public class ClientLocalDao implements ILocalDao, Serializable {
     private static final Log log = LogFactory.getLog(ClientLocalDao.class);
 
     @Override
-    public SortedMap<String, Local> list(Partida partida) throws PersistenceException {
+    public SortedMap<String, Local> listWithVisibility(Partida partida) throws PersistenceException {
         return WorldManager.getInstance().getLocais();
     }
 
@@ -65,5 +65,10 @@ public class ClientLocalDao implements ILocalDao, Serializable {
     @Override
     public void update(Local local) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public SortedMap<String, Local> listFull(Partida partida) throws PersistenceException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

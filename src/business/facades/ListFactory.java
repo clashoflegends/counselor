@@ -8,11 +8,33 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.SortedMap;
-import model.*;
+import model.Alianca;
+import model.Artefato;
+import model.Cidade;
+import model.Exercito;
+import model.Feitico;
+import model.Jogador;
+import model.Local;
+import model.Nacao;
+import model.Ordem;
+import model.Partida;
+import model.Personagem;
+import model.Produto;
+import model.TipoTropa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.PersistenceException;
-import persistence.iDao.*;
+import persistence.iDao.IAliancaDao;
+import persistence.iDao.IArtefatoDao;
+import persistence.iDao.ICidadeDao;
+import persistence.iDao.IExercitoDao;
+import persistence.iDao.IFeiticoDao;
+import persistence.iDao.IJogadorDao;
+import persistence.iDao.ILocalDao;
+import persistence.iDao.INacaoDao;
+import persistence.iDao.IOrdemDao;
+import persistence.iDao.IPersonagemDao;
+import persistence.iDao.IProdutoDao;
 import persistence.local.PersistFactory;
 import persistence.local.WorldManager;
 
@@ -27,7 +49,7 @@ public class ListFactory implements Serializable {
     public SortedMap<String, Local> listLocais() {
         ILocalDao localDao = PersistFactory.getLocalDao();
         try {
-            return localDao.list(null);
+            return localDao.listWithVisibility(null);
         } catch (PersistenceException ex) {
             throw new UnsupportedOperationException("text...", ex);
         }

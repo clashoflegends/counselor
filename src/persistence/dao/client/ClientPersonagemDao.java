@@ -11,8 +11,8 @@ import model.Personagem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.PersistenceException;
-import persistence.local.WorldManager;
 import persistence.iDao.IPersonagemDao;
+import persistence.local.WorldManager;
 
 /**
  *
@@ -25,16 +25,24 @@ public class ClientPersonagemDao implements IPersonagemDao, Serializable {
     public ClientPersonagemDao() {
     }
 
+    @Override
     public Personagem get(int id, int turno) throws PersistenceException {
         //server only
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public SortedMap<String, Personagem> list(Partida partida) throws PersistenceException {
         return WorldManager.getInstance().getPersonagens();
     }
 
+    @Override
     public void clear() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Personagem get(int id, Partida partida) throws PersistenceException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
