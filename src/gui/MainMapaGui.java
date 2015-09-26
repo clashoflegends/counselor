@@ -23,7 +23,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -80,11 +79,10 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         mapaLabel = new javax.swing.JLabel();
 
         setAutoscrolls(true);
-        setMinimumSize(new java.awt.Dimension(10, 10));
 
         mapaLabel.setMaximumSize(new java.awt.Dimension(32767, 32767));
+        jLayeredPane1.add(mapaLabel);
         mapaLabel.setBounds(0, 0, 400, 400);
-        jLayeredPane1.add(mapaLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jScrollPane1.setViewportView(jLayeredPane1);
 

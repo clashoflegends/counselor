@@ -7,15 +7,18 @@ package gui;
 
 import baseLib.SysApoio;
 import baseLib.SysProperties;
+import business.ImageFactory;
 import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
 import control.WorldControler;
 import gui.tabs.TabPersonagensGui;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.Serializable;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.apache.commons.logging.Log;
@@ -39,6 +42,8 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
      */
     public MainResultWindowGui(String autoLoad) {
         initComponents();
+        //load teaser
+        doLoadTeaser();
         //adiciona listeners
         jbOpen.addActionListener(wc);
         jbLoad.addActionListener(wc);
@@ -428,4 +433,15 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         }
         this.labelMoney.setText(String.format("%s %s", txt, labels.getString("MONEY")));
     }
+
+    private void doLoadTeaser() {
+        final ImageFactory imfac = new ImageFactory();
+        final ImageIcon teaser = imfac.getTeaser();
+        //Gera o mapa
+        Dimension tamanho = new Dimension(teaser.getIconWidth(), teaser.getIconHeight());
+        this.splitMainPanel.setPreferredSize(tamanho);
+        this.jlRight.setSize(tamanho);
+        this.jlRight.setIcon(teaser);
+    }
+
 }

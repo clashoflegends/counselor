@@ -1,0 +1,51 @@
+#Counselor config file
+#filtro.default=0|1 -> All|Own
+#maximize = 0|1 -> normal|maximize
+#saveDir = default folder to save orders
+#loadDir = default folder to load results and orders
+#doneDir = server side use, no effect on the Counselor
+#local = server side use, no effect on the Counselor
+#database = server side use, no effect on the Counselor
+#language = pt/en, to define the GUI language
+#autoLoad = file name that you want to be loaded every time (use / as opposed to \)
+#splitSize = define the size of the left side screen split. Default=300
+#mostraNumeroOrdem = 1, shows the orders numbers in the order combo. will be deprecated soon.
+#CopyActionsPopUp = 1, displays a popup when copying Actions to clipboard.
+#MyEmail=user@domain, define your email address.
+#
+#
+#Sat Oct 22 14:48:17 MDT 2011
+autoLoad=/tmpbm/285/game_285_2.murazorgames.rr.egf
+autoLoadActions=/tmpbm/285/orders_285_3.murazorgames.rc.egf
+MyEmail=jmoura@shaw.ca
+CopyActionsPopUp=1
+language=en
+loadDir=/tmpbm/saves/
+#loadDir=/tmpbm/savesDebug/
+doneDir=/tmpbm/Inbox/Done/
+local=Unknow
+saveDir=/tmpbm/Inbox/
+splitSize=660
+maximizeWindowOnStart=1
+filtro.default=1
+database=ProdTeste
+minimizeMapOnStart=0
+HexTagStyle=0
+HexTagFrame=0
+#OverrideElimination=1
+#worldBuilder=1
+newUi=1
+MapTiles=2d
+KeepPopupOpen=0
+TableColumnAdjust=1
+#ImagemMar=hex_mar.png
+#ImagemCosta=hex_costa.png
+#ImagemLitoral=shore.png
+#ImagemFloresta=woods.png
+#ImagemPlanicie=planicie.png
+#ImagemMontanha=mountains.png
+#ImagemColinas=hills.png
+#ImagemPantano=swamp.png
+#ImagemDeserto=desert.png
+EnableBetaFeatures=1
+SortAllCombos=1
