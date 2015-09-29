@@ -685,7 +685,8 @@ public class SubTabOrdem extends TabBase implements Serializable {
             //ordens do actor
             setOrdensModel(getActor().getOrdemTableModel());
             //trigger selection and doMudaOrdem(0)
-            jtListaOrdens.getSelectionModel().setSelectionInterval(0, 0);
+            //jtListaOrdens.getSelectionModel().setSelectionInterval(0, 0);
+            doFindNextActionSlot();
         } else {
             //eh gameover?
             //forca selecao para vazio, limpando quadro de parametros
