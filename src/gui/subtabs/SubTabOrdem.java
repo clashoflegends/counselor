@@ -631,9 +631,9 @@ public class SubTabOrdem extends TabBase implements Serializable {
         }
     }
 
-    public void doFindNextActionSlot() {
+    public boolean doFindNextActionSlot() {
         if (!SysProperties.getProps("AutoMoveNextAction", "1").equals("1")) {
-            return;
+            return false;
         }
         //testa se slot next actor
         for (int ii = 0; ii < this.jtListaOrdens.getModel().getRowCount(); ii++) {
@@ -641,11 +641,12 @@ public class SubTabOrdem extends TabBase implements Serializable {
             if (valueAt.equals(" ")) {
 //                log.fatal("muda foco aki");
                 this.jtListaOrdens.getSelectionModel().setSelectionInterval(ii, ii);
-                break;
+                return true;
             }
         }
         //testa slot em outros personagens?
         //sem slot aberto, entao nao faz nada
+        return false;
     }
 
     public void setValueAt(String[] ordemDisplay, int ordIndex) {
@@ -685,8 +686,9 @@ public class SubTabOrdem extends TabBase implements Serializable {
             //ordens do actor
             setOrdensModel(getActor().getOrdemTableModel());
             //trigger selection and doMudaOrdem(0)
-            //jtListaOrdens.getSelectionModel().setSelectionInterval(0, 0);
-            doFindNextActionSlot();
+            if (!doFindNextActionSlot()) {
+                jtListaOrdens.getSelectionModel().setSelectionInterval(0, 0);
+            }
         } else {
             //eh gameover?
             //forca selecao para vazio, limpando quadro de parametros
