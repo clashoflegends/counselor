@@ -255,6 +255,8 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
         jlLeft.setToolTipText("Open.");
         splitMainPanel.setLeftComponent(jlLeft);
+
+        jlRight.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         splitMainPanel.setRightComponent(jlRight);
 
         statusBar.setBackground(new java.awt.Color(204, 204, 255));
