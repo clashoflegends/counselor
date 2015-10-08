@@ -50,6 +50,10 @@ public class TabTipoTropasGui extends TabBase {
         jtDefesa.setAutoCreateRowSorter(true);
         jtDefesa.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jtDefesa.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jtTatica.setAutoCreateColumnsFromModel(true);
+        jtTatica.setAutoCreateRowSorter(true);
+        jtTatica.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jtTatica.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jtMovimentacao.setAutoCreateColumnsFromModel(true);
         jtMovimentacao.setAutoCreateRowSorter(true);
         jtMovimentacao.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -98,6 +102,8 @@ public class TabTipoTropasGui extends TabBase {
         jtDefesa = new javax.swing.JTable();
         jsMovimentacao = new javax.swing.JScrollPane();
         jtMovimentacao = new javax.swing.JTable();
+        jsTatica = new javax.swing.JScrollPane();
+        jtTatica = new javax.swing.JTable();
         jsTroopHab = new javax.swing.JScrollPane();
         jPanel3 = new javax.swing.JPanel();
         jReplace = new javax.swing.JPanel();
@@ -226,6 +232,21 @@ public class TabTipoTropasGui extends TabBase {
 
         jTabbedPane1.addTab(bundle.getString("TROPA.MOVIMENTACAO"), new javax.swing.ImageIcon(getClass().getResource("/images/right.gif")), jsMovimentacao, bundle.getString("TROPA.MOVIMENTACAO.TOOLTIP")); // NOI18N
 
+        jtTatica.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Nome", "Valor"
+            }
+        ));
+        jsTatica.setViewportView(jtTatica);
+
+        jTabbedPane1.addTab(bundle.getString("TATICA"), new javax.swing.ImageIcon(getClass().getResource("/images/combat.png")), jsTatica, "Defense values for all troops"); // NOI18N
+
         javax.swing.GroupLayout jReplaceLayout = new javax.swing.GroupLayout(jReplace);
         jReplace.setLayout(jReplaceLayout);
         jReplaceLayout.setHorizontalGroup(
@@ -297,12 +318,14 @@ public class TabTipoTropasGui extends TabBase {
     private javax.swing.JScrollPane jsDefesa;
     private javax.swing.JScrollPane jsHabilidade;
     private javax.swing.JScrollPane jsMovimentacao;
+    private javax.swing.JScrollPane jsTatica;
     private javax.swing.JScrollPane jsTroopHab;
     private javax.swing.JTable jtAtaque;
     private javax.swing.JTable jtDefesa;
     private javax.swing.JTable jtHabilidade;
     private javax.swing.JTable jtMainLista;
     private javax.swing.JTable jtMovimentacao;
+    private javax.swing.JTable jtTatica;
     private javax.swing.JLabel qtTropas;
     // End of variables declaration//GEN-END:variables
 
@@ -313,6 +336,7 @@ public class TabTipoTropasGui extends TabBase {
     public final void setMainModel(TableModel model) {
         this.setAtaqueModel(null);
         this.setDefesaModel(null);
+        this.setTaticaModel(null);
         this.setMovimentacaoModel(null);
         this.setHabilidadeModel(null);
         this.jtMainLista.setModel(model);
@@ -333,13 +357,13 @@ public class TabTipoTropasGui extends TabBase {
         if (model == null) {
             this.jtAtaque.setModel(new javax.swing.table.DefaultTableModel(
                     new Object[][]{
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}},
+                        {null, null},
+                        {null, null},
+                        {null, null},
+                        {null, null}},
                     new String[]{
-                labels.getString("TERRENO"), labels.getString("VALOR")
-            }));
+                        labels.getString("TERRENO"), labels.getString("VALOR")
+                    }));
         } else {
             this.jtAtaque.setModel(model);
             calcColumnWidths(jtAtaque);
@@ -350,16 +374,33 @@ public class TabTipoTropasGui extends TabBase {
         if (model == null) {
             this.jtDefesa.setModel(new javax.swing.table.DefaultTableModel(
                     new Object[][]{
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}},
+                        {null, null},
+                        {null, null},
+                        {null, null},
+                        {null, null}},
                     new String[]{
-                labels.getString("TERRENO"), labels.getString("VALOR")
-            }));
+                        labels.getString("TERRENO"), labels.getString("VALOR")
+                    }));
         } else {
             this.jtDefesa.setModel(model);
             calcColumnWidths(jtDefesa);
+        }
+    }
+
+    private void setTaticaModel(TableModel model) {
+        if (model == null) {
+            this.jtTatica.setModel(new javax.swing.table.DefaultTableModel(
+                    new Object[][]{
+                        {null, null},
+                        {null, null},
+                        {null, null},
+                        {null, null}},
+                    new String[]{
+                        labels.getString("TATICA"), labels.getString("VALOR")
+                    }));
+        } else {
+            this.jtTatica.setModel(model);
+            calcColumnWidths(jtTatica);
         }
     }
 
@@ -367,13 +408,13 @@ public class TabTipoTropasGui extends TabBase {
         if (model == null) {
             this.jtMovimentacao.setModel(new javax.swing.table.DefaultTableModel(
                     new Object[][]{
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}},
+                        {null, null},
+                        {null, null},
+                        {null, null},
+                        {null, null}},
                     new String[]{
-                labels.getString("TERRENO"), labels.getString("VALOR")
-            }));
+                        labels.getString("TERRENO"), labels.getString("VALOR")
+                    }));
         } else {
             this.jtMovimentacao.setModel(model);
             calcColumnWidths(jtMovimentacao);
@@ -384,13 +425,13 @@ public class TabTipoTropasGui extends TabBase {
         if (model == null) {
             this.jtHabilidade.setModel(new javax.swing.table.DefaultTableModel(
                     new Object[][]{
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}},
+                        {null, null},
+                        {null, null},
+                        {null, null},
+                        {null, null}},
                     new String[]{
-                labels.getString("TERRENO"), labels.getString("VALOR")
-            }));
+                        labels.getString("TERRENO"), labels.getString("VALOR")
+                    }));
         } else {
             this.jtHabilidade.setModel(model);
             calcColumnWidths(jtHabilidade);
@@ -400,6 +441,7 @@ public class TabTipoTropasGui extends TabBase {
     public void doMuda(List<TipoTropa> lista, TipoTropa tpTropa) {
         this.setAtaqueModel(controler.getAtaqueTableModel(lista));
         this.setDefesaModel(controler.getDefesaTableModel(lista));
+        this.setTaticaModel(controler.getTaticaTableModel());
         this.setMovimentacaoModel(controler.getMovimentacaoTableModel(lista));
         this.setHabilidadeModel(controler.getHabilidadeTableModel(tpTropa));
     }

@@ -7,6 +7,7 @@ package control;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
+import control.services.CenarioConverter;
 import control.services.TipoTropaConverter;
 import gui.tabs.TabTipoTropasGui;
 import java.awt.event.ActionEvent;
@@ -57,6 +58,10 @@ public class TipoTropaControler implements Serializable, ActionListener, ListSel
 
     public GenericoTableModel getDefesaTableModel(List<TipoTropa> lista) {
         return TipoTropaConverter.getTerrainTableModel(lista, 1);
+    }
+
+    public GenericoTableModel getTaticaTableModel() {
+        return CenarioConverter.getInstance().getTaticaTableModel();
     }
 
     public GenericoTableModel getMovimentacaoTableModel(List<TipoTropa> lista) {

@@ -12,6 +12,7 @@ import business.services.ComparatorFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
 import javax.swing.ComboBoxModel;
 import model.Cenario;
 import model.Habilidade;
@@ -65,6 +66,58 @@ public class CenarioConverter implements Serializable {
         return model;
     }
 
+    public GenericoTableModel getTaticaTableModel() {
+        SortedMap<Integer, String> taticas = cenarioFacade.listTaticasAsList(cenario);
+        GenericoTableModel model = new GenericoTableModel(
+                getTaticaColNames(taticas),
+                getTaticaAsArray(taticas),
+                new Class[]{
+                    java.lang.String.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class
+                });
+        return model;
+    }
+
+    private String[] getTaticaColNames(SortedMap<Integer, String> taticas) {
+        final List<String> colNames = new ArrayList<String>();
+        colNames.add(labels.getString("TATICA"));
+        for (String value : taticas.values()) {
+            colNames.add(value);
+        }
+        return (colNames.toArray(new String[0]));
+    }
+
+    private Object[][] getTaticaAsArray(SortedMap<Integer, String> lista) {
+        if (lista.isEmpty()) {
+            Object[][] ret = {{"", ""}};
+            return (ret);
+        }
+        Object[][] ret = new Object[lista.size()][lista.size() + 1];
+        int ii = 0;
+        for (Integer keyA : lista.keySet()) {
+            int nn = 0;
+            ret[ii][nn++] = lista.get(keyA);
+            for (Integer keyB : lista.keySet()) {
+                ret[ii][nn++] = cenarioFacade.getTaticaBonus(cenario, keyA, keyB);
+            }
+            ii++;
+        }
+        return (ret);
+    }
+
     public ComboBoxModel getTropaTipoComboModel(Raca racaCidade, Raca racaNacao) {
         List<TipoTropa> lista = new ArrayList<TipoTropa>();
         lista.addAll(cenarioFacade.getTipoTropas(cenario, racaCidade, racaNacao));
@@ -95,25 +148,25 @@ public class CenarioConverter implements Serializable {
                 getPackageColNames(),
                 getPackageAsArray(packages, nacoes),
                 new Class[]{
-            Habilidade.class, java.lang.Integer.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class,
-            java.lang.Boolean.class, java.lang.Boolean.class
-        });
+                    Habilidade.class, java.lang.Integer.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class,
+                    java.lang.Boolean.class, java.lang.Boolean.class
+                });
         model.setEditable(getPackageEditable(packages, nacoes));
         return model;
     }

@@ -5,6 +5,7 @@
 package control.services;
 
 import baseLib.GenericoTableModel;
+import business.facade.CenarioFacade;
 import control.PartidaControler;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ public class PartidaConverter implements Serializable {
     }
 
     private static Object[][] getPartidaAsArray(Partida partida) {
+        final CenarioFacade cenarioFacade = new CenarioFacade();
         int ii = 0;
         // Converte Partida para um Array[] 
         List<String[]> lista = new ArrayList<String[]>();
@@ -61,7 +63,7 @@ public class PartidaConverter implements Serializable {
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.CENARIO"), cenario.getNome()});
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.TURNO"), partida.getTurno() + ""});
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.TURNO.PROXIMO"), partida.getTurnoNext() + ""});
-        lista.add(new String[]{labels.getString("PARTIDA.LABEL.TURNO.MAX"), partida.getTurnoMax()+ ""});
+        lista.add(new String[]{labels.getString("PARTIDA.LABEL.TURNO.MAX"), partida.getTurnoMax() + ""});
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.MAXPERS"), cenario.getNumMaxPersonagem() + ""});
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.MAXMOV"), cenario.getNumMaxMovimento() + ""});
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.MINORDENS"), cenario.getNumOrdensPers() + ""});
@@ -72,7 +74,7 @@ public class PartidaConverter implements Serializable {
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.NUMFEITICOS"), cenario.getFeiticos().size() + ""});
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.NUMTROPAS"), cenario.getTipoTropas().values().size() + ""});
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.NUMPRODUTO"), cenario.getProdutos().values().size() + ""});
-        lista.add(new String[]{labels.getString("PARTIDA.LABEL.NUMTATICAS"), cenario.getTaticas().length + ""});
+        lista.add(new String[]{labels.getString("PARTIDA.LABEL.NUMTATICAS"), cenarioFacade.listTaticas(cenario).length + ""});
         for (Habilidade hab : partida.getHabilidades().values()) {
             lista.add(new String[]{labels.getString("PARTIDA.LABEL.HABGAME"), hab.getNome()});
         }
