@@ -59,6 +59,10 @@ public abstract class ActorInterface extends ControlBase implements Serializable
         return NacaoConverter.getNacaoComboModel(getNacao());
     }
 
+    public ComboBoxModel getNacaoAllyComboModel() {
+        return NacaoConverter.getNacaoAllyComboModel(getNacao());
+    }
+
     /**
      * 0 = Personagens 1 = Personagem-Comandante-Ex 2 = Personagem-Local 3 =
      * Personagem-Nacao-Local 4 = Personagem-Local-NoNacao 5 = Personagem-Nacao
@@ -120,8 +124,8 @@ public abstract class ActorInterface extends ControlBase implements Serializable
                 new String[]{labels.getString("ACAO"), labels.getString("PARAMETRO"), labels.getString("TIPO")},
                 getOrdemAsArray(),
                 new Class[]{
-            java.lang.String.class, java.lang.String.class, java.lang.String.class
-        });
+                    java.lang.String.class, java.lang.String.class, java.lang.String.class
+                });
         return model;
     }
 

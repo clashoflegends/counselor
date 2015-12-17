@@ -72,6 +72,7 @@ public class ComponentFactory implements Serializable {
     private static final String MAGIA_KNOWN = "Magia_Known";
     private static final String MAGIA_PRE = "Magia_Pre";
     private static final String NACAO = "Nacao";
+    private static final String NACAO_ALLY = "Nacao_Ally";
     private static final String NACAO_RELACIONAMENTO = "Nacao_Relacionamento";
     private static final String NOME = "Nome";
     private static final String NOVACIDADE = "NovaCidade";
@@ -315,6 +316,10 @@ public class ComponentFactory implements Serializable {
         } else if (controle.equals(NACAO)) {//Nacao
             //é um combo com o model nacao, menos a nacao do actor
             JComboBox cbNacao = new JComboBox(getActor().getNacaoComboModel());
+            cNovo = cbNacao;
+        } else if (controle.equals(NACAO_ALLY)) {//Nacao
+            //é um combo com o model nacao, menos a nacao do actor
+            JComboBox cbNacao = new JComboBox(getActor().getNacaoAllyComboModel());
             cNovo = cbNacao;
         } else if (controle.equals(NACAO_RELACIONAMENTO)) {//Nacao_RELACIONAMENTO
             SubTabRelacionamento jpTemp = new SubTabRelacionamento(vlDefaultId, getActor().getNacao(),

@@ -12,7 +12,11 @@ import business.facade.NacaoFacade;
 import business.facades.ListFactory;
 import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.SortedMap;
 import model.Jogador;
 import model.Local;
 import model.Nacao;
@@ -43,25 +47,31 @@ public class NacaoConverter implements Serializable {
         return model;
     }
 
+    public static GenericoComboBoxModel getNacaoAllyComboModel(Nacao nacaoExcluida) {
+        Nacao[] items = listNacoesAllyDisponiveis(nacaoExcluida);
+        GenericoComboBoxModel model = new GenericoComboBoxModel(items);
+        return model;
+    }
+
     public static GenericoTableModel getNacaoModel(int filtro) {
         GenericoTableModel nacaoModel = new GenericoTableModel(
                 getNacaoColNames(),
                 getNacoesAsArray(filtro),
                 new Class[]{
-            java.lang.String.class,
-            java.lang.String.class,
-            java.lang.Integer.class,
-            java.lang.String.class,
-            Local.class,
-            java.lang.Integer.class,
-            java.lang.Integer.class,
-            java.lang.Integer.class,
-            java.lang.Integer.class,
-            java.lang.Integer.class,
-            java.lang.Integer.class,
-            java.lang.String.class,
-            java.lang.String.class
-        });
+                    java.lang.String.class,
+                    java.lang.String.class,
+                    java.lang.Integer.class,
+                    java.lang.String.class,
+                    Local.class,
+                    java.lang.Integer.class,
+                    java.lang.Integer.class,
+                    java.lang.Integer.class,
+                    java.lang.Integer.class,
+                    java.lang.Integer.class,
+                    java.lang.Integer.class,
+                    java.lang.String.class,
+                    java.lang.String.class
+                });
         return nacaoModel;
     }
 
@@ -205,20 +215,29 @@ public class NacaoConverter implements Serializable {
     }
 
     public static Nacao[] listNacoesDisponiveis(Nacao nacaoExcluida) {
+        return listNacoes(nacaoExcluida, 0);
+    }
+
+    public static Nacao[] listNacoesAllyDisponiveis(Nacao nacaoExcluida) {
+        return listNacoes(nacaoExcluida, 1);
+    }
+
+    /*
+     * Filter == 0; all
+     * Filter == 1; ally
+     */
+    private static Nacao[] listNacoes(Nacao nacaoExcluida, int filter) {
         //FIXME: como tratar nacao dos npcs na lista?
-        int mod = 0;
-        if (nacaoExcluida != null) {
-            mod = 1;
-        }
-        Nacao[] ret = new Nacao[listFactory.listNacoes().size() - mod];
-        Iterator lista = listFactory.listNacoes().values().iterator();
-        int i = 0;
-        while (lista.hasNext()) {
-            Nacao nacao = (Nacao) lista.next();
-            if (nacao != nacaoExcluida) {
-                ret[i++] = nacao;
+        List<Nacao> nationList = new ArrayList<Nacao>(listFactory.listNacoes().size());
+        for (Nacao nacao : listFactory.listNacoes().values()) {
+            if (nacao == nacaoExcluida) {
+                continue;
             }
+            if (filter == 1 && !nacaoFacade.isAliado(nacaoExcluida, nacao)) {
+                continue;
+            }
+            nationList.add(nacao);
         }
-        return ret;
+        return nationList.toArray(new Nacao[0]);
     }
 }
