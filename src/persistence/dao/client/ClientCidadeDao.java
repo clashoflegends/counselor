@@ -5,6 +5,7 @@
 package persistence.dao.client;
 
 import java.io.Serializable;
+import java.sql.ResultSet;
 import java.util.SortedMap;
 import model.Cidade;
 import model.Partida;
@@ -40,5 +41,10 @@ public class ClientCidadeDao implements ICidadeDao, Serializable {
     @Override
     public void update(Cidade cidade) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Cidade get(ResultSet rs, Partida partida) throws PersistenceException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
