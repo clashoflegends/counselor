@@ -54,35 +54,24 @@ public class NacaoConverter implements Serializable {
     }
 
     public static GenericoTableModel getNacaoModel(int filtro) {
+        List<Class> classes = new ArrayList<Class>(30);
         GenericoTableModel nacaoModel = new GenericoTableModel(
-                getNacaoColNames(),
+                getNacaoColNames(classes),
                 getNacoesAsArray(filtro),
-                new Class[]{
-                    java.lang.String.class,
-                    java.lang.String.class,
-                    java.lang.Integer.class,
-                    java.lang.String.class,
-                    Local.class,
-                    java.lang.Integer.class,
-                    java.lang.Integer.class,
-                    java.lang.Integer.class,
-                    java.lang.Integer.class,
-                    java.lang.Integer.class,
-                    java.lang.Integer.class,
-                    java.lang.String.class,
-                    java.lang.String.class
-                });
+                classes.toArray(new Class[0]));
         return nacaoModel;
     }
 
     private static Object[] toArray(Nacao nacao) {
         int ii = 0;
-        Object[] cArray = new Object[getNacaoColNames().length];
+        Object[] cArray = new Object[getNacaoColNames(new ArrayList<Class>(30)).length];
         cArray[ii++] = nacaoFacade.getNome(nacao);
         cArray[ii++] = nacaoFacade.getRacaNome(nacao);
         cArray[ii++] = nacaoFacade.getPontosVitoria(nacao);
         cArray[ii++] = SysApoio.iif(nacaoFacade.isAtiva(nacao), labels.getString("ATIVA"), labels.getString("INATIVA"));
-        cArray[ii++] = nacaoFacade.getCoordenadasCapital(nacao);
+        if (WorldFacadeCounselor.getInstance().hasCapitals()) {
+            cArray[ii++] = nacaoFacade.getCoordenadasCapital(nacao);
+        }
         cArray[ii++] = acaoFacade.getPointsSetup(nacao);
         cArray[ii++] = nacaoFacade.getTropasQt(nacao);
         cArray[ii++] = nacaoFacade.getMoneySaldo(nacao);
@@ -94,23 +83,37 @@ public class NacaoConverter implements Serializable {
         return cArray;
     }
 
-    private static String[] getNacaoColNames() {
-        String[] colNames = {
-            labels.getString("NOME"),
-            labels.getString("RACA"),
-            labels.getString("PONTOS.VITORIA"),
-            labels.getString("ATIVA"),
-            labels.getString("CIDADE.CAPITAL"),
-            labels.getString("STARTUP.POINTS"),
-            labels.getString("TROPAS"),
-            labels.getString("TREASURY"),
-            labels.getString("IMPOSTOS"),
-            labels.getString("LEALDADE"),
-            labels.getString("LEALDADE.VARIACAO"),
-            labels.getString("JOGADOR"),
-            labels.getString("JOGADOR.EMAIL")
-        };
-        return (colNames);
+    private static String[] getNacaoColNames(List<Class> classes) {
+        List<String> colNames = new ArrayList<String>(30);
+        colNames.add(labels.getString("NOME"));
+        classes.add(java.lang.String.class);
+        colNames.add(labels.getString("RACA"));
+        classes.add(java.lang.String.class);
+        colNames.add(labels.getString("PONTOS.VITORIA"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("ATIVA"));
+        classes.add(java.lang.String.class);
+        if (WorldFacadeCounselor.getInstance().hasCapitals()) {
+            colNames.add(labels.getString("CIDADE.CAPITAL"));
+            classes.add(Local.class);
+        }
+        colNames.add(labels.getString("STARTUP.POINTS"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("TROPAS"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("TREASURY"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("IMPOSTOS"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("LEALDADE"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("LEALDADE.VARIACAO"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("JOGADOR"));
+        classes.add(java.lang.String.class);
+        colNames.add(labels.getString("JOGADOR.EMAIL"));
+        classes.add(java.lang.String.class);
+        return (colNames.toArray(new String[0]));
     }
 
     private static Object[][] getNacoesAsArray(int filtro) {
@@ -120,7 +123,7 @@ public class NacaoConverter implements Serializable {
             return (ret);
         } else {
             int ii = 0;
-            Object[][] ret = new Object[listaExibir.size()][getNacaoColNames().length];
+            Object[][] ret = new Object[listaExibir.size()][getNacaoColNames(new ArrayList<Class>(30)).length];
             Iterator lista = listaExibir.iterator();
             while (lista.hasNext()) {
                 Nacao nacao = (Nacao) lista.next();

@@ -16,7 +16,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import model.*;
+import model.Cenario;
+import model.Cidade;
+import model.Comando;
+import model.Habilidade;
+import model.Jogador;
+import model.Mercado;
+import model.Nacao;
+import model.Ordem;
+import model.Partida;
+import model.Personagem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.PersistenceException;
@@ -31,6 +40,7 @@ public class WorldFacadeCounselor implements Serializable {
 
     private static final Log log = LogFactory.getLog(WorldFacadeCounselor.class);
     private static WorldFacadeCounselor instance;
+    private CenarioFacade cf = new CenarioFacade();
     private MapaControler mapaControler;
 
     private WorldFacadeCounselor() {
@@ -188,13 +198,19 @@ public class WorldFacadeCounselor implements Serializable {
     }
 
     public boolean hasEmissario() {
-        CenarioFacade cf = new CenarioFacade();
         return cf.hasDiplomat(getCenario());
     }
 
     public boolean hasWizard() {
-        CenarioFacade cf = new CenarioFacade();
         return cf.hasWizard(getCenario());
+    }
+
+    public boolean hasResourceManagement() {
+        return cf.hasResourceManagement(getCenario());
+    }
+
+    public boolean hasCapitals() {
+        return getCenario().hasHabilidade(";SNC;");
     }
 
     public SortedMap<String, Habilidade> getHabilidades(String habilidades) {

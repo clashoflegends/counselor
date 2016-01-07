@@ -4,9 +4,15 @@
  */
 package control.services;
 
-import utils.StringRet;
-import baseLib.*;
-import business.facade.*;
+import baseLib.GenericoComboBoxModel;
+import baseLib.GenericoTableModel;
+import baseLib.IBaseModel;
+import business.facade.ArtefatoFacade;
+import business.facade.CenarioFacade;
+import business.facade.FeiticoFacade;
+import business.facade.LocalFacade;
+import business.facade.OrdemFacade;
+import business.facade.PersonagemFacade;
 import business.facades.ListFactory;
 import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
@@ -14,11 +20,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import model.*;
+import model.Artefato;
+import model.Cenario;
+import model.Feitico;
+import model.Jogador;
+import model.Local;
+import model.Nacao;
+import model.Ordem;
+import model.Personagem;
+import model.PersonagemFeitico;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
 import persistence.SettingsManager;
+import utils.StringRet;
 
 /**
  *
@@ -27,8 +42,8 @@ import persistence.SettingsManager;
 public class PersonagemConverter implements Serializable {
 
     public static final int ORDEM_COL_INDEX_START = 1;
-    private static final int FILTRO_PROPRIOS = 1;
-    private static final int FILTRO_TODOS = 0;
+//    private static final int FILTRO_PROPRIOS = 1;
+//    private static final int FILTRO_TODOS = 0;
     private static final Log log = LogFactory.getLog(PersonagemConverter.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private static final PersonagemFacade personagemFacade = new PersonagemFacade();
@@ -66,8 +81,10 @@ public class PersonagemConverter implements Serializable {
             colNames.add(labels.getString("EMISSARIO"));
             classes.add(java.lang.Integer.class);
         }
-        colNames.add(labels.getString("MAGO"));
-        classes.add(java.lang.Integer.class);
+        if (WorldFacadeCounselor.getInstance().hasWizard()) {
+            colNames.add(labels.getString("MAGO"));
+            classes.add(java.lang.Integer.class);
+        }
         colNames.add(labels.getString("FURTIVIDADE"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("DUELO"));
@@ -107,7 +124,9 @@ public class PersonagemConverter implements Serializable {
         if (WorldFacadeCounselor.getInstance().hasEmissario()) {
             cArray[ii++] = personagem.getPericiaEmissario();
         }
-        cArray[ii++] = personagem.getPericiaMago();
+        if (WorldFacadeCounselor.getInstance().hasWizard()) {
+            cArray[ii++] = personagem.getPericiaMago();
+        }
         cArray[ii++] = personagem.getPericiaFurtividade();
         cArray[ii++] = personagem.getDuelo();
         cArray[ii++] = personagem.getVida();
@@ -159,8 +178,8 @@ public class PersonagemConverter implements Serializable {
                 getArtefatoColNames(),
                 getArtefatosAsArray(personagem),
                 new Class[]{
-            java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
-        });
+                    java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
+                });
         return model;
     }
 
@@ -194,8 +213,8 @@ public class PersonagemConverter implements Serializable {
                 new String[]{labels.getString("PERSONAGEM"), labels.getString("ACAO"), labels.getString("PARAMETRO")},
                 getOrdemAsArray(listaExibida),
                 new Class[]{
-            java.lang.String.class, java.lang.String.class, java.lang.String.class
-        });
+                    java.lang.String.class, java.lang.String.class, java.lang.String.class
+                });
         return model;
     }
 
@@ -227,9 +246,9 @@ public class PersonagemConverter implements Serializable {
                 getFeiticoColNames(),
                 getFeiticosAsArray(personagem),
                 new Class[]{
-            java.lang.String.class, java.lang.Integer.class, java.lang.String.class,
-            java.lang.String.class, java.lang.String.class
-        });
+                    java.lang.String.class, java.lang.Integer.class, java.lang.String.class,
+                    java.lang.String.class, java.lang.String.class
+                });
         return model;
     }
 
@@ -391,15 +410,15 @@ public class PersonagemConverter implements Serializable {
             if (personagem.getPericiaAgente() != personagem.getPericiaAgenteNatural()) {
                 ret += String.format(mask1,
                         cenarioFacade.getTituloPericia(cenario,
-                        CenarioFacade.ROGUE,
-                        personagem.getPericiaAgenteNatural()),
+                                CenarioFacade.ROGUE,
+                                personagem.getPericiaAgenteNatural()),
                         personagem.getPericiaAgente(),
                         personagem.getPericiaAgenteNatural());
             } else {
                 ret += String.format(mask2,
                         cenarioFacade.getTituloPericia(cenario,
-                        CenarioFacade.ROGUE,
-                        personagem.getPericiaAgenteNatural()),
+                                CenarioFacade.ROGUE,
+                                personagem.getPericiaAgenteNatural()),
                         personagem.getPericiaAgenteNatural());
             }
         }
@@ -407,15 +426,15 @@ public class PersonagemConverter implements Serializable {
             if (personagem.getPericiaComandante() != personagem.getPericiaComandanteNatural()) {
                 ret += String.format(mask1,
                         cenarioFacade.getTituloPericia(cenario,
-                        CenarioFacade.COMANDANTE,
-                        personagem.getPericiaComandanteNatural()),
+                                CenarioFacade.COMANDANTE,
+                                personagem.getPericiaComandanteNatural()),
                         personagem.getPericiaComandante(),
                         personagem.getPericiaComandanteNatural());
             } else {
                 ret += String.format(mask2,
                         cenarioFacade.getTituloPericia(cenario,
-                        CenarioFacade.COMANDANTE,
-                        personagem.getPericiaComandanteNatural()),
+                                CenarioFacade.COMANDANTE,
+                                personagem.getPericiaComandanteNatural()),
                         personagem.getPericiaComandanteNatural());
             }
         }
@@ -423,15 +442,15 @@ public class PersonagemConverter implements Serializable {
             if (personagem.getPericiaEmissario() != personagem.getPericiaEmissarioNatural()) {
                 ret += String.format(mask1,
                         cenarioFacade.getTituloPericia(cenario,
-                        CenarioFacade.DIPLOMAT,
-                        personagem.getPericiaEmissarioNatural()),
+                                CenarioFacade.DIPLOMAT,
+                                personagem.getPericiaEmissarioNatural()),
                         personagem.getPericiaEmissario(),
                         personagem.getPericiaEmissarioNatural());
             } else {
                 ret += String.format(mask2,
                         cenarioFacade.getTituloPericia(cenario,
-                        CenarioFacade.DIPLOMAT,
-                        personagem.getPericiaEmissarioNatural()),
+                                CenarioFacade.DIPLOMAT,
+                                personagem.getPericiaEmissarioNatural()),
                         personagem.getPericiaEmissarioNatural());
             }
         }
@@ -439,15 +458,15 @@ public class PersonagemConverter implements Serializable {
             if (personagem.getPericiaMago() != personagem.getPericiaMagoNatural()) {
                 ret += String.format(mask1,
                         cenarioFacade.getTituloPericia(cenario,
-                        CenarioFacade.WIZARD,
-                        personagem.getPericiaMagoNatural()),
+                                CenarioFacade.WIZARD,
+                                personagem.getPericiaMagoNatural()),
                         personagem.getPericiaMago(),
                         personagem.getPericiaMagoNatural());
             } else {
                 ret += String.format(mask2,
                         cenarioFacade.getTituloPericia(cenario,
-                        CenarioFacade.WIZARD,
-                        personagem.getPericiaMagoNatural()),
+                                CenarioFacade.WIZARD,
+                                personagem.getPericiaMagoNatural()),
                         personagem.getPericiaMagoNatural());
             }
         }

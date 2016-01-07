@@ -6,7 +6,12 @@ package control.services;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
-import business.facade.*;
+import business.facade.CenarioFacade;
+import business.facade.CidadeFacade;
+import business.facade.ExercitoFacade;
+import business.facade.LocalFacade;
+import business.facade.OrdemFacade;
+import business.facade.PersonagemFacade;
 import business.facades.ListFactory;
 import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
@@ -14,7 +19,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.ComboBoxModel;
-import model.*;
+import model.Cidade;
+import model.Exercito;
+import model.Jogador;
+import model.Local;
+import model.Mercado;
+import model.Nacao;
+import model.Personagem;
+import model.Produto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
@@ -92,8 +104,10 @@ public class CidadeConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("OCULTO"));
         classes.add(java.lang.String.class);
-        colNames.add(labels.getString("CIDADE.CAPITAL"));
-        classes.add(java.lang.String.class);
+        if (WorldFacadeCounselor.getInstance().hasCapitals()) {
+            colNames.add(labels.getString("CIDADE.CAPITAL"));
+            classes.add(java.lang.String.class);
+        }
         colNames.add(labels.getString("SITIADO"));
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("NACAO"));
@@ -102,9 +116,11 @@ public class CidadeConverter implements Serializable {
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("CLIMA"));
         classes.add(java.lang.String.class);
-        for (Produto produto : getResourceList()) {
-            colNames.add(produto.getNome());
-            classes.add(java.lang.Integer.class);
+        if (WorldFacadeCounselor.getInstance().hasResourceManagement()) {
+            for (Produto produto : getResourceList()) {
+                colNames.add(produto.getNome());
+                classes.add(java.lang.Integer.class);
+            }
         }
 
 //        String[] colNames = {
@@ -140,15 +156,19 @@ public class CidadeConverter implements Serializable {
         cArray[ii++] = cidadeFacade.getDefesa(cidade);
         cArray[ii++] = cidadeFacade.getFoodGiven(cidade);
         cArray[ii++] = cidadeFacade.getOculto(cidade);
-        cArray[ii++] = cidadeFacade.getCapital(cidade);
+        if (WorldFacadeCounselor.getInstance().hasCapitals()) {
+            cArray[ii++] = cidadeFacade.getCapital(cidade);
+        }
         cArray[ii++] = cidadeFacade.getSitiado(cidade);
         cArray[ii++] = cidadeFacade.getNacaoNome(cidade);
         cArray[ii++] = localFacade.getTerrenoNome(cidadeFacade.getLocal(cidade));
         cArray[ii++] = localFacade.getClima(cidadeFacade.getLocal(cidade));
-        for (Produto produto : getResourceList()) {
-            int estoque = cidadeFacade.getEstoque(cidade, produto);
-            estoque += cidadeFacade.getProducao(cidade, produto);
-            cArray[ii++] = estoque;
+        if (WorldFacadeCounselor.getInstance().hasResourceManagement()) {
+            for (Produto produto : getResourceList()) {
+                int estoque = cidadeFacade.getEstoque(cidade, produto);
+                estoque += cidadeFacade.getProducao(cidade, produto);
+                cArray[ii++] = estoque;
+            }
         }
         return cArray;
     }
@@ -174,8 +194,8 @@ public class CidadeConverter implements Serializable {
                 getPresencasColNames(),
                 getPresencasAsArray(cidade),
                 new Class[]{
-            java.lang.String.class, java.lang.String.class, java.lang.String.class
-        });
+                    java.lang.String.class, java.lang.String.class, java.lang.String.class
+                });
         return presencasModel;
     }
 
@@ -233,8 +253,8 @@ public class CidadeConverter implements Serializable {
                 getProdutoColNames(),
                 getProdutosAsArray(cidade),
                 new Class[]{
-            java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
-        });
+                    java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+                });
         return produtoModel;
     }
 

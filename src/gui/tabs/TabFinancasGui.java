@@ -5,7 +5,9 @@
  */
 package gui.tabs;
 
+import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
+import business.facades.WorldFacadeCounselor;
 import control.FinancasControler;
 import control.MapaControler;
 import gui.TabBase;
@@ -35,6 +37,7 @@ public final class TabFinancasGui extends TabBase implements Serializable {
     private final SubTabBaseList stBalance = new SubTabBaseList();
     private final SubTabBaseList stResources = new SubTabBaseList();
     private final NacaoFacade nacaoFacade = new NacaoFacade();
+    private final CenarioFacade cenarioFacade = new CenarioFacade();
 
     public TabFinancasGui(String titulo, String dica, MapaControler mapaControl) {
         initComponents();
@@ -219,9 +222,11 @@ public final class TabFinancasGui extends TabBase implements Serializable {
         detalhesCidade.addTab(labels.getString("EXTRATO.PROXIMO.TURNO"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/diplomacy.gif")),
                 stForecast, labels.getString("EXTRATO.PROXIMO.TURNO"));
-        detalhesCidade.addTab(labels.getString("MERCADO"),
-                new javax.swing.ImageIcon(getClass().getResource("/images/diplomacy.gif")),
-                stResources, labels.getString("MERCADO"));
+        if (cenarioFacade.hasResourceManagement(WorldFacadeCounselor.getInstance().getCenario())) {
+            detalhesCidade.addTab(labels.getString("MERCADO"),
+                    new javax.swing.ImageIcon(getClass().getResource("/images/diplomacy.gif")),
+                    stResources, labels.getString("MERCADO"));
+        }
     }
 
     private void initConfig() {
