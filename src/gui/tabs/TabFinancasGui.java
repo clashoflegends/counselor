@@ -5,6 +5,7 @@
  */
 package gui.tabs;
 
+import business.facade.NacaoFacade;
 import control.FinancasControler;
 import control.MapaControler;
 import gui.TabBase;
@@ -33,6 +34,7 @@ public final class TabFinancasGui extends TabBase implements Serializable {
     private final SubTabBaseList stForecast = new SubTabBaseList();
     private final SubTabBaseList stBalance = new SubTabBaseList();
     private final SubTabBaseList stResources = new SubTabBaseList();
+    private final NacaoFacade nacaoFacade = new NacaoFacade();
 
     public TabFinancasGui(String titulo, String dica, MapaControler mapaControl) {
         initComponents();
@@ -201,7 +203,7 @@ public final class TabFinancasGui extends TabBase implements Serializable {
 
     public void doMudaNacao(Nacao nacao) {
         try {
-            getMapaControler().printTag(nacao.getCapital().getLocal());
+            getMapaControler().printTag(nacaoFacade.getLocal(nacao));
         } catch (NullPointerException ex) {
             this.doTagHide();
         }

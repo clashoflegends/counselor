@@ -213,7 +213,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
 
     public void doMudaNacao(Nacao nacao) {
         try {
-            getMapaControler().printTag(nacao.getCapital().getLocal());
+            getMapaControler().printTag(nacaoFacade.getLocal(nacao));
         } catch (NullPointerException ex) {
             this.doTagHide();
         }
