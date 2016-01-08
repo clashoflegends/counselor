@@ -9,6 +9,7 @@ import baseLib.GenericoTableModel;
 import business.converter.ConverterFactory;
 import business.services.ComparatorFactory;
 import control.services.CenarioConverter;
+import control.services.FiltroConverter;
 import control.services.TipoTropaConverter;
 import gui.subtabs.SubTabCasualtyGui;
 import java.awt.event.ActionEvent;
@@ -53,7 +54,7 @@ public class CasualtyControler implements Serializable, ActionListener {
         if (tactic.equalsIgnoreCase("pa")) {
             listaExibida = new ArrayList<TipoTropa>();
         } else {
-            listaExibida = TipoTropaConverter.listaByFiltroCasualty(filtro);
+            listaExibida = FiltroConverter.listaByFiltroCasualty(filtro);
         }
         //sort array
         ComparatorFactory.getComparatorCasualtiesTipoTropaSorter(listaExibida, ConverterFactory.taticaToInt(tactic), local.getTerreno(), WorldManager.getInstance().getPartida().getId());
@@ -62,7 +63,7 @@ public class CasualtyControler implements Serializable, ActionListener {
     }
 
     public ComboBoxModel listFiltro() {
-        return new GenericoComboBoxModel(TipoTropaConverter.listFiltroLW());
+        return new GenericoComboBoxModel(FiltroConverter.listFiltroLW());
     }
 
     public ComboBoxModel listFiltroTactic() {

@@ -38,8 +38,6 @@ import persistence.SettingsManager;
  */
 public class CidadeConverter implements Serializable {
 
-    public static final int FILTRO_PROPRIOS = 1;
-    public static final int FILTRO_TODOS = 0;
     private static final Log log = LogFactory.getLog(CidadeConverter.class);
     private static final CidadeFacade cidadeFacade = new CidadeFacade();
     private static final ExercitoFacade exercitoFacade = new ExercitoFacade();
@@ -292,7 +290,6 @@ public class CidadeConverter implements Serializable {
         } catch (NullPointerException ex) {
             return null;
         }
-
     }
 
     public static List listaByNacao(Nacao filtro) {

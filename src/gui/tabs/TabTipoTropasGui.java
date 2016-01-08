@@ -5,7 +5,9 @@
  */
 package gui.tabs;
 
+import baseLib.GenericoComboObject;
 import control.TipoTropaControler;
+import control.services.FiltroConverter;
 import gui.TabBase;
 import gui.subtabs.SubTabTroopHabGui;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
 import persistence.SettingsManager;
+import persistence.local.WorldManager;
 
 /**
  *
@@ -67,13 +70,13 @@ public class TabTipoTropasGui extends TabBase {
         parLayout.replace(jReplace, newComp);
 
         comboFiltro.setActionCommand("comboFiltro");
-        comboFiltro.setModel(controler.listFiltro());
+        comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 3));
 
         //adiciona listeners
         comboFiltro.addActionListener(controler);
         jtMainLista.getSelectionModel().addListSelectionListener(controler);
 
-        TableModel model = controler.getMainTableModel("Todos");
+        TableModel model = controler.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
         this.setMainModel(model);
     }
 
@@ -343,10 +346,6 @@ public class TabTipoTropasGui extends TabBase {
         this.calcColumnWidths(jtMainLista);
         this.updateGui();
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);
-    }
-
-    private String getFiltro() {
-        return (String) comboFiltro.getSelectedItem();
     }
 
     private void updateGui() {

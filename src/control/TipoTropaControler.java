@@ -4,7 +4,6 @@
  */
 package control;
 
-import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
 import control.services.CenarioConverter;
@@ -14,12 +13,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.List;
-import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import model.Nacao;
 import model.TipoTropa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,8 +45,14 @@ public class TipoTropaControler implements Serializable, ActionListener, ListSel
         return tabGui;
     }
 
-    public GenericoTableModel getMainTableModel(String filtro) {
-        listaExibida = TipoTropaConverter.listaByFiltro(filtro);
+    public GenericoTableModel getMainTableModel(GenericoComboObject filtro) {
+        Nacao nacao = null;
+        try {
+            nacao = (Nacao) filtro.getObject();
+            listaExibida = TipoTropaConverter.listaByNacao(nacao);
+        } catch (ClassCastException ex) {
+            listaExibida = TipoTropaConverter.listaByFiltro(filtro.getComboId());
+        }
         this.mainTableModel = TipoTropaConverter.getTropaModel(listaExibida);
         return this.mainTableModel;
     }
@@ -72,10 +77,6 @@ public class TipoTropaControler implements Serializable, ActionListener, ListSel
         return TipoTropaConverter.getHabilidadeTableModel(tpTropa);
     }
 
-    public ComboBoxModel listFiltro() {
-        return new GenericoComboBoxModel(TipoTropaConverter.listFiltro());
-    }
-
     @Override
     public void actionPerformed(ActionEvent event) {
         if (event.getSource() instanceof JTable) {
@@ -84,7 +85,7 @@ public class TipoTropaControler implements Serializable, ActionListener, ListSel
             JComboBox cb = (JComboBox) event.getSource();
             if ("comboFiltro".equals(cb.getActionCommand())) {
                 GenericoComboObject elem = (GenericoComboObject) cb.getSelectedItem();
-                getTabGui().setMainModel(getMainTableModel(elem.getComboId()));
+                getTabGui().setMainModel(getMainTableModel(elem));
             }
         }
     }

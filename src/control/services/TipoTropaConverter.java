@@ -6,7 +6,9 @@ package control.services;
 
 import baseLib.GenericoTableModel;
 import baseLib.IBaseModel;
+import business.facade.NacaoFacade;
 import business.facades.ListFactory;
+import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +17,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 import model.Habilidade;
+import model.Jogador;
+import model.Nacao;
 import model.Terreno;
 import model.TipoTropa;
 import org.apache.commons.logging.Log;
@@ -31,65 +35,77 @@ public class TipoTropaConverter implements Serializable {
     private static final Log log = LogFactory.getLog(TipoTropaConverter.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private static final ListFactory listFactory = new ListFactory();
-
-    public static String[][] listFiltro() {
-        String[][] ret = new String[7][2];
-        int ii = 0;
-        ret[ii][0] = labels.getString("FILTRO.TODOS"); //Display
-        ret[ii++][1] = "Todos"; //Id
-        ret[ii][0] = labels.getString("TROPA.FILTRO.CAVALARIA"); //Display
-        ret[ii++][1] = "Fast"; //Id
-        ret[ii][0] = labels.getString("TROPA.FILTRO.INFANTARIA"); //Display
-        ret[ii++][1] = "Regular"; //Id
-        ret[ii][0] = labels.getString("TROPA.FILTRO.LAND"); //Display
-        ret[ii++][1] = "Land"; //Id
-        ret[ii][0] = labels.getString("TROPA.FILTRO.BARCOS"); //Display
-        ret[ii++][1] = "Barcos"; //Id
-        ret[ii][0] = labels.getString("TROPA.FILTRO.SIEGE"); //Display
-        ret[ii++][1] = "Siege"; //Id
-        ret[ii][0] = labels.getString("TROPA.FILTRO.TRASNFER"); //Display
-        ret[ii++][1] = "Trasnfer"; //Id
-        return ret;
-    }
+    private static final NacaoFacade nacaoFacade = new NacaoFacade();
 
     public static List<TipoTropa> listaByFiltro(String filtro) {
         List<TipoTropa> ret = new ArrayList();
-        if (filtro.equalsIgnoreCase("Todos")) {
+        if (filtro.equalsIgnoreCase("all")) {
             //todos
             for (TipoTropa tpTropa : listFactory.listTropas()) {
                 ret.add(tpTropa);
             }
-        } else if (filtro.equalsIgnoreCase("Fast")) {
+        } else if (filtro.equalsIgnoreCase("own")) {
+            final Collection<Nacao> nacoes = WorldFacadeCounselor.getInstance().getJogadorAtivo().getNacoes().values();
+            Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
+            for (Nacao nacao : nacoes) {
+                tropas.addAll(nacaoFacade.getTropas(nacao).keySet());
+            }
+            ret.addAll(tropas);
+        } else if (filtro.equalsIgnoreCase("allies")) {
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+            final Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
+            for (Nacao ally : listFactory.listNacoes().values()) {
+                try {
+                    if (jAtivo.isJogadorAliado(ally) && !jAtivo.isNacao(ally)) {
+                        ret.addAll(nacaoFacade.getTropas(ally).keySet());
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+            ret.addAll(tropas);
+        } else if (filtro.equalsIgnoreCase("enemies")) {
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+            final Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
+            for (Nacao ally : listFactory.listNacoes().values()) {
+                try {
+                    if (!jAtivo.isJogadorAliado(ally) && !jAtivo.isNacao(ally)) {
+                        ret.addAll(nacaoFacade.getTropas(ally).keySet());
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+            ret.addAll(tropas);
+        } else if (filtro.equalsIgnoreCase("fast")) {
             for (TipoTropa tpTropa : listFactory.listTropas()) {
                 if (tpTropa.isFastMovement()) {
                     ret.add(tpTropa);
                 }
             }
-        } else if (filtro.equalsIgnoreCase("Regular")) {
+        } else if (filtro.equalsIgnoreCase("regular")) {
             for (TipoTropa tpTropa : listFactory.listTropas()) {
                 if (!tpTropa.isFastMovement()) {
                     ret.add(tpTropa);
                 }
             }
-        } else if (filtro.equalsIgnoreCase("Trasnfer")) {
+        } else if (filtro.equalsIgnoreCase("trasnfer")) {
             for (TipoTropa tpTropa : listFactory.listTropas()) {
                 if (tpTropa.isTransferable()) {
                     ret.add(tpTropa);
                 }
             }
-        } else if (filtro.equalsIgnoreCase("Siege")) {
+        } else if (filtro.equalsIgnoreCase("siege")) {
             for (TipoTropa tpTropa : listFactory.listTropas()) {
                 if (tpTropa.isSiege()) {
                     ret.add(tpTropa);
                 }
             }
-        } else if (filtro.equalsIgnoreCase("Land")) {
+        } else if (filtro.equalsIgnoreCase("land")) {
             for (TipoTropa tpTropa : listFactory.listTropas()) {
                 if (!tpTropa.isBarcos()) {
                     ret.add(tpTropa);
                 }
             }
-        } else if (filtro.equalsIgnoreCase("Barcos")) {
+        } else if (filtro.equalsIgnoreCase("barcos")) {
             for (TipoTropa tpTropa : listFactory.listTropas()) {
                 if (tpTropa.isBarcos()) {
                     ret.add(tpTropa);
@@ -99,39 +115,8 @@ public class TipoTropaConverter implements Serializable {
         return ret;
     }
 
-    public static String[][] listFiltroLW() {
-        String[][] ret = new String[3][2];
-        int ii = 0;
-        ret[ii][0] = labels.getString("FILTRO.TODOS"); //Display
-        ret[ii++][1] = "Todos"; //Id
-        ret[ii][0] = labels.getString("TROPA.FILTRO.LAND"); //Display
-        ret[ii++][1] = "Land"; //Id
-        ret[ii][0] = labels.getString("TROPA.FILTRO.BARCOS"); //Display
-        ret[ii++][1] = "Barcos"; //Id
-        return ret;
-    }
-
-    public static List<TipoTropa> listaByFiltroCasualty(String filtro) {
-        List<TipoTropa> tropas = new ArrayList();
-        if (filtro.equalsIgnoreCase("Todos")) {
-            //todos
-            for (TipoTropa tpTropa : listFactory.listTropas()) {
-                tropas.add(tpTropa);
-            }
-        } else if (filtro.equalsIgnoreCase("Land")) {
-            for (TipoTropa tpTropa : listFactory.listTropas()) {
-                if (!tpTropa.isBarcos()) {
-                    tropas.add(tpTropa);
-                }
-            }
-        } else if (filtro.equalsIgnoreCase("Barcos")) {
-            for (TipoTropa tpTropa : listFactory.listTropas()) {
-                if (tpTropa.isBarcos()) {
-                    tropas.add(tpTropa);
-                }
-            }
-        }
-        return tropas;
+    public static List<TipoTropa> listaByNacao(Nacao filtro) {
+        return new ArrayList<TipoTropa>(nacaoFacade.getTropas(filtro).keySet());
     }
 
     public static IBaseModel[] listFiltroTroopHab() {
@@ -163,17 +148,17 @@ public class TipoTropaConverter implements Serializable {
                 getTipoTropaColNames(),
                 getTipoTropaAsArray(lista),
                 new Class[]{
-            java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class
-        });
+                    java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class
+                });
         return model;
     }
 
@@ -213,17 +198,17 @@ public class TipoTropaConverter implements Serializable {
                 getCasualtyColNames(),
                 getCasualtyAsArray(listaExibida, terreno),
                 new Class[]{
-            java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class
-        });
+                    java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class
+                });
         return model;
     }
 
@@ -270,22 +255,22 @@ public class TipoTropaConverter implements Serializable {
                 colNames,
                 getTerrainAsArray(lista, tipo, colNames.length),
                 new Class[]{
-            java.lang.String.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class
-        });
+                    java.lang.String.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class
+                });
         return model;
     }
 
@@ -331,22 +316,22 @@ public class TipoTropaConverter implements Serializable {
                 colNames,
                 getHabilidadeAsArray(tpTropa.getHabilidades().values()),
                 new Class[]{
-            java.lang.String.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class
-        });
+                    java.lang.String.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class
+                });
         return model;
     }
 
