@@ -75,11 +75,14 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar1 = new javax.swing.JToolBar();
         jbOpen = new javax.swing.JButton();
         jbLoad = new javax.swing.JButton();
-        jbSaveWorld = new javax.swing.JButton();
         jbSave = new javax.swing.JButton();
+        jbSend = new javax.swing.JButton();
+        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        jbSaveWorld = new javax.swing.JButton();
         jbCopy = new javax.swing.JButton();
         jbMap = new javax.swing.JButton();
-        jbSend = new javax.swing.JButton();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        jbConfigs = new javax.swing.JButton();
         jbAbout = new javax.swing.JButton();
         splitMainPanel = new javax.swing.JSplitPane();
         jlLeft = new javax.swing.JLabel();
@@ -140,17 +143,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbLoad.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbLoad);
 
-        jbSaveWorld.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/disk icon.jpg"))); // NOI18N
-        jbSaveWorld.setText(labels.getString("SALVAR.WORLD")); // NOI18N
-        jbSaveWorld.setToolTipText(labels.getString("SALVAR.WORLD.TOOLTIP")); // NOI18N
-        jbSaveWorld.setActionCommand("jbSaveWorld");
-        jbSaveWorld.setEnabled(false);
-        jbSaveWorld.setFocusable(false);
-        jbSaveWorld.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        jbSaveWorld.setName("jbSaveWorld"); // NOI18N
-        jbSaveWorld.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar1.add(jbSaveWorld);
-
         jbSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save.png"))); // NOI18N
         jbSave.setText(labels.getString("SALVAR.ACOES")); // NOI18N
         jbSave.setToolTipText(labels.getString("SALVAR.ACOES.TOOLTIP")); // NOI18N
@@ -161,6 +153,29 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbSave.setName("jbSave"); // NOI18N
         jbSave.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbSave);
+
+        jbSend.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/submit.png"))); // NOI18N
+        jbSend.setText(labels.getString("ENVIAR.ACOES")); // NOI18N
+        jbSend.setToolTipText(labels.getString("ENVIAR.ACOES.TOOLTIP")); // NOI18N
+        jbSend.setActionCommand("jbSend");
+        jbSend.setEnabled(false);
+        jbSend.setFocusable(false);
+        jbSend.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jbSend.setName("jbSend"); // NOI18N
+        jbSend.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jbSend);
+        jToolBar1.add(filler2);
+
+        jbSaveWorld.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/disk icon.jpg"))); // NOI18N
+        jbSaveWorld.setText(labels.getString("SALVAR.WORLD")); // NOI18N
+        jbSaveWorld.setToolTipText(labels.getString("SALVAR.WORLD.TOOLTIP")); // NOI18N
+        jbSaveWorld.setActionCommand("jbSaveWorld");
+        jbSaveWorld.setEnabled(false);
+        jbSaveWorld.setFocusable(false);
+        jbSaveWorld.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jbSaveWorld.setName("jbSaveWorld"); // NOI18N
+        jbSaveWorld.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jbSaveWorld);
 
         jbCopy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/copy.png"))); // NOI18N
         jbCopy.setText(labels.getString("COPIAR.ACOES")); // NOI18N
@@ -183,17 +198,13 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbMap.setName("jbExportMap"); // NOI18N
         jbMap.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbMap);
+        jToolBar1.add(filler1);
 
-        jbSend.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/submit.png"))); // NOI18N
-        jbSend.setText(labels.getString("ENVIAR.ACOES")); // NOI18N
-        jbSend.setToolTipText(labels.getString("ENVIAR.ACOES.TOOLTIP")); // NOI18N
-        jbSend.setActionCommand("jbSend");
-        jbSend.setEnabled(false);
-        jbSend.setFocusable(false);
-        jbSend.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        jbSend.setName("jbSend"); // NOI18N
-        jbSend.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar1.add(jbSend);
+        jbConfigs.setText("jButton1");
+        jbConfigs.setFocusable(false);
+        jbConfigs.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbConfigs.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jbConfigs);
 
         jbAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/about.png"))); // NOI18N
         jbAbout.setText(labels.getString("MENU.ABOUT")); // NOI18N
@@ -297,9 +308,12 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.Box.Filler filler1;
+    private javax.swing.Box.Filler filler2;
     private javax.swing.JPanel infoPanel;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JButton jbAbout;
+    private javax.swing.JButton jbConfigs;
     private javax.swing.JButton jbCopy;
     private javax.swing.JButton jbLoad;
     private javax.swing.JButton jbMap;
