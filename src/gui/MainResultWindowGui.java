@@ -200,15 +200,19 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar1.add(jbMap);
         jToolBar1.add(filler1);
 
-        jbConfigs.setText("jButton1");
+        jbConfigs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icon_customize.gif"))); // NOI18N
+        jbConfigs.setText(bundle.getString("MENU.CONFIG")); // NOI18N
+        jbConfigs.setToolTipText(bundle.getString("MENU.CONFIG.TOOLTIP")); // NOI18N
+        jbConfigs.setActionCommand("jbConfig");
         jbConfigs.setFocusable(false);
-        jbConfigs.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbConfigs.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jbConfigs.setName("jbConfig"); // NOI18N
         jbConfigs.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbConfigs);
 
         jbAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/about.png"))); // NOI18N
         jbAbout.setText(labels.getString("MENU.ABOUT")); // NOI18N
-        jbAbout.setToolTipText(labels.getString("SALVAR.ACOES.TOOLTIP")); // NOI18N
+        jbAbout.setToolTipText(labels.getString("MENU.ABOUT.TOOLTIP")); // NOI18N
         jbAbout.setActionCommand("jbAbout");
         jbAbout.setFocusable(false);
         jbAbout.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
