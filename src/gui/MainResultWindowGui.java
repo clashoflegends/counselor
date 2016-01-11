@@ -204,6 +204,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbConfigs.setText(bundle.getString("MENU.CONFIG")); // NOI18N
         jbConfigs.setToolTipText(bundle.getString("MENU.CONFIG.TOOLTIP")); // NOI18N
         jbConfigs.setActionCommand("jbConfig");
+        jbConfigs.setEnabled(false);
         jbConfigs.setFocusable(false);
         jbConfigs.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jbConfigs.setName("jbConfig"); // NOI18N
