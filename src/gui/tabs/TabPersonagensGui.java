@@ -39,6 +39,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private PersonagemControler personagemControl;
     private final PersonagemFacade personagemFacade = new PersonagemFacade();
+    private final JogadorFacade jogadorFacade = new JogadorFacade();
     private Personagem personagemAtivo;
     private final SubTabTextArea stResults = new SubTabTextArea();
     private final SubTabBaseList stMagicItems = new SubTabBaseList();
@@ -312,7 +313,6 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         getMapaControler().printTag(personagemFacade.getLocal(personagem));
         doConfigTabs();
         //verifica se o personagem pode receber ordens...
-        JogadorFacade jogadorFacade = new JogadorFacade();
         if (jogadorFacade.isMine(personagem, WorldFacadeCounselor.getInstance().getJogadorAtivo())
                 && personagemFacade.isAtivo(personagem)) {
             //can receive orders

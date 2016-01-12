@@ -7,6 +7,7 @@ package gui.tabs;
 
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
+import business.facade.JogadorFacade;
 import business.facade.NacaoFacade;
 import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
@@ -39,14 +40,15 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     private static final Log log = LogFactory.getLog(TabNacoesGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private NacaoControler nacaoControl;
+    private static final AcaoFacade acaoFacade = new AcaoFacade();
+    private final NacaoFacade nacaoFacade = new NacaoFacade();
+    private final CenarioFacade cenarioFacade = new CenarioFacade();
+    private final JogadorFacade jogadorFacade = new JogadorFacade();
     private final SubTabTextArea stResults = new SubTabTextArea();
     private final SubTabBaseList stDiplomacy = new SubTabBaseList();
     private final SubTabBaseList stTroops = new SubTabBaseList();
     private SubTabOrdem stOrdens;
     private LimitTableCellRenderer ltcr;
-    private final NacaoFacade nacaoFacade = new NacaoFacade();
-    private static final AcaoFacade acaoFacade = new AcaoFacade();
-    private final CenarioFacade cenarioFacade = new CenarioFacade();
 
     public TabNacoesGui(String titulo, String dica, MapaControler mapaControl) {
         initComponents();
@@ -211,18 +213,6 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         this.qtNacoes.setText(getMainLista().getRowCount() + "");
     }
 
-    public void doMudaNacao(Nacao nacao) {
-        try {
-            getMapaControler().printTag(nacaoFacade.getLocal(nacao));
-        } catch (NullPointerException ex) {
-            this.doTagHide();
-        }
-        stDiplomacy.setListModel(nacaoControl.getRelacionamentoTableModel(nacao));
-        stTroops.setListModel(nacaoControl.getTropaTableModel(nacao));
-        setResults(nacao);
-        stOrdens.doMudaActor(nacao);
-    }
-
     private void initConfig() {
         stOrdens = new SubTabOrdem(this, getMapaControler());
         //configura grid
@@ -296,5 +286,25 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
             hab += labels.getString("?");
         }
         stResults.setText(hab);
+    }
+
+    public void doMudaNacao(Nacao nacao) {
+        try {
+            getMapaControler().printTag(nacaoFacade.getLocal(nacao));
+        } catch (NullPointerException ex) {
+            this.doTagHide();
+        }
+        stDiplomacy.setListModel(nacaoControl.getRelacionamentoTableModel(nacao));
+        stTroops.setListModel(nacaoControl.getTropaTableModel(nacao));
+        setResults(nacao);
+        if (jogadorFacade.isMine(nacao, WorldFacadeCounselor.getInstance().getJogadorAtivo())
+                && nacaoFacade.isAtivo(nacao)) {
+            //can receive orders
+            stOrdens.doMudaActor(nacao);
+        } else {
+            //refem ou morto, nao pode dar ordem
+            //forca selecao para vazio, limpando quadro de parametros
+            stOrdens.doOrdemClear();
+        }
     }
 }

@@ -7,6 +7,8 @@ package gui.tabs;
 
 import baseLib.GenericoComboObject;
 import business.facade.CenarioFacade;
+import business.facade.CidadeFacade;
+import business.facade.JogadorFacade;
 import business.facades.WorldFacadeCounselor;
 import control.CidadeControler;
 import control.MapaControler;
@@ -38,12 +40,14 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     private static final Log log = LogFactory.getLog(TabCidadesGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private CidadeControler cidadeControl;
+    private final CenarioFacade cenarioFacade = new CenarioFacade();
+    private final CidadeFacade cidadeFacade = new CidadeFacade();
+    private final JogadorFacade jogadorFacade = new JogadorFacade();
 //    private SubTabConfigActor stRename = new SubTabConfigActor();
     private final SubTabTextArea stResults = new SubTabTextArea();
     private final SubTabBaseList stPersonagens = new SubTabBaseList();
     private final SubTabBaseList stProdutos = new SubTabBaseList();
     private SubTabOrdem stOrdens;
-    private final CenarioFacade cenarioFacade = new CenarioFacade();
     private Cenario cenario;
 
     /**
@@ -271,7 +275,15 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         stProdutos.setListModel(CidadeConverter.getProdutoModel(cidade));
         stPersonagens.setListModel(CidadeConverter.getPresencasModel(cidade));
         stResults.setText(cidadeControl.getResultados(cidade));
-//        stRename.doMudaActor(cidade);
         stOrdens.doMudaActor(cidade);
+        if (jogadorFacade.isMine(cidade, WorldFacadeCounselor.getInstance().getJogadorAtivo())
+                && cidadeFacade.isAtivo(cidade)) {
+            //can receive orders
+            stOrdens.doMudaActor(cidade);
+        } else {
+            //refem ou morto, nao pode dar ordem
+            //forca selecao para vazio, limpando quadro de parametros
+            stOrdens.doOrdemClear();
+        }
     }
 }
