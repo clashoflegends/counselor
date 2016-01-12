@@ -34,7 +34,7 @@ public class NacaoControler extends ControlBase implements Serializable, ActionL
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
     private final TabNacoesGui tabNacaoGui;
-    private List listaExibida;
+    private List<Nacao> listaExibida;
     private int modelRowIndex = 0;
 
     public NacaoControler(TabNacoesGui tabGui) {

@@ -650,9 +650,10 @@ public class SubTabOrdem extends TabBase implements Serializable {
     }
 
     public void setValueAt(String[] ordemDisplay, int ordIndex) {
-        this.jtListaOrdens.getModel().setValueAt(ordemDisplay[0], ordIndex, 0);
+        for (int ii = 0; ii < ordemDisplay.length; ii++) {
+            this.jtListaOrdens.getModel().setValueAt(ordemDisplay[ii], ordIndex, ii);
+        }
         this.jtListaOrdens.getModel().setValueAt(ordemDisplay[1].replace('[', ' ').replace(']', ' ').trim(), ordIndex, 1);
-        this.jtListaOrdens.getModel().setValueAt(ordemDisplay[2], ordIndex, 2);
         parentTab.setValueAt(ordemDisplay, ordIndex);
     }
 

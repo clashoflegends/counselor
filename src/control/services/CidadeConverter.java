@@ -292,7 +292,7 @@ public class CidadeConverter implements Serializable {
         }
     }
 
-    public static List listaByNacao(Nacao filtro) {
+    public static List<Cidade> listaByNacao(Nacao filtro) {
         List<Cidade> ret = new ArrayList();
         for (Cidade cidade : listFactory.listCidades().values()) {
             if (filtro == null) {
