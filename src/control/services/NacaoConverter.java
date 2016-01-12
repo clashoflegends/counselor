@@ -32,7 +32,7 @@ import persistence.SettingsManager;
  */
 public class NacaoConverter implements Serializable {
 
-    public static final int ORDEM_COL_INDEX_START = 5;
+    public static final int ORDEM_COL_INDEX_START = 4;
     public static final int FILTRO_PROPRIOS = 1;
     public static final int FILTRO_TODOS = 0;
     private static final Log log = LogFactory.getLog(NacaoConverter.class);

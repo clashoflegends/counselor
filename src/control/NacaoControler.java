@@ -109,7 +109,7 @@ public class NacaoControler extends ControlBase implements Serializable, ActionL
                 getTabGui().doMudaNacao(nacao);
                 //PENDING atualizar table mensagens
             }
-        } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+        } catch (IndexOutOfBoundsException ex) {
             //lista vazia?
         }
     }
