@@ -242,7 +242,7 @@ public final class TabFinancasGui extends TabBase implements Serializable {
 
         comboFiltro.setName("comboFiltro");
         comboFiltro.setActionCommand("comboFiltro");
-        comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 0));
+        comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 4));
         comboFiltro.setSelectedIndex(this.getFiltroDefault());
         //Cria o Controle da lista 
         financasControl = new FinancasControler(this);
