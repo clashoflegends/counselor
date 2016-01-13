@@ -187,7 +187,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jtMainLista.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         comboFiltro.setName("comboFiltro");
-        comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 4));
+        comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 5));
         comboFiltro.setSelectedIndex(this.getFiltroDefault());
 
         //Cria o Controle da lista de cidades

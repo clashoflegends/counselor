@@ -268,7 +268,7 @@ public class CidadeConverter implements Serializable {
     private static Object[][] getProdutosAsArray(Cidade cidade) {
         try {
             int ii = 0;
-            Iterator lista = cidade.getEstoques().keySet().iterator();
+            Iterator lista = cidadeFacade.getEstoques(cidade).keySet().iterator();
             Object[][] ret = new Object[cidade.getEstoques().keySet().size()][getProdutoColNames().length];
             while (lista.hasNext()) {
                 Produto produto = (Produto) lista.next();
@@ -297,7 +297,7 @@ public class CidadeConverter implements Serializable {
         for (Cidade cidade : listFactory.listCidades().values()) {
             if (filtro == null) {
                 ret.add(cidade);
-            } else if (filtro == cidade.getNacao()) {
+            } else if (filtro == cidadeFacade.getNacao(cidade)) {
                 ret.add(cidade);
             }
         }
@@ -305,37 +305,32 @@ public class CidadeConverter implements Serializable {
     }
 
     public static List listaByFiltro(String filtro) {
+        final Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
         List<Cidade> ret = new ArrayList();
         if (filtro.equalsIgnoreCase("all")) {
             ret.addAll(listFactory.listCidades().values());
-        } else if (filtro.equalsIgnoreCase("own")) {
-            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+        } else if (filtro.equalsIgnoreCase("own") && jAtivo != null) {
             for (Cidade cidade : listFactory.listCidades().values()) {
-                try {
-                    if (jAtivo.isNacao(cidade.getNacao())) {
-                        ret.add(cidade);
-                    }
-                } catch (NullPointerException e) {
+                if (jAtivo.isNacao(cidadeFacade.getNacao(cidade))) {
+                    ret.add(cidade);
                 }
             }
-        } else if (filtro.equalsIgnoreCase("allies")) {
-            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+        } else if (filtro.equalsIgnoreCase("bigcitymy") && jAtivo != null) {
             for (Cidade cidade : listFactory.listCidades().values()) {
-                try {
-                    if (jAtivo.isJogadorAliado(cidade.getNacao()) && !jAtivo.isNacao(cidade.getNacao())) {
-                        ret.add(cidade);
-                    }
-                } catch (NullPointerException e) {
+                if (jAtivo.isNacao(cidadeFacade.getNacao(cidade)) && cidadeFacade.isBigCity(cidade)) {
+                    ret.add(cidade);
                 }
             }
-        } else if (filtro.equalsIgnoreCase("enemies")) {
-            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+        } else if (filtro.equalsIgnoreCase("allies") && jAtivo != null) {
             for (Cidade cidade : listFactory.listCidades().values()) {
-                try {
-                    if (!jAtivo.isJogadorAliado(cidade.getNacao()) && !jAtivo.isNacao(cidade.getNacao())) {
-                        ret.add(cidade);
-                    }
-                } catch (NullPointerException e) {
+                if (jAtivo.isJogadorAliado(cidadeFacade.getNacao(cidade)) && !jAtivo.isNacao(cidadeFacade.getNacao(cidade))) {
+                    ret.add(cidade);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("enemies") && jAtivo != null) {
+            for (Cidade cidade : listFactory.listCidades().values()) {
+                if (!jAtivo.isJogadorAliado(cidadeFacade.getNacao(cidade)) && !jAtivo.isNacao(cidadeFacade.getNacao(cidade))) {
+                    ret.add(cidade);
                 }
             }
         }
