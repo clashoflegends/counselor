@@ -8,6 +8,7 @@ import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
 import baseLib.SysApoio;
 import business.facade.AcaoFacade;
+import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
 import business.facades.ListFactory;
 import business.facades.WorldFacadeCounselor;
@@ -32,13 +33,12 @@ import persistence.SettingsManager;
 public class NacaoConverter implements Serializable {
 
     public static final int ORDEM_COL_INDEX_START = 4;
-    public static final int FILTRO_PROPRIOS = 1;
-    public static final int FILTRO_TODOS = 0;
     private static final Log log = LogFactory.getLog(NacaoConverter.class);
     private static final NacaoFacade nacaoFacade = new NacaoFacade();
     private static final AcaoFacade acaoFacade = new AcaoFacade();
     private static final ListFactory listFactory = new ListFactory();
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
+    private static final CenarioFacade cenarioFacade = new CenarioFacade();
 
     public static GenericoComboBoxModel getNacaoComboModel(Nacao nacaoExcluida) {
         Nacao[] items = listNacoesDisponiveis(nacaoExcluida);
@@ -68,7 +68,9 @@ public class NacaoConverter implements Serializable {
         cArray[ii++] = nacaoFacade.getRacaNome(nacao);
         cArray[ii++] = nacaoFacade.getPontosVitoria(nacao);
         cArray[ii++] = SysApoio.iif(nacaoFacade.isAtiva(nacao), labels.getString("ATIVA"), labels.getString("INATIVA"));
-        cArray[ii++] = acaoFacade.getPointsSetup(nacao);
+        if (cenarioFacade.hasOrdensNacao(WorldFacadeCounselor.getInstance().getPartida())) {
+            cArray[ii++] = acaoFacade.getPointsSetup(nacao);
+        }
         if (WorldFacadeCounselor.getInstance().hasCapitals()) {
             cArray[ii++] = nacaoFacade.getCoordenadasCapital(nacao);
         }
@@ -92,9 +94,11 @@ public class NacaoConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("ATIVA"));
         classes.add(java.lang.String.class);
-        //xxx: add if for startup points here.
-        colNames.add(labels.getString("STARTUP.POINTS"));
-        classes.add(java.lang.Integer.class);
+        if (cenarioFacade.hasOrdensNacao(WorldFacadeCounselor.getInstance().getPartida())) {
+            //add if for startup points here.
+            colNames.add(labels.getString("STARTUP.POINTS"));
+            classes.add(java.lang.Integer.class);
+        }
         if (WorldFacadeCounselor.getInstance().hasCapitals()) {
             colNames.add(labels.getString("CIDADE.CAPITAL"));
             classes.add(Local.class);
