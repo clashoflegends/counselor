@@ -4,6 +4,7 @@
  */
 package control;
 
+import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
 import business.facade.AcaoFacade;
 import control.services.FinancasConverter;
@@ -53,9 +54,9 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
         return FinancasConverter.getExtratoTableModel(nacao);
     }
 
-    public GenericoTableModel getMainTableModel(int filtro) {
-        listaExibida = NacaoConverter.listaByFiltro(filtro);
-        this.mainTableModel = NacaoConverter.getNacaoModel(filtro);
+    public GenericoTableModel getMainTableModel(GenericoComboObject filtro) {
+        listaExibida = NacaoConverter.listaByFiltro(filtro.getComboId());
+        this.mainTableModel = NacaoConverter.getNacaoModel(listaExibida);
         return this.mainTableModel;
     }
 
@@ -78,7 +79,8 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
         } else if (event.getSource() instanceof JComboBox) {
             JComboBox cb = (JComboBox) event.getSource();
             if ("comboFiltro".equals(cb.getName())) {
-                getTabGui().setMainModel(getMainTableModel(cb.getSelectedIndex()));
+                final GenericoComboObject elem = (GenericoComboObject) cb.getSelectedItem();
+                getTabGui().setMainModel(getMainTableModel(elem));
             }
         }
     }

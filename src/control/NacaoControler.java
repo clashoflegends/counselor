@@ -4,6 +4,7 @@
  */
 package control;
 
+import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
 import control.services.NacaoConverter;
 import control.support.ControlBase;
@@ -42,9 +43,9 @@ public class NacaoControler extends ControlBase implements Serializable, ActionL
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_RELOAD);
     }
 
-    public GenericoTableModel getMainTableModel(int filtro) {
-        listaExibida = NacaoConverter.listaByFiltro(filtro);
-        this.mainTableModel = NacaoConverter.getNacaoModel(filtro);
+    public GenericoTableModel getMainTableModel(GenericoComboObject filtro) {
+        listaExibida = NacaoConverter.listaByFiltro(filtro.getComboId());
+        this.mainTableModel = NacaoConverter.getNacaoModel(listaExibida);
         return this.mainTableModel;
     }
 
@@ -88,7 +89,8 @@ public class NacaoControler extends ControlBase implements Serializable, ActionL
         } else if (event.getSource() instanceof JComboBox) {
             JComboBox cb = (JComboBox) event.getSource();
             if ("comboFiltro".equals(cb.getName())) {
-                getTabGui().setMainModel(getMainTableModel(cb.getSelectedIndex()));
+                final GenericoComboObject elem = (GenericoComboObject) cb.getSelectedItem();
+                getTabGui().setMainModel(getMainTableModel(elem));
             }
         }
     }

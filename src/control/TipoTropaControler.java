@@ -84,7 +84,7 @@ public class TipoTropaControler implements Serializable, ActionListener, ListSel
         } else if (event.getSource() instanceof JComboBox) {
             JComboBox cb = (JComboBox) event.getSource();
             if ("comboFiltro".equals(cb.getActionCommand())) {
-                GenericoComboObject elem = (GenericoComboObject) cb.getSelectedItem();
+                final GenericoComboObject elem = (GenericoComboObject) cb.getSelectedItem();
                 getTabGui().setMainModel(getMainTableModel(elem));
             }
         }

@@ -5,11 +5,13 @@
  */
 package gui.tabs;
 
+import baseLib.GenericoComboObject;
 import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
 import business.facades.WorldFacadeCounselor;
 import control.FinancasControler;
 import control.MapaControler;
+import control.services.FiltroConverter;
 import gui.TabBase;
 import gui.subtabs.SubTabBaseList;
 import java.io.Serializable;
@@ -23,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
 import persistence.SettingsManager;
+import persistence.local.WorldManager;
 
 /**
  *
@@ -188,8 +191,8 @@ public final class TabFinancasGui extends TabBase implements Serializable {
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);
     }
 
-    public int getFiltro() {
-        return comboFiltro.getSelectedIndex();
+    public GenericoComboObject getFiltro() {
+        return (GenericoComboObject) comboFiltro.getSelectedItem();
     }
 
     private void updateGui() {
@@ -238,6 +241,8 @@ public final class TabFinancasGui extends TabBase implements Serializable {
         addTabs();
 
         comboFiltro.setName("comboFiltro");
+        comboFiltro.setActionCommand("comboFiltro");
+        comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 0));
         comboFiltro.setSelectedIndex(this.getFiltroDefault());
         //Cria o Controle da lista 
         financasControl = new FinancasControler(this);
@@ -246,7 +251,7 @@ public final class TabFinancasGui extends TabBase implements Serializable {
         comboFiltro.addActionListener(financasControl);
         jtMainLista.getSelectionModel().addListSelectionListener(financasControl);
 
-        TableModel model = financasControl.getMainTableModel(this.getFiltro());
+        final TableModel model = financasControl.getMainTableModel(this.getFiltro());
         this.setMainModel(model);
     }
 }

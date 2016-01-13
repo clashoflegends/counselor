@@ -14,7 +14,6 @@ import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 import model.Jogador;
@@ -53,11 +52,11 @@ public class NacaoConverter implements Serializable {
         return model;
     }
 
-    public static GenericoTableModel getNacaoModel(int filtro) {
+    public static GenericoTableModel getNacaoModel(List<Nacao> lista) {
         List<Class> classes = new ArrayList<Class>(30);
         GenericoTableModel nacaoModel = new GenericoTableModel(
                 getNacaoColNames(classes),
-                getNacoesAsArray(filtro),
+                getNacoesAsArray(lista),
                 classes.toArray(new Class[0]));
         return nacaoModel;
     }
@@ -69,10 +68,10 @@ public class NacaoConverter implements Serializable {
         cArray[ii++] = nacaoFacade.getRacaNome(nacao);
         cArray[ii++] = nacaoFacade.getPontosVitoria(nacao);
         cArray[ii++] = SysApoio.iif(nacaoFacade.isAtiva(nacao), labels.getString("ATIVA"), labels.getString("INATIVA"));
+        cArray[ii++] = acaoFacade.getPointsSetup(nacao);
         if (WorldFacadeCounselor.getInstance().hasCapitals()) {
             cArray[ii++] = nacaoFacade.getCoordenadasCapital(nacao);
         }
-        cArray[ii++] = acaoFacade.getPointsSetup(nacao);
         cArray[ii++] = nacaoFacade.getTropasQt(nacao);
         cArray[ii++] = nacaoFacade.getMoneySaldo(nacao);
         cArray[ii++] = nacaoFacade.getImpostos(nacao);
@@ -93,12 +92,13 @@ public class NacaoConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("ATIVA"));
         classes.add(java.lang.String.class);
+        //xxx: add if for startup points here.
+        colNames.add(labels.getString("STARTUP.POINTS"));
+        classes.add(java.lang.Integer.class);
         if (WorldFacadeCounselor.getInstance().hasCapitals()) {
             colNames.add(labels.getString("CIDADE.CAPITAL"));
             classes.add(Local.class);
         }
-        colNames.add(labels.getString("STARTUP.POINTS"));
-        classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("TROPAS"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("TREASURY"));
@@ -116,17 +116,14 @@ public class NacaoConverter implements Serializable {
         return (colNames.toArray(new String[0]));
     }
 
-    private static Object[][] getNacoesAsArray(int filtro) {
-        List listaExibir = listaByFiltro(filtro);
+    private static Object[][] getNacoesAsArray(List<Nacao> listaExibir) {
         if (listaExibir.isEmpty()) {
             Object[][] ret = {{"", ""}};
             return (ret);
         } else {
             int ii = 0;
-            Object[][] ret = new Object[listaExibir.size()][getNacaoColNames(new ArrayList<Class>(30)).length];
-            Iterator lista = listaExibir.iterator();
-            while (lista.hasNext()) {
-                Nacao nacao = (Nacao) lista.next();
+            Object[][] ret = new Object[listaExibir.size()][getNacaoColNames(new ArrayList<Class>(1)).length];
+            for (Nacao nacao : listaExibir) {
                 // Converte um Nacao para um Array[] 
                 ret[ii++] = NacaoConverter.toArray(nacao);
             }
@@ -197,20 +194,24 @@ public class NacaoConverter implements Serializable {
         }
     }
 
-    public static List<Nacao> listaByFiltro(int filtro) {
+    public static List<Nacao> listaByFiltro(String filtro) {
+        final Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
         List<Nacao> ret = new ArrayList();
-        for (Nacao nacao : listFactory.listNacoes().values()) {
-            if (filtro == FILTRO_TODOS) {
-                ret.add(nacao);
-            } else if (filtro == FILTRO_PROPRIOS) {
-                Jogador jativo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
-                Jogador jnacao = null;
-                if (nacao.getOwner() != null) {
-                    jnacao = nacaoFacade.getOwner(nacao);
+        if (filtro.equalsIgnoreCase("all")) {
+            //todos
+            ret.addAll(listFactory.listNacoes().values());
+        } else if (filtro.equalsIgnoreCase("own")) {
+            ret.addAll(jAtivo.getNacoes().values());
+        } else if (filtro.equalsIgnoreCase("allies") && jAtivo != null) {
+            for (Nacao ally : listFactory.listNacoes().values()) {
+                if (jAtivo.isJogadorAliado(ally) && !jAtivo.isNacao(ally)) {
+                    ret.add(ally);
                 }
-//                log.info(jativo + "/" + jnacao);
-                if (jativo == jnacao) {
-                    ret.add(nacao);
+            }
+        } else if (filtro.equalsIgnoreCase("enemies") && jAtivo != null) {
+            for (Nacao ally : listFactory.listNacoes().values()) {
+                if (!jAtivo.isJogadorAliado(ally) && !jAtivo.isNacao(ally)) {
+                    ret.add(ally);
                 }
             }
         }

@@ -30,7 +30,7 @@ public class TabTipoTropasGui extends TabBase {
 
     private static final Log log = LogFactory.getLog(TabTipoTropasGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private final TipoTropaControler controler;
+    private TipoTropaControler controler;
 
     public TabTipoTropasGui(String titulo, String dica) {
         initComponents();
@@ -38,46 +38,7 @@ public class TabTipoTropasGui extends TabBase {
         setIcone("/images/help_icon.gif");
         setTitle(titulo);
         setDica(dica);
-        //Cria o Controle da lista 
-        controler = new TipoTropaControler(this);
-        //configura grid
-        jtMainLista.setAutoCreateColumnsFromModel(true);
-        jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jtMainLista.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jtMainLista.setAutoCreateRowSorter(true);
-        jtAtaque.setAutoCreateColumnsFromModel(true);
-        jtAtaque.setAutoCreateRowSorter(true);
-        jtAtaque.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jtAtaque.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jtDefesa.setAutoCreateColumnsFromModel(true);
-        jtDefesa.setAutoCreateRowSorter(true);
-        jtDefesa.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jtDefesa.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jtTatica.setAutoCreateColumnsFromModel(true);
-        jtTatica.setAutoCreateRowSorter(true);
-        jtTatica.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jtTatica.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jtMovimentacao.setAutoCreateColumnsFromModel(true);
-        jtMovimentacao.setAutoCreateRowSorter(true);
-        jtMovimentacao.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jtMovimentacao.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jtHabilidade.setAutoCreateColumnsFromModel(true);
-        jtHabilidade.setAutoCreateRowSorter(true);
-        jtHabilidade.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jtHabilidade.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        SubTabTroopHabGui newComp = new SubTabTroopHabGui();
-        GroupLayout parLayout = (GroupLayout) jPanel3.getLayout();
-        parLayout.replace(jReplace, newComp);
-
-        comboFiltro.setActionCommand("comboFiltro");
-        comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 3));
-
-        //adiciona listeners
-        comboFiltro.addActionListener(controler);
-        jtMainLista.getSelectionModel().addListSelectionListener(controler);
-
-        TableModel model = controler.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
-        this.setMainModel(model);
+        initConfig();
     }
 
     /**
@@ -331,6 +292,49 @@ public class TabTipoTropasGui extends TabBase {
     private javax.swing.JTable jtTatica;
     private javax.swing.JLabel qtTropas;
     // End of variables declaration//GEN-END:variables
+
+    private void initConfig() {
+        //Cria o Controle da lista
+        controler = new TipoTropaControler(this);
+        //configura grid
+        jtMainLista.setAutoCreateColumnsFromModel(true);
+        jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jtMainLista.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jtMainLista.setAutoCreateRowSorter(true);
+        jtAtaque.setAutoCreateColumnsFromModel(true);
+        jtAtaque.setAutoCreateRowSorter(true);
+        jtAtaque.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jtAtaque.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jtDefesa.setAutoCreateColumnsFromModel(true);
+        jtDefesa.setAutoCreateRowSorter(true);
+        jtDefesa.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jtDefesa.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jtTatica.setAutoCreateColumnsFromModel(true);
+        jtTatica.setAutoCreateRowSorter(true);
+        jtTatica.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jtTatica.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jtMovimentacao.setAutoCreateColumnsFromModel(true);
+        jtMovimentacao.setAutoCreateRowSorter(true);
+        jtMovimentacao.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jtMovimentacao.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jtHabilidade.setAutoCreateColumnsFromModel(true);
+        jtHabilidade.setAutoCreateRowSorter(true);
+        jtHabilidade.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jtHabilidade.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        SubTabTroopHabGui newComp = new SubTabTroopHabGui();
+        GroupLayout parLayout = (GroupLayout) jPanel3.getLayout();
+        parLayout.replace(jReplace, newComp);
+
+        comboFiltro.setActionCommand("comboFiltro");
+        comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 3));
+
+        //adiciona listeners
+        comboFiltro.addActionListener(controler);
+        jtMainLista.getSelectionModel().addListSelectionListener(controler);
+
+        TableModel model = controler.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
+        this.setMainModel(model);
+    }
 
     public JTable getMainLista() {
         return jtMainLista;

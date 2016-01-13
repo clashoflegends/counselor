@@ -38,40 +38,31 @@ public class TipoTropaConverter implements Serializable {
     private static final NacaoFacade nacaoFacade = new NacaoFacade();
 
     public static List<TipoTropa> listaByFiltro(String filtro) {
-        List<TipoTropa> ret = new ArrayList();
+        final Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+        final List<TipoTropa> ret = new ArrayList();
         if (filtro.equalsIgnoreCase("all")) {
             //todos
-            for (TipoTropa tpTropa : listFactory.listTropas()) {
-                ret.add(tpTropa);
-            }
+            ret.addAll(listFactory.listTropas());
         } else if (filtro.equalsIgnoreCase("own")) {
-            final Collection<Nacao> nacoes = WorldFacadeCounselor.getInstance().getJogadorAtivo().getNacoes().values();
-            Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
+            final Collection<Nacao> nacoes = jAtivo.getNacoes().values();
+            final Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
             for (Nacao nacao : nacoes) {
                 tropas.addAll(nacaoFacade.getTropas(nacao).keySet());
             }
             ret.addAll(tropas);
-        } else if (filtro.equalsIgnoreCase("allies")) {
-            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+        } else if (filtro.equalsIgnoreCase("allies") && jAtivo != null) {
             final Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
             for (Nacao ally : listFactory.listNacoes().values()) {
-                try {
-                    if (jAtivo.isJogadorAliado(ally) && !jAtivo.isNacao(ally)) {
-                        ret.addAll(nacaoFacade.getTropas(ally).keySet());
-                    }
-                } catch (NullPointerException e) {
+                if (jAtivo.isJogadorAliado(ally) && !jAtivo.isNacao(ally)) {
+                    tropas.addAll(nacaoFacade.getTropas(ally).keySet());
                 }
             }
             ret.addAll(tropas);
-        } else if (filtro.equalsIgnoreCase("enemies")) {
-            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+        } else if (filtro.equalsIgnoreCase("enemies") && jAtivo != null) {
             final Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
             for (Nacao ally : listFactory.listNacoes().values()) {
-                try {
-                    if (!jAtivo.isJogadorAliado(ally) && !jAtivo.isNacao(ally)) {
-                        ret.addAll(nacaoFacade.getTropas(ally).keySet());
-                    }
-                } catch (NullPointerException e) {
+                if (!jAtivo.isJogadorAliado(ally) && !jAtivo.isNacao(ally)) {
+                    tropas.addAll(nacaoFacade.getTropas(ally).keySet());
                 }
             }
             ret.addAll(tropas);

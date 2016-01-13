@@ -59,18 +59,20 @@ public class FiltroConverter implements Serializable {
             lista.add(new GenericoComboObject(labels.getString("TROPA.FILTRO.SIEGE"), "siege"));
             lista.add(new GenericoComboObject(labels.getString("TROPA.FILTRO.TRASNFER"), "trasnfer"));
         }
-        final List<Nacao> listNacao = new ArrayList<Nacao>(NacaoConverter.listNacoesDisponiveis(null).length);
-        for (Nacao nacao : NacaoConverter.listNacoesDisponiveis(null)) {
-            if (filterMine) {
-                if (nacao.getOwner() == jogadorAtivo) {
+        if (options > 0) {
+            final List<Nacao> listNacao = new ArrayList<Nacao>(NacaoConverter.listNacoesDisponiveis(null).length);
+            for (Nacao nacao : NacaoConverter.listNacoesDisponiveis(null)) {
+                if (filterMine) {
+                    if (nacao.getOwner() == jogadorAtivo) {
+                        listNacao.add(nacao);
+                    }
+                } else {
                     listNacao.add(nacao);
                 }
-            } else {
-                listNacao.add(nacao);
             }
+            Collections.sort(listNacao, new ComparatorBaseDisplayModelSorter(false));
+            lista.addAll(listNacao);
         }
-        Collections.sort(listNacao, new ComparatorBaseDisplayModelSorter(false));
-        lista.addAll(listNacao);
         GenericoComboBoxModel model = new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]), true);
         return model;
     }

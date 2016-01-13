@@ -5,6 +5,7 @@
  */
 package gui.tabs;
 
+import baseLib.GenericoComboObject;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.JogadorFacade;
@@ -12,6 +13,7 @@ import business.facade.NacaoFacade;
 import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
 import control.NacaoControler;
+import control.services.FiltroConverter;
 import control.services.NacaoConverter;
 import gui.TabBase;
 import gui.services.IAcaoGui;
@@ -30,6 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
 import persistence.SettingsManager;
+import persistence.local.WorldManager;
 
 /**
  *
@@ -205,8 +208,8 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);
     }
 
-    public int getFiltro() {
-        return comboFiltro.getSelectedIndex();
+    public GenericoComboObject getFiltro() {
+        return (GenericoComboObject) comboFiltro.getSelectedItem();
     }
 
     private void updateGui() {
@@ -221,7 +224,10 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         jtMainLista.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jtMainLista.setAutoCreateRowSorter(true);
         comboFiltro.setName("comboFiltro");
+        comboFiltro.setActionCommand("comboFiltro");
+        comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 0));
         comboFiltro.setSelectedIndex(this.getFiltroDefault());
+
         //Cria o Controle da lista 
         nacaoControl = new NacaoControler(this);
         stResults.setFontText(detalhesNacao.getFont());
