@@ -44,8 +44,6 @@ import utils.StringRet;
  */
 public class ExercitoConverter implements Serializable {
 
-    public static final int FILTRO_PROPRIOS = 1;
-    public static final int FILTRO_TODOS = 0;
     private static final Log log = LogFactory.getLog(ExercitoConverter.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private static final ExercitoFacade exercitoFacade = new ExercitoFacade();
