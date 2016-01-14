@@ -19,7 +19,9 @@ import gui.TabBase;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import model.*;
+import model.Local;
+import model.Ordem;
+import model.TipoTropa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
@@ -167,8 +169,6 @@ public final class SubTabDirecaoExercito extends TabBase implements Serializable
         jlDestino = new javax.swing.JLabel();
         jcbComida = new javax.swing.JCheckBox();
         jcTipoTropa = new javax.swing.JComboBox();
-
-        setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         jbNo.setText(labels.getString("NORTEOESTE.ABREVIADO")); // NOI18N
         jbNo.setActionCommand("nw");

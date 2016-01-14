@@ -50,12 +50,14 @@ public class SubTabTextArea extends TabBase implements Serializable {
         jpAjuda = new javax.swing.JPanel();
         jtaTextArea = new javax.swing.JTextArea();
 
+        detAjuda.setBorder(null);
         detAjuda.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         jtaTextArea.setFont(jtaTextArea.getFont().deriveFont(jtaTextArea.getFont().getSize()-1f));
         jtaTextArea.setLineWrap(true);
         jtaTextArea.setRows(80);
         jtaTextArea.setWrapStyleWord(true);
+        jtaTextArea.setBorder(null);
 
         javax.swing.GroupLayout jpAjudaLayout = new javax.swing.GroupLayout(jpAjuda);
         jpAjuda.setLayout(jpAjudaLayout);
@@ -65,7 +67,7 @@ public class SubTabTextArea extends TabBase implements Serializable {
         );
         jpAjudaLayout.setVerticalGroup(
             jpAjudaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jtaTextArea, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+            .addComponent(jtaTextArea, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
         );
 
         detAjuda.setViewportView(jpAjuda);
@@ -82,7 +84,7 @@ public class SubTabTextArea extends TabBase implements Serializable {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 281, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(detAjuda, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE))
+                .addComponent(detAjuda))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables

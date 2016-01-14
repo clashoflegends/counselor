@@ -34,7 +34,7 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="infoPanel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="splitMainPanel" pref="662" max="32767" attributes="0"/>
+              <Component id="splitMainPanel" pref="666" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="statusBar" min="-2" max="-2" attributes="0"/>
           </Group>
@@ -366,7 +366,11 @@
     </Container>
     <Container class="javax.swing.JSplitPane" name="splitMainPanel">
       <Properties>
-        <Property name="dividerSize" type="int" value="9"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="null"/>
+        </Property>
+        <Property name="dividerLocation" type="int" value="300"/>
+        <Property name="dividerSize" type="int" value="8"/>
         <Property name="autoscrolls" type="boolean" value="true"/>
         <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[0, 0]"/>
@@ -403,17 +407,12 @@
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="ff" green="cc" red="cc" type="rgb"/>
         </Property>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.BevelBorderInfo">
-            <BevelBorder bevelType="1"/>
-          </Border>
-        </Property>
       </Properties>
 
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="statusLabel" alignment="0" pref="1010" max="32767" attributes="0"/>
+              <Component id="statusLabel" alignment="0" pref="1014" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">

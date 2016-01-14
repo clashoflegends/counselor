@@ -7,7 +7,17 @@ package gui;
 
 import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
-import gui.tabs.*;
+import gui.tabs.TabAcoesGui;
+import gui.tabs.TabArtefatosGui;
+import gui.tabs.TabCidadesGui;
+import gui.tabs.TabExercitosGui;
+import gui.tabs.TabFeiticosGui;
+import gui.tabs.TabFinancasGui;
+import gui.tabs.TabNacoesGui;
+import gui.tabs.TabPackagesGui;
+import gui.tabs.TabPartidaGui;
+import gui.tabs.TabPersonagensGui;
+import gui.tabs.TabTipoTropasGui;
 import java.io.Serializable;
 import persistence.BundleManager;
 import persistence.SettingsManager;
@@ -65,6 +75,7 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTabbedPane1 = new javax.swing.JTabbedPane();
 
+        jScrollPane1.setBorder(null);
         jScrollPane1.setViewportView(jTabbedPane1);
         jTabbedPane1.getAccessibleContext().setAccessibleName("Personagem"); // NOI18N
 

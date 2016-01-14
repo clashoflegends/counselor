@@ -83,6 +83,8 @@ public class SubTabTropas extends TabBase implements Serializable {
         jsPanel = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
 
+        jsPanel.setBorder(null);
+
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null},

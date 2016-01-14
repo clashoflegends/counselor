@@ -142,6 +142,8 @@ public class BattleSimulator extends JFrame {
 
         jpArmies.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("BATTLESIM.ARMIES.TITLE"))); // NOI18N
 
+        jScrollPane1.setBorder(null);
+
         jtArmyList.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},

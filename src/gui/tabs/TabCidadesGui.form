@@ -96,6 +96,9 @@
         </Component>
         <Container class="javax.swing.JScrollPane" name="jScrollPane3">
           <Properties>
+            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+              <Border info="null"/>
+            </Property>
             <Property name="horizontalScrollBarPolicy" type="int" value="32"/>
             <Property name="verticalScrollBarPolicy" type="int" value="22"/>
           </Properties>

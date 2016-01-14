@@ -80,6 +80,8 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
 
         setAutoscrolls(true);
 
+        jScrollPane1.setBorder(null);
+
         mapaLabel.setMaximumSize(new java.awt.Dimension(32767, 32767));
         jLayeredPane1.add(mapaLabel);
         mapaLabel.setBounds(0, 0, 400, 400);

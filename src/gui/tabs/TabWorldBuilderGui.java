@@ -109,7 +109,12 @@ public class TabWorldBuilderGui extends TabBase implements Serializable {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jScrollPane1.setBorder(null);
+
+        listaDetalhes.setBorder(null);
         jScrollPane1.setViewportView(listaDetalhes);
+
+        jScrollPane4.setBorder(null);
 
         jtListaInfos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {

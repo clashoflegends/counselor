@@ -123,6 +123,8 @@ public class TabExercitosGui extends TabBase implements Serializable {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jScrollPane3.setBorder(null);
+
         jtMainLista.setAutoCreateRowSorter(true);
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -152,6 +154,8 @@ public class TabExercitosGui extends TabBase implements Serializable {
         });
         jScrollPane3.setViewportView(jtMainLista);
 
+        jScrollPane2.setBorder(null);
+
         jtListaPelotao.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
@@ -173,6 +177,9 @@ public class TabExercitosGui extends TabBase implements Serializable {
         });
         jScrollPane2.setViewportView(jtListaPelotao);
 
+        jScrollPane1.setBorder(null);
+
+        listaDetalhes.setBorder(null);
         jScrollPane1.setViewportView(listaDetalhes);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);

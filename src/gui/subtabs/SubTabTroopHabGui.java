@@ -7,8 +7,8 @@ package gui.subtabs;
 
 import baseLib.GenericoComboObject;
 import control.TroopHabControler;
-import gui.tabs.*;
 import gui.TabBase;
+import gui.tabs.TabTipoTropasGui;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
@@ -95,6 +95,8 @@ public final class SubTabTroopHabGui extends TabBase {
                     .addComponent(qtTropas))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        jScrollPane3.setBorder(null);
 
         jtMainLista.setAutoCreateRowSorter(true);
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(

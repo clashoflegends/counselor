@@ -105,6 +105,8 @@ public final class TabFinancasGui extends TabBase implements Serializable {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jScrollPane3.setBorder(null);
+
         jtMainLista.setAutoCreateRowSorter(true);
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {

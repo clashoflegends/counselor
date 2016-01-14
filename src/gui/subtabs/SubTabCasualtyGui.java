@@ -7,8 +7,8 @@ package gui.subtabs;
 
 import baseLib.GenericoComboObject;
 import control.CasualtyControler;
-import gui.tabs.*;
 import gui.TabBase;
+import gui.tabs.TabTipoTropasGui;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
@@ -103,6 +103,8 @@ public final class SubTabCasualtyGui extends TabBase {
                     .addComponent(comboFiltroTactic, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        jScrollPane3.setBorder(null);
 
         jtMainLista.setAutoCreateRowSorter(true);
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(

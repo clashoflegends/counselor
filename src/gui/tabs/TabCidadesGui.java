@@ -89,6 +89,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
 
         qtCidades.setText("999");
 
+        jScrollPane3.setBorder(null);
         jScrollPane3.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         jScrollPane3.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 

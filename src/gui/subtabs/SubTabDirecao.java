@@ -108,8 +108,6 @@ public final class SubTabDirecao extends TabBase implements Serializable {
         jLabel1 = new javax.swing.JLabel();
         jlDestino = new javax.swing.JLabel();
 
-        setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
-
         jbNo.setText(labels.getString("NORTEOESTE.ABREVIADO")); // NOI18N
         jbNo.setActionCommand("nw");
         jbNo.setDefaultCapable(false);

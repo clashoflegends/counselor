@@ -102,6 +102,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
         jScrollPane1 = new javax.swing.JScrollPane();
         jtListaOrdens = new javax.swing.JTable();
 
+        detOrdens.setBorder(null);
         detOrdens.setToolTipText(labels.getString("PERSONAGEM.ACOES.TOOLTIP")); // NOI18N
 
         jpOrdens.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("ORDENS"))); // NOI18N

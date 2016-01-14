@@ -48,6 +48,7 @@ public class SubTabBaseList extends TabBase implements Serializable {
         detLista = new javax.swing.JScrollPane();
         jtListaBase = new javax.swing.JTable();
 
+        detLista.setBorder(null);
         detLista.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         jtListaBase.setModel(new javax.swing.table.DefaultTableModel(

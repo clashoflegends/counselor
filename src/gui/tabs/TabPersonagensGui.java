@@ -87,6 +87,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
 
         qtPersonagens.setText(labels.getString("QTD")); // NOI18N
 
+        jScrollPane3.setBorder(null);
         jScrollPane3.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         jScrollPane3.setMaximumSize(new java.awt.Dimension(200, 600));
         jScrollPane3.setOpaque(false);

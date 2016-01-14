@@ -71,6 +71,8 @@ public final class TabPackagesGui extends TabBase {
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
+        jScrollPane3.setBorder(null);
+
         jtMainLista.setAutoCreateRowSorter(true);
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -111,6 +113,7 @@ public final class TabPackagesGui extends TabBase {
 
         qtAcoes.setText(labels.getString("QTD")); // NOI18N
 
+        jsHelp.setBorder(null);
         jsHelp.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);

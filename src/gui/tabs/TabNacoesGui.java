@@ -81,6 +81,8 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         qtNacoes = new javax.swing.JLabel();
         detalhesNacao = new javax.swing.JTabbedPane();
 
+        jScrollPane3.setBorder(null);
+
         jtMainLista.setAutoCreateRowSorter(true);
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {

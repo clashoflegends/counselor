@@ -71,6 +71,8 @@ public final class TabFeiticosGui extends TabBase implements Serializable {
         jLabel2 = new javax.swing.JLabel();
         qtFeiticos = new javax.swing.JLabel();
 
+        jScrollPane3.setBorder(null);
+
         jtMainLista.setAutoCreateRowSorter(true);
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -104,6 +106,9 @@ public final class TabFeiticosGui extends TabBase implements Serializable {
         jtMainLista.setName(""); // NOI18N
         jScrollPane3.setViewportView(jtMainLista);
 
+        jScrollPane1.setBorder(null);
+
+        listaHelp.setBorder(null);
         jScrollPane1.setViewportView(listaHelp);
 
         jlListar.setText(labels.getString("LISTAR:")); // NOI18N

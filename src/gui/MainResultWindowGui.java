@@ -264,7 +264,9 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
                 .addContainerGap())
         );
 
-        splitMainPanel.setDividerSize(9);
+        splitMainPanel.setBorder(null);
+        splitMainPanel.setDividerLocation(300);
+        splitMainPanel.setDividerSize(8);
         splitMainPanel.setAutoscrolls(true);
         splitMainPanel.setMinimumSize(new java.awt.Dimension(0, 0));
         splitMainPanel.setOneTouchExpandable(true);
@@ -276,7 +278,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         splitMainPanel.setRightComponent(jlRight);
 
         statusBar.setBackground(new java.awt.Color(204, 204, 255));
-        statusBar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         statusLabel.setText(labels.getString("STATUS.MESSAGES")); // NOI18N
@@ -285,7 +286,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         statusBar.setLayout(statusBarLayout);
         statusBarLayout.setHorizontalGroup(
             statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 1010, Short.MAX_VALUE)
+            .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 1014, Short.MAX_VALUE)
         );
         statusBarLayout.setVerticalGroup(
             statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -307,7 +308,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             .addGroup(layout.createSequentialGroup()
                 .addComponent(infoPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(splitMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
+                .addComponent(splitMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 666, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(statusBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );

@@ -69,6 +69,8 @@ public final class TabAcoesGui extends TabBase {
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
+        jScrollPane3.setBorder(null);
+
         jtMainLista.setAutoCreateRowSorter(true);
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {

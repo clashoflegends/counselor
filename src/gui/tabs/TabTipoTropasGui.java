@@ -105,6 +105,8 @@ public class TabTipoTropasGui extends TabBase {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jScrollPane3.setBorder(null);
+
         jtMainLista.setAutoCreateRowSorter(true);
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -135,6 +137,8 @@ public class TabTipoTropasGui extends TabBase {
         jtMainLista.setName(""); // NOI18N
         jScrollPane3.setViewportView(jtMainLista);
 
+        jsHabilidade.setBorder(null);
+
         jtHabilidade.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -151,6 +155,8 @@ public class TabTipoTropasGui extends TabBase {
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
         jTabbedPane1.addTab(bundle.getString("TROPA.HABILIDADE"), new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png")), jsHabilidade, bundle.getString("TROPA.HABILIDADE.TOOLTIP")); // NOI18N
 
+        jsAtaque.setBorder(null);
+
         jtAtaque.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null},
@@ -165,6 +171,8 @@ public class TabTipoTropasGui extends TabBase {
         jsAtaque.setViewportView(jtAtaque);
 
         jTabbedPane1.addTab(bundle.getString("TROPA.ATAQUE"), new javax.swing.ImageIcon(getClass().getResource("/images/hex_exercito.gif")), jsAtaque, bundle.getString("TROPA.ATAQUE.TOOLTIP")); // NOI18N
+
+        jsDefesa.setBorder(null);
 
         jtDefesa.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -181,6 +189,8 @@ public class TabTipoTropasGui extends TabBase {
 
         jTabbedPane1.addTab(bundle.getString("TROPA.DEFESA"), new javax.swing.ImageIcon(getClass().getResource("/images/hex_exercito.gif")), jsDefesa, bundle.getString("TROPA.DEFESA.TOOLTIP")); // NOI18N
 
+        jsMovimentacao.setBorder(null);
+
         jtMovimentacao.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -195,6 +205,8 @@ public class TabTipoTropasGui extends TabBase {
         jsMovimentacao.setViewportView(jtMovimentacao);
 
         jTabbedPane1.addTab(bundle.getString("TROPA.MOVIMENTACAO"), new javax.swing.ImageIcon(getClass().getResource("/images/right.gif")), jsMovimentacao, bundle.getString("TROPA.MOVIMENTACAO.TOOLTIP")); // NOI18N
+
+        jsTatica.setBorder(null);
 
         jtTatica.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -211,15 +223,17 @@ public class TabTipoTropasGui extends TabBase {
 
         jTabbedPane1.addTab(bundle.getString("TATICA"), new javax.swing.ImageIcon(getClass().getResource("/images/combat.png")), jsTatica, "Defense values for all troops"); // NOI18N
 
+        jsTroopHab.setBorder(null);
+
         javax.swing.GroupLayout jReplaceLayout = new javax.swing.GroupLayout(jReplace);
         jReplace.setLayout(jReplaceLayout);
         jReplaceLayout.setHorizontalGroup(
             jReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 228, Short.MAX_VALUE)
+            .addGap(0, 230, Short.MAX_VALUE)
         );
         jReplaceLayout.setVerticalGroup(
             jReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 171, Short.MAX_VALUE)
+            .addGap(0, 173, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);

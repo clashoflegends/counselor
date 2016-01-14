@@ -72,6 +72,8 @@ public class TabOrdensGui extends TabBase implements Serializable {
 
         jLabel3.setText(labels.getString("LISTAR:")); // NOI18N
 
+        jScrollPane3.setBorder(null);
+
         jtMainLista.setAutoCreateRowSorter(true);
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -105,6 +107,9 @@ public class TabOrdensGui extends TabBase implements Serializable {
         jtMainLista.setName(""); // NOI18N
         jScrollPane3.setViewportView(jtMainLista);
 
+        jScrollPane1.setBorder(null);
+
+        listaHelp.setBorder(null);
         jScrollPane1.setViewportView(listaHelp);
 
         jLabel2.setText(labels.getString("TOTAL:")); // NOI18N
