@@ -265,7 +265,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         );
 
         splitMainPanel.setBorder(null);
-        splitMainPanel.setDividerLocation(300);
         splitMainPanel.setDividerSize(8);
         splitMainPanel.setAutoscrolls(true);
         splitMainPanel.setMinimumSize(new java.awt.Dimension(0, 0));
