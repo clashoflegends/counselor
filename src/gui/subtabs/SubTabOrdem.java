@@ -95,10 +95,10 @@ public class SubTabOrdem extends TabBase implements Serializable {
         jlPar17 = new javax.swing.JLabel();
         cbOrdem = new javax.swing.JComboBox();
         jbOk = new javax.swing.JButton();
-        cbOrdersAll = new javax.swing.JCheckBox();
-        cbOrdersDetach = new javax.swing.JCheckBox();
-        jbHelp = new javax.swing.JButton();
         jbClear = new javax.swing.JButton();
+        jbDetach = new javax.swing.JToggleButton();
+        jbHelp = new javax.swing.JButton();
+        cbOrdersAll = new javax.swing.JCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtListaOrdens = new javax.swing.JTable();
 
@@ -155,26 +155,29 @@ public class SubTabOrdem extends TabBase implements Serializable {
         jbOk.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/right.gif"))); // NOI18N
         jbOk.setToolTipText(labels.getString("GRAVA.ACAO.TOOLTIP")); // NOI18N
 
-        cbOrdersAll.setText(labels.getString("ALL")); // NOI18N
-        cbOrdersAll.setToolTipText(labels.getString("PERSONAGEM.ORDENSALL.TOOLTIP")); // NOI18N
-        cbOrdersAll.setActionCommand("cbOrdersAll"); // NOI18N
-        cbOrdersAll.setFocusable(false);
-        cbOrdersAll.setName("cbOrdersAll"); // NOI18N
+        jbClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/erase.png"))); // NOI18N
+        jbClear.setToolTipText(labels.getString("PERSONAGEM.ERASE.TOOLTIP")); // NOI18N
+        jbClear.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        jbClear.setFocusable(false);
 
-        cbOrdersDetach.setText(labels.getString("DETACH")); // NOI18N
-        cbOrdersDetach.setToolTipText(labels.getString("PERSONAGEM.DETACH.TOOLTIP")); // NOI18N
-        cbOrdersDetach.setActionCommand("cbOrdersDetach"); // NOI18N
-        cbOrdersDetach.setFocusable(false);
+        jbDetach.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/detach.png"))); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
+        jbDetach.setToolTipText(bundle.getString("PERSONAGEM.DETACH.TOOLTIP")); // NOI18N
+        jbDetach.setFocusable(false);
+        jbDetach.setMaximumSize(new java.awt.Dimension(23, 23));
+        jbDetach.setMinimumSize(new java.awt.Dimension(23, 23));
+        jbDetach.setPreferredSize(new java.awt.Dimension(23, 23));
 
         jbHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/help_icon.gif"))); // NOI18N
         jbHelp.setToolTipText(labels.getString("PERSONAGEM.AJUDA.TOOLTIP")); // NOI18N
         jbHelp.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
         jbHelp.setFocusable(false);
 
-        jbClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/erase.png"))); // NOI18N
-        jbClear.setToolTipText(labels.getString("PERSONAGEM.ERASE.TOOLTIP")); // NOI18N
-        jbClear.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
-        jbClear.setFocusable(false);
+        cbOrdersAll.setText(labels.getString("ALL")); // NOI18N
+        cbOrdersAll.setToolTipText(labels.getString("PERSONAGEM.ORDENSALL.TOOLTIP")); // NOI18N
+        cbOrdersAll.setActionCommand("cbOrdersAll"); // NOI18N
+        cbOrdersAll.setFocusable(false);
+        cbOrdersAll.setName("cbOrdersAll"); // NOI18N
 
         javax.swing.GroupLayout jpOrdensLayout = new javax.swing.GroupLayout(jpOrdens);
         jpOrdens.setLayout(jpOrdensLayout);
@@ -203,16 +206,16 @@ public class SubTabOrdem extends TabBase implements Serializable {
                             .addComponent(cbPar11, 0, 1, Short.MAX_VALUE)))
                     .addGroup(jpOrdensLayout.createSequentialGroup()
                         .addGap(9, 9, 9)
-                        .addComponent(cbOrdem, 0, 343, Short.MAX_VALUE)))
+                        .addComponent(cbOrdem, 0, 370, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cbOrdersDetach)
                     .addComponent(jbOk)
                     .addComponent(cbOrdersAll)
                     .addGroup(jpOrdensLayout.createSequentialGroup()
                         .addComponent(jbHelp)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jbClear)))
+                        .addComponent(jbClear))
+                    .addComponent(jbDetach, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         jpOrdensLayout.setVerticalGroup(
@@ -251,15 +254,15 @@ public class SubTabOrdem extends TabBase implements Serializable {
                 .addComponent(jbOk)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jbHelp)
-                    .addComponent(jbClear))
-                .addGap(4, 4, 4)
-                .addComponent(cbOrdersAll)
+                    .addComponent(jbClear)
+                    .addComponent(jbHelp))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbOrdersDetach))
+                .addComponent(jbDetach, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(cbOrdersAll))
         );
 
-        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("ACOES"))); // NOI18N
+        jScrollPane1.setBorder(null);
         jScrollPane1.setToolTipText(labels.getString("ACOES.TOOLTIP")); // NOI18N
 
         jtListaOrdens.setModel(new javax.swing.table.DefaultTableModel(
@@ -322,7 +325,6 @@ public class SubTabOrdem extends TabBase implements Serializable {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox cbOrdem;
     private javax.swing.JCheckBox cbOrdersAll;
-    private javax.swing.JCheckBox cbOrdersDetach;
     private javax.swing.JComboBox cbPar11;
     private javax.swing.JComboBox cbPar12;
     private javax.swing.JComboBox cbPar13;
@@ -333,6 +335,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
     private javax.swing.JScrollPane detOrdens;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jbClear;
+    private javax.swing.JToggleButton jbDetach;
     private javax.swing.JButton jbHelp;
     private javax.swing.JButton jbOk;
     private javax.swing.JLabel jlPar11;
@@ -399,7 +402,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
         cbOrdersAll.setActionCommand("cbOrdersAll");
         jbHelp.setActionCommand("jbHelp");
         jbClear.setActionCommand("jbClear");
-        cbOrdersDetach.setActionCommand("cbOrdersDetach");
+        jbDetach.setActionCommand("jbDetach");
 
         doDisableFields();
 
@@ -411,7 +414,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
         cbOrdersAll.addItemListener(ordemControl);
         jbHelp.addActionListener(ordemControl);
         jbClear.addActionListener(ordemControl);
-        cbOrdersDetach.addItemListener(ordemControl);
+        jbDetach.addItemListener(ordemControl);
 
         this.setDefaultButton(jbOk);
     }
@@ -611,41 +614,50 @@ public class SubTabOrdem extends TabBase implements Serializable {
         this.stAjuda.setText(text);
     }
 
-    public void doDetachOrders(boolean isShow) {
-        if (isShow) {
-            //change triggered by CheckBox
-            if (cbOrdersDetach.isSelected()) {
-                //monta a floating window para ordens
-                dOrdem.add(this.jpDetOrdens);
-                dOrdem.pack();
-                dOrdem.setLocationRelativeTo(this.detOrdens);
-                dOrdem.setVisible(true);
-                this.detOrdens.repaint();
-            } else {
-                dOrdem.setVisible(false);
-                detOrdens.setViewportView(jpDetOrdens);
-            }
+    public void doDetachOrders() {
+        //change triggered by CheckBox
+        if (jbDetach.isSelected()) {
+            //monta a floating window para ordens
+            dOrdem.add(this.jpDetOrdens);
+            dOrdem.pack();
+            dOrdem.setLocationRelativeTo(this.detOrdens);
+            dOrdem.setVisible(true);
+            this.detOrdens.repaint();
         } else {
-            //closing dialog, forced to redraw
-            cbOrdersDetach.setSelected(false);
+            dOrdem.setVisible(false);
             detOrdens.setViewportView(jpDetOrdens);
         }
+    }
+
+    public void doAttachOrders() {
+        //closing dialog, forced to redraw
+        jbDetach.setSelected(false);
+        detOrdens.setViewportView(jpDetOrdens);
+    }
+
+    public int getNextActionSlot() {
+        //testa se slot next actor
+        for (int ii = 0; ii < this.jtListaOrdens.getModel().getRowCount(); ii++) {
+            String valueAt = (String) this.jtListaOrdens.getModel().getValueAt(ii, 0);
+            if (valueAt.equals(" ")) {
+                return ii;
+            }
+        }
+        //no open slots
+        return -1;
     }
 
     public boolean doFindNextActionSlot() {
         if (!SysProperties.getProps("AutoMoveNextAction", "1").equals("1")) {
             return false;
         }
-        //testa se slot next actor
-        for (int ii = 0; ii < this.jtListaOrdens.getModel().getRowCount(); ii++) {
-            String valueAt = (String) this.jtListaOrdens.getModel().getValueAt(ii, 0);
-            if (valueAt.equals(" ")) {
+        final int nextActionSlot = getNextActionSlot();
+        //todo: testa slot em outros personagens?
+        if (nextActionSlot > -1) {
 //                log.fatal("muda foco aki");
-                this.jtListaOrdens.getSelectionModel().setSelectionInterval(ii, ii);
-                return true;
-            }
+            this.jtListaOrdens.getSelectionModel().setSelectionInterval(nextActionSlot, nextActionSlot);
+            return true;
         }
-        //testa slot em outros personagens?
         //sem slot aberto, entao nao faz nada
         return false;
     }
@@ -732,7 +744,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
         this.cbOrdersAll.setEnabled(false);
         jbHelp.setEnabled(false);
         jbClear.setEnabled(false);
-        this.cbOrdersDetach.setEnabled(false);
+        jbDetach.setEnabled(false);
         this.setLastHelp("");
         jbOk.setEnabled(false);
         jtListaOrdens.setEnabled(false);
@@ -744,7 +756,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
         this.cbOrdersAll.setEnabled(true);
         jbHelp.setEnabled(true);
         jbClear.setEnabled(true);
-        this.cbOrdersDetach.setEnabled(true);
+        jbDetach.setEnabled(true);
     }
 
     private Component getParametroComponent(String controle, String vlParametro, Ordem ordemSelecionada, PersonagemOrdem ordemGravada, int nuParametro) {

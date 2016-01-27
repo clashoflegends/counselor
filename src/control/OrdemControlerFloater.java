@@ -6,9 +6,10 @@ package control;
 
 import control.support.ControlBase;
 import gui.subtabs.SubTabOrdem;
-import java.awt.event.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.Serializable;
-import javax.swing.*;
+import javax.swing.JDialog;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,7 +50,7 @@ public class OrdemControlerFloater extends ControlBase implements Serializable, 
             //whether it was selected or deselected.
             if ("dOrdem".equals(cb.getName())) {
                 //criar floating window para ordens
-                this.getTabGui().doDetachOrders(false);
+                this.getTabGui().doAttachOrders();
             }
         }
     }

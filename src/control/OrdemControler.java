@@ -5,15 +5,27 @@
 package control;
 
 import baseLib.GenericoComboObject;
-import control.services.*;
+import business.facade.OrdemFacade;
+import control.services.AcaoConverter;
+import control.services.CenarioConverter;
 import control.support.ControlBase;
 import gui.subtabs.SubTabOrdem;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.Serializable;
-import javax.swing.*;
+import javax.swing.ComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JTable;
+import javax.swing.JToggleButton;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import model.*;
+import model.Ordem;
+import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
@@ -27,8 +39,9 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
 
     private static final Log log = LogFactory.getLog(OrdemControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private final SubTabOrdem tabGui;
     private int indexModelOrdem;
+    private final SubTabOrdem tabGui;
+    private final OrdemFacade ordemFacade = new OrdemFacade();
 
     public OrdemControler(SubTabOrdem tabOrdens) {
         this.tabGui = tabOrdens;
@@ -44,9 +57,24 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
     }
 
     private void doSalvaAction() {
-        final String[] ordemDisplay = getTabGui().getActor().doOrderSave(indexModelOrdem, getTabGui().getOrdemQuadro());
-        getTabGui().setValueAt(ordemDisplay, indexModelOrdem);
-        getTabGui().doFindNextActionSlot();
+        try {
+            doSalvaAction(indexModelOrdem);
+            final int repeats = ordemFacade.getRequirementsMultiLevel(getTabGui().getOrdemQuadro().getOrdem());
+            for (int ii = 0; ii < repeats; ii++) {
+                doSalvaAction(getTabGui().getNextActionSlot());
+            }
+            getTabGui().doFindNextActionSlot();
+        } catch (NullPointerException ex) {
+            //nao fax nada, ordem nao existe
+        }
+    }
+
+    private void doSalvaAction(int index) {
+        if (index < 0) {
+            return;
+        }
+        final String[] ordemDisplay = getTabGui().getActor().doOrderSave(index, getTabGui().getOrdemQuadro());
+        getTabGui().setValueAt(ordemDisplay, index);
     }
 
     public ComboBoxModel getTaticasComboModel() {
@@ -73,11 +101,7 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         } else if (actionEvent.getSource() instanceof JButton) {
             JButton button = (JButton) actionEvent.getSource();
             if ("jbOk".equals(button.getActionCommand())) {
-                try {
-                    doSalvaAction();
-                } catch (NullPointerException ex) {
-                    //nao faz nada, ordens nao disponiveis...
-                }
+                doSalvaAction();
             } else if ("jbHelp".equals(button.getActionCommand())) {
                 //exibir ajuda.
                 getTabGui().doDisplayAjuda();
@@ -107,7 +131,7 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
     public void itemStateChanged(ItemEvent event) {
         //Object source = event.getItemSelectable();
         if (event.getSource() instanceof JCheckBox) {
-            JCheckBox cb = (JCheckBox) event.getSource();
+            final JCheckBox cb = (JCheckBox) event.getSource();
             //Now that we know which button was pushed, find out
             //whether it was selected or deselected.
             if ("cbOrdersAll".equals(cb.getActionCommand())) {
@@ -115,16 +139,24 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
                 //&& event.getStateChange() == ItemEvent.DESELECTED
                 // eh apenas o refresh da combo.
                 getTabGui().doMudaOrdem(this.indexModelOrdem);
-            } else if ("cbOrdersDetach".equals(cb.getActionCommand())) {
-                //criar floating window para ordens
-                getTabGui().doDetachOrders(true);
             }
         }
         if (event.getSource() instanceof JComboBox && event.getStateChange() == ItemEvent.SELECTED) {
-            JComboBox cb = (JComboBox) event.getSource();
+            final JComboBox cb = (JComboBox) event.getSource();
             try {
                 if ("cbOrdem".equals(cb.getActionCommand())) {
                     getTabGui().setOrdemParametrosQuadro((GenericoComboObject) cb.getModel().getSelectedItem());
+                }
+            } catch (ClassCastException ex) {
+                log.debug("hum... suspicious");
+            }
+        }
+        if (event.getSource() instanceof JToggleButton) {
+            final JToggleButton cb = (JToggleButton) event.getSource();
+            try {
+                if ("jbDetach".equals(cb.getActionCommand())) {
+                    //criar floating window para ordens
+                    getTabGui().doDetachOrders();
                 }
             } catch (ClassCastException ex) {
                 log.debug("hum... suspicious");
