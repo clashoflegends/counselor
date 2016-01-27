@@ -35,6 +35,7 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import model.Cenario;
 import model.Exercito;
 import model.Jogador;
 import model.Local;
@@ -42,7 +43,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
 import persistence.SettingsManager;
-import persistence.local.WorldManager;
 import radialMenu.RadialActions;
 import radialMenu.RadialMenu;
 import radialMenu.mapmenu.MapMenuManager;
@@ -69,19 +69,20 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     private final MapMenuManager mapMenuManager;
 
     public MapaControler(JPanel form) {
-        mapaManager = new MapaManager(WorldFacadeCounselor.getInstance().getCenario(), form);
+        final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
+        mapaManager = new MapaManager(cenario, form);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_REDRAW);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_RANGE_CLICK);
         //inicialize locais
         WorldBuilderMenuManager.getInstance().doCanvasReset(mapaManager.getMapMaxSize(listFactory.listLocais().values()));
         WorldBuilderMenuManager.getInstance().setLocais(listFactory.listLocais());
         WorldBuilderMenuManager.getInstance().setNacoes(listFactory.listNacoes());
-        WorldBuilderMenuManager.getInstance().setTerrenos(WorldFacadeCounselor.getInstance().getCenario().getTerrenos());
+        WorldBuilderMenuManager.getInstance().setTerrenos(cenario.getTerrenos());
         mapMenuManager = new MapMenuManager();
         mapMenuManager.doCanvasReset(mapaManager.getMapMaxSize(listFactory.listLocais().values()));
         mapMenuManager.setLocais(listFactory.listLocais());
         mapMenuManager.setNacoes(listFactory.listNacoes());
-        mapMenuManager.setTerrenos(WorldFacadeCounselor.getInstance().getCenario().getTerrenos());
+        mapMenuManager.setTerrenos(cenario.getTerrenos());
     }
 
     public ImageIcon getTagImage() {
@@ -89,12 +90,12 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     }
 
     public ImageIcon printMapaGeral() {
-        final Jogador jogadorAtivo = WorldManager.getInstance().getPartida().getJogadorAtivo();
+        final Jogador jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
         return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
     }
 
     public BufferedImage getMap() {
-        final Jogador jogadorAtivo = WorldManager.getInstance().getPartida().getJogadorAtivo();
+        final Jogador jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
         return mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo);
     }
 

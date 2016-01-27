@@ -57,11 +57,24 @@ public class ComponentFactory implements Serializable {
     private static final String CIDADE_NEWCAPITAL = "Cidade_NewCapital";
     private static final String COORDENADA = "Coordenada";
     private static final String COORDENADAW = "CoordenadaW";
-    private static final String COORDENADA_12 = "Coordenada_12";
-    private static final String COORDENADA_5 = "Coordenada_5";
+    private static final String COORDENADAC = "Coordenadac";
+    private static final String COORDENADAX = "Coordenadax";
     private static final String COORDENADA_3 = "Coordenada_3";
+    private static final String COORDENADA_3C = "Coordenada_3c";
+    private static final String COORDENADA_3X = "Coordenada_3x";
+    private static final String COORDENADA_3W = "Coordenada_3w";
+    private static final String COORDENADA_5 = "Coordenada_5";
+    private static final String COORDENADA_5C = "Coordenada_5c";
+    private static final String COORDENADA_5X = "Coordenada_5x";
+    private static final String COORDENADA_5W = "Coordenada_5w";
     private static final String COORDENADA_8 = "Coordenada_8";
+    private static final String COORDENADA_8C = "Coordenada_8c";
+    private static final String COORDENADA_8X = "Coordenada_8x";
     private static final String COORDENADA_8W = "Coordenada_8W";
+    private static final String COORDENADA_12 = "Coordenada_12";
+    private static final String COORDENADA_12C = "Coordenada_12c";
+    private static final String COORDENADA_12X = "Coordenada_12x";
+    private static final String COORDENADA_12W = "Coordenada_12w";
     private static final String COORDENADA_NAVIO = "Coordenada_Navio";
     private static final String DIRECAO = "Direcao";
     private static final String DIRECAO_EX = "Direcao_Ex";
@@ -123,10 +136,10 @@ public class ComponentFactory implements Serializable {
             //FIXME: carregar do cenario, nao utilizada no grecia
             JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
                     new String[][]{
-                {labels.getString("ALIANCA.SERVOS.NEGROS"), "sn"},
-                {labels.getString("ALIANCA.NEUTROS"), "ne"},
-                {labels.getString("ALIANCA.POVOS.LIVRES"), "pl"}
-            }));
+                        {labels.getString("ALIANCA.SERVOS.NEGROS"), "sn"},
+                        {labels.getString("ALIANCA.NEUTROS"), "ne"},
+                        {labels.getString("ALIANCA.POVOS.LIVRES"), "pl"}
+                    }));
             cNovo = cbTemp;
         } else if (controle.equals(ARTEFATO_ALL)) {            //Artefato-All
             //é um combo com TODOS os artefatos
@@ -218,44 +231,125 @@ public class ComponentFactory implements Serializable {
             //Novo combobox com locais dentro do range
             final int range = 9999;
             SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, this.getMapaControler());
+                    range, isAllSelected(), false, 0, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADAC)) {            //Coordenada, cities only
+            //Novo combobox com locais dentro do range
+            final int range = 9999;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 1, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADAX)) {            //Coordenada, hide cities
+            //Novo combobox com locais dentro do range
+            final int range = 9999;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), true, 2, this.getMapaControler());
             cNovo = jpTemp;
         } else if (controle.equals(COORDENADAW)) {            //Coordenada
             //Novo combobox com locais dentro do range
             final int range = 9999;
             SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), true, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_8)) {            //Coordenada-8
-            //Novo combobox com locais dentro do range
-            final int range = 8;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, this.getMapaControler());
+                    range, isAllSelected(), true, 0, this.getMapaControler());
             cNovo = jpTemp;
         } else if (controle.equals(COORDENADA_3)) {            //Coordenada-3
-            //Novo combobox com locais dentro do range
+            //combobox com locais dentro do range
             final int range = 3;
             SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, this.getMapaControler());
+                    range, isAllSelected(), false, 0, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_3C)) {            //Coordenada-3, cities only
+            //combobox com locais dentro do range, exclude cities
+            final int range = 3;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 1, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_3X)) {            //Coordenada-3, hide cities
+            //combobox com locais dentro do range, exclude cities
+            final int range = 3;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 2, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_3W)) {            //Coordenada-3, hide cities
+            //combobox com locais dentro do range, exclude cities
+            final int range = 3;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 0, this.getMapaControler());
             cNovo = jpTemp;
         } else if (controle.equals(COORDENADA_5)) {            //Coordenada-5
             //Novo combobox com locais dentro do range
             final int range = 5;
             SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, this.getMapaControler());
+                    range, isAllSelected(), false, 0, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_5C)) {            //Coordenada-5
+            //Novo combobox com locais dentro do range
+            final int range = 5;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 1, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_5X)) {            //Coordenada-5
+            //Novo combobox com locais dentro do range
+            final int range = 5;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 2, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_5W)) {            //Coordenada-5
+            //Novo combobox com locais dentro do range
+            final int range = 5;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 0, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_8)) {            //Coordenada-8
+            //Novo combobox com locais dentro do range
+            final int range = 8;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 0, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_8C)) {            //Coordenada-8
+            //Novo combobox com locais dentro do range
+            final int range = 8;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 1, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_8X)) {            //Coordenada-8
+            //Novo combobox com locais dentro do range
+            final int range = 8;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 2, this.getMapaControler());
             cNovo = jpTemp;
         } else if (controle.equals(COORDENADA_8W)) {            //Coordenada-8
             //Novo combobox com locais dentro do range
             final int range = 8;
             SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), true, this.getMapaControler());
+                    range, isAllSelected(), true, 0, this.getMapaControler());
             cNovo = jpTemp;
         } else if (controle.equals(COORDENADA_12)) {
             //Coordenada-12
             //Novo combobox com locais dentro do range
             final int range = 12;
             SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, this.getMapaControler());
+                    range, isAllSelected(), false, 0, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_12C)) {
+            //Coordenada-12
+            //Novo combobox com locais dentro do range
+            final int range = 12;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 1, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_12X)) {
+            //Coordenada-12
+            //Novo combobox com locais dentro do range
+            final int range = 12;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 2, this.getMapaControler());
+            cNovo = jpTemp;
+        } else if (controle.equals(COORDENADA_12W)) {
+            //Coordenada-12
+            //Novo combobox com locais dentro do range
+            final int range = 12;
+            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                    range, isAllSelected(), false, 0, this.getMapaControler());
             cNovo = jpTemp;
         } else if (controle.equals(COORDENADA_NAVIO)) {            //Coordenada-Navio
             //Inputbox
@@ -282,17 +376,17 @@ public class ComponentFactory implements Serializable {
             //é um combo male/female
             JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
                     new String[][]{
-                {labels.getString("NORMAL"), "nr"},
-                {labels.getString("EVASIVO"), "EV"}
-            }));
+                        {labels.getString("NORMAL"), "nr"},
+                        {labels.getString("EVASIVO"), "EV"}
+                    }));
             cNovo = cbTemp;
         } else if (controle.equals(MALE_FEMALE)) {            //M/F
             //é um combo male/female
             JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
                     new String[][]{
-                {labels.getString("MASCULINO"), "m"},
-                {labels.getString("FEMININO"), "f"}
-            }));
+                        {labels.getString("MASCULINO"), "m"},
+                        {labels.getString("FEMININO"), "f"}
+                    }));
             cNovo = cbTemp;
         } else if (controle.equals(MAGIA_ALL)) {//Magia-All
             //é um combo com o model magia, todas as magias que o actor nao tem
@@ -452,8 +546,8 @@ public class ComponentFactory implements Serializable {
             //é um combo Melhora/Piora
             JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
                     new String[][]{
-                {labels.getString("MELHORAR"), "1"},
-                {labels.getString("REBAIXAR"), "-1"}}));
+                        {labels.getString("MELHORAR"), "1"},
+                        {labels.getString("REBAIXAR"), "-1"}}));
             cNovo = cbTemp;
         } else if (controle.equals(REFEM)) { //Refem
             /*
@@ -463,9 +557,9 @@ public class ComponentFactory implements Serializable {
             //é um combo sim/nao 
             JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
                     new String[][]{
-                {labels.getString("SIM"), "Sim"},
-                {labels.getString("NAO"), "Nao"}
-            }));
+                        {labels.getString("SIM"), "Sim"},
+                        {labels.getString("NAO"), "Nao"}
+                    }));
             cNovo = cbTemp;
         } else if (controle.equals(TATICA)) {//Tatica
             //é um combo com o model com as taticas do cenario

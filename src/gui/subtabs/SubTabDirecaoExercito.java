@@ -12,6 +12,7 @@ import business.converter.ConverterFactory;
 import business.facade.ExercitoFacade;
 import business.facade.LocalFacade;
 import business.facades.ListFactory;
+import business.facades.WorldFacadeCounselor;
 import control.DirecaoExercitoControler;
 import control.MapaControler;
 import control.support.ActorInterface;
@@ -31,15 +32,16 @@ import persistence.SettingsManager;
  *
  * @author gurgel
  */
-public final class SubTabDirecaoExercito extends TabBase implements Serializable {
+public class SubTabDirecaoExercito extends TabBase implements Serializable {
 
     private static final Log log = LogFactory.getLog(SubTabDirecaoExercito.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private String direcaoDisplay = "", direcaoTipo = "nr";
     private List<String> direcoesId = new ArrayList();
     private DirecaoExercitoControler dirExControl;
-    private Local origem, destino;
-    private LocalFacade localFacade = new LocalFacade();
+    private Local origem;
+    private Local destino;
+    private final LocalFacade localFacade = new LocalFacade();
     private Ordem ordem;
     private ActorInterface actor;
     private final ListFactory listFactory = new ListFactory();
@@ -54,10 +56,6 @@ public final class SubTabDirecaoExercito extends TabBase implements Serializable
 
         setAll(all);
         this.setMapaControler(mapaControl);
-        //setValorInicial(vlInicial);
-        this.origem = actorAtivo.getLocal();
-        this.destino = actorAtivo.getLocal();
-        this.actor = actorAtivo;
         this.ordem = ordemSelecionada;
         //FIXME: limite varia de acordo com a ordem. Salvar na ordem ou cenario.
         //FIXME: transformar em parametros no banco de dados.
@@ -74,35 +72,8 @@ public final class SubTabDirecaoExercito extends TabBase implements Serializable
             setLimiteMovimento(0);
             setAgua(false);
         }
-
-        dirExControl = new DirecaoExercitoControler(this);
-
-        //set combo.model
-        GenericoComboBoxModel cbmTemp = getTropaModel();
-        jcTipoTropa.setModel(cbmTemp);
-        jcTipoTropa.setVisible(isAll());
-        //set default item - comida
-        ExercitoFacade ef = new ExercitoFacade();
-        jcbComida.setSelected(!ef.isComida(actor.getExercito()));
-
-        //set default item - slower troop
-        int slow = -1, index = -1;
-        for (int ii = 0; ii < cbmTemp.getSize(); ii++) {
-            GenericoComboObject temp = (GenericoComboObject) cbmTemp.getElementAt(ii);
-            TipoTropa tpTropa = (TipoTropa) temp.getObject();
-            List<TipoTropa> tropas = new ArrayList<TipoTropa>();
-            tropas.add(tpTropa);
-            final int current = ef.getCustoMovimentoBase(tropas, origem.getTerreno(), false, isAgua());
-            if (current > slow) {
-                index = ii;
-                slow = current;
-            }
-        }
-        jcTipoTropa.setSelectedIndex(index);
-
-        //set initial tag
-        this.doMovementTagsPaint(vlInicial);
-        setListeners();
+        this.actor = actorAtivo;
+        initConfig(actorAtivo.getLocal(), vlInicial);
     }
 
     public SubTabDirecaoExercito(Local local, int limitMov, boolean waterMov, MapaControler mapaControl) {
@@ -110,29 +81,41 @@ public final class SubTabDirecaoExercito extends TabBase implements Serializable
 
         setAll(true);
         this.setMapaControler(mapaControl);
-        this.origem = local;
-        this.destino = local;
         //FIXME: limite varia de acordo com a ordem. Salvar na ordem ou cenario.
         //FIXME: transformar em parametros no banco de dados.
         setLimiteMovimento(limitMov);
         setAgua(waterMov);
+        initConfig(local, "");
+    }
 
+    private void initConfig(Local local, String vlInicial) {
+        //setValorInicial(vlInicial);
+        this.origem = local;
+        this.destino = local;
         dirExControl = new DirecaoExercitoControler(this);
-
         //set combo.model
-        GenericoComboBoxModel cbmTemp = getTropaModel();
+        final GenericoComboBoxModel cbmTemp = getTropaModel();
         jcTipoTropa.setModel(cbmTemp);
         jcTipoTropa.setVisible(isAll());
         //set default item - comida
-        jcbComida.setSelected(false);
-        ExercitoFacade ef = new ExercitoFacade();
-
+        final ExercitoFacade ef = new ExercitoFacade();
+        if (WorldFacadeCounselor.getInstance().hasResourceManagement()) {
+            if (actor != null) {
+                setComidaSelected(!ef.isComida(actor.getExercito()));
+            } else {
+                setComidaSelected(false);
+            }
+            doFieldsDisplay();
+        } else {
+            setComidaSelected(false);
+            doFieldsHide();
+        }
         //set default item - slower troop
         int slow = -1, index = -1;
         for (int ii = 0; ii < cbmTemp.getSize(); ii++) {
-            GenericoComboObject temp = (GenericoComboObject) cbmTemp.getElementAt(ii);
-            TipoTropa tpTropa = (TipoTropa) temp.getObject();
-            List<TipoTropa> tropas = new ArrayList<TipoTropa>();
+            final GenericoComboObject temp = (GenericoComboObject) cbmTemp.getElementAt(ii);
+            final TipoTropa tpTropa = (TipoTropa) temp.getObject();
+            final List<TipoTropa> tropas = new ArrayList<TipoTropa>(2);
             tropas.add(tpTropa);
             final int current = ef.getCustoMovimentoBase(tropas, origem.getTerreno(), false, isAgua());
             if (current > slow) {
@@ -141,7 +124,8 @@ public final class SubTabDirecaoExercito extends TabBase implements Serializable
             }
         }
         jcTipoTropa.setSelectedIndex(index);
-
+        //set initial tag
+        this.doMovementTagsPaint(vlInicial);
         setListeners();
     }
 
@@ -457,6 +441,9 @@ public final class SubTabDirecaoExercito extends TabBase implements Serializable
     }
 
     private void doMovementTagsPaint(String vlInicial) {
+        if (vlInicial.equals("")) {
+            return;
+        }
         String[] movs = vlInicial.split(";");
         for (String elem : movs) {
             //tipo de movimentacao ou vazio, ignorar.
@@ -503,7 +490,7 @@ public final class SubTabDirecaoExercito extends TabBase implements Serializable
     /**
      * @return the agua
      */
-    public boolean isAgua() {
+    public final boolean isAgua() {
         return agua;
     }
 
@@ -531,15 +518,31 @@ public final class SubTabDirecaoExercito extends TabBase implements Serializable
     /**
      * @return the all
      */
-    public boolean isAll() {
+    public final boolean isAll() {
         return all;
     }
 
     /**
      * @param all the all to set
      */
-    public void setAll(boolean all) {
+    private void setAll(boolean all) {
         this.all = all;
+    }
+
+    protected final void doFieldsHide() {
+        jcbComida.setVisible(false);
+        jrbEvasivo.setVisible(false);
+        jrbNormal.setVisible(false);
+    }
+
+    protected final void doFieldsDisplay() {
+        jcbComida.setVisible(true);
+        jrbEvasivo.setVisible(true);
+        jrbNormal.setVisible(true);
+    }
+
+    protected final void setComidaSelected(boolean food) {
+        jcbComida.setSelected(food);
     }
 
     private void setListeners() {

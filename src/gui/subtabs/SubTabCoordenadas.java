@@ -31,7 +31,7 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final LocalFacade localFacade = new LocalFacade();
 
-    public SubTabCoordenadas(String vlInicial, Local origem, int range, boolean all, boolean water, MapaControler mapaControl) {
+    public SubTabCoordenadas(String vlInicial, Local origem, int range, boolean all, boolean water, int displayCities, MapaControler mapaControl) {
         //water=true, lista todos os hexes, water=false, lista apenas os hexes de terra (nao agua)
         initComponents();
         //define o controler
@@ -40,7 +40,7 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
         jcLocais.addItemListener(mapaControl);
         jcLocais.setActionCommand("Coordenadas");
         //seta model no combo do panel
-        GenericoComboBoxModel cbmTemp = getCombo(origem, range, water, all);
+        GenericoComboBoxModel cbmTemp = getCombo(origem, range, water, displayCities, all);
         jcLocais.setModel(cbmTemp);
         //seleciona vlInicial como default
         if (vlInicial == null || vlInicial.equals("")) {
@@ -82,7 +82,11 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
     private javax.swing.JComboBox jcLocais;
     // End of variables declaration//GEN-END:variables
 
-    private GenericoComboBoxModel getCombo(Local origem, int range, boolean water, boolean all) {
+    private GenericoComboBoxModel getCombo(Local origem, int range, boolean water, int displayCities, boolean all) {
+        /* displayCities ==0, all
+         *  displayCities ==1, cities only
+         *  displayCities ==2, hide cities
+         */
         //prep list
         List<MovimentoPersonagem> lista = new ArrayList<MovimentoPersonagem>(WorldManager.getInstance().getLocais().size());
         //monta a lista de locais
@@ -91,6 +95,14 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
                 //verifica se ALL
                 lista.add(new MovimentoPersonagem(origem, local, range, water));
             } else if (!localFacade.isAgua(local) || water) {
+                if (displayCities == 2 && localFacade.isCidade(local)) {
+                    //hide cities
+                    continue;
+                }
+                if (displayCities == 1 && !localFacade.isCidade(local)) {
+                    //hide cities
+                    continue;
+                }
                 //filtra os locais no range
                 if (localFacade.getDistancia(origem, local) <= range) {
                     //verifica se Water
