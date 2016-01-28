@@ -14,6 +14,7 @@ import control.support.DispatchManager;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+import model.Cenario;
 import model.ExtratoDetail;
 import model.Mercado;
 import model.Nacao;
@@ -88,26 +89,27 @@ public class FinancasConverter implements Serializable {
         if (nacao == null) {
             throw new UnsupportedOperationException(labels.getString("NOT.IMPLEMENTED"));
         } else {
+            final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
             ListFactory lf = new ListFactory();
             int ii = 0;
             int valorAcoes = 0;
-            int exe = nacaoFacade.getCustoExercitoNacao(nacao, lf.listExercitos().values()) * -1;
+            int exercitos = nacaoFacade.getCustoExercitoNacao(nacao, lf.listExercitos().values()) * -1;
             int exeBonus = nacaoFacade.getDescontoExercitoNacao(nacao, lf.listExercitos().values());
-            int cid = nacaoFacade.getCustoCidades(nacao) * -1;
-            int per = nacaoFacade.getCustoPersonagens(nacao) * -1;
-            int arr = nacaoFacade.getArrecadacao(nacao);
-            int our = nacaoFacade.getProducao(nacao, WorldFacadeCounselor.getInstance().getCenario().getMoney());
-            final int custos = exe + cid + per + exeBonus;
+            int cidadesUpkeep = nacaoFacade.getCustoCidades(nacao, cenario) * -1;
+            int personagens = nacaoFacade.getCustoPersonagens(nacao, cenario) * -1;
+            int arrecadacao = nacaoFacade.getArrecadacao(nacao);
+            int ouroProd = nacaoFacade.getProducao(nacao, cenario.getMoney());
+            final int custos = exercitos + cidadesUpkeep + personagens + exeBonus;
             if (exeBonus != 0) {
                 dados[ii][0] = labels.getString("FINANCAS.CURRENT.DISCOUNT.ARMIES");
                 dados[ii++][1] = exeBonus;
             }
             dados[ii][0] = labels.getString("FINANCAS.CURRENT.UPKEEP.ARMIES");
-            dados[ii++][1] = exe;
+            dados[ii++][1] = exercitos;
             dados[ii][0] = labels.getString("FINANCAS.CURRENT.UPKEEP.CHARS");
-            dados[ii++][1] = per;
+            dados[ii++][1] = personagens;
             dados[ii][0] = labels.getString("FINANCAS.CURRENT.UPKEEP.CITIES");
-            dados[ii++][1] = cid;
+            dados[ii++][1] = cidadesUpkeep;
             dados[ii][0] = labels.getString("FINANCAS.CURRENT.COSTS");
             dados[ii++][1] = (custos);
             dados[ii][0] = " ";
@@ -115,33 +117,40 @@ public class FinancasConverter implements Serializable {
             dados[ii][0] = labels.getString("FINANCAS.CURRENT.TAXES.PERCENT");
             dados[ii++][1] = nacaoFacade.getImpostos(nacao);
             dados[ii][0] = labels.getString("FINANCAS.CURRENT.TAXES.GATHER");
-            dados[ii++][1] = arr;
+            dados[ii++][1] = arrecadacao;
             dados[ii][0] = labels.getString("FINANCAS.CURRENT.GOLD.GATHER");
-            dados[ii++][1] = our;
+            dados[ii++][1] = ouroProd;
             dados[ii][0] = labels.getString("FINANCAS.CURRENT.REVENUE");
-            dados[ii++][1] = arr + our;
+            dados[ii++][1] = arrecadacao + ouroProd;
             dados[ii][0] = " ";
             dados[ii++][1] = null;
             dados[ii][0] = labels.getString("FINANCAS.CURRENT.TREASURY");
             dados[ii++][1] = nacaoFacade.getMoney(nacao);
             dados[ii][0] = labels.getString("FINANCAS.CURRENT.UPKEEP.DEFICT");
-            dados[ii++][1] = (arr + our) + (custos);
+            dados[ii++][1] = (arrecadacao + ouroProd) + (custos);
             dados[ii][0] = labels.getString("FINANCAS.FORECAST.RESERVE");
-            final int moneyFinal = (arr + our) + (custos) + nacaoFacade.getMoney(nacao);
+            final int moneyFinal = (arrecadacao + ouroProd) + (custos) + nacaoFacade.getMoney(nacao);
             dados[ii++][1] = moneyFinal;
             if (!listPo.isEmpty()) {
                 dados[ii][0] = " ";
                 dados[ii++][1] = null;
+
                 for (PersonagemOrdem po : listPo) {
                     final Ordem ordem = po.getOrdem();
                     dados[ii][0] = String.format("%s - %s", po.getNome(), ordem.getDescricao());
                     dados[ii++][1] = acaoFacade.getCusto(ordem) * -1;
                     valorAcoes -= acaoFacade.getCusto(ordem);
                 }
+
                 dados[ii][0] = " ";
                 dados[ii++][1] = null;
+                final int decay = nacaoFacade.getGoldDecay(moneyFinal + valorAcoes, cenario) * -1;
+                if (decay != 0) {
+                    dados[ii][0] = labels.getString("FINANCAS.FORECAST.DECAY");
+                    dados[ii++][1] = decay;
+                }
                 dados[ii][0] = labels.getString("FINANCAS.FORECAST.FINAL");
-                dados[ii++][1] = moneyFinal + valorAcoes;
+                dados[ii++][1] = moneyFinal + valorAcoes + decay;
             }
             final String label = String.format("%s: %s", labels.getString("MENU.ACTION.COST"), valorAcoes);
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SET_LABEL_MONEY, label);
@@ -157,9 +166,9 @@ public class FinancasConverter implements Serializable {
                 getMercadoColNames(),
                 getMercadoAsArray(nacao),
                 new Class[]{java.lang.String.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.Integer.class, java.lang.Integer.class
-        });
+                    java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class
+                });
         return model;
     }
 
