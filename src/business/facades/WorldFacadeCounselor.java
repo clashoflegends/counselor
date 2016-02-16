@@ -40,7 +40,7 @@ public class WorldFacadeCounselor implements Serializable {
 
     private static final Log log = LogFactory.getLog(WorldFacadeCounselor.class);
     private static WorldFacadeCounselor instance;
-    private CenarioFacade cf = new CenarioFacade();
+    private final CenarioFacade cf = new CenarioFacade();
     private MapaControler mapaControler;
 
     private WorldFacadeCounselor() {
