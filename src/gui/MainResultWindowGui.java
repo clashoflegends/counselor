@@ -366,11 +366,13 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         }
         this.labelTurno.setText(String.format("%s: %s", labels.getString("TURNO"), wc.getTurno()));
         this.labelJogador.setText(String.format("%s: %s", labels.getString("JOGADOR"), wc.getJogadorAtivoNome()));
+        //just pre-load with some dummy data. Will be replaced later.
         this.labelMoney.setText(String.format("%s: %s", labels.getString("MONEY"), wc.getJogadorAtivoNome()));
         this.labelJogo.setText(String.format("%s: %s", labels.getString("JOGO"), wc.getPartidaNome()));
         if (wc.getNacoesJogadorAtivoQtd() < 4) {
             this.labelNacao.setText(String.format("%s: %s", labels.getString("NACAO"), wc.getNacoesJogadorAtivoNome()));
         } else {
+            //too many names to display
             this.labelNacao.setText(String.format("%s: %s", labels.getString("NACAO"), wc.getNacoesJogadorAtivoQtd() + " ... "));
         }
 
