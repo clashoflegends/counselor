@@ -692,9 +692,15 @@ public class SubTabOrdem extends TabBase implements Serializable {
     }
 
     private void doMudaActor() {
-        if (SysProperties.getProps("OverrideElimination", "0").equals("1")
-                || (!WorldFacadeCounselor.getInstance().isGameOver()
-                && !WorldFacadeCounselor.getInstance().isJogadorAtivoEliminado(WorldFacadeCounselor.getInstance().getJogadorAtivo()))) {
+        boolean allowOrders = getActor().getNacao().isAtiva();
+        if (SysProperties.getProps("OverrideElimination", "0").equals("1")) {
+            allowOrders = true;
+        } else if (WorldFacadeCounselor.getInstance().isGameOver()
+                || WorldFacadeCounselor.getInstance().isJogadorAtivoEliminado(WorldFacadeCounselor.getInstance().getJogadorAtivo())) {
+            allowOrders = false;
+        }
+
+        if (allowOrders) {
             //can receive orders
             this.getMapaControler().remMovementTag();
             //ordens do actor
