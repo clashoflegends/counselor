@@ -692,7 +692,13 @@ public class SubTabOrdem extends TabBase implements Serializable {
     }
 
     private void doMudaActor() {
-        boolean allowOrders = getActor().getNacao().isAtiva();
+        boolean allowOrders;
+        try {
+            allowOrders = getActor().getNacao().isAtiva();
+        } catch (NullPointerException e) {
+            allowOrders = false;
+        }
+
         if (SysProperties.getProps("OverrideElimination", "0").equals("1")) {
             allowOrders = true;
         } else if (WorldFacadeCounselor.getInstance().isGameOver()
