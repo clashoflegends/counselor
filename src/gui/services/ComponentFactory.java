@@ -88,7 +88,8 @@ public class ComponentFactory implements Serializable {
     private static final String NACAO_ALLY = "Nacao_Ally";
     private static final String NACAO_RELACIONAMENTO = "Nacao_Relacionamento";
     private static final String NOME = "Nome";
-    private static final String NOVACIDADE = "NovaCidade";
+    private static final String NOVACIDADE5 = "NovaCidade";
+    private static final String NOVACIDADE8 = "NovaCidade_8";
     private static final String NOMEGENDER = "NomeGender";
     private static final String NO_VALUE = "None";
     private static final String OURO = "Ouro";
@@ -441,7 +442,7 @@ public class ComponentFactory implements Serializable {
             jtTemp.replaceA(nome);
             jtTemp.replaceB(hex);
             cNovo = jtTemp;
-        } else if (controle.equals(NOVACIDADE)) {//Nome, Hex
+        } else if (controle.equals(NOVACIDADE5)) {//Nome, Hex
             //two in one (name + hex)
             CompDuplo jtTemp = new CompDuplo();
             String[] vlDisplay = new String[2];
@@ -453,7 +454,23 @@ public class ComponentFactory implements Serializable {
                 vlId = vlDefaultId.split(";");
             }
             final Component nome = this.getParametroComponent(NOME, vlDisplay[0], vlId[0], ordemSelecionada);
-            final Component hex = this.getParametroComponent(COORDENADA_5, vlDisplay[1], vlId[1], ordemSelecionada);
+            final Component hex = this.getParametroComponent(COORDENADA_5X, vlDisplay[1], vlId[1], ordemSelecionada);
+            jtTemp.replaceA(nome);
+            jtTemp.replaceB(hex);
+            cNovo = jtTemp;
+        } else if (controle.equals(NOVACIDADE8)) {//Nome, Hex
+            //two in one (name + hex)
+            CompDuplo jtTemp = new CompDuplo();
+            String[] vlDisplay = new String[2];
+            if (vlInicialDisplay.contains(";")) {
+                vlDisplay = vlInicialDisplay.split(";");
+            }
+            String[] vlId = new String[2];
+            if (vlDefaultId.contains(";")) {
+                vlId = vlDefaultId.split(";");
+            }
+            final Component nome = this.getParametroComponent(NOME, vlDisplay[0], vlId[0], ordemSelecionada);
+            final Component hex = this.getParametroComponent(COORDENADA_8X, vlDisplay[1], vlId[1], ordemSelecionada);
             jtTemp.replaceA(nome);
             jtTemp.replaceB(hex);
             cNovo = jtTemp;

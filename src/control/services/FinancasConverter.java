@@ -144,7 +144,7 @@ public class FinancasConverter implements Serializable {
 
                 dados[ii][0] = " ";
                 dados[ii++][1] = null;
-                final int decay = nacaoFacade.getGoldDecay(moneyFinal + valorAcoes, cenario) * -1;
+                final int decay = nacaoFacade.getGoldDecay(nacao, moneyFinal + valorAcoes, cenario) * -1;
                 if (decay != 0) {
                     dados[ii][0] = labels.getString("FINANCAS.FORECAST.DECAY");
                     dados[ii++][1] = decay;
