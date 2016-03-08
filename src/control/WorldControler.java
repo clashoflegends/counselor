@@ -466,7 +466,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     ret += msg;
                 }
                 ret += "\n";
-                ret += ordemFacade.getResultado(cidade);
                 ret += getActorOrdersString(cidade);
                 ret += "\n";
             }
@@ -482,7 +481,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 ret += msg;
             }
             ret += "\n";
-            ret += ordemFacade.getResultado(nacao);
             ret += getActorOrdersString(nacao);
             ret += "\n";
         }
