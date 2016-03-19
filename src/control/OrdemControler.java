@@ -81,6 +81,10 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         return CenarioConverter.getInstance().getTaticaComboModel();
     }
 
+    public ComboBoxModel getTerrainComboModel() {
+        return CenarioConverter.getInstance().getTerrainComboModel();
+    }
+
     private SubTabOrdem getTabGui() {
         return this.tabGui;
     }

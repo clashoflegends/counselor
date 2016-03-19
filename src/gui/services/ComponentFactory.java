@@ -113,6 +113,7 @@ public class ComponentFactory implements Serializable {
     private static final String REFEM = "Refem";
     private static final String SIM_NAO = "Sim_Nao";
     private static final String TATICA = "Tatica";
+    private static final String TERRENO = "Terreno";
     private static final String TEXTO_20 = "Texto_20";
     private static final String TROPA_TIPO = "Tropa_Tipo";
     private static final String TROPA_TABLE = "Tropa_Table";
@@ -581,6 +582,10 @@ public class ComponentFactory implements Serializable {
         } else if (controle.equals(TATICA)) {//Tatica
             //é um combo com o model com as taticas do cenario
             JComboBox cbTemp = new JComboBox(getOrdemControl().getTaticasComboModel());
+            cNovo = cbTemp;
+        } else if (controle.equals(TERRENO)) {//terrain
+            //é um combo com o model com as terrenos do cenario
+            JComboBox cbTemp = new JComboBox(getOrdemControl().getTerrainComboModel());
             cNovo = cbTemp;
         } else if (controle.equals(TEXTO_20)) {//Texto-20
             //Inputbox

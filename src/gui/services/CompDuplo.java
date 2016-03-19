@@ -1,6 +1,5 @@
 package gui.services;
 
-import gui.services.ComponentFactory;
 import java.awt.Component;
 import java.io.Serializable;
 import java.util.ArrayList;

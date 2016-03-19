@@ -7,6 +7,7 @@ package control.services;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
 import baseLib.GenericoTableModelPerCell;
+import baseLib.IBaseModel;
 import business.facade.CenarioFacade;
 import business.services.ComparatorFactory;
 import java.io.Serializable;
@@ -245,5 +246,11 @@ public class CenarioConverter implements Serializable {
             }
             return (editMap);
         }
+    }
+
+    public GenericoComboBoxModel getTerrainComboModel() {
+        final IBaseModel[] items = cenarioFacade.listTerrains(cenario);
+        final GenericoComboBoxModel model = new GenericoComboBoxModel(items);
+        return model;
     }
 }
