@@ -4,10 +4,12 @@
  */
 package gui.services;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.io.Serializable;
-import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,6 +34,9 @@ public class LimitTableCellRenderer extends DefaultTableCellRenderer implements 
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
         Integer current = (Integer) value;
+        if (current == null) {
+            current = 0;
+        }
         if (current <= limit && isSelected) {
             c.setBackground(colorBgSelected);
             c.setForeground(colorFgSelected);
