@@ -386,7 +386,7 @@ public class CidadeConverter implements Serializable {
     }
 
     public static List<String> getInfo(Cidade cidade) {
-        return cidadeFacade.getInfo(cidade);
+        return cidadeFacade.getInfo(cidade, WorldFacadeCounselor.getInstance().getJogadorAtivo().getNacoes().values());
     }
 
     private static List<Produto> getResourceList() {

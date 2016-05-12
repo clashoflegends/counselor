@@ -174,7 +174,7 @@ public class NacaoConverter implements Serializable {
     }
 
     private static String[] getRelacionamentoColNames() {
-        String[] colNames = {labels.getString("NACAO"), labels.getString("RELACIONAMENTO")};
+        String[] colNames = {labels.getString("NACAO"), labels.getString("DIPLOMACY")};
         return (colNames);
     }
 
