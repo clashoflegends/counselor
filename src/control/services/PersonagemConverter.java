@@ -95,6 +95,8 @@ public class PersonagemConverter implements Serializable {
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("CUSTO.MANUTENCAO"));
         classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("ARTEFATOS"));
+        classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("CLIMA"));
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("TERRENO"));
@@ -132,6 +134,7 @@ public class PersonagemConverter implements Serializable {
         cArray[ii++] = personagem.getVida();
         cArray[ii++] = personagemFacade.getNacaoNome(personagem);
         cArray[ii++] = personagemFacade.getUpkeepMoney(personagem);
+        cArray[ii++] = personagemFacade.getArtefatos(personagem).size();
         cArray[ii++] = localFacade.getClima(local);
         cArray[ii++] = localFacade.getTerrenoNome(local);
         if (isProprio(personagem)) {
@@ -491,21 +494,6 @@ public class PersonagemConverter implements Serializable {
         return ret;
     }
 
-    /**
-     * DEPRECATED< only alive until city actions are fully implemented>
-     *
-     * @param personagem
-     * @param index = numero da ordem, ie. 0 ou 1
-     * @param lista = primeiro elemento da lista é a ordem, demais sao os
-     * parametros
-     */
-//    public static String[] setOrdem(Personagem personagem, int index, PersonagemOrdem pOrdem) {
-//        ordemFacade.setOrdem(personagem, index, pOrdem);
-//        return ordemFacade.getOrdemDisplay(personagem, index, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-//    }
-//    public static Ordem getOrdem(Personagem personagem, int indexOrdem) {
-//        return ordemFacade.getOrdem(personagem, indexOrdem);
-//    }
     public static List<String> getInfo(Personagem personagem) {
         StringRet ret = new StringRet();
         if (personagemFacade.isMorto(personagem)) {
