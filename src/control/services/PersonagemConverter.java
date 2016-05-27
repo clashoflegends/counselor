@@ -328,10 +328,8 @@ public class PersonagemConverter implements Serializable {
             Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Personagem personagem : listFactory.listPersonagens()) {
                 try {
-                    if (jAtivo.isNacao(personagem.getNacao())) {
-                        if (personagemFacade.isInCapital(personagem)) {
-                            ret.add(personagem);
-                        }
+                    if (jAtivo.isNacao(personagem.getNacao()) && personagemFacade.isInCapital(personagem)) {
+                        ret.add(personagem);
                     }
                 } catch (NullPointerException e) {
                 }
@@ -340,10 +338,17 @@ public class PersonagemConverter implements Serializable {
             Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Personagem personagem : listFactory.listPersonagens()) {
                 try {
-                    if (jAtivo.isNacao(personagem.getNacao())) {
-                        if (personagemFacade.isComandaExercito(personagem)) {
-                            ret.add(personagem);
-                        }
+                    if (jAtivo.isNacao(personagem.getNacao()) && personagemFacade.isComandaExercito(personagem)) {
+                        ret.add(personagem);
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("double")) {
+            for (Personagem personagem : listFactory.listPersonagens()) {
+                try {
+                    if (personagemFacade.isDoubleAgent(personagem)) {
+                        ret.add(personagem);
                     }
                 } catch (NullPointerException e) {
                 }
