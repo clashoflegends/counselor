@@ -373,6 +373,20 @@ public class PersonagemConverter implements Serializable {
                 } catch (NullPointerException e) {
                 }
             }
+        } else if (filtro.equalsIgnoreCase("mypcinfo")) {
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+            for (Personagem personagem : listFactory.listPersonagens()) {
+                try {
+                    if (!jAtivo.isJogadorAliado(personagem.getNacao()) && !jAtivo.isNacao(personagem.getNacao())) {
+                        ret.add(personagem);
+                    } else if (personagemFacade.isDoubleAgent(personagem)) {
+                        ret.add(personagem);
+                    } else if (jAtivo.isNacao(personagem.getNacao())) {
+                        ret.add(personagem);
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
         }
         return ret;
     }

@@ -52,6 +52,7 @@ public class FiltroConverter implements Serializable {
         lista.add(new GenericoComboObject(labels.getString("FILTRO.ENEMIES"), "enemies"));
         if (options == 2) {
             //char options
+            lista.add(new GenericoComboObject(labels.getString("FILTRO.MYINFO"), "mypcinfo"));
             lista.add(new GenericoComboObject(labels.getString("FILTRO.CAPITAL"), "capital"));
             lista.add(new GenericoComboObject(labels.getString("FILTRO.ARMY"), "army"));
             lista.add(new GenericoComboObject(labels.getString("FILTRO.DOUBLES"), "double"));
