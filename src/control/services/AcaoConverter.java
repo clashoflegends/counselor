@@ -10,7 +10,9 @@ import business.facade.AcaoFacade;
 import business.facades.ListFactory;
 import business.services.ComparatorFactory;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import model.Ordem;
 import msgs.TitleFactory;
 import org.apache.commons.logging.Log;
@@ -41,12 +43,12 @@ public class AcaoConverter implements Serializable {
                 getAcaoColNames(),
                 getAcaosAsArray(lista),
                 new Class[]{
-            java.lang.Integer.class, java.lang.String.class,
-            java.lang.String.class,
-            java.lang.String.class, java.lang.String.class,
-            java.lang.Integer.class, java.lang.Integer.class,
-            java.lang.String.class, java.lang.String.class
-        });
+                    java.lang.Integer.class, java.lang.String.class,
+                    java.lang.String.class,
+                    java.lang.String.class, java.lang.String.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.String.class, java.lang.String.class
+                });
         return feiticoModel;
     }
 
@@ -86,11 +88,6 @@ public class AcaoConverter implements Serializable {
 
     public static String getAjuda(Ordem ordem) {
         return TitleFactory.getOrdemDisplay(ordem);
-    }
-
-    public static GenericoComboBoxModel getTipoPersonagemComboModel() {
-        String[][] itens = TitleFactory.listTipoPersonagem();
-        return new GenericoComboBoxModel(itens);
     }
 
     public static List<Ordem> listaByFiltro(String filtro) {

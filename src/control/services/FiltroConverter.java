@@ -18,6 +18,7 @@ import javax.swing.ComboBoxModel;
 import model.Jogador;
 import model.Nacao;
 import model.TipoTropa;
+import msgs.TitleFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.BundleManager;
@@ -56,6 +57,9 @@ public class FiltroConverter implements Serializable {
             lista.add(new GenericoComboObject(labels.getString("FILTRO.CAPITAL"), "capital"));
             lista.add(new GenericoComboObject(labels.getString("FILTRO.ARMY"), "army"));
             lista.add(new GenericoComboObject(labels.getString("FILTRO.DOUBLES"), "double"));
+            for (String skillName : TitleFactory.getTipoSkill()) {
+                lista.add(new GenericoComboObject(labels.getString(skillName), skillName));
+            }
         }
         if (options == 3) {
             lista.add(new GenericoComboObject(labels.getString("TROPA.FILTRO.CAVALARIA"), "fast"));
@@ -116,6 +120,23 @@ public class FiltroConverter implements Serializable {
             }
         }
         return tropas;
+    }
+
+    public static GenericoComboBoxModel getTipoPersonagemComboModel() {
+        String[][] itens = FiltroConverter.listTipoPersonagem();
+        return new GenericoComboBoxModel(itens);
+    }
+
+    public static String[][] listTipoPersonagem() {
+        String[][] ret = new String[TitleFactory.getTipoPersonagem().length + 1][2];
+        int ii = 0;
+        ret[ii][0] = labels.getString("TODOS"); //Display
+        ret[ii++][1] = "Todos"; //Id
+        for (String elem : TitleFactory.getTipoPersonagem()) {
+            ret[ii][0] = elem;
+            ret[ii++][1] = elem;
+        }
+        return ret;
     }
 
 }

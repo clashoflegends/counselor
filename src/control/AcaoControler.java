@@ -7,6 +7,7 @@ package control;
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
 import control.services.AcaoConverter;
+import control.services.FiltroConverter;
 import gui.tabs.TabAcoesGui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,7 +32,8 @@ import persistence.SettingsManager;
 public class AcaoControler implements Serializable, ActionListener, ListSelectionListener {
 
     private static final Log log = LogFactory.getLog(AcaoControler.class);
-    private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();;
+    private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
+    ;
     private GenericoTableModel mainTableModel;
     private final TabAcoesGui tabGui;
     private List listaExibida;
@@ -68,7 +70,7 @@ public class AcaoControler implements Serializable, ActionListener, ListSelectio
     }
 
     public ComboBoxModel getTipoPersonagemComboModel() {
-        return AcaoConverter.getTipoPersonagemComboModel();
+        return FiltroConverter.getTipoPersonagemComboModel();
     }
 
     @Override
@@ -85,10 +87,10 @@ public class AcaoControler implements Serializable, ActionListener, ListSelectio
                 int modelIndex = table.convertRowIndexToModel(rowIndex);
                 Ordem ordem = (Ordem) listaExibida.get(modelIndex);
                 getTabGui().doMudaAcao(ordem);
-            //PENDING atualizar table mensagens
+                //PENDING atualizar table mensagens
             }
         } catch (IndexOutOfBoundsException ex) {
-        //lista vazia?
+            //lista vazia?
         }
     }
 }

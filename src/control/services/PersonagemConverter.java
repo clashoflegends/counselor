@@ -387,6 +387,42 @@ public class PersonagemConverter implements Serializable {
                 } catch (NullPointerException e) {
                 }
             }
+        } else if (filtro.equalsIgnoreCase("COMANDANTE")) {
+            for (Personagem personagem : listFactory.listPersonagens()) {
+                try {
+                    if (personagem.isComandante()) {
+                        ret.add(personagem);
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("AGENTE")) {
+            for (Personagem personagem : listFactory.listPersonagens()) {
+                try {
+                    if (personagem.isAgente()) {
+                        ret.add(personagem);
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("EMISSARIO")) {
+            for (Personagem personagem : listFactory.listPersonagens()) {
+                try {
+                    if (personagem.isEmissario()) {
+                        ret.add(personagem);
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("MAGO")) {
+            for (Personagem personagem : listFactory.listPersonagens()) {
+                try {
+                    if (personagem.isMago()) {
+                        ret.add(personagem);
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
         }
         return ret;
     }
