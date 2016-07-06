@@ -57,21 +57,7 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
         setAll(all);
         this.setMapaControler(mapaControl);
         this.ordem = ordemSelecionada;
-        //FIXME: limite varia de acordo com a ordem. Salvar na ordem ou cenario.
-        //FIXME: transformar em parametros no banco de dados.
-        if (ordem.getCodigo().equals("850")) {
-            setLimiteMovimento(12);
-            setAgua(false);
-        } else if (ordem.getCodigo().equals("860")) {
-            setLimiteMovimento(14);
-            setAgua(false);
-        } else if (ordem.getCodigo().equals("830")) {
-            setLimiteMovimento(14);
-            setAgua(true);
-        } else {
-            setLimiteMovimento(0);
-            setAgua(false);
-        }
+        setDefaultValues();
         this.actor = actorAtivo;
         initConfig(actorAtivo.getLocal(), vlInicial);
     }
@@ -127,6 +113,41 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
         //set initial tag
         this.doMovementTagsPaint(vlInicial);
         setListeners();
+    }
+
+    private void setDefaultValues() {
+        setAgua(ordem.hasHabilidade(";AMW;"));
+        if (ordem.hasHabilidade(";AM12;")) {
+            setLimiteMovimento(12);
+            return;
+        }
+        if (ordem.hasHabilidade(";AM14;")) {
+            setLimiteMovimento(14);
+            return;
+        }
+        //FIXME: clean up after a while (7/5/2016) once it's in the EGF.
+        if (ordem.getCodigo().equals("850") && WorldFacadeCounselor.getInstance().hasResourceManagement()) {
+            setLimiteMovimento(12);
+            setAgua(false);
+        } else if (ordem.getCodigo().equals("850") && !WorldFacadeCounselor.getInstance().hasResourceManagement()) {
+            setLimiteMovimento(14);
+            setAgua(false);
+        } else if (ordem.getCodigo().equals("851")) {
+            setLimiteMovimento(14);
+            setAgua(false);
+        } else if (ordem.getCodigo().equals("852")) {
+            setLimiteMovimento(14);
+            setAgua(false);
+        } else if (ordem.getCodigo().equals("860")) {
+            setLimiteMovimento(14);
+            setAgua(false);
+        } else if (ordem.getCodigo().equals("830")) {
+            setLimiteMovimento(14);
+            setAgua(true);
+        } else {
+            setLimiteMovimento(0);
+            setAgua(false);
+        }
     }
 
     /**
