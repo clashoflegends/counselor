@@ -48,6 +48,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     private final CenarioFacade cenarioFacade = new CenarioFacade();
     private final JogadorFacade jogadorFacade = new JogadorFacade();
     private final SubTabTextArea stResults = new SubTabTextArea();
+    private final SubTabTextArea stCombats = new SubTabTextArea();
     private final SubTabBaseList stDiplomacy = new SubTabBaseList();
     private final SubTabBaseList stTroops = new SubTabBaseList();
     private SubTabOrdem stOrdens;
@@ -196,6 +197,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     public final void setMainModel(TableModel model) {
         //clear stuff
         stResults.setText("");
+        stCombats.setText("");
         stDiplomacy.setListModelClear();
         stTroops.setListModelClear();
         //set model
@@ -227,12 +229,13 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         jtMainLista.setAutoCreateRowSorter(true);
         comboFiltro.setName("comboFiltro");
         comboFiltro.setActionCommand("comboFiltro");
-        comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 0));
+        comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 6));
         comboFiltro.setSelectedIndex(this.getFiltroDefault());
 
         //Cria o Controle da lista 
         nacaoControl = new NacaoControler(this);
         stResults.setFontText(detalhesNacao.getFont());
+        stCombats.setFontText(detalhesNacao.getFont());
         addTabs();
         //adiciona listeners
         comboFiltro.addActionListener(nacaoControl);
@@ -254,6 +257,9 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         detalhesNacao.addTab(labels.getString("RESULTADOS"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png")),
                 stResults, labels.getString("RESULTADOS.TOOLTIP"));
+        detalhesNacao.addTab(labels.getString("RESULTADOS.COMBAT"),
+                new javax.swing.ImageIcon(getClass().getResource("/images/combat.png")),
+                stCombats, labels.getString("RESULTADOS.COMBAT.TOOLTIP"));
         detalhesNacao.addTab(labels.getString("DIPLOMACY"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/diplomacy.gif")),
                 stDiplomacy, labels.getString("DIPLOMACY.TOOLTIP"));
@@ -285,7 +291,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
             }
         }
         try {
-            for (String msg : nacaoFacade.getMensagens(nacao)) {
+            for (String msg : nacaoFacade.getMensagensResultsRumoresEncontros(nacao)) {
 //                hab += "\n\n\n" + msg.replace(',', '\n');
                 hab += "\n\n\n" + msg;
             }
@@ -294,6 +300,20 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
             hab += labels.getString("?");
         }
         stResults.setText(hab);
+    }
+
+    private void setCombats(Nacao nacao) {
+        String hab = "\n";
+        try {
+            for (String msg : nacaoFacade.getMensagensCombatesDuelos(nacao)) {
+//                hab += "\n\n\n" + msg.replace(',', '\n');
+                hab += "\n\n\n" + msg;
+            }
+        } catch (NullPointerException ex) {
+            //just skip
+            hab += labels.getString("?");
+        }
+        stCombats.setText(hab);
     }
 
     public void doMudaNacao(Nacao nacao) {
@@ -305,6 +325,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         stDiplomacy.setListModel(nacaoControl.getRelacionamentoTableModel(nacao));
         stTroops.setListModel(nacaoControl.getTropaTableModel(nacao));
         setResults(nacao);
+        setCombats(nacao);
         if (jogadorFacade.isMine(nacao, WorldFacadeCounselor.getInstance().getJogadorAtivo())
                 && nacaoFacade.isAtivo(nacao)) {
             //can receive orders

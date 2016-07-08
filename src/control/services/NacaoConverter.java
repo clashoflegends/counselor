@@ -204,6 +204,12 @@ public class NacaoConverter implements Serializable {
         if (filtro.equalsIgnoreCase("all")) {
             //todos
             ret.addAll(listFactory.listNacoes().values());
+        } else if (filtro.equalsIgnoreCase("active")) {
+            for (Nacao ally : listFactory.listNacoes().values()) {
+                if (ally.isAtiva()) {
+                    ret.add(ally);
+                }
+            }
         } else if (filtro.equalsIgnoreCase("own")) {
             ret.addAll(jAtivo.getNacoes().values());
         } else if (filtro.equalsIgnoreCase("allies") && jAtivo != null) {
