@@ -54,7 +54,7 @@ public class ActorInterfaceNacao extends ActorInterface {
 
     @Override
     public boolean isAtivo() {
-        return nacaoFacade.isAtivo(getNacao());
+        return nacaoFacade.isAtiva(getNacao());
     }
 
     @Override

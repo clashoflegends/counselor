@@ -327,7 +327,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         setResults(nacao);
         setCombats(nacao);
         if (jogadorFacade.isMine(nacao, WorldFacadeCounselor.getInstance().getJogadorAtivo())
-                && nacaoFacade.isAtivo(nacao)) {
+                && nacaoFacade.isAtiva(nacao)) {
             //can receive orders
             stOrdens.doMudaActor(nacao);
         } else {
