@@ -169,6 +169,10 @@ public class WorldFacadeCounselor implements Serializable {
         return WorldManager.getInstance().getTurno();
     }
 
+    public int getTurnoMax() {
+        return WorldManager.getInstance().getTurnoMax();
+    }
+
     public Ordem getOrdem(String ordemCodigo) {
         return WorldManager.getInstance().getOrdens().get(ordemCodigo);
     }

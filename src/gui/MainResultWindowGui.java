@@ -364,7 +364,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             }
             this.infoPanel.repaint();
         }
-        this.labelTurno.setText(String.format("%s: %s", labels.getString("TURNO"), wc.getTurno()));
+        this.labelTurno.setText(String.format("%s: %s / %s", labels.getString("TURNO"), wc.getTurno(), wc.getTurnoMax()));
         this.labelJogador.setText(String.format("%s: %s", labels.getString("JOGADOR"), wc.getJogadorAtivoNome()));
         //just pre-load with some dummy data. Will be replaced later.
         this.labelMoney.setText(String.format("%s: %s", labels.getString("MONEY"), wc.getJogadorAtivoNome()));

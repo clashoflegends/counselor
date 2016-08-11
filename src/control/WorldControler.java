@@ -597,6 +597,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return WorldFacadeCounselor.getInstance().getTurno();
     }
 
+    public int getTurnoMax() {
+        return WorldFacadeCounselor.getInstance().getTurnoMax();
+    }
+
     public String getDeadline() {
         try {
             return WorldFacadeCounselor.getInstance().getPartida().getDeadline().toDateTimeString();
