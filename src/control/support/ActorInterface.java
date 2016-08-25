@@ -55,12 +55,16 @@ public abstract class ActorInterface extends ControlBase implements Serializable
         return CidadeConverter.getCidadeComboModel(tipo, getNacao());
     }
 
-    public ComboBoxModel getNacaoComboModel() {
+    public GenericoComboBoxModel getNacaoComboModel() {
         return NacaoConverter.getNacaoComboModel(getNacao());
     }
 
-    public ComboBoxModel getNacaoAllyComboModel() {
+    public GenericoComboBoxModel getNacaoAllyComboModel() {
         return NacaoConverter.getNacaoAllyComboModel(getNacao());
+    }
+
+    public GenericoComboBoxModel getNacaoNoEnemySwornComboModel() {
+        return NacaoConverter.getNacaoNoEnemySwornComboModel(getNacao());
     }
 
     /**

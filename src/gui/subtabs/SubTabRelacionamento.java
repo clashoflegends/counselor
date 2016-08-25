@@ -10,7 +10,6 @@ import business.facade.NacaoFacade;
 import control.NacaoRelacionamentoControl;
 import gui.TabBase;
 import java.io.Serializable;
-import javax.swing.ComboBoxModel;
 import model.Nacao;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,8 +24,9 @@ public final class SubTabRelacionamento extends TabBase implements Serializable 
 
     private static final Log log = LogFactory.getLog(SubTabRelacionamento.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private NacaoRelacionamentoControl relControl = new NacaoRelacionamentoControl();
-    NacaoFacade nacaoFacade = new NacaoFacade();
+    private final NacaoRelacionamentoControl relControl = new NacaoRelacionamentoControl();
+    private final NacaoFacade nacaoFacade = new NacaoFacade();
+    private String vlDefaultRelacionamento = "-";
 
     /**
      * don't use
@@ -38,12 +38,19 @@ public final class SubTabRelacionamento extends TabBase implements Serializable 
     /**
      * Creates new form subTabRelacionamentos
      */
-    public SubTabRelacionamento(String vlDefault, Nacao nacao, ComboBoxModel nacaoComboModel, boolean all) {
+    public SubTabRelacionamento(String vlDefault, Nacao nacao, GenericoComboBoxModel nacaoComboModel, boolean all) {
         initComponents();
+        String[] vlId = new String[2];
+        if (vlDefault.contains(";")) {
+            vlId = vlDefault.split(";");
+            this.vlDefaultRelacionamento = vlId[1];
+        }
         relControl.setNacaoBase(nacao);
         relControl.setTabGui(this);
         //liga actionlisteners para a combo
         jcbNacao.setModel(nacaoComboModel);
+        int index = nacaoComboModel.getIndexById(vlId[0]);
+        jcbNacao.setSelectedIndex(index);
         jcbNacao.setActionCommand("jcbNacao");
         jcbNacao.addItemListener(relControl);
         //seta model no combo do panel
@@ -94,10 +101,11 @@ public final class SubTabRelacionamento extends TabBase implements Serializable 
     // End of variables declaration//GEN-END:variables
 
     public void setRelacionamentoCombo(Nacao nacaoAlvo) {
+        //creates a combo and pre-loads vlDefault
         final GenericoComboBoxModel relacionamentoComboModel = relControl.getRelacionamentoComboModel(nacaoAlvo);
         jcbRelacionamento.setModel(relacionamentoComboModel);
-//        int index = relacionamentoComboModel.getIndexByDisplay(vlDefault);
-//        jcbRelacionamento.setSelectedIndex(index);
+        int index = relacionamentoComboModel.getIndexById(this.vlDefaultRelacionamento);
+        jcbRelacionamento.setSelectedIndex(index);
     }
 
     /**

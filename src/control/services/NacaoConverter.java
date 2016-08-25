@@ -52,6 +52,12 @@ public class NacaoConverter implements Serializable {
         return model;
     }
 
+    public static GenericoComboBoxModel getNacaoNoEnemySwornComboModel(Nacao nacaoExcluida) {
+        Nacao[] items = listNacoesNoEnemySwornDisponiveis(nacaoExcluida);
+        GenericoComboBoxModel model = new GenericoComboBoxModel(items);
+        return model;
+    }
+
     public static GenericoTableModel getNacaoModel(List<Nacao> lista) {
         List<Class> classes = new ArrayList<Class>(30);
         GenericoTableModel nacaoModel = new GenericoTableModel(
@@ -236,6 +242,10 @@ public class NacaoConverter implements Serializable {
         return listNacoes(nacaoExcluida, 1);
     }
 
+    public static Nacao[] listNacoesNoEnemySwornDisponiveis(Nacao nacaoExcluida) {
+        return listNacoes(nacaoExcluida, 2);
+    }
+
     /*
      * Filter == 0; all
      * Filter == 1; ally
@@ -248,6 +258,9 @@ public class NacaoConverter implements Serializable {
                 continue;
             }
             if (filter == 1 && !nacaoFacade.isAliado(nacaoExcluida, nacao)) {
+                continue;
+            }
+            if (filter == 2 && nacaoFacade.isEnemySworn(nacaoExcluida, nacao)) {
                 continue;
             }
             nationList.add(nacao);

@@ -51,6 +51,10 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
             jcLocais.insertItemAt(vlInicial, 0);
         }
         //desenha no mapa quando selecionado ou vlInicial
+        if (index == 0) {
+            //to force a change on first load
+            jcLocais.setSelectedIndex(-1);
+        }
         jcLocais.setSelectedIndex(index);
     }
 

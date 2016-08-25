@@ -133,7 +133,7 @@ public class ComponentFactory implements Serializable {
     public Component getParametroComponent(String controle, String vlInicialDisplay, String vlDefaultId,
             Ordem ordemSelecionada) {
 
-        Component cNovo = new JLabel(labels.getString("CONTROLE.NAO.IMPLEMENTADO"));
+        Component cNovo = null;
         if (controle.equals(ALIANCA)) {            //Alianca
             //FIXME: carregar do cenario, nao utilizada no grecia
             JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
@@ -419,7 +419,7 @@ public class ComponentFactory implements Serializable {
             cNovo = cbNacao;
         } else if (controle.equals(NACAO_RELACIONAMENTO)) {//Nacao_RELACIONAMENTO
             SubTabRelacionamento jpTemp = new SubTabRelacionamento(vlDefaultId, getActor().getNacao(),
-                    getActor().getNacaoComboModel(), isAllSelected());
+                    getActor().getNacaoNoEnemySwornComboModel(), isAllSelected());
             cNovo = jpTemp;
         } else if (controle.equals(NOME)) {//Nome
             //Inputbox
@@ -622,6 +622,8 @@ public class ComponentFactory implements Serializable {
              * gera especifico na GUI
              */
             cNovo = new JLabel(labels.getString("CONTROLE.VARIADO"));
+        } else {
+            cNovo = new JLabel(labels.getString("CONTROLE.NAO.IMPLEMENTADO"));
         }
         //seleciona item default
         if (cNovo instanceof JComboBox) {
