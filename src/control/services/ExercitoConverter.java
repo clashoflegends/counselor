@@ -144,6 +144,7 @@ public class ExercitoConverter implements Serializable {
         cArray[ii++] = exercitoFacade.getComida(exercito);
         cArray[ii++] = exercitoFacade.getUpkeepFood(exercito);
         cArray[ii++] = exercitoFacade.getMoral(exercito);
+        cArray[ii++] = exercitoFacade.getDescricaoTamanho(exercito);
         cArray[ii++] = exercitoFacade.getUpkeepCost(exercito);
         cArray[ii++] = exercitoFacade.getSiege(exercito);
         cArray[ii++] = exercitoFacade.getAtaqueExercito(exercito, true);
@@ -173,6 +174,7 @@ public class ExercitoConverter implements Serializable {
                             java.lang.String.class, java.lang.String.class, Local.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
+                            java.lang.Integer.class, 
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
@@ -187,6 +189,7 @@ public class ExercitoConverter implements Serializable {
             labels.getString("COMANDANTE"), labels.getString("NACAO"), labels.getString("LOCAL"),
             labels.getString("CAVALARIAS"), labels.getString("INFANTARIAS"), labels.getString("NAVIOS"),
             labels.getString("COMIDA"), labels.getString("COMIDA.CONSUMO"), labels.getString("MORAL"),
+            labels.getString("TAMANHO"),
             labels.getString("CUSTO.MANUTENCAO"), labels.getString("MAQUINAS.GUERRA"),
             labels.getString("TROPA.ATAQUE.NAVAL"), labels.getString("TROPA.DEFESA.NAVAL"),
             labels.getString("TROPA.ATAQUE.TERRA"), labels.getString("TROPA.DEFESA.TERRA"),
