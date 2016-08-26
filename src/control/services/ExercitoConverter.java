@@ -174,7 +174,7 @@ public class ExercitoConverter implements Serializable {
                             java.lang.String.class, java.lang.String.class, Local.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
-                            java.lang.Integer.class, 
+                            java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
