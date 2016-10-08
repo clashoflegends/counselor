@@ -85,6 +85,7 @@ public class NacaoConverter implements Serializable {
         cArray[ii++] = nacaoFacade.getImpostos(nacao);
         cArray[ii++] = nacaoFacade.getLealdade(nacao);
         cArray[ii++] = nacaoFacade.getLealdadeAnterior(nacao);
+        cArray[ii++] = nacaoFacade.getTeamFlag(nacao);
         cArray[ii++] = nacaoFacade.getJogadorDisplay(nacao);
         cArray[ii++] = nacaoFacade.getJogadorEmail(nacao);
         return cArray;
@@ -119,6 +120,8 @@ public class NacaoConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("LEALDADE.VARIACAO"));
         classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("ALIANCA"));
+        classes.add(java.lang.String.class);
         colNames.add(labels.getString("JOGADOR"));
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("JOGADOR.EMAIL"));
