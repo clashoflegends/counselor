@@ -6,7 +6,7 @@ package control.services;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
-import baseLib.SysApoio;
+import persistenceCommons.SysApoio;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
@@ -23,8 +23,8 @@ import model.Nacao;
 import model.TipoTropa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.SettingsManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
 
 /**
  *

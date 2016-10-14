@@ -10,7 +10,7 @@ import model.Cenario;
 import model.Feitico;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.PersistenceException;
+import persistenceCommons.PersistenceException;
 import persistence.local.WorldManager;
 import persistence.iDao.IFeiticoDao;
 

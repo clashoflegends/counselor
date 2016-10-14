@@ -5,8 +5,8 @@
  */
 package gui;
 
-import baseLib.SysApoio;
-import baseLib.SysProperties;
+import persistenceCommons.SysApoio;
+import persistenceCommons.SysProperties;
 import control.MapaControler;
 import gui.services.ColumnWidthsAdjuster;
 import gui.services.LocalTableCellRenderer;
@@ -17,8 +17,8 @@ import javax.swing.JTable;
 import model.Local;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.SettingsManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
 
 /**
  *
