@@ -22,9 +22,9 @@ import model.Exercito;
 import model.Pelotao;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.SettingsManager;
-import persistence.XmlManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
+import persistenceCommons.XmlManager;
 
 /**
  *

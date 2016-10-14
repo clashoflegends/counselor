@@ -9,10 +9,10 @@ import java.io.Serializable;
 import model.World;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.PersistenceException;
-import persistence.SettingsManager;
-import persistence.XmlManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.PersistenceException;
+import persistenceCommons.SettingsManager;
+import persistenceCommons.XmlManager;
 import persistence.iDao.IWorldDao;
 
 /**

@@ -5,7 +5,7 @@
  */
 package gui;
 
-import baseLib.SysProperties;
+import persistenceCommons.SysProperties;
 import business.ArmyPath;
 import business.ImageFactory;
 import business.MovimentoExercito;
@@ -29,8 +29,8 @@ import javax.swing.JLabel;
 import javax.swing.JViewport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.SettingsManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
 import radialMenu.RadialMenu;
 
 /**

@@ -28,8 +28,8 @@ import model.Partida;
 import model.Personagem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.PersistenceException;
-import persistence.XmlManager;
+import persistenceCommons.PersistenceException;
+import persistenceCommons.XmlManager;
 import persistence.local.WorldManager;
 
 /**

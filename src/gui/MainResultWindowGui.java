@@ -5,8 +5,8 @@
  */
 package gui;
 
-import baseLib.SysApoio;
-import baseLib.SysProperties;
+import persistenceCommons.SysApoio;
+import persistenceCommons.SysProperties;
 import business.ImageFactory;
 import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
@@ -23,8 +23,8 @@ import javax.swing.JButton;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.SettingsManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
 
 /**
  *

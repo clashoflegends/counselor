@@ -10,7 +10,7 @@ import model.Partida;
 import model.Personagem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.PersistenceException;
+import persistenceCommons.PersistenceException;
 import persistence.iDao.IPersonagemDao;
 import persistence.local.WorldManager;
 

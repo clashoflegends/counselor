@@ -19,8 +19,8 @@ import gui.tabs.TabPartidaGui;
 import gui.tabs.TabPersonagensGui;
 import gui.tabs.TabTipoTropasGui;
 import java.io.Serializable;
-import persistence.BundleManager;
-import persistence.SettingsManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
 
 /**
  *

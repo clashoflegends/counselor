@@ -4,12 +4,12 @@
  */
 package client;
 
-import baseLib.SysApoio;
-import baseLib.SysProperties;
+import persistenceCommons.SysApoio;
+import persistenceCommons.SysProperties;
 import java.io.Serializable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.SettingsManager;
+import persistenceCommons.SettingsManager;
 
 /**
  *
