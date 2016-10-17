@@ -7,7 +7,7 @@ package control.services;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.IBaseModel;
-import baseLib.SysProperties;
+import persistenceCommons.SysProperties;
 import business.facades.ListFactory;
 import business.services.ComparatorBaseDisplayModelSorter;
 import java.io.Serializable;
@@ -21,8 +21,8 @@ import model.TipoTropa;
 import msgs.TitleFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.SettingsManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
 
 /**
  *

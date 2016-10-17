@@ -10,7 +10,7 @@ import model.Cenario;
 import model.Ordem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.PersistenceException;
+import persistenceCommons.PersistenceException;
 import persistence.iDao.IOrdemDao;
 import persistence.local.WorldManager;
 

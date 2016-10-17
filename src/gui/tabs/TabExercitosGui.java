@@ -7,7 +7,7 @@ package gui.tabs;
 
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
-import baseLib.SysProperties;
+import persistenceCommons.SysProperties;
 import control.ExercitoControler;
 import control.MapaControler;
 import control.services.ExercitoConverter;
@@ -20,8 +20,8 @@ import javax.swing.table.TableModel;
 import model.Exercito;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.SettingsManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
 import persistence.local.WorldManager;
 
 /**

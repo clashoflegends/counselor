@@ -8,9 +8,9 @@ import java.io.File;
 import model.World;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.PersistenceException;
-import persistence.SettingsManager;
-import persistence.WorldManagerBase;
+import persistenceCommons.PersistenceException;
+import persistenceCommons.SettingsManager;
+import business.WorldManagerBase;
 
 /**
  * Singleton para gerenciar o xml que deve ser único. TODO: depois tem que ver como fica o multi turno.

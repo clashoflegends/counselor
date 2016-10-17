@@ -6,11 +6,11 @@ package gui.services;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.IBaseModel;
-import baseLib.SysApoio;
 import business.facade.ExercitoFacade;
 import control.MapaControler;
 import control.OrdemControler;
 import control.support.ActorInterface;
+import gui.components.DialogTextArea;
 import gui.subtabs.SubTabCoordenadas;
 import gui.subtabs.SubTabDirecao;
 import gui.subtabs.SubTabDirecaoExercito;
@@ -28,8 +28,9 @@ import model.Ordem;
 import msgs.BaseMsgs;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.SettingsManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 
 /**
  *
@@ -753,5 +754,18 @@ public class ComponentFactory implements Serializable {
 
     public void setOrdemControl(OrdemControler ordemControl) {
         this.ordemControl = ordemControl;
+    }
+
+    public static DialogTextArea showDialogPopup(String title, String text, Component relativeTo) {
+        DialogTextArea localTextArea = new DialogTextArea(false);
+        localTextArea.setText(text);
+        localTextArea.setTitle(title);
+        //configura jDialog
+        if (relativeTo != null) {
+            localTextArea.setLocationRelativeTo(relativeTo);
+        }
+        localTextArea.pack();
+        localTextArea.setVisible(true);
+        return localTextArea;
     }
 }
