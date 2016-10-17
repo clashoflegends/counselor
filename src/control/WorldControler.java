@@ -5,8 +5,6 @@
 package control;
 
 import baseLib.BaseModel;
-import baseLib.SysApoio;
-import baseLib.SysProperties;
 import business.BussinessException;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
@@ -53,17 +51,20 @@ import model.Partida;
 import model.Personagem;
 import model.PersonagemOrdem;
 import model.World;
+import modelWeb.PartidaJogadorWebInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.PathFactory;
-import persistence.PersistenceException;
-import persistence.SettingsManager;
-import persistence.SmtpManager;
-import persistence.WebCounselorManager;
-import persistence.XmlManager;
 import persistence.local.PersistFactory;
 import persistence.local.WorldManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.PersistenceException;
+import persistenceCommons.SettingsManager;
+import persistenceCommons.SmtpManager;
+import persistenceCommons.SysApoio;
+import persistenceCommons.SysProperties;
+import persistenceCommons.WebCounselorManager;
+import persistenceCommons.XmlManager;
+import persistenceLocal.PathFactory;
 
 /**
  *
@@ -322,7 +323,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         this.getGui().setStatusMsg(labels.getString("ENVIAR.POST.JUDGE"));
         if (!SysProperties.getProps("SendOrderWebPopUp", "1").equals("1")) {
             doSendViaEmail(attachment, labels.getString("ENVIAR.FAILREASON.PROPERTYSET"));
-        } else if (!doSendViaPost(attachment)) {
+        } else if (!doSendPost(attachment)) {
             //try to send via email
             final String lastResponse = WebCounselorManager.getInstance().getLastResponseString();
             doSendViaEmail(attachment, lastResponse);
@@ -903,11 +904,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private boolean doSendViaPost(File attachment) {
+    private boolean doSendPost(File attachment) {
         try {
-            Partida partida = WorldFacadeCounselor.getInstance().getPartida();
-            int ret = WebCounselorManager.getInstance().doSendViaPost(attachment, partida, listaOrdens());
-
+            //int ret = WebCounselorManager.getInstance().doSendViaPost(attachment, partida, listaOrdens());
+            PartidaJogadorWebInfo info = doPrepPost(attachment);
+            int ret = WebCounselorManager.getInstance().doSendViaPost(info);
             if (ret == WebCounselorManager.OK) {
                 final String msg = String.format(labels.getString("POST.DONE"), attachment.getName());
                 log.info(msg);
@@ -936,6 +937,22 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
             return false;
         }
+    }
+
+    private PartidaJogadorWebInfo doPrepPost(File attachment) {
+        Partida partida = WorldFacadeCounselor.getInstance().getPartida();
+        Jogador jogador = partida.getJogadorAtivo();
+
+        PartidaJogadorWebInfo info = new PartidaJogadorWebInfo();
+        info.setAttachment(attachment);
+        info.setOrders(listaOrdens());
+        info.setGameId(partida.getId());
+        info.setGameTurn(partida.getTurno());
+        info.setGameNm(partida.getNome());
+        info.setPlayerId(jogador.getId());
+        info.setPlayerLogin(jogador.getLogin());
+        info.setPlayerEmail(jogador.getEmail());
+        return info;
     }
 
     private boolean doSendViaEmail(File attachment, String msg) {

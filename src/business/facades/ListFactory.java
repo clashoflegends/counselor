@@ -23,7 +23,7 @@ import model.Produto;
 import model.TipoTropa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.PersistenceException;
+import persistenceCommons.PersistenceException;
 import persistence.iDao.IAliancaDao;
 import persistence.iDao.IArtefatoDao;
 import persistence.iDao.ICidadeDao;

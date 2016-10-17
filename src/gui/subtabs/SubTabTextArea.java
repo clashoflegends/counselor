@@ -18,8 +18,8 @@ import java.io.Serializable;
 import javax.swing.GroupLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.SettingsManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
 
 /**
  *

@@ -5,8 +5,6 @@
 package control;
 
 import baseLib.GenericoComboObject;
-import baseLib.SysApoio;
-import baseLib.SysProperties;
 import business.ArmyPath;
 import business.MapaManager;
 import business.MovimentoExercito;
@@ -20,6 +18,7 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.MainMapaGui;
 import gui.components.DialogTextArea;
+import gui.services.ComponentFactory;
 import java.awt.Point;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -41,8 +40,9 @@ import model.Jogador;
 import model.Local;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.SettingsManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
+import persistenceCommons.SysProperties;
 import radialMenu.RadialActions;
 import radialMenu.RadialMenu;
 import radialMenu.mapmenu.MapMenuManager;
@@ -192,7 +192,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
             hexInfo.setTitle(title);
             hexInfo.setVisible(true);
         } else {
-            hexInfo = SysApoio.showDialogPopup(title, text, this.getTabGui());
+            hexInfo = ComponentFactory.showDialogPopup(title, text, this.getTabGui());
         }
     }
 

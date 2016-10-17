@@ -6,7 +6,7 @@ package client;
 
 import baseLib.Application;
 import baseLib.JgFrame;
-import baseLib.SysProperties;
+import persistenceCommons.SysProperties;
 import gui.MainResultWindowGui;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;

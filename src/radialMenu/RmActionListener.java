@@ -4,8 +4,6 @@
  */
 package radialMenu;
 
-import baseLib.SysApoio;
-import baseLib.SysProperties;
 import control.services.LocalConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
@@ -13,6 +11,7 @@ import gui.ArmyMoveSimulator;
 import gui.BattleSimulator;
 import gui.TroopsCasualtiesList;
 import gui.components.DialogTextArea;
+import gui.services.ComponentFactory;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.Serializable;
@@ -23,8 +22,9 @@ import model.Nacao;
 import model.Terreno;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.BundleManager;
-import persistence.SettingsManager;
+import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
+import persistenceCommons.SysProperties;
 import radialMenu.mapmenu.MapMenuRadialActions;
 import static radialMenu.mapmenu.MapMenuRadialActions.ARMY_MOVEMENT_SIMULATOR;
 import static radialMenu.mapmenu.MapMenuRadialActions.LOCAL_INFO;
@@ -223,7 +223,7 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
             hexInfo.setTitle(title);
             hexInfo.setVisible(true);
         } else {
-            hexInfo = SysApoio.showDialogPopup(title, text, rb);
+            hexInfo = ComponentFactory.showDialogPopup(title, text, rb);
         }
     }
 
