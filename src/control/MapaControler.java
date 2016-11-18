@@ -42,7 +42,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
-import persistenceCommons.SysProperties;
 import radialMenu.RadialActions;
 import radialMenu.RadialMenu;
 import radialMenu.mapmenu.MapMenuManager;
@@ -187,7 +186,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         this.printTag(local);
         final String title = String.format(labels.getString("LOCAL.TITLE"), local.getCoordenadas());
         String text = LocalConverter.getInfo(local);
-        if (SysProperties.getProps("KeepPopupOpen", "0").equals("0") && hexInfo != null) {
+        if (SettingsManager.getInstance().getConfig("KeepPopupOpen", "0").equals("0") && hexInfo != null) {
             hexInfo.setText(text);
             hexInfo.setTitle(title);
             hexInfo.setVisible(true);

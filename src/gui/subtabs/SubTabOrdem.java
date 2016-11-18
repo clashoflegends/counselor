@@ -2,7 +2,6 @@ package gui.subtabs;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
-import persistenceCommons.SysProperties;
 import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
 import control.OrdemControler;
@@ -648,7 +647,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
     }
 
     public boolean doFindNextActionSlot() {
-        if (!SysProperties.getProps("AutoMoveNextAction", "1").equals("1")) {
+        if (!SettingsManager.getInstance().getConfig("AutoMoveNextAction", "1").equals("1")) {
             return false;
         }
         final int nextActionSlot = getNextActionSlot();
@@ -699,7 +698,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
             allowOrders = false;
         }
 
-        if (SysProperties.getProps("OverrideElimination", "0").equals("1")) {
+        if (SettingsManager.getInstance().getConfig("OverrideElimination", "0").equals("1")) {
             allowOrders = true;
         } else if (WorldFacadeCounselor.getInstance().isGameOver()
                 || WorldFacadeCounselor.getInstance().isJogadorAtivoEliminado(WorldFacadeCounselor.getInstance().getJogadorAtivo())) {

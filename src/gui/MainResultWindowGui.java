@@ -5,8 +5,6 @@
  */
 package gui;
 
-import persistenceCommons.SysApoio;
-import persistenceCommons.SysProperties;
 import business.ImageFactory;
 import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
@@ -25,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 
 /**
  *
@@ -402,13 +401,13 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         // Joga a janela toda para a esquerda = 0
         // divide a janela ao meio = -1
         //        this.splitMainPanel.setDividerLocation(55555);
-        int splitWid = SysApoio.parseInt(SysProperties.getProps("splitSize", "660"));
+        int splitWid = SysApoio.parseInt(SettingsManager.getInstance().getConfig("splitSize", "660"));
         this.splitMainPanel.setDividerLocation(splitWid);
         doMinimizeMap();
     }
 
     public void doMinimizeMap() {
-        if (SysProperties.getProps("minimizeMapOnStart", "0").equals("1")) {
+        if (SettingsManager.getInstance().getConfig("minimizeMapOnStart", "0").equals("1")) {
             //configuracoes para o autoloader
             this.splitMainPanel.addComponentListener(new ComponentListener() {
                 @Override

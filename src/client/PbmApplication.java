@@ -6,7 +6,6 @@ package client;
 
 import baseLib.Application;
 import baseLib.JgFrame;
-import persistenceCommons.SysProperties;
 import gui.MainResultWindowGui;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
@@ -14,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.util.MissingResourceException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistenceCommons.SettingsManager;
 
 /**
  *
@@ -65,7 +65,7 @@ public class PbmApplication extends Application {
         //default
         frame.pack();
         //frame.setLocationRelativeTo(null);
-        if (SysProperties.getProps("maximizeWindowOnStart","0").equals("1")) {
+        if (SettingsManager.getInstance().getConfig("maximizeWindowOnStart","0").equals("1")) {
             frame.setExtendedState(Frame.MAXIMIZED_BOTH);
         } else {
             frame.setExtendedState(Frame.NORMAL);

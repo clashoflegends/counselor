@@ -24,7 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
-import persistenceCommons.SysProperties;
 import radialMenu.mapmenu.MapMenuRadialActions;
 import static radialMenu.mapmenu.MapMenuRadialActions.ARMY_MOVEMENT_SIMULATOR;
 import static radialMenu.mapmenu.MapMenuRadialActions.LOCAL_INFO;
@@ -218,7 +217,7 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
         final String title = String.format(labels.getString("LOCAL.TITLE"), local.getCoordenadas());
         String text = LocalConverter.getInfo(local);
 
-        if (SysProperties.getProps("KeepPopupOpen", "0").equals("0") && hexInfo != null) {
+        if (SettingsManager.getInstance().getConfig("KeepPopupOpen", "0").equals("0") && hexInfo != null) {
             hexInfo.setText(text);
             hexInfo.setTitle(title);
             hexInfo.setVisible(true);

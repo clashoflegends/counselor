@@ -5,8 +5,6 @@
  */
 package gui;
 
-import persistenceCommons.SysApoio;
-import persistenceCommons.SysProperties;
 import control.MapaControler;
 import gui.services.ColumnWidthsAdjuster;
 import gui.services.LocalTableCellRenderer;
@@ -19,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 
 /**
  *
@@ -39,7 +38,7 @@ public class TabBase extends javax.swing.JRootPane implements Serializable {
      */
     public TabBase() {
         initComponents();
-        int vlFiltro = SysApoio.parseInt(SysProperties.getProps("filtro.default"));
+        int vlFiltro = SysApoio.parseInt(SettingsManager.getInstance().getConfig("filtro.default"));
         //se diferente de 1e0,provavelmente eh um valor invalido, ou chave nao encontrada.
         if (vlFiltro != 1) {
             vlFiltro = 0;

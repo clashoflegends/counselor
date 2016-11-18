@@ -7,7 +7,6 @@ package control.services;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.IBaseModel;
-import persistenceCommons.SysProperties;
 import business.facades.ListFactory;
 import business.services.ComparatorBaseDisplayModelSorter;
 import java.io.Serializable;
@@ -35,7 +34,7 @@ public class FiltroConverter implements Serializable {
     private static final ListFactory listFactory = new ListFactory();
 
     public static ComboBoxModel getFiltroComboModelByJogador(Jogador jogadorAtivo, int options) {
-        boolean filterMine = "1".equals(SysProperties.getProps("filter.mine", "0"));
+        boolean filterMine = "1".equals(SettingsManager.getInstance().getConfig("filter.mine", "0"));
         List<IBaseModel> lista = new ArrayList<IBaseModel>();
         lista.add(new GenericoComboObject(labels.getString("FILTRO.TODOS"), "all"));
         lista.add(new GenericoComboObject(labels.getString("FILTRO.PROPRIOS"), "own"));

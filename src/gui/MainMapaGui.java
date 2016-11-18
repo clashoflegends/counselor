@@ -5,7 +5,6 @@
  */
 package gui;
 
-import persistenceCommons.SysProperties;
 import business.ArmyPath;
 import business.ImageFactory;
 import business.MovimentoExercito;
@@ -264,7 +263,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
      * @param mapaControl
      */
     private void setTag(MapaControler mapaControl) {
-        final String tagStyle = SysProperties.getProps("HexTagStyle", "0");
+        final String tagStyle = SettingsManager.getInstance().getConfig("HexTagStyle", "0");
         //prepara tag, chamar depois do printMapaGeral, pois ele carrega todas as imagens.
         if (tagStyle.equals("1")) {
             drawTagStyle0(mapaControl);
@@ -277,7 +276,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         }
         tagLabel.setOpaque(false);
 //        tagLabel.setBounds(0, 0, HEX_SIZE, HEX_SIZE);
-        if (SysProperties.getProps("HexTagFrame", "0").equals("1")) {
+        if (SettingsManager.getInstance().getConfig("HexTagFrame", "0").equals("1")) {
             tagLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         }
         tagLabel.setVisible(false);
