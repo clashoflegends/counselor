@@ -7,7 +7,6 @@ package gui.tabs;
 
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
-import persistenceCommons.SysProperties;
 import control.ExercitoControler;
 import control.MapaControler;
 import control.services.ExercitoConverter;
@@ -20,9 +19,9 @@ import javax.swing.table.TableModel;
 import model.Exercito;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
-import persistence.local.WorldManager;
 
 /**
  *
@@ -271,7 +270,7 @@ public class TabExercitosGui extends TabBase implements Serializable {
     public void doMudaExercito(Exercito exercito) {
         try {
             getMapaControler().printTag(exercito.getLocal());
-            if (SysProperties.getProps("ShowArmyMovPath", "1").equals("1")) {
+            if (SettingsManager.getInstance().getConfig("ShowArmyMovPath", "1").equals("1")) {
                 getMapaControler().printTagArmyRange(exercito);
             }
         } catch (NullPointerException ex) {
