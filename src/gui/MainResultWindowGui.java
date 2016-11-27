@@ -52,6 +52,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbCopy.addActionListener(wc);
         jbSend.addActionListener(wc);
         jbAbout.addActionListener(wc);
+        jbConfigs.addActionListener(wc);
         wc.doAutoLoad(autoLoad);
     }
 
@@ -203,7 +204,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbConfigs.setText(bundle.getString("MENU.CONFIG")); // NOI18N
         jbConfigs.setToolTipText(bundle.getString("MENU.CONFIG.TOOLTIP")); // NOI18N
         jbConfigs.setActionCommand("jbConfig");
-        jbConfigs.setEnabled(false);
         jbConfigs.setFocusable(false);
         jbConfigs.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         jbConfigs.setName("jbConfig"); // NOI18N
@@ -236,13 +236,13 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
                         .addGap(3, 3, 3)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(labelJogo, javax.swing.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE)
-                    .addComponent(labelCenario, javax.swing.GroupLayout.DEFAULT_SIZE, 268, Short.MAX_VALUE))
+                    .addComponent(labelJogo, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
+                    .addComponent(labelCenario, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(labelMoney, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-                    .addComponent(labelJogador, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)))
-            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 782, Short.MAX_VALUE)
+                    .addComponent(labelMoney, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
+                    .addComponent(labelJogador, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)))
+            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 1166, Short.MAX_VALUE)
         );
         infoPanelLayout.setVerticalGroup(
             infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -284,7 +284,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         statusBar.setLayout(statusBarLayout);
         statusBarLayout.setHorizontalGroup(
             statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 1014, Short.MAX_VALUE)
+            .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 1154, Short.MAX_VALUE)
         );
         statusBarLayout.setVerticalGroup(
             statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -299,7 +299,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             .addGroup(layout.createSequentialGroup()
                 .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
-            .addComponent(splitMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1024, Short.MAX_VALUE)
+            .addComponent(splitMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1166, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -398,6 +398,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbCopy.setEnabled(true);
         jbSend.setEnabled(true);
         jbAbout.setEnabled(true);
+        jbConfigs.setEnabled(true);
         // Joga a janela toda para a esquerda = 0
         // divide a janela ao meio = -1
         //        this.splitMainPanel.setDividerLocation(55555);
