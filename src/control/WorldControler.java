@@ -61,7 +61,6 @@ import persistenceCommons.PersistenceException;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SmtpManager;
 import persistenceCommons.SysApoio;
-import persistenceCommons.SysProperties;
 import persistenceCommons.WebCounselorManager;
 import persistenceCommons.XmlManager;
 import persistenceLocal.PathFactory;
@@ -74,7 +73,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private static final Log log = LogFactory.getLog(WorldControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private final JFileChooser fc = new JFileChooser(SysProperties.getProps("loadDir"));
+    private final JFileChooser fc = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
     private boolean saved = false;
     private boolean savedWorld = false;
     private MainResultWindowGui gui = null;
@@ -282,7 +281,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         jtaResultado.copy();
         this.getGui().setStatusMsg(labels.getString("COPIAR.ACOES.STATUS"));
         jtaResultado.select(0, 0);
-        if (SysProperties.getProps("CopyActionsPopUp", "1").equals("1")) {
+        if (SettingsManager.getInstance().getConfig("CopyActionsPopUp", "1").equals("1")) {
             //scroll pane
             JScrollPane jsp = new javax.swing.JScrollPane(jtaResultado);
             //configura jDialog
@@ -321,7 +320,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
          * if fail, then alternate message
          */
         this.getGui().setStatusMsg(labels.getString("ENVIAR.POST.JUDGE"));
-        if (!SysProperties.getProps("SendOrderWebPopUp", "1").equals("1")) {
+        if (!SettingsManager.getInstance().getConfig("SendOrderWebPopUp", "1").equals("1")) {
             doSendViaEmail(attachment, labels.getString("ENVIAR.FAILREASON.PROPERTYSET"));
         } else if (!doSendPost(attachment)) {
             //try to send via email
@@ -375,12 +374,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      */
     public void doAutoLoad(String autoLoad) {
         if (autoLoad != null) {
-//            autoLoad = SysProperties.getProps("loadDir") + autoLoad;
+//            autoLoad = SettingsManager.getInstance().getConfig("loadDir") + autoLoad;
             try {
                 log.info(labels.getString("AUTOLOADING.OPENING") + autoLoad);
                 WorldFacadeCounselor.getInstance().doStart(new File(autoLoad));
                 getGui().iniciaConfig();
-                String autoLoadActions = SysProperties.getProps("autoLoadActions", "none");
+                String autoLoadActions = SettingsManager.getInstance().getConfig("autoLoadActions", "none");
                 if (!autoLoadActions.equals("none")) {
                     final File loadActions = new File(autoLoadActions);
                     setComando(loadActions);
@@ -416,7 +415,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         if (cenarioFacade.hasOrdensCidade(WorldFacadeCounselor.getInstance().getCenario())) {
             ret += listaOrdensByCity() + "\n\n";
         }
-        if (SysProperties.getProps("CopyActionsOrder", "1").equals("1")) {
+        if (SettingsManager.getInstance().getConfig("CopyActionsOrder", "1").equals("1")) {
             ret += listaOrdensByPers() + "\n\n";
         }
         return ret;
@@ -709,7 +708,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         } catch (Exception e) {
             log.info(e);
         }
-        SettingsManager.getInstance().setTableColumnAdjust(SysProperties.getProps("TableColumnAdjust", "0").equalsIgnoreCase("0"));
+        SettingsManager.getInstance().setTableColumnAdjust(SettingsManager.getInstance().getConfig("TableColumnAdjust", "0").equalsIgnoreCase("0"));
         getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_RELOAD, "");
         SettingsManager.getInstance().setTableColumnAdjust(true);
         return ret;
@@ -913,7 +912,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 final String msg = String.format(labels.getString("POST.DONE"), attachment.getName());
                 log.info(msg);
                 this.getGui().setStatusMsg(msg);
-                if (SysProperties.getProps("SendOrderConfirmationPopUp", "1").equals("1")) {
+                if (SettingsManager.getInstance().getConfig("SendOrderConfirmationPopUp", "1").equals("1")) {
                     SysApoio.showDialogInfo(labels.getString("POST.DONE.TITLE"), labels.getString("POST.DONE.TITLE"));
                 }
                 return true;
@@ -1003,7 +1002,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private String getEmail() {
-        String from = SysProperties.getProps("MyEmail", "none");
+        String from = SettingsManager.getInstance().getConfig("MyEmail", "none");
         if (from.equals("none")) {
             from = JOptionPane.showInputDialog(labels.getString("ENVIAR.INPUT.EMAIL"), from);
             if (from == null || from.equals("none")) {
@@ -1012,7 +1011,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 return "none";
             }
             //salva novas informacoes no properties
-            SysProperties.getInstance().setProp("MyEmail", from);
+            SettingsManager.getInstance().setConfigAndSaveToFile("MyEmail", from);
         }
         return from;
     }
