@@ -8,9 +8,9 @@ import java.io.Serializable;
 import model.Partida;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistenceCommons.PersistenceException;
 import persistence.iDao.IPartidaDao;
 import persistence.local.WorldManager;
+import persistenceCommons.PersistenceException;
 
 /**
  *
@@ -47,5 +47,10 @@ public class ClientPartidaDao implements IPartidaDao, Serializable {
     @Override
     public boolean setRun(int idPartida) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean setRunNow(int idPartida) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
