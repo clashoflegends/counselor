@@ -6,7 +6,6 @@
 package gui;
 
 import control.SettingsControler;
-import java.util.Arrays;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextField;
@@ -39,6 +38,17 @@ public class MainSettingsGui extends javax.swing.JPanel {
       autoLoadButton.addActionListener(settingsControler);
       autoLoadActionButton.addActionListener(settingsControler);
       overEliminCheckBox.addActionListener(settingsControler);
+      myEmailTextField.addActionListener(settingsControler);
+      sendConfirmPopUpCheckBox.addActionListener(settingsControler);
+      sendOrderRequestCheckBox.addActionListener(settingsControler);
+      
+      initFilterRadiobutton();
+      initSortOrdersRadiobutton();      
+      allFiltroRadioButton.addActionListener(settingsControler);
+      ownFiltroRadioButton.addActionListener(settingsControler);
+      alphabeticOrderButton.addActionListener(settingsControler);
+      sequenceRadioButton.addActionListener(settingsControler);
+              
     }
 
     /**
@@ -50,7 +60,9 @@ public class MainSettingsGui extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        GamePanel = new javax.swing.JPanel();
+        filtroButtonGroup = new javax.swing.ButtonGroup();
+        ordersSortButtonGroup = new javax.swing.ButtonGroup();
+        gamePanel = new javax.swing.JPanel();
         languageLabel = new javax.swing.JLabel();
         languageComboBox = new javax.swing.JComboBox<>();
         saveDirLabel = new javax.swing.JLabel();
@@ -66,44 +78,35 @@ public class MainSettingsGui extends javax.swing.JPanel {
         autoLoadButton = new javax.swing.JButton();
         autoLoadActionTextField = new javax.swing.JTextField();
         autoLoadActionButton = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jCheckBox3 = new javax.swing.JCheckBox();
-        jCheckBox4 = new javax.swing.JCheckBox();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
-        jTextField5 = new javax.swing.JTextField();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel14 = new javax.swing.JLabel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
-        jLabel20 = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
-        jLabel23 = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
-        jCheckBox5 = new javax.swing.JCheckBox();
-        jSpinner1 = new javax.swing.JSpinner();
-        jCheckBox6 = new javax.swing.JCheckBox();
-        jCheckBox7 = new javax.swing.JCheckBox();
-        jCheckBox8 = new javax.swing.JCheckBox();
-        jCheckBox9 = new javax.swing.JCheckBox();
-        jCheckBox10 = new javax.swing.JCheckBox();
+        playerPanel = new javax.swing.JPanel();
+        myEmailLabel = new javax.swing.JLabel();
+        serverSmtpLabel = new javax.swing.JLabel();
+        serverPortLabel = new javax.swing.JLabel();
+        serverUserLabel = new javax.swing.JLabel();
+        serverPassLabel = new javax.swing.JLabel();
+        sendConfirmPopUpCheckBox = new javax.swing.JCheckBox();
+        sendOrderRequestCheckBox = new javax.swing.JCheckBox();
+        serverSMTPTextField = new javax.swing.JTextField();
+        serverUserTextField = new javax.swing.JTextField();
+        myEmailTextField = new javax.swing.JTextField();
+        serverPortTextField = new javax.swing.JFormattedTextField();
+        serverPasswordField = new javax.swing.JPasswordField();
+        displayPanel = new javax.swing.JPanel();
+        filtroLabel = new javax.swing.JLabel();
+        allFiltroRadioButton = new javax.swing.JRadioButton();
+        ownFiltroRadioButton = new javax.swing.JRadioButton();
+        splitSizeLabel = new javax.swing.JLabel();
+        minimizeWindowCheckBox = new javax.swing.JCheckBox();
+        splitSizeSpinner = new javax.swing.JSpinner();
+        tableColumnCheckBox = new javax.swing.JCheckBox();
+        copyActionsPopUpCheckBox = new javax.swing.JCheckBox();
+        copyOrdersCheckBox = new javax.swing.JCheckBox();
+        keepPopUpCheckBox = new javax.swing.JCheckBox();
+        autoMoveCheckBox = new javax.swing.JCheckBox();
+        maximizeWindowCheckBox = new javax.swing.JCheckBox();
+        sortOrdersLabel = new javax.swing.JLabel();
+        alphabeticOrderButton = new javax.swing.JRadioButton();
+        sequenceRadioButton = new javax.swing.JRadioButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel24 = new javax.swing.JLabel();
         jLabel25 = new javax.swing.JLabel();
@@ -117,7 +120,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
         jCheckBox12 = new javax.swing.JCheckBox();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
-        GamePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.GAME"))); // NOI18N
+        gamePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.GAME"))); // NOI18N
 
         languageLabel.setText(bundle.getString("SETTINGS.LABEL.LANGUAGE")); // NOI18N
 
@@ -136,11 +139,6 @@ public class MainSettingsGui extends javax.swing.JPanel {
         overEliminCheckBox.setText(bundle.getString("SETTINGS.GAME.OVERRIDE")); // NOI18N
         overEliminCheckBox.setToolTipText(bundle.getString("SETTINGS.GAME.OVERRIDE.TOOLTIP")); // NOI18N
         overEliminCheckBox.setActionCommand("overrideAction");
-        overEliminCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                overEliminCheckBoxActionPerformed(evt);
-            }
-        });
 
         openSaveDir.setText("...");
         openSaveDir.setActionCommand("fSaves");
@@ -171,74 +169,74 @@ public class MainSettingsGui extends javax.swing.JPanel {
         autoLoadActionButton.setText("...");
         autoLoadActionButton.setActionCommand("fLoadAutoAction");
 
-        javax.swing.GroupLayout GamePanelLayout = new javax.swing.GroupLayout(GamePanel);
-        GamePanel.setLayout(GamePanelLayout);
-        GamePanelLayout.setHorizontalGroup(
-            GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(GamePanelLayout.createSequentialGroup()
+        javax.swing.GroupLayout gamePanelLayout = new javax.swing.GroupLayout(gamePanel);
+        gamePanel.setLayout(gamePanelLayout);
+        gamePanelLayout.setHorizontalGroup(
+            gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(gamePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(GamePanelLayout.createSequentialGroup()
+                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(gamePanelLayout.createSequentialGroup()
                         .addComponent(saveDirLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(GamePanelLayout.createSequentialGroup()
-                        .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(GamePanelLayout.createSequentialGroup()
+                    .addGroup(gamePanelLayout.createSequentialGroup()
+                        .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(gamePanelLayout.createSequentialGroup()
                                 .addComponent(languageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(languageComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(overEliminCheckBox)
-                            .addGroup(GamePanelLayout.createSequentialGroup()
-                                .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(gamePanelLayout.createSequentialGroup()
+                                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(saveDirTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addGroup(GamePanelLayout.createSequentialGroup()
+                                    .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addGroup(gamePanelLayout.createSequentialGroup()
                                             .addComponent(loadDirLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addComponent(loadDirTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(GamePanelLayout.createSequentialGroup()
-                                            .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(gamePanelLayout.createSequentialGroup()
+                                            .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                 .addComponent(autoLoadActionLabel)
                                                 .addComponent(autoLoadDirLabel))
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                                            .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                                 .addComponent(autoLoadActionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addComponent(autoLoadTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(autoLoadActionButton)
                                     .addComponent(autoLoadButton)
                                     .addComponent(saveDirButton)
                                     .addComponent(openSaveDir))))
-                        .addContainerGap(52, Short.MAX_VALUE))))
+                        .addContainerGap(59, Short.MAX_VALUE))))
         );
-        GamePanelLayout.setVerticalGroup(
-            GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(GamePanelLayout.createSequentialGroup()
+        gamePanelLayout.setVerticalGroup(
+            gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(gamePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(languageLabel)
                     .addComponent(languageComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(saveDirLabel)
                     .addComponent(saveDirTextField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(openSaveDir))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(loadDirTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(loadDirLabel)
                     .addComponent(saveDirButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(autoLoadButton, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(autoLoadDirLabel)
                         .addComponent(autoLoadTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(autoLoadActionButton)
-                    .addGroup(GamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(autoLoadActionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(autoLoadActionLabel)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -246,241 +244,232 @@ public class MainSettingsGui extends javax.swing.JPanel {
                 .addGap(0, 47, Short.MAX_VALUE))
         );
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Player settings"));
+        playerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Player settings"));
 
-        jLabel7.setText("jLabel7");
+        myEmailLabel.setText(bundle.getString("SETTINGS.PLAYER.EMAIL")); // NOI18N
 
-        jLabel8.setText("jLabel8");
+        serverSmtpLabel.setText(bundle.getString("SETTINGS.PLAYER.SMTP.SERVER")); // NOI18N
 
-        jLabel9.setText("jLabel9");
+        serverPortLabel.setText(bundle.getString("SETTINGS.PLAYER.SMTP.PORT")); // NOI18N
 
-        jLabel10.setText("jLabel10");
+        serverUserLabel.setText(bundle.getString("SETTINGS.PLAYER.SMTP.USER")); // NOI18N
 
-        jLabel11.setText("jLabel11");
+        serverPassLabel.setText(bundle.getString("SETTINGS.PLAYER.SMTP.PASS")); // NOI18N
 
-        jLabel12.setText("jLabel12");
+        sendConfirmPopUpCheckBox.setSelected(isConfirmOrderSelected());
+        sendConfirmPopUpCheckBox.setText(bundle.getString("SETTINGS.PLAYER.SENDORDERCONFIRM")); // NOI18N
+        sendConfirmPopUpCheckBox.setToolTipText(bundle.getString("SETTINGS.PLAYER.SENDORDERCONFIRM.TOOLTIP")); // NOI18N
+        sendConfirmPopUpCheckBox.setActionCommand("showPopUp");
 
-        jLabel13.setText("jLabel13");
+        sendOrderRequestCheckBox.setSelected(isRecieveConfirmSelected());
+        sendOrderRequestCheckBox.setText(bundle.getString("SETTINGS.PLAYER.SENDORDERRECEIPT")); // NOI18N
+        sendOrderRequestCheckBox.setToolTipText(bundle.getString("SETTINGS.PLAYER.SENDORDERRECEIPT.TOOLTIP")); // NOI18N
+        sendOrderRequestCheckBox.setActionCommand("recieveConfirm");
 
-        jTextField1.setText("jTextField1");
+        serverSMTPTextField.setText(settingsManager.getConfig("mail.smtp.server"));
+        serverSMTPTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                serverSMTPTextFieldFocusLost(evt);
+            }
+        });
 
-        jCheckBox3.setText("jCheckBox3");
+        serverUserTextField.setText(settingsManager.getConfig("mail.smtp.user"));
+        serverUserTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                serverUserTextFieldFocusLost(evt);
+            }
+        });
 
-        jCheckBox4.setText("jCheckBox4");
+        myEmailTextField.setText(settingsManager.getConfig("MyEmail"));
+        myEmailTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                myEmailTextFieldFocusLost(evt);
+            }
+        });
 
-        jTextField2.setText("jTextField2");
+        serverPortTextField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
+        serverPortTextField.setText(settingsManager.getConfig("mail.smpt.port"));
+        serverPortTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                serverPortTextFieldFocusLost(evt);
+            }
+        });
 
-        jTextField3.setText("jTextField3");
+        serverPasswordField.setText(settingsManager.getConfig("mail.smtp.passwd"));
+        serverPasswordField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                serverPasswordFieldFocusLost(evt);
+            }
+        });
 
-        jTextField4.setText("jTextField4");
-
-        jTextField5.setText("jTextField5");
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout playerPanelLayout = new javax.swing.GroupLayout(playerPanel);
+        playerPanel.setLayout(playerPanelLayout);
+        playerPanelLayout.setHorizontalGroup(
+            playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(playerPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel10)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel12)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField4))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel9))
-                        .addGap(28, 28, 28)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBox4)
-                            .addComponent(jCheckBox3)))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel11)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField3))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel13)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField5))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel7)
+                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, playerPanelLayout.createSequentialGroup()
+                        .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(sendOrderRequestCheckBox, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(sendConfirmPopUpCheckBox, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, playerPanelLayout.createSequentialGroup()
+                                .addComponent(myEmailLabel)
+                                .addGap(50, 50, 50)
+                                .addComponent(myEmailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, playerPanelLayout.createSequentialGroup()
+                        .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(serverPassLabel)
+                            .addComponent(serverUserLabel)
+                            .addComponent(serverPortLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(serverSmtpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(serverSMTPTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(serverUserTextField)
+                                .addComponent(serverPortTextField)
+                                .addComponent(serverPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)))))
+                .addContainerGap(23, Short.MAX_VALUE))
+        );
+        playerPanelLayout.setVerticalGroup(
+            playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(playerPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(myEmailLabel)
+                    .addComponent(myEmailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(sendConfirmPopUpCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(sendOrderRequestCheckBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(serverSmtpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(serverSMTPTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(serverPortLabel)
+                    .addComponent(serverPortTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(serverUserLabel)
+                    .addComponent(serverUserTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(serverPassLabel)
+                    .addComponent(serverPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+
+        displayPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.DISPLAY"))); // NOI18N
+
+        filtroLabel.setText(bundle.getString("SETTINGS.DISPLAY.FILTER")); // NOI18N
+
+        filtroButtonGroup.add(allFiltroRadioButton);
+        allFiltroRadioButton.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.ALL")); // NOI18N
+        allFiltroRadioButton.setActionCommand("allFilter");
+
+        filtroButtonGroup.add(ownFiltroRadioButton);
+        ownFiltroRadioButton.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.OWN")); // NOI18N
+        ownFiltroRadioButton.setActionCommand("ownFilter");
+
+        splitSizeLabel.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.SPLITSIZE")); // NOI18N
+        splitSizeLabel.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SPLITSIZE.TOOLTIP")); // NOI18N
+
+        minimizeWindowCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.MINIMIZEMAP")); // NOI18N
+        minimizeWindowCheckBox.setEnabled(false);
+
+        tableColumnCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.COLUMNADJUST")); // NOI18N
+        tableColumnCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.COLUMNADJUST.TOOLTIP")); // NOI18N
+
+        copyActionsPopUpCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.COPYACTIONSPOPUP")); // NOI18N
+        copyActionsPopUpCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.COPYACTIONSPOPUP.TOOLTIP")); // NOI18N
+
+        copyOrdersCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.COPYORDERSPOPUP")); // NOI18N
+        copyOrdersCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.COPYORDERSPOPUP.TOOLTIP")); // NOI18N
+
+        keepPopUpCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.KEEPPOPUP")); // NOI18N
+        keepPopUpCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.KEEPPOPUP.TOOLTIP")); // NOI18N
+
+        autoMoveCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.MOVENEXT")); // NOI18N
+        autoMoveCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.MOVENEXT.TOOLTIP")); // NOI18N
+
+        maximizeWindowCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.MAXIMIZEWIN")); // NOI18N
+
+        sortOrdersLabel.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.SORTORDERS")); // NOI18N
+
+        ordersSortButtonGroup.add(alphabeticOrderButton);
+        alphabeticOrderButton.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.SORTORDERS.ALPHABETIC")); // NOI18N
+        alphabeticOrderButton.setActionCommand("alphaSort");
+
+        ordersSortButtonGroup.add(sequenceRadioButton);
+        sequenceRadioButton.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.SORTORDERS.SEQUENCE")); // NOI18N
+        sequenceRadioButton.setActionCommand("seqSort");
+
+        javax.swing.GroupLayout displayPanelLayout = new javax.swing.GroupLayout(displayPanel);
+        displayPanel.setLayout(displayPanelLayout);
+        displayPanelLayout.setHorizontalGroup(
+            displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(displayPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(maximizeWindowCheckBox)
+                    .addComponent(tableColumnCheckBox)
+                    .addComponent(copyOrdersCheckBox)
+                    .addComponent(autoMoveCheckBox)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, displayPanelLayout.createSequentialGroup()
+                        .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(sortOrdersLabel)
+                            .addComponent(splitSizeLabel)
+                            .addComponent(filtroLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(35, 35, 35)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(allFiltroRadioButton)
+                            .addComponent(splitSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(alphabeticOrderButton))))
+                .addGap(18, 18, 18)
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(keepPopUpCheckBox)
+                    .addComponent(copyActionsPopUpCheckBox)
+                    .addComponent(minimizeWindowCheckBox)
+                    .addComponent(ownFiltroRadioButton)
+                    .addComponent(sequenceRadioButton))
+                .addContainerGap(89, Short.MAX_VALUE))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        displayPanelLayout.setVerticalGroup(
+            displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(displayPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(filtroLabel)
+                    .addComponent(allFiltroRadioButton)
+                    .addComponent(ownFiltroRadioButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(jCheckBox3))
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(sortOrdersLabel)
+                    .addComponent(alphabeticOrderButton)
+                    .addComponent(sequenceRadioButton))
+                .addGap(9, 9, 9)
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(splitSizeLabel)
+                    .addComponent(splitSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(jCheckBox4))
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(maximizeWindowCheckBox)
+                    .addComponent(minimizeWindowCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tableColumnCheckBox)
+                    .addComponent(copyActionsPopUpCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel11)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(copyOrdersCheckBox)
+                    .addComponent(keepPopUpCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel12)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("display_settings"));
-
-        jLabel14.setText("filtro.default");
-
-        jRadioButton1.setText("jRadioButton1");
-
-        jRadioButton2.setText("jRadioButton2");
-
-        jLabel15.setText("SortAllCombos");
-
-        jLabel16.setText("maximizeWindowOnStart");
-
-        jLabel17.setText("minimizeMapOnStart");
-
-        jLabel18.setText("splitSize");
-
-        jLabel19.setText("TableColumnAdjust");
-
-        jLabel20.setText("CopyActionsPopUp");
-
-        jLabel21.setText("CopyActionsOrder");
-
-        jLabel22.setText("KeepPopupOpen");
-
-        jLabel23.setText("AutoMoveNextAction");
-
-        jCheckBox1.setText("jCheckBox1");
-
-        jRadioButton3.setText("jRadioButton3");
-
-        jRadioButton4.setText("jRadioButton4");
-
-        jCheckBox5.setText("jCheckBox5");
-
-        jCheckBox6.setText("jCheckBox6");
-
-        jCheckBox7.setText("jCheckBox7");
-
-        jCheckBox8.setText("jCheckBox8");
-
-        jCheckBox9.setText("jCheckBox9");
-
-        jCheckBox10.setText("jCheckBox10");
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel14)
-                            .addComponent(jLabel15))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBox1)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(jRadioButton1)
-                                .addGap(18, 18, 18)
-                                .addComponent(jRadioButton2))))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel16)
-                            .addComponent(jLabel17)
-                            .addComponent(jLabel18)
-                            .addComponent(jLabel19)
-                            .addComponent(jLabel20)
-                            .addComponent(jLabel21)
-                            .addComponent(jLabel22)
-                            .addComponent(jLabel23))
-                        .addGap(2, 2, 2)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBox10)
-                            .addComponent(jCheckBox9)
-                            .addComponent(jCheckBox8)
-                            .addComponent(jCheckBox7)
-                            .addComponent(jCheckBox6)
-                            .addComponent(jCheckBox5)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(jRadioButton3)
-                                .addGap(18, 18, 18)
-                                .addComponent(jRadioButton4))
-                            .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(53, Short.MAX_VALUE))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel14)
-                    .addComponent(jRadioButton1)
-                    .addComponent(jRadioButton2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel15)
-                    .addComponent(jCheckBox1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel16)
-                    .addComponent(jRadioButton3)
-                    .addComponent(jRadioButton4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel17)
-                    .addComponent(jCheckBox5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel18)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel19)
-                    .addComponent(jCheckBox6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel20)
-                    .addComponent(jCheckBox7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel21)
-                    .addComponent(jCheckBox8))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel22)
-                    .addComponent(jCheckBox9))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel23)
-                    .addComponent(jCheckBox10))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(autoMoveCheckBox)
+                .addContainerGap(99, Short.MAX_VALUE))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("map_settings"));
@@ -524,7 +513,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                     .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jCheckBox11)
                     .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(234, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -549,119 +538,144 @@ public class MainSettingsGui extends javax.swing.JPanel {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel28)
                     .addComponent(jCheckBox12))
-                .addContainerGap(136, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 506, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                .addComponent(displayPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(playerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(42, 42, 42))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(GamePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(537, Short.MAX_VALUE)))
+                    .addComponent(gamePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(551, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(playerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(displayPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(GamePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(408, Short.MAX_VALUE)))
+                    .addComponent(gamePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(415, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void overEliminCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_overEliminCheckBoxActionPerformed
+    private void myEmailTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_myEmailTextFieldFocusLost
         // TODO add your handling code here:
-    }//GEN-LAST:event_overEliminCheckBoxActionPerformed
+        String playerEmail = myEmailTextField.getText();
+        if (playerEmail != null && !playerEmail.isEmpty()) {
+            SettingsManager.getInstance().setConfig("MyEmail", playerEmail);
+            }
+    }//GEN-LAST:event_myEmailTextFieldFocusLost
+
+    private void serverSMTPTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverSMTPTextFieldFocusLost
+        // TODO add your handling code here:
+        String serverName = serverSMTPTextField.getText();
+        if (serverName != null) {
+            SettingsManager.getInstance().setConfig("mail.smtp.server", serverName);
+         }
+    }//GEN-LAST:event_serverSMTPTextFieldFocusLost
+
+    private void serverPortTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverPortTextFieldFocusLost
+        // TODO add your handling code here:
+        String port = serverPortTextField.getText();
+        if (port != null) {               
+            SettingsManager.getInstance().setConfig("mail.smpt.port", port);
+         }
+    }//GEN-LAST:event_serverPortTextFieldFocusLost
+
+    private void serverUserTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverUserTextFieldFocusLost
+        // TODO add your handling code here:
+        String user = serverUserTextField.getText();
+        if (user != null) {
+            SettingsManager.getInstance().setConfig("mail.smpt.user", user);
+         }
+    }//GEN-LAST:event_serverUserTextFieldFocusLost
+
+    private void serverPasswordFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverPasswordFieldFocusLost
+        // TODO add your handling code here:
+        String pass = new String(serverPasswordField.getPassword());
+        SettingsManager.getInstance().setConfig("mail.smtp.passwd", pass);
+        
+    }//GEN-LAST:event_serverPasswordFieldFocusLost
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel GamePanel;
+    private javax.swing.JRadioButton allFiltroRadioButton;
+    private javax.swing.JRadioButton alphabeticOrderButton;
     private javax.swing.JButton autoLoadActionButton;
     private javax.swing.JLabel autoLoadActionLabel;
     private javax.swing.JTextField autoLoadActionTextField;
     private javax.swing.JButton autoLoadButton;
     private javax.swing.JLabel autoLoadDirLabel;
     private javax.swing.JTextField autoLoadTextField;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JCheckBox jCheckBox10;
+    private javax.swing.JCheckBox autoMoveCheckBox;
+    private javax.swing.JCheckBox copyActionsPopUpCheckBox;
+    private javax.swing.JCheckBox copyOrdersCheckBox;
+    private javax.swing.JPanel displayPanel;
+    private javax.swing.ButtonGroup filtroButtonGroup;
+    private javax.swing.JLabel filtroLabel;
+    private javax.swing.JPanel gamePanel;
     private javax.swing.JCheckBox jCheckBox11;
     private javax.swing.JCheckBox jCheckBox12;
-    private javax.swing.JCheckBox jCheckBox3;
-    private javax.swing.JCheckBox jCheckBox4;
-    private javax.swing.JCheckBox jCheckBox5;
-    private javax.swing.JCheckBox jCheckBox6;
-    private javax.swing.JCheckBox jCheckBox7;
-    private javax.swing.JCheckBox jCheckBox8;
-    private javax.swing.JCheckBox jCheckBox9;
     private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JComboBox<String> jComboBox3;
     private javax.swing.JComboBox<String> jComboBox4;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
+    private javax.swing.JCheckBox keepPopUpCheckBox;
     private javax.swing.JComboBox<ComboItem> languageComboBox;
     private javax.swing.JLabel languageLabel;
     private javax.swing.JLabel loadDirLabel;
     private javax.swing.JTextField loadDirTextField;
+    private javax.swing.JCheckBox maximizeWindowCheckBox;
+    private javax.swing.JCheckBox minimizeWindowCheckBox;
+    private javax.swing.JLabel myEmailLabel;
+    private javax.swing.JTextField myEmailTextField;
     private javax.swing.JButton openSaveDir;
+    private javax.swing.ButtonGroup ordersSortButtonGroup;
     private javax.swing.JCheckBox overEliminCheckBox;
+    private javax.swing.JRadioButton ownFiltroRadioButton;
+    private javax.swing.JPanel playerPanel;
     private javax.swing.JButton saveDirButton;
     private javax.swing.JLabel saveDirLabel;
     private javax.swing.JTextField saveDirTextField;
+    private javax.swing.JCheckBox sendConfirmPopUpCheckBox;
+    private javax.swing.JCheckBox sendOrderRequestCheckBox;
+    private javax.swing.JRadioButton sequenceRadioButton;
+    private javax.swing.JLabel serverPassLabel;
+    private javax.swing.JPasswordField serverPasswordField;
+    private javax.swing.JLabel serverPortLabel;
+    private javax.swing.JFormattedTextField serverPortTextField;
+    private javax.swing.JTextField serverSMTPTextField;
+    private javax.swing.JLabel serverSmtpLabel;
+    private javax.swing.JLabel serverUserLabel;
+    private javax.swing.JTextField serverUserTextField;
+    private javax.swing.JLabel sortOrdersLabel;
+    private javax.swing.JLabel splitSizeLabel;
+    private javax.swing.JSpinner splitSizeSpinner;
+    private javax.swing.JCheckBox tableColumnCheckBox;
     // End of variables declaration//GEN-END:variables
 
 
@@ -684,10 +698,17 @@ public class MainSettingsGui extends javax.swing.JPanel {
     
      
     private boolean isOverrideSelected(){    
-        return settingsManager.getConfig("OverrideElimination", "0").equals("1");
-        
+        return settingsManager.getConfig("OverrideElimination", "0").equals("1");       
     }
 
+    private boolean isConfirmOrderSelected() {        
+        return settingsManager.getConfig("SendOrderConfirmationPopUp","0").equals("1");  
+    }
+    
+    private boolean isRecieveConfirmSelected() {
+        return settingsManager.getConfig("SendOrderReceiptRequest", "0").equals("1"); 
+    }
+    
     private ComboItem[] getLanguageComboModel(){
         
         String languages[] = new String[] {"PT","ES","EN","IT"};
@@ -696,11 +717,9 @@ public class MainSettingsGui extends javax.swing.JPanel {
         String langLabel = null;
         for (int i = 0; i < languages.length; i++) {
             langLabel = LABELS.getString("SETTINGS.LABEL.LANGUAGE.".concat(languages[i]));
-            combo[i] = new ComboItem(languages[i].toLowerCase(), langLabel);
-            
+            combo[i] = new ComboItem(languages[i].toLowerCase(), langLabel);            
         }
-            
-        
+                    
         return combo;
     }
 
@@ -731,6 +750,28 @@ public class MainSettingsGui extends javax.swing.JPanel {
         
         public String getValue() {
             return this.value;
+        }
+    }
+    
+    private void initFilterRadiobutton() {
+        boolean isAll = settingsManager.getConfig("filtro.default", "0").equals("0"); 
+        if (isAll) {
+            allFiltroRadioButton.setSelected(true);
+            ownFiltroRadioButton.setSelected(false);
+        } else {
+            allFiltroRadioButton.setSelected(false);
+            ownFiltroRadioButton.setSelected(true);
+        }
+    }
+    
+    private void initSortOrdersRadiobutton() {
+        boolean isSorted = settingsManager.getConfig("SortAllCombos", "0").equals("1"); 
+        if (isSorted) {
+            alphabeticOrderButton.setSelected(true);
+            sequenceRadioButton.setSelected(false);
+        } else {
+            alphabeticOrderButton.setSelected(false);
+            sequenceRadioButton.setSelected(true);
         }
     }
 
