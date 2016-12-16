@@ -18,7 +18,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import persistenceCommons.SettingsManager;
 import persistenceLocal.PathFactory;
 
@@ -26,7 +29,7 @@ import persistenceLocal.PathFactory;
  *
  * @author serguei
  */
-public class SettingsControler extends ControlBase implements Serializable, ActionListener {
+public class SettingsControler extends ControlBase implements Serializable, ActionListener, ChangeListener  {
     
     
     private final MainSettingsGui settingsGui;
@@ -145,6 +148,15 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
         
      //   throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public void stateChanged(ChangeEvent ce) {
+       
+        JSpinner jspiner = (JSpinner)ce.getSource();        
+        int sizeValue = (Integer)jspiner.getValue();
+        SettingsManager.getInstance().setConfig("splitSize", String.valueOf(sizeValue));
+        
+       }
     
     
     
