@@ -48,6 +48,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
       ownFiltroRadioButton.addActionListener(settingsControler);
       alphabeticOrderButton.addActionListener(settingsControler);
       sequenceRadioButton.addActionListener(settingsControler);
+      splitSizeSpinner.addChangeListener(settingsControler);
               
     }
 
@@ -118,6 +119,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
         jComboBox3 = new javax.swing.JComboBox<>();
         jComboBox4 = new javax.swing.JComboBox<>();
         jCheckBox12 = new javax.swing.JCheckBox();
+        jFormattedTextField1 = new javax.swing.JFormattedTextField();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
         gamePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.GAME"))); // NOI18N
@@ -381,6 +383,9 @@ public class MainSettingsGui extends javax.swing.JPanel {
         minimizeWindowCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.MINIMIZEMAP")); // NOI18N
         minimizeWindowCheckBox.setEnabled(false);
 
+        splitSizeSpinner.setModel(new javax.swing.SpinnerNumberModel(0, null, null, 5));
+        splitSizeSpinner.setValue(Integer.parseInt(settingsManager.getConfig("splitSize", "0")));
+
         tableColumnCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.COLUMNADJUST")); // NOI18N
         tableColumnCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.COLUMNADJUST.TOOLTIP")); // NOI18N
 
@@ -494,6 +499,8 @@ public class MainSettingsGui extends javax.swing.JPanel {
 
         jCheckBox12.setText("jCheckBox12");
 
+        jFormattedTextField1.setText("jFormattedTextField1");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -501,18 +508,21 @@ public class MainSettingsGui extends javax.swing.JPanel {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel26)
-                    .addComponent(jLabel25)
-                    .addComponent(jLabel24)
-                    .addComponent(jLabel27)
-                    .addComponent(jLabel28))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox12)
-                    .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCheckBox11)
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel26)
+                            .addComponent(jLabel25)
+                            .addComponent(jLabel24)
+                            .addComponent(jLabel27)
+                            .addComponent(jLabel28))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jCheckBox12)
+                            .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jCheckBox11)
+                            .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -538,7 +548,9 @@ public class MainSettingsGui extends javax.swing.JPanel {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel28)
                     .addComponent(jCheckBox12))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(58, 58, 58)
+                .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(161, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -638,6 +650,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JComboBox<String> jComboBox3;
     private javax.swing.JComboBox<String> jComboBox4;
+    private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
@@ -765,7 +778,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
     }
     
     private void initSortOrdersRadiobutton() {
-        boolean isSorted = settingsManager.getConfig("SortAllCombos", "0").equals("1"); 
+        boolean isSorted = settingsManager.getConfig("SortAllCombos", "0").equals("1");         
         if (isSorted) {
             alphabeticOrderButton.setSelected(true);
             sequenceRadioButton.setSelected(false);

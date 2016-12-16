@@ -639,6 +639,14 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JSpinner" name="splitSizeSpinner">
+          <Properties>
+            <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
+              <SpinnerModel initial="0" numberType="java.lang.Integer" stepSize="5" type="number"/>
+            </Property>
+            <Property name="value" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="Integer.parseInt(settingsManager.getConfig(&quot;splitSize&quot;, &quot;0&quot;))" type="code"/>
+            </Property>
+          </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="tableColumnCheckBox">
           <Properties>
@@ -740,22 +748,27 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel26" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel25" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel24" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel27" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel28" alignment="0" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jCheckBox12" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jComboBox4" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jComboBox2" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jCheckBox11" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="jComboBox3" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jLabel26" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel25" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel24" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel27" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel28" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jCheckBox12" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jComboBox4" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jComboBox2" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jCheckBox11" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jComboBox3" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <Component id="jFormattedTextField1" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -789,7 +802,9 @@
                       <Component id="jLabel28" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBox12" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="58" max="-2" attributes="0"/>
+                  <Component id="jFormattedTextField1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="161" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -873,6 +888,11 @@
         <Component class="javax.swing.JCheckBox" name="jCheckBox12">
           <Properties>
             <Property name="text" type="java.lang.String" value="jCheckBox12"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JFormattedTextField" name="jFormattedTextField1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="jFormattedTextField1"/>
           </Properties>
         </Component>
       </SubComponents>
