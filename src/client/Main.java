@@ -28,11 +28,12 @@ public class Main implements Serializable {
         log.info("Starting...");
         log.info("Counselor version: " + SysApoio.getVersionClash("version_counselor"));
         log.info("Commons version: " + SysApoio.getVersionClash("version_commons"));
-        SettingsManager.getInstance().setConfigurationMode("Client");
-        SettingsManager.getInstance().setLanguage(SettingsManager.getInstance().getConfig("language", "en"));
-        final String autoload = SettingsManager.getInstance().getConfig("autoLoad");
-        SettingsManager.getInstance().setWorldBuilder(SettingsManager.getInstance().getConfig("worldBuilder", "0").equalsIgnoreCase("1"));
-        SettingsManager.getInstance().setRadialMenu(SettingsManager.getInstance().getConfig("newUi", "1").equalsIgnoreCase("1"));
+        final SettingsManager sm = SettingsManager.getInstance();
+        sm.setConfigurationMode("Client");
+        sm.setLanguage(sm.getConfig("language", "en"));
+        final String autoload = sm.getConfig("autoLoad");
+        sm.setWorldBuilder(sm.getConfig("worldBuilder", "0").equalsIgnoreCase("1"));
+        sm.setRadialMenu(sm.getConfig("newUi", "1").equalsIgnoreCase("1"));
         //load application
         new PbmApplication(autoload).start(); //filename to autoload results file
     }
