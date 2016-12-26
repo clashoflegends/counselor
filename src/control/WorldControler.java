@@ -30,10 +30,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.mail.internet.AddressException;
 import javax.swing.JButton;
@@ -274,9 +272,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         dAbout.setVisible(true);
     }
     
-     private void doConfig() throws HeadlessException {
-        
-     
+     private void doConfig() throws HeadlessException {    
        
         MainSettingsGui settingPanel = new MainSettingsGui(); 
        
@@ -290,12 +286,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             Enumeration keys  = SettingsManager.getInstance().listConfigs();
             while (keys.hasMoreElements()) {
                 String key = (String)keys.nextElement();
-                
+                //FIXME Comparation is not working. All settings are saving to file.
                 if (SettingsManager.getInstance().isConfig(key,SettingsManager.getInstance().getConfig(key) , "")) {
                     SettingsManager.getInstance().doConfigSave(key);
-                }
-                    
-                
+                }                                   
             }
             
         } else {
@@ -304,14 +298,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             
             Enumeration keys  = SettingsManager.getInstance().listConfigs();
             while (keys.hasMoreElements()) {
-                SettingsManager.getInstance().doConfigRestore((String)keys.nextElement());
-                
+                SettingsManager.getInstance().doConfigRestore((String)keys.nextElement());                
             }
-        }
-        
-        System.out.println(option);   
-        
-        
+        }       
     }
      
       /**
