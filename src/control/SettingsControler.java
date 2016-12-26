@@ -10,8 +10,6 @@ import gui.MainSettingsGui;
 import gui.MainSettingsGui.ComboItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.Serializable;
 import javax.swing.JCheckBox;
@@ -138,15 +136,52 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             if (selected == 1) {
                 SettingsManager.getInstance().setConfig("SortAllCombos", String.valueOf(0));
             }
-        }
+        } else if (actionCommand.equals("maxWindow")) {      
+            JCheckBox maxWindow = (JCheckBox)e.getSource();
+            int selected = (maxWindow.isSelected()) ? 1 : 0;
+            SettingsManager.getInstance().setConfig("maximizeWindowOnStart", String.valueOf(selected));
+        } else if (actionCommand.equals("columnAdjust")) {      
+            JCheckBox columnAdjust = (JCheckBox)e.getSource();
+            int selected = (columnAdjust.isSelected()) ? 1 : 0;
+            SettingsManager.getInstance().setConfig("TableColumnAdjust", String.valueOf(selected));
+        } else if (actionCommand.equals("copyActions")) {      
+            JCheckBox copyActions = (JCheckBox)e.getSource();
+            int selected = (copyActions.isSelected()) ? 1 : 0;
+            SettingsManager.getInstance().setConfig("CopyActionsPopUp", String.valueOf(selected));
+        } else if (actionCommand.equals("copyOrders")) {      
+            JCheckBox copyOrders = (JCheckBox)e.getSource();
+            int selected = (copyOrders.isSelected()) ? 1 : 0;
+            SettingsManager.getInstance().setConfig("CopyActionsOrder", String.valueOf(selected));
+        } else if (actionCommand.equals("keepPopUp")) {      
+            JCheckBox keepPopUp = (JCheckBox)e.getSource();
+            int selected = (keepPopUp.isSelected()) ? 1 : 0;
+            SettingsManager.getInstance().setConfig("KeepPopupOpen", String.valueOf(selected));
+        } else if (actionCommand.equals("autoMoveAction")) {      
+            JCheckBox autoMoveAction = (JCheckBox)e.getSource();
+            int selected = (autoMoveAction.isSelected()) ? 1 : 0;
+            SettingsManager.getInstance().setConfig("AutoMoveNextAction", String.valueOf(selected));
+        } else if (actionCommand.equals("mapTiles")) {
+            JComboBox mapTiles = (JComboBox)e.getSource();
+            String value = (String)mapTiles.getSelectedItem();
+            SettingsManager.getInstance().setConfig("MapTiles", value);
+        } else if (actionCommand.equals("tagStyle")) {
+            JComboBox tagStyle = (JComboBox)e.getSource();
+            String value = (String)tagStyle.getSelectedItem();
+            SettingsManager.getInstance().setConfig("HexTagStyle", value);
+        }  else if (actionCommand.equals("hexTagFrame")) {      
+            JCheckBox hexTagFrame = (JCheckBox)e.getSource();
+            int selected = (hexTagFrame.isSelected()) ? 1 : 0;
+            SettingsManager.getInstance().setConfig("HexTagFrame", String.valueOf(selected));
+        } else if (actionCommand.equals("armyPath")) {
+            JComboBox tagStyle = (JComboBox)e.getSource();
+            int index =  tagStyle.getSelectedIndex();
+            SettingsManager.getInstance().setConfig("ShowArmyMovPath", String.valueOf(index));
+        } else if (actionCommand.equals("pcPath")) {      
+            JCheckBox pcPath = (JCheckBox)e.getSource();
+            int selected = (pcPath.isSelected()) ? 1 : 0;
+            SettingsManager.getInstance().setConfig("drawPcPath", String.valueOf(selected));
+        } 
         
-        
-        
-        
-        
-        
-        
-     //   throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
