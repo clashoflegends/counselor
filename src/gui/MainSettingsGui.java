@@ -28,7 +28,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private SettingsManager settingsManager;
     
     public MainSettingsGui() {
-    //    this.settingsMap = settingsMap;
+    
       this.settingsManager = SettingsManager.getInstance();
       settingsControler = new SettingsControler(this);
       initComponents();
@@ -49,6 +49,17 @@ public class MainSettingsGui extends javax.swing.JPanel {
       alphabeticOrderButton.addActionListener(settingsControler);
       sequenceRadioButton.addActionListener(settingsControler);
       splitSizeSpinner.addChangeListener(settingsControler);
+      maximizeWindowCheckBox.addActionListener(settingsControler);
+      tableColumnCheckBox.addActionListener(settingsControler);
+      copyActionsPopUpCheckBox.addActionListener(settingsControler);
+      copyOrdersCheckBox.addActionListener(settingsControler);
+      keepPopUpCheckBox.addActionListener(settingsControler);
+      autoMoveCheckBox.addActionListener(settingsControler);
+      mapTilesComboBox.addActionListener(settingsControler);
+      hexTagStyleComboBox.addActionListener(settingsControler);
+      hexTagFrameCheckBox.addActionListener(settingsControler);
+      armyPathComboBox.addActionListener(settingsControler);
+      pcPathCheckBox.addActionListener(settingsControler);
               
     }
 
@@ -108,21 +119,19 @@ public class MainSettingsGui extends javax.swing.JPanel {
         sortOrdersLabel = new javax.swing.JLabel();
         alphabeticOrderButton = new javax.swing.JRadioButton();
         sequenceRadioButton = new javax.swing.JRadioButton();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel24 = new javax.swing.JLabel();
-        jLabel25 = new javax.swing.JLabel();
-        jLabel26 = new javax.swing.JLabel();
-        jLabel27 = new javax.swing.JLabel();
-        jLabel28 = new javax.swing.JLabel();
-        jComboBox2 = new javax.swing.JComboBox<>();
-        jCheckBox11 = new javax.swing.JCheckBox();
-        jComboBox3 = new javax.swing.JComboBox<>();
-        jComboBox4 = new javax.swing.JComboBox<>();
-        jCheckBox12 = new javax.swing.JCheckBox();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
+        mapPanel = new javax.swing.JPanel();
+        hexTagStyleLabel = new javax.swing.JLabel();
+        armyPathLabel = new javax.swing.JLabel();
+        mapTilesLabel = new javax.swing.JLabel();
+        hexTagStyleComboBox = new javax.swing.JComboBox<>();
+        hexTagFrameCheckBox = new javax.swing.JCheckBox();
+        armyPathComboBox = new javax.swing.JComboBox<>();
+        mapTilesComboBox = new javax.swing.JComboBox<>();
+        pcPathCheckBox = new javax.swing.JCheckBox();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
         gamePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.GAME"))); // NOI18N
+        gamePanel.setPreferredSize(new java.awt.Dimension(470, 350));
 
         languageLabel.setText(bundle.getString("SETTINGS.LABEL.LANGUAGE")); // NOI18N
 
@@ -210,7 +219,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                                     .addComponent(autoLoadButton)
                                     .addComponent(saveDirButton)
                                     .addComponent(openSaveDir))))
-                        .addContainerGap(59, Short.MAX_VALUE))))
+                        .addContainerGap(84, Short.MAX_VALUE))))
         );
         gamePanelLayout.setVerticalGroup(
             gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -243,10 +252,11 @@ public class MainSettingsGui extends javax.swing.JPanel {
                         .addComponent(autoLoadActionLabel)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(overEliminCheckBox)
-                .addGap(0, 47, Short.MAX_VALUE))
+                .addGap(0, 50, Short.MAX_VALUE))
         );
 
-        playerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Player settings"));
+        playerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.PLAYER"))); // NOI18N
+        playerPanel.setPreferredSize(new java.awt.Dimension(500, 351));
 
         myEmailLabel.setText(bundle.getString("SETTINGS.PLAYER.EMAIL")); // NOI18N
 
@@ -325,7 +335,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                             .addComponent(serverPassLabel)
                             .addComponent(serverUserLabel)
                             .addComponent(serverPortLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(serverSmtpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE))
+                            .addComponent(serverSmtpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(serverSMTPTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -333,7 +343,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                                 .addComponent(serverUserTextField)
                                 .addComponent(serverPortTextField)
                                 .addComponent(serverPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)))))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
         playerPanelLayout.setVerticalGroup(
             playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -366,6 +376,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
         );
 
         displayPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.DISPLAY"))); // NOI18N
+        displayPanel.setPreferredSize(new java.awt.Dimension(470, 300));
 
         filtroLabel.setText(bundle.getString("SETTINGS.DISPLAY.FILTER")); // NOI18N
 
@@ -386,22 +397,34 @@ public class MainSettingsGui extends javax.swing.JPanel {
         splitSizeSpinner.setModel(new javax.swing.SpinnerNumberModel(0, null, null, 5));
         splitSizeSpinner.setValue(Integer.parseInt(settingsManager.getConfig("splitSize", "0")));
 
+        tableColumnCheckBox.setSelected(isTableColumnAdjustSelected());
         tableColumnCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.COLUMNADJUST")); // NOI18N
         tableColumnCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.COLUMNADJUST.TOOLTIP")); // NOI18N
+        tableColumnCheckBox.setActionCommand("columnAdjust");
 
+        copyActionsPopUpCheckBox.setSelected(isCopyActionsPopUpSelected());
         copyActionsPopUpCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.COPYACTIONSPOPUP")); // NOI18N
         copyActionsPopUpCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.COPYACTIONSPOPUP.TOOLTIP")); // NOI18N
+        copyActionsPopUpCheckBox.setActionCommand("copyActions");
 
+        copyOrdersCheckBox.setSelected(isCopyOrdersPopUpSelected());
         copyOrdersCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.COPYORDERSPOPUP")); // NOI18N
         copyOrdersCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.COPYORDERSPOPUP.TOOLTIP")); // NOI18N
+        copyOrdersCheckBox.setActionCommand("copyOrders");
 
+        keepPopUpCheckBox.setSelected(isKeepPopUpSelected());
         keepPopUpCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.KEEPPOPUP")); // NOI18N
         keepPopUpCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.KEEPPOPUP.TOOLTIP")); // NOI18N
+        keepPopUpCheckBox.setActionCommand("keepPopUp");
 
+        autoMoveCheckBox.setSelected(isAutoMoveNextSelected());
         autoMoveCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.MOVENEXT")); // NOI18N
         autoMoveCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.MOVENEXT.TOOLTIP")); // NOI18N
+        autoMoveCheckBox.setActionCommand("autoMoveAction");
 
+        maximizeWindowCheckBox.setSelected(isMaximizeWindowSelected());
         maximizeWindowCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.MAXIMIZEWIN")); // NOI18N
+        maximizeWindowCheckBox.setActionCommand("maxWindow");
 
         sortOrdersLabel.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.SORTORDERS")); // NOI18N
 
@@ -419,29 +442,39 @@ public class MainSettingsGui extends javax.swing.JPanel {
             displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(displayPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(maximizeWindowCheckBox)
-                    .addComponent(tableColumnCheckBox)
-                    .addComponent(copyOrdersCheckBox)
-                    .addComponent(autoMoveCheckBox)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, displayPanelLayout.createSequentialGroup()
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(displayPanelLayout.createSequentialGroup()
+                        .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(maximizeWindowCheckBox)
+                            .addComponent(tableColumnCheckBox)
+                            .addComponent(copyOrdersCheckBox)
+                            .addComponent(autoMoveCheckBox))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(minimizeWindowCheckBox)
+                            .addComponent(copyActionsPopUpCheckBox)
+                            .addComponent(keepPopUpCheckBox))
+                        .addGap(91, 91, 91))
+                    .addGroup(displayPanelLayout.createSequentialGroup()
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(sortOrdersLabel)
                             .addComponent(splitSizeLabel)
                             .addComponent(filtroLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(allFiltroRadioButton)
-                            .addComponent(splitSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(alphabeticOrderButton))))
-                .addGap(18, 18, 18)
-                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(keepPopUpCheckBox)
-                    .addComponent(copyActionsPopUpCheckBox)
-                    .addComponent(minimizeWindowCheckBox)
-                    .addComponent(ownFiltroRadioButton)
-                    .addComponent(sequenceRadioButton))
-                .addContainerGap(89, Short.MAX_VALUE))
+                            .addGroup(displayPanelLayout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(splitSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(332, Short.MAX_VALUE))
+                            .addGroup(displayPanelLayout.createSequentialGroup()
+                                .addGap(26, 26, 26)
+                                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(alphabeticOrderButton)
+                                    .addComponent(allFiltroRadioButton))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(ownFiltroRadioButton)
+                                    .addComponent(sequenceRadioButton))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
         );
         displayPanelLayout.setVerticalGroup(
             displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -461,115 +494,114 @@ public class MainSettingsGui extends javax.swing.JPanel {
                     .addComponent(splitSizeLabel)
                     .addComponent(splitSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(maximizeWindowCheckBox)
                     .addComponent(minimizeWindowCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(tableColumnCheckBox)
                     .addComponent(copyActionsPopUpCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(copyOrdersCheckBox)
                     .addComponent(keepPopUpCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(autoMoveCheckBox)
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("map_settings"));
+        mapPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.MAP"))); // NOI18N
+        mapPanel.setPreferredSize(new java.awt.Dimension(500, 300));
 
-        jLabel24.setText("HexTagStyle");
+        hexTagStyleLabel.setText(bundle.getString("SETTINGS.MAP.HEXTAGSTYLE")); // NOI18N
 
-        jLabel25.setText("HexTagFrame");
+        armyPathLabel.setText(bundle.getString("SETTINGS.MAP.ARMYPATH")); // NOI18N
+        armyPathLabel.setToolTipText(bundle.getString("SETTINGS.MAP.ARMYPATH.TOOLTIP")); // NOI18N
 
-        jLabel26.setText("ShowArmyMovPath");
+        mapTilesLabel.setText(bundle.getString("SETTINGS.MAP.MAPTILES")); // NOI18N
+        mapTilesLabel.setToolTipText(bundle.getString("SETTINGS.MAP.MAPTILES.TOOLTIP")); // NOI18N
 
-        jLabel27.setText("MapTiles");
+        hexTagStyleComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2" }));
+        hexTagStyleComboBox.setSelectedItem(settingsManager.getConfig("HexTagStyle"));
+        hexTagStyleComboBox.setActionCommand("tagStyle");
 
-        jLabel28.setText("drawPcPath");
+        hexTagFrameCheckBox.setSelected(isTagFrameSelected());
+        hexTagFrameCheckBox.setText(bundle.getString("SETTINGS.MAP.HEXTAGFRAME")); // NOI18N
+        hexTagFrameCheckBox.setActionCommand("hexTagFrame");
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        armyPathComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(getArmyPathComboLabels()));
+        armyPathComboBox.setSelectedIndex(getArmyPathIndexSelected());
+        armyPathComboBox.setActionCommand("armyPath");
 
-        jCheckBox11.setText("jCheckBox11");
+        mapTilesComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2a", "2b", "2d", "3d" }));
+        mapTilesComboBox.setSelectedItem(settingsManager.getConfig("MapTiles"));
+        mapTilesComboBox.setActionCommand("mapTiles");
 
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        pcPathCheckBox.setSelected(isPcPathSelected());
+        pcPathCheckBox.setText(bundle.getString("SETTINGS.MAP.PCPATH")); // NOI18N
+        pcPathCheckBox.setActionCommand("pcPath");
 
-        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jCheckBox12.setText("jCheckBox12");
-
-        jFormattedTextField1.setText("jFormattedTextField1");
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout mapPanelLayout = new javax.swing.GroupLayout(mapPanel);
+        mapPanel.setLayout(mapPanelLayout);
+        mapPanelLayout.setHorizontalGroup(
+            mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(mapPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel26)
-                            .addComponent(jLabel25)
-                            .addComponent(jLabel24)
-                            .addComponent(jLabel27)
-                            .addComponent(jLabel28))
+                .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(mapPanelLayout.createSequentialGroup()
+                        .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(armyPathLabel)
+                            .addComponent(hexTagStyleLabel)
+                            .addComponent(mapTilesLabel))
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jCheckBox12)
-                            .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jCheckBox11)
-                            .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(armyPathComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(hexTagStyleComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(mapTilesComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addComponent(hexTagFrameCheckBox)
+                    .addComponent(pcPathCheckBox))
+                .addContainerGap(240, Short.MAX_VALUE))
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        mapPanelLayout.setVerticalGroup(
+            mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, mapPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel24)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(mapTilesLabel)
+                    .addComponent(mapTilesComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel25)
-                    .addComponent(jCheckBox11))
+                .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(hexTagStyleLabel)
+                    .addComponent(hexTagStyleComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel26)
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(hexTagFrameCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel27)
-                    .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(armyPathLabel)
+                    .addComponent(armyPathComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel28)
-                    .addComponent(jCheckBox12))
-                .addGap(58, 58, 58)
-                .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(161, Short.MAX_VALUE))
+                .addComponent(pcPathCheckBox)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(displayPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(displayPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 513, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(playerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(42, 42, 42))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(playerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(21, 21, 21))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(gamePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(551, Short.MAX_VALUE)))
+                    .addComponent(gamePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 511, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(541, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -577,15 +609,15 @@ public class MainSettingsGui extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(playerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(displayPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(displayPanel, 301, 301, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(mapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(gamePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(415, Short.MAX_VALUE)))
+                    .addComponent(gamePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(329, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -632,6 +664,8 @@ public class MainSettingsGui extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton allFiltroRadioButton;
     private javax.swing.JRadioButton alphabeticOrderButton;
+    private javax.swing.JComboBox<String> armyPathComboBox;
+    private javax.swing.JLabel armyPathLabel;
     private javax.swing.JButton autoLoadActionButton;
     private javax.swing.JLabel autoLoadActionLabel;
     private javax.swing.JTextField autoLoadActionTextField;
@@ -645,23 +679,17 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private javax.swing.ButtonGroup filtroButtonGroup;
     private javax.swing.JLabel filtroLabel;
     private javax.swing.JPanel gamePanel;
-    private javax.swing.JCheckBox jCheckBox11;
-    private javax.swing.JCheckBox jCheckBox12;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JComboBox<String> jComboBox3;
-    private javax.swing.JComboBox<String> jComboBox4;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
-    private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel25;
-    private javax.swing.JLabel jLabel26;
-    private javax.swing.JLabel jLabel27;
-    private javax.swing.JLabel jLabel28;
-    private javax.swing.JPanel jPanel4;
+    private javax.swing.JCheckBox hexTagFrameCheckBox;
+    private javax.swing.JComboBox<String> hexTagStyleComboBox;
+    private javax.swing.JLabel hexTagStyleLabel;
     private javax.swing.JCheckBox keepPopUpCheckBox;
     private javax.swing.JComboBox<ComboItem> languageComboBox;
     private javax.swing.JLabel languageLabel;
     private javax.swing.JLabel loadDirLabel;
     private javax.swing.JTextField loadDirTextField;
+    private javax.swing.JPanel mapPanel;
+    private javax.swing.JComboBox<String> mapTilesComboBox;
+    private javax.swing.JLabel mapTilesLabel;
     private javax.swing.JCheckBox maximizeWindowCheckBox;
     private javax.swing.JCheckBox minimizeWindowCheckBox;
     private javax.swing.JLabel myEmailLabel;
@@ -670,6 +698,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private javax.swing.ButtonGroup ordersSortButtonGroup;
     private javax.swing.JCheckBox overEliminCheckBox;
     private javax.swing.JRadioButton ownFiltroRadioButton;
+    private javax.swing.JCheckBox pcPathCheckBox;
     private javax.swing.JPanel playerPanel;
     private javax.swing.JButton saveDirButton;
     private javax.swing.JLabel saveDirLabel;
@@ -722,6 +751,45 @@ public class MainSettingsGui extends javax.swing.JPanel {
         return settingsManager.getConfig("SendOrderReceiptRequest", "0").equals("1"); 
     }
     
+    private boolean isMaximizeWindowSelected() {
+        return settingsManager.getConfig("maximizeWindowOnStart", "0").equals("1"); 
+    }
+    
+    private boolean isTableColumnAdjustSelected() {
+        return settingsManager.getConfig("TableColumnAdjust", "0").equals("1"); 
+    }
+    
+    private boolean isCopyActionsPopUpSelected() {
+        return settingsManager.getConfig("CopyActionsPopUp", "0").equals("1"); 
+    }
+    
+    private boolean isCopyOrdersPopUpSelected() {
+        return settingsManager.getConfig("CopyActionsOrder", "0").equals("1"); 
+    }
+    
+    private boolean isKeepPopUpSelected() {
+        return settingsManager.getConfig("KeepPopupOpen", "0").equals("1"); 
+    } 
+    
+    private boolean isAutoMoveNextSelected() {
+        return settingsManager.getConfig("AutoMoveNextAction", "0").equals("1"); 
+    }
+    
+    private boolean isTagFrameSelected() {
+        return settingsManager.getConfig("HexTagFrame", "0").equals("1"); 
+    }
+    
+    private int getArmyPathIndexSelected(){
+        int index = 0;
+        String indexStr = settingsManager.getConfig("ShowArmyMovPath", "1");
+        index = Integer.parseInt(indexStr);
+        return index;
+    }
+    
+    private boolean isPcPathSelected() {
+        return settingsManager.getConfig("drawPcPath", "1").equals("1"); 
+    }
+    
     private ComboItem[] getLanguageComboModel(){
         
         String languages[] = new String[] {"PT","ES","EN","IT"};
@@ -746,6 +814,17 @@ public class MainSettingsGui extends javax.swing.JPanel {
         
         return comboBoxModel;
     }
+    
+    private String[] getArmyPathComboLabels() {
+        String[] combo = new String[3];
+        combo[0] = LABELS.getString("SETTINGS.MAP.ARMYPATH.NONE");
+        combo[1] = LABELS.getString("SETTINGS.MAP.ARMYPATH.ARMY");
+        combo[2] = LABELS.getString("SETTINGS.MAP.ARMYPATH.NAVY");        
+        return combo;
+    }
+    
+    
+    
     
     public class ComboItem {
         private final String value;
