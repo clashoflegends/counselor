@@ -76,7 +76,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
         ordersSortButtonGroup = new javax.swing.ButtonGroup();
         gamePanel = new javax.swing.JPanel();
         languageLabel = new javax.swing.JLabel();
-        languageComboBox = new javax.swing.JComboBox<>();
+        languageComboBox = new javax.swing.JComboBox();
         saveDirLabel = new javax.swing.JLabel();
         autoLoadDirLabel = new javax.swing.JLabel();
         autoLoadActionLabel = new javax.swing.JLabel();
@@ -123,10 +123,10 @@ public class MainSettingsGui extends javax.swing.JPanel {
         hexTagStyleLabel = new javax.swing.JLabel();
         armyPathLabel = new javax.swing.JLabel();
         mapTilesLabel = new javax.swing.JLabel();
-        hexTagStyleComboBox = new javax.swing.JComboBox<>();
+        hexTagStyleComboBox = new javax.swing.JComboBox();
         hexTagFrameCheckBox = new javax.swing.JCheckBox();
-        armyPathComboBox = new javax.swing.JComboBox<>();
-        mapTilesComboBox = new javax.swing.JComboBox<>();
+        armyPathComboBox = new javax.swing.JComboBox();
+        mapTilesComboBox = new javax.swing.JComboBox();
         pcPathCheckBox = new javax.swing.JCheckBox();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
@@ -521,7 +521,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
         mapTilesLabel.setText(bundle.getString("SETTINGS.MAP.MAPTILES")); // NOI18N
         mapTilesLabel.setToolTipText(bundle.getString("SETTINGS.MAP.MAPTILES.TOOLTIP")); // NOI18N
 
-        hexTagStyleComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2" }));
+        hexTagStyleComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0", "1", "2" }));
         hexTagStyleComboBox.setSelectedItem(settingsManager.getConfig("HexTagStyle"));
         hexTagStyleComboBox.setActionCommand("tagStyle");
 
@@ -529,11 +529,11 @@ public class MainSettingsGui extends javax.swing.JPanel {
         hexTagFrameCheckBox.setText(bundle.getString("SETTINGS.MAP.HEXTAGFRAME")); // NOI18N
         hexTagFrameCheckBox.setActionCommand("hexTagFrame");
 
-        armyPathComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(getArmyPathComboLabels()));
+        armyPathComboBox.setModel(new javax.swing.DefaultComboBoxModel(getArmyPathComboLabels()));
         armyPathComboBox.setSelectedIndex(getArmyPathIndexSelected());
         armyPathComboBox.setActionCommand("armyPath");
 
-        mapTilesComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2a", "2b", "2d", "3d" }));
+        mapTilesComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2a", "2b", "2d", "3d" }));
         mapTilesComboBox.setSelectedItem(settingsManager.getConfig("MapTiles"));
         mapTilesComboBox.setActionCommand("mapTiles");
 
@@ -561,7 +561,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                                 .addComponent(mapTilesComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addComponent(hexTagFrameCheckBox)
                     .addComponent(pcPathCheckBox))
-                .addContainerGap(240, Short.MAX_VALUE))
+                .addContainerGap(210, Short.MAX_VALUE))
         );
         mapPanelLayout.setVerticalGroup(
             mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -664,7 +664,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton allFiltroRadioButton;
     private javax.swing.JRadioButton alphabeticOrderButton;
-    private javax.swing.JComboBox<String> armyPathComboBox;
+    private javax.swing.JComboBox armyPathComboBox;
     private javax.swing.JLabel armyPathLabel;
     private javax.swing.JButton autoLoadActionButton;
     private javax.swing.JLabel autoLoadActionLabel;
@@ -680,15 +680,15 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private javax.swing.JLabel filtroLabel;
     private javax.swing.JPanel gamePanel;
     private javax.swing.JCheckBox hexTagFrameCheckBox;
-    private javax.swing.JComboBox<String> hexTagStyleComboBox;
+    private javax.swing.JComboBox hexTagStyleComboBox;
     private javax.swing.JLabel hexTagStyleLabel;
     private javax.swing.JCheckBox keepPopUpCheckBox;
-    private javax.swing.JComboBox<ComboItem> languageComboBox;
+    private javax.swing.JComboBox languageComboBox;
     private javax.swing.JLabel languageLabel;
     private javax.swing.JLabel loadDirLabel;
     private javax.swing.JTextField loadDirTextField;
     private javax.swing.JPanel mapPanel;
-    private javax.swing.JComboBox<String> mapTilesComboBox;
+    private javax.swing.JComboBox mapTilesComboBox;
     private javax.swing.JLabel mapTilesLabel;
     private javax.swing.JCheckBox maximizeWindowCheckBox;
     private javax.swing.JCheckBox minimizeWindowCheckBox;
