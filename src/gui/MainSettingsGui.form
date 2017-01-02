@@ -192,7 +192,7 @@
             <Property name="actionCommand" type="java.lang.String" value="languageCombo"/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;ComboItem&gt;"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value=""/>
           </AuxValues>
         </Component>
         <Component class="javax.swing.JLabel" name="saveDirLabel">
@@ -825,7 +825,7 @@
                       <Component id="hexTagFrameCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="pcPathCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="240" max="32767" attributes="0"/>
+                  <EmptySpace pref="210" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -899,7 +899,7 @@
             <Property name="actionCommand" type="java.lang.String" value="tagStyle"/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value=""/>
           </AuxValues>
         </Component>
         <Component class="javax.swing.JCheckBox" name="hexTagFrameCheckBox">
@@ -916,7 +916,7 @@
         <Component class="javax.swing.JComboBox" name="armyPathComboBox">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new javax.swing.DefaultComboBoxModel&lt;&gt;(getArmyPathComboLabels())" type="code"/>
+              <Connection code="new javax.swing.DefaultComboBoxModel(getArmyPathComboLabels())" type="code"/>
             </Property>
             <Property name="selectedIndex" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="getArmyPathIndexSelected()" type="code"/>
@@ -924,7 +924,7 @@
             <Property name="actionCommand" type="java.lang.String" value="armyPath"/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value=""/>
           </AuxValues>
         </Component>
         <Component class="javax.swing.JComboBox" name="mapTilesComboBox">
@@ -943,7 +943,7 @@
             <Property name="actionCommand" type="java.lang.String" value="mapTiles"/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value=""/>
           </AuxValues>
         </Component>
         <Component class="javax.swing.JCheckBox" name="pcPathCheckBox">
