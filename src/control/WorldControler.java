@@ -17,6 +17,7 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.MainAboutBox;
 import gui.MainResultWindowGui;
+import gui.MainSettingsGui;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
@@ -110,7 +112,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doSend(jbTemp);
             } else if ("jbAbout".equals(jbTemp.getActionCommand())) {
                 doAbout();
-            } else if ("jbLoad".equals(jbTemp.getActionCommand())) {
+            } else if ("jbConfig".equals(jbTemp.getActionCommand())) {
+                doConfig();
+            }else if ("jbLoad".equals(jbTemp.getActionCommand())) {
                 doLoad(jbTemp);
             } else {
                 log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
@@ -267,7 +271,51 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         dAbout.pack();
         dAbout.setVisible(true);
     }
-
+    
+     private void doConfig() throws HeadlessException {    
+       
+        MainSettingsGui settingPanel = new MainSettingsGui(); 
+       
+        int option = JOptionPane.showOptionDialog(null,settingPanel,labels.getString("MENU.CONFIG"),
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, 
+                new javax.swing.ImageIcon(getClass().getResource("/images/icon_customize.gif")), null,null);   
+        
+        if (option == JOptionPane.OK_OPTION) {
+            log.debug("Saving settings from option window.");
+            
+            Enumeration keys  = SettingsManager.getInstance().listConfigs();
+            while (keys.hasMoreElements()) {
+                String key = (String)keys.nextElement();
+                //FIXME Comparation is not working. All settings are saving to file.
+                if (SettingsManager.getInstance().isConfig(key,SettingsManager.getInstance().getConfig(key) , "")) {
+                    SettingsManager.getInstance().doConfigSave(key);
+                }                                   
+            }
+            
+        } else {
+           SettingsManager.getInstance().listConfigs();
+            log.debug("Cancel settings option window.");
+            
+            Enumeration keys  = SettingsManager.getInstance().listConfigs();
+            while (keys.hasMoreElements()) {
+                SettingsManager.getInstance().doConfigRestore((String)keys.nextElement());                
+            }
+        }       
+    }
+     
+      /**
+     * Transictional method for development porpuse. Must be deleted after new methods 
+     * in SettingsManager would be implemented.
+     * @param props
+     * @return 
+     
+    private Map<String, String> getMapProperties(SettingsManager settingsManager) {
+        Map<String, String> mapProperties = new HashMap<String, String>();
+        mapProperties.put("loadDir", settingsManager.getProperties("loadDir"));
+        mapProperties.put("saveDir", settingsManager.getProperties("saveDir"));
+        return mapProperties;
+    }
+*/
     private void doCopy() throws HeadlessException {
         //config text Area
         JTextArea jtaResultado = new javax.swing.JTextArea(80, 20);
