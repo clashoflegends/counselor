@@ -25,7 +25,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private static final BundleManager LABELS = SettingsManager.getInstance().getBundleManager();
     
     private final SettingsControler settingsControler;
-    private SettingsManager settingsManager;
+    private final SettingsManager settingsManager;
     
     public MainSettingsGui() {
     

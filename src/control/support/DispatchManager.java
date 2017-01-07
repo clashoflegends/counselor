@@ -35,6 +35,8 @@ public class DispatchManager implements Serializable {
     public static final int LOCAL_RANGE_CLICK = 6;
     public static final int PACKAGE_RELOAD = 7;
     public static final int ACTIONS_RELOAD = 8;
+    public static final int LOCAL_MAP_REDRAW_RELOAD_TILES = 9;
+    public static final int LOCAL_MAP_REDRAW_TAG = 10;
 
     private DispatchManager() {
     }
@@ -57,6 +59,14 @@ public class DispatchManager implements Serializable {
             HashSet<ControlBase> set = new HashSet<ControlBase>();
             set.add(controler);
             lista.put(msgName, set);
+        }
+    }
+
+    public void sendDispatchForMsg(int msgName) {
+        if (lista.containsKey(msgName)) {
+            for (ControlBase cb : lista.get(msgName)) {
+                cb.receiveDispatch(msgName);
+            }
         }
     }
 

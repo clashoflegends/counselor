@@ -4,7 +4,6 @@
  */
 package control.support;
 
-import control.support.DispatchManager;
 import java.io.Serializable;
 import model.Local;
 import model.PersonagemOrdem;
@@ -35,6 +34,9 @@ public abstract class ControlBase implements Serializable {
     }
 
     public void receiveDispatch(PersonagemOrdem antes, PersonagemOrdem depois) {
+    }
+
+    public void receiveDispatch(int msgName) {
     }
 
     public void receiveDispatch(int msgName, String txt) {
