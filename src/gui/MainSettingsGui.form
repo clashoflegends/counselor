@@ -110,7 +110,7 @@
                                                   <Component id="autoLoadActionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                                                   <Component id="autoLoadDirLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                                               </Group>
-                                              <EmptySpace pref="22" max="32767" attributes="0"/>
+                                              <EmptySpace max="32767" attributes="0"/>
                                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                                   <Component id="autoLoadActionTextField" min="-2" pref="213" max="-2" attributes="0"/>
                                                   <Component id="autoLoadTextField" min="-2" pref="213" max="-2" attributes="0"/>
@@ -127,7 +127,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="84" max="32767" attributes="0"/>
+                          <EmptySpace pref="82" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -171,7 +171,7 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="overEliminCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="0" pref="50" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="133" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -336,7 +336,7 @@
                               <Component id="serverPassLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="serverUserLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="serverPortLabel" alignment="0" min="-2" pref="119" max="-2" attributes="0"/>
-                              <Component id="serverSmtpLabel" pref="176" max="32767" attributes="0"/>
+                              <Component id="serverSmtpLabel" pref="180" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -349,7 +349,7 @@
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace pref="29" max="32767" attributes="0"/>
+                  <EmptySpace pref="33" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -536,7 +536,7 @@
                               <Component id="copyOrdersCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="autoMoveCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="122" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="minimizeWindowCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="copyActionsPopUpCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -612,7 +612,7 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="autoMoveCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="16" max="32767" attributes="0"/>
+                  <EmptySpace pref="85" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -825,7 +825,7 @@
                       <Component id="hexTagFrameCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="pcPathCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="210" max="32767" attributes="0"/>
+		  <EmptySpace pref="292" max="32767" attributes="0"/> <EmptySpace pref="292" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
