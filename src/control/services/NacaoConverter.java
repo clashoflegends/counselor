@@ -6,7 +6,6 @@ package control.services;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
-import persistenceCommons.SysApoio;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
@@ -17,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.SortedMap;
+import model.Cenario;
+import model.Exercito;
 import model.Jogador;
 import model.Local;
 import model.Nacao;
@@ -25,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 
 /**
  *
@@ -80,7 +82,11 @@ public class NacaoConverter implements Serializable {
         if (WorldFacadeCounselor.getInstance().hasCapitals()) {
             cArray[ii++] = nacaoFacade.getCoordenadasCapital(nacao);
         }
-        cArray[ii++] = nacaoFacade.getTropasQt(nacao);
+        final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
+        final Collection<Exercito> exercitos = WorldFacadeCounselor.getInstance().getExercitos();
+        cArray[ii++] = nacaoFacade.getPersonagens(nacao);
+        cArray[ii++] = nacaoFacade.getPersonagensSlot(nacao, cenario);
+        cArray[ii++] = nacaoFacade.getTropasQt(nacao, exercitos);
         cArray[ii++] = nacaoFacade.getMoneySaldo(nacao);
         cArray[ii++] = nacaoFacade.getImpostos(nacao);
         cArray[ii++] = nacaoFacade.getLealdade(nacao);
@@ -110,6 +116,10 @@ public class NacaoConverter implements Serializable {
             colNames.add(labels.getString("CIDADE.CAPITAL"));
             classes.add(Local.class);
         }
+        colNames.add(labels.getString("PERSONAGENS.SLOT"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("PERSONAGENS"));
+        classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("TROPAS"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("TREASURY"));
