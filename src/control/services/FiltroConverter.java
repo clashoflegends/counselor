@@ -11,11 +11,13 @@ import business.facades.ListFactory;
 import business.services.ComparatorBaseDisplayModelSorter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.ComboBoxModel;
 import model.Jogador;
 import model.Nacao;
+import model.Pelotao;
 import model.TipoTropa;
 import msgs.TitleFactory;
 import org.apache.commons.logging.Log;
@@ -103,22 +105,40 @@ public class FiltroConverter implements Serializable {
     }
 
     public static List<TipoTropa> listaByFiltroCasualty(String filtro) {
+        Collection<TipoTropa> tipoTropaAvailable = listFactory.listTropas();
         List<TipoTropa> tropas = new ArrayList();
         if (filtro.equalsIgnoreCase("Todos")) {
-            //todos
-            for (TipoTropa tpTropa : listFactory.listTropas()) {
-                tropas.add(tpTropa);
-            }
+            tropas.addAll(tipoTropaAvailable);
         } else if (filtro.equalsIgnoreCase("Land")) {
-            for (TipoTropa tpTropa : listFactory.listTropas()) {
+            for (TipoTropa tpTropa : tipoTropaAvailable) {
                 if (!tpTropa.isBarcos()) {
                     tropas.add(tpTropa);
                 }
             }
         } else if (filtro.equalsIgnoreCase("Barcos")) {
-            for (TipoTropa tpTropa : listFactory.listTropas()) {
+            for (TipoTropa tpTropa : tipoTropaAvailable) {
                 if (tpTropa.isBarcos()) {
                     tropas.add(tpTropa);
+                }
+            }
+        }
+        return tropas;
+    }
+
+    public static List<Pelotao> listaByFiltroCasualty(String filtro, Collection<Pelotao> tipoTropaAvailable) {
+        List<Pelotao> tropas = new ArrayList();
+        if (filtro.equalsIgnoreCase("Todos")) {
+            tropas.addAll(tipoTropaAvailable);
+        } else if (filtro.equalsIgnoreCase("Land")) {
+            for (Pelotao platoon : tipoTropaAvailable) {
+                if (!platoon.getTipoTropa().isBarcos()) {
+                    tropas.add(platoon);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("Barcos")) {
+            for (Pelotao platoon : tipoTropaAvailable) {
+                if (platoon.getTipoTropa().isBarcos()) {
+                    tropas.add(platoon);
                 }
             }
         }

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package gui;
+package gui.accessories;
 
 import business.facades.WorldFacadeCounselor;
 import gui.subtabs.SubTabDirecaoExercito;

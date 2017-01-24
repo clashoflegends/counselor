@@ -8,8 +8,9 @@
  *
  * Created on 21/Abr/2011, 7:42:51
  */
-package gui;
+package gui.accessories;
 
+import gui.TabBase;
 import persistenceCommons.SysApoio;
 import gui.components.ButtonLink;
 import java.io.Serializable;
