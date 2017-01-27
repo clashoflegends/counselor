@@ -116,9 +116,9 @@ public class NacaoConverter implements Serializable {
             colNames.add(labels.getString("CIDADE.CAPITAL"));
             classes.add(Local.class);
         }
-        colNames.add(labels.getString("PERSONAGENS.SLOT"));
+        colNames.add(labels.getString("PERSONAGENS.KNOWN"));
         classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("PERSONAGENS"));
+        colNames.add(labels.getString("PERSONAGENS.SLOT"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("TROPAS"));
         classes.add(java.lang.Integer.class);
