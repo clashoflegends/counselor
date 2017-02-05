@@ -206,8 +206,12 @@ public class WorldFacadeCounselor implements Serializable {
         return WorldManager.getInstance().getPartida().getNationPackagesLimit();
     }
 
-    public boolean hasEmissario() {
+    public boolean hasDiplomat() {
         return cf.hasDiplomat(getCenario());
+    }
+
+    public boolean hasRogue() {
+        return cf.hasRogue(getCenario());
     }
 
     public boolean hasWizard() {
