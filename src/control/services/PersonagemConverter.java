@@ -78,7 +78,7 @@ public class PersonagemConverter implements Serializable {
         classes.add(Local.class);
         colNames.add(labels.getString("COMANDANTE"));
         classes.add(java.lang.Integer.class);
-        if (WorldFacadeCounselor.getInstance().hasRogue()) {
+        if (WorldFacadeCounselor.getInstance().hasRogue() || !WorldFacadeCounselor.getInstance().getCenario().isLom()) {
             colNames.add(labels.getString("AGENTE"));
             classes.add(java.lang.Integer.class);
         }
@@ -127,7 +127,7 @@ public class PersonagemConverter implements Serializable {
         }
         cArray[ii++] = localFacade.getCoordenadas(local);
         cArray[ii++] = personagem.getPericiaComandante();
-        if (WorldFacadeCounselor.getInstance().hasRogue()) {
+        if (WorldFacadeCounselor.getInstance().hasRogue() || !WorldFacadeCounselor.getInstance().getCenario().isLom()) {
             cArray[ii++] = personagem.getPericiaAgente();
         }
         if (WorldFacadeCounselor.getInstance().hasDiplomat()) {
