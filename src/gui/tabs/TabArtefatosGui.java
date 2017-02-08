@@ -205,7 +205,7 @@ public class TabArtefatosGui extends TabBase implements Serializable {
         this.setAreaText();
         this.jtMainLista.setModel(model);
         jtMainLista.doLayout();
-        this.calcColumnWidths(jtMainLista);
+        this.doConfigTableColumns(jtMainLista);
         this.updateGui();
         this.doTagHide();
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);

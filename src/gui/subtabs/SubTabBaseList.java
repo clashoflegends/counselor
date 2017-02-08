@@ -105,7 +105,7 @@ public class SubTabBaseList extends TabBase implements Serializable {
         } else {
             this.jtListaBase.setModel(model);
             if (model.getRowCount() > 0) {
-                calcColumnWidths(jtListaBase);
+                doConfigTableColumns(jtListaBase);
             }
         }
     }

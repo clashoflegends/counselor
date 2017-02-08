@@ -12,11 +12,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.List;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import model.Artefato;
 import model.Nacao;
 import org.apache.commons.logging.Log;
@@ -48,12 +48,6 @@ public class ArtefatoControler implements Serializable, ActionListener, ListSele
         } catch (ClassCastException e) {
             listaExibida = ArtefatoConverter.listaByFiltro(filtro.getComboId());
         }
-//        if (filtro.getComboId().equals("all") || filtro.getComboId().equals("own")) {
-//            listaExibida = ArtefatoConverter.listaByFiltro(filtro.getComboId());
-//        } else {
-//            nacao = (Nacao) filtro.getObject();
-//            listaExibida = ArtefatoConverter.listaByNacao(nacao);
-//        }
         this.mainTableModel = ArtefatoConverter.getArtefatoModel(listaExibida);
         return this.mainTableModel;
     }

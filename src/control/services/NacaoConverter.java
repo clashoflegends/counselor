@@ -231,6 +231,12 @@ public class NacaoConverter implements Serializable {
             }
         } else if (filtro.equalsIgnoreCase("own")) {
             ret.addAll(jAtivo.getNacoes().values());
+        } else if (filtro.equalsIgnoreCase("team") && jAtivo != null) {
+            for (Nacao ally : listFactory.listNacoes().values()) {
+                if (jAtivo.isJogadorAliado(ally) || jAtivo.isNacao(ally)) {
+                    ret.add(ally);
+                }
+            }
         } else if (filtro.equalsIgnoreCase("allies") && jAtivo != null) {
             for (Nacao ally : listFactory.listNacoes().values()) {
                 if (jAtivo.isJogadorAliado(ally) && !jAtivo.isNacao(ally)) {

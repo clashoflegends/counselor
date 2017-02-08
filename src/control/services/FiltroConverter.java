@@ -40,6 +40,10 @@ public class FiltroConverter implements Serializable {
         List<IBaseModel> lista = new ArrayList<IBaseModel>();
         lista.add(new GenericoComboObject(labels.getString("FILTRO.TODOS"), "all"));
         lista.add(new GenericoComboObject(labels.getString("FILTRO.PROPRIOS"), "own"));
+        if (options == 4) {
+            //magic item options
+            lista.add(new GenericoComboObject(labels.getString("FILTRO.ITEM.LOST"), "itemlost"));
+        }
         if (options == 1) {
             //army options
             lista.add(new GenericoComboObject(labels.getString("FILTRO.ARMY.MEU"), "armymy"));
@@ -54,6 +58,7 @@ public class FiltroConverter implements Serializable {
             //Active options
             lista.add(new GenericoComboObject(labels.getString("FILTRO.ACTIVE"), "active"));
         }
+        lista.add(new GenericoComboObject(labels.getString("FILTRO.TEAM"), "team"));
         lista.add(new GenericoComboObject(labels.getString("FILTRO.ALLIES"), "allies"));
         lista.add(new GenericoComboObject(labels.getString("FILTRO.ENEMIES"), "enemies"));
         if (options == 2) {

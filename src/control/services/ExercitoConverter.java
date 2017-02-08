@@ -241,7 +241,7 @@ public class ExercitoConverter implements Serializable {
             labels.getString("TROPA.ATAQUE"), labels.getString("TROPA.DEFESA"),
             labels.getString("TREINO"),
             labels.getString("ARMA"),
-            labels.getString("ARMADURA"), 
+            labels.getString("ARMADURA"),
             labels.getString("TRANSPORTE.CAPACITY"),
             labels.getString("TRANSPORTE.CARGOUSED"), labels.getString("TRANSPORTE.MINIMO"),
             labels.getString("TIPO")
@@ -333,6 +333,16 @@ public class ExercitoConverter implements Serializable {
             for (Exercito exercito : listFactory.listExercitos().values()) {
                 try {
                     if (jativo.isNacao(exercito.getNacao()) && exercitoFacade.isGuarnicao(exercito)) {
+                        ret.add(exercito);
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("team")) {
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+            for (Exercito exercito : listFactory.listExercitos().values()) {
+                try {
+                    if (jAtivo.isJogadorAliado(exercito.getNacao()) || jAtivo.isNacao(exercito.getNacao())) {
                         ret.add(exercito);
                     }
                 } catch (NullPointerException e) {

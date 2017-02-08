@@ -25,9 +25,9 @@ import javax.swing.table.TableModel;
 import model.Personagem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
-import persistence.local.WorldManager;
 
 /**
  *
@@ -232,7 +232,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
      */
     public void setMainModel(TableModel model) {
         this.jtMainLista.setModel(model);
-        this.calcColumnWidths(jtMainLista);
+        this.doConfigTableColumns(jtMainLista);
         this.doTagHide();
         this.qtPersonagens.setText(getMainLista().getRowCount() + "");
         //seta primeira linha da tablemaster como selecionado e forca a carga dos detalhes.

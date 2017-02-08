@@ -185,7 +185,7 @@ public final class SubTabCasualtyGui extends TabBase {
 
     public final void setMainModel(TableModel model) {
         this.jtMainLista.setModel(model);
-        this.calcColumnWidths(jtMainLista);
+        this.doConfigTableColumns(jtMainLista);
         this.updateGui();
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);
     }

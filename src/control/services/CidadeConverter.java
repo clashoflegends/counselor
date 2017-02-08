@@ -138,7 +138,7 @@ public class CidadeConverter implements Serializable {
     }
 
     private static Object[] toArray(Cidade cidade) {
-                final Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
+        final Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
         int ii = 0;
         Object[] cArray = new Object[getCidadeColNames(new ArrayList<Class>(30)).length];
         cArray[ii++] = cidadeFacade.getNome(cidade);
@@ -321,6 +321,12 @@ public class CidadeConverter implements Serializable {
         } else if (filtro.equalsIgnoreCase("bigcitymy") && jAtivo != null) {
             for (Cidade cidade : listFactory.listCidades().values()) {
                 if (jAtivo.isNacao(cidadeFacade.getNacao(cidade)) && cidadeFacade.isBigCity(cidade)) {
+                    ret.add(cidade);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("team") && jAtivo != null) {
+            for (Cidade cidade : listFactory.listCidades().values()) {
+                if (jAtivo.isJogadorAliado(cidadeFacade.getNacao(cidade)) || jAtivo.isNacao(cidadeFacade.getNacao(cidade))) {
                     ret.add(cidade);
                 }
             }

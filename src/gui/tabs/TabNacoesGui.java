@@ -205,7 +205,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         //confid red background
         jtMainLista.getColumnModel().getColumn(NacaoConverter.ORDEM_COL_INDEX_START).setCellRenderer(ltcr);
         //auto adjust columns
-        this.calcColumnWidths(jtMainLista);
+        this.doConfigTableColumns(jtMainLista);
         this.updateGui();
         this.doTagHide();
         //trigger change

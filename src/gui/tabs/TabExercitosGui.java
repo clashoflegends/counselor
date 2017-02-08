@@ -240,7 +240,7 @@ public class TabExercitosGui extends TabBase implements Serializable {
         setPelotaoModel(null);
         this.listaDetalhes.setText("");
         this.jtMainLista.setModel(model);
-        this.calcColumnWidths(jtMainLista);
+        this.doConfigTableColumns(jtMainLista);
         this.updateGui();
         this.doTagHide();
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);
@@ -259,7 +259,7 @@ public class TabExercitosGui extends TabBase implements Serializable {
                     }));
         } else {
             this.jtListaPelotao.setModel(model);
-            calcColumnWidths(jtListaPelotao);
+            doConfigTableColumns(jtListaPelotao);
         }
     }
 
