@@ -45,7 +45,7 @@ public class ColumnWidthsAdjuster {
             }
             for (int row = rowCount - 1; row >= 0; --row) {
                 TableCellRenderer r = table.getCellRenderer(row, i);
-                if (r instanceof ActorOrderTableCellRenderer && SettingsManager.getInstance().isConfig("TableActionColumnAdjust", "0", "1")) {
+                if (r instanceof ActorOrderTableCellRenderer && SettingsManager.getInstance().isConfig("TableActionColumnAdjust", "0", "0")) {
                     //don't readjust
                     break;
                 }
