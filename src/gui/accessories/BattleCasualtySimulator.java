@@ -389,19 +389,19 @@ public class BattleCasualtySimulator extends JFrame implements IBattleSimulator 
         final CasualtyControler casualtyControler = new CasualtyControler(local);
         battleSimControler.setCasualtyControler(casualtyControler);
 
-        //add casualty
-//        setCasualtyBorder(local.getTerreno());
-
         //add component to UI
         SubTabCasualtyGui jtabMain = new SubTabCasualtyGui(local, casualtyControler);
         GroupLayout parLayout = (GroupLayout) jpQuadro.getLayout();
         parLayout.replace(jpPlaceholder, jtabMain);
+
+        //select first army to load titles
+        this.jtArmyList.setRowSelectionInterval(0, 0);
     }
 
     @Override
     public void setCasualtyBorder(ExercitoSim exercito, Terreno terrain) {
         //config border
-        final String title = String.format(labels.getString("TROOPCASUALTIES.TITLE"), exercito.getNome(), terrain.getNome());
+        final String title = String.format(labels.getString("TROOPCASUALTIES.COMMANDER.TITLE"), exercito.getNome(), terrain.getNome());
         jpQuadro.setBorder(javax.swing.BorderFactory.createTitledBorder(title));
     }
 

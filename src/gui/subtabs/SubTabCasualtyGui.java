@@ -53,7 +53,6 @@ public final class SubTabCasualtyGui extends TabBase {
 
         TableModel model = casualtyControler.getMainTableModel(getFiltro(), getFiltroTactic(), local.getTerreno());
         this.setMainModel(model);
-        log.info("Aki!");
     }
 
     /**
