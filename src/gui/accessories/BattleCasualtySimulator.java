@@ -385,12 +385,12 @@ public class BattleCasualtySimulator extends JFrame implements IBattleSimulator 
         jtArmyList.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jtArmyList.getSelectionModel().addListSelectionListener(battleSimControler);
 
-        //add casualty
-        setCasualtyBorder(local.getTerreno());
-
         //create and link controlers
         final CasualtyControler casualtyControler = new CasualtyControler(local);
         battleSimControler.setCasualtyControler(casualtyControler);
+
+        //add casualty
+//        setCasualtyBorder(local.getTerreno());
 
         //add component to UI
         SubTabCasualtyGui jtabMain = new SubTabCasualtyGui(local, casualtyControler);
@@ -399,9 +399,9 @@ public class BattleCasualtySimulator extends JFrame implements IBattleSimulator 
     }
 
     @Override
-    public void setCasualtyBorder(Terreno terrain) {
+    public void setCasualtyBorder(ExercitoSim exercito, Terreno terrain) {
         //config border
-        final String title = String.format(labels.getString("TROOPCASUALTIES.TITLE"), terrain.getNome());
+        final String title = String.format(labels.getString("TROOPCASUALTIES.TITLE"), exercito.getNome(), terrain.getNome());
         jpQuadro.setBorder(javax.swing.BorderFactory.createTitledBorder(title));
     }
 

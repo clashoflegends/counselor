@@ -23,5 +23,5 @@ public interface IBattleSimulator {
 
     public void updateArmy(ExercitoSim exercito);
 
-    public void setCasualtyBorder(Terreno terrain);
+    public void setCasualtyBorder(ExercitoSim exercito, Terreno terrain);
 }

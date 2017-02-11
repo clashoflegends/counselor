@@ -122,6 +122,7 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
                 exercito = (ExercitoSim) listaExibida.get(modelIndex);
                 getTabGui().updateArmy(exercito);
                 //set short casualties list
+                getTabGui().setCasualtyBorder(exercito, getTerreno());
                 getCasualtyControler().updateArmy(exercito, getTerreno());
             }
         } catch (IndexOutOfBoundsException ex) {
@@ -152,7 +153,7 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
                     army.setTerreno(terrain);
                 }
                 this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
-                getTabGui().setCasualtyBorder(terrain);
+                getTabGui().setCasualtyBorder(exercito, terrain);
                 this.setTerreno(terrain);
                 //set short casualties list
                 getCasualtyControler().updateArmy(exercito, terrain);
