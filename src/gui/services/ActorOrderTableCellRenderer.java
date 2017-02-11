@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 public class ActorOrderTableCellRenderer extends DefaultTableCellRenderer implements Serializable {
 
     private static final Log log = LogFactory.getLog(ActorOrderTableCellRenderer.class);
-    private final Color colorBgSelected = new Color(46, 106, 197), colorBgNotSelected = Color.WHITE;
+    private final Color colorBgSelected = new Color(128, 128, 255), colorBgNotSelected = Color.WHITE;
     private final Color colorFgSelected = Color.WHITE, colorFgNotSelected = Color.BLACK;
     private final Color colorBgMissing = new Color(255, 251, 251), colorFgDisable = Color.LIGHT_GRAY;
 
@@ -32,21 +32,27 @@ public class ActorOrderTableCellRenderer extends DefaultTableCellRenderer implem
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        //set defaults
+        int alignment = SwingConstants.LEFT;
+        Color foreground = colorFgNotSelected;
+        Color background = colorBgNotSelected;
 
-        //Load collor on first time, so we can UN paint them...
+        //select custom settings
         if (isSelected) {
-            c.setBackground(colorBgSelected);
-            c.setForeground(colorFgSelected);
-        } else {
-            c.setBackground(colorBgNotSelected);
-            c.setForeground(colorFgNotSelected);
+            background = colorBgSelected;
+            foreground = colorFgSelected;
+        }
+        if (value.equals(OrdemFacade.ACTIONMISSING)) {
+            background = colorBgMissing;
         }
         if (value.equals(OrdemFacade.ACTIONDISABLED)) {
-            c.setForeground(colorFgDisable);
-        } else if (value.equals(OrdemFacade.ACTIONMISSING)) {
-            c.setBackground(colorBgMissing);
+            foreground = colorFgDisable;
+            alignment = SwingConstants.CENTER;
         }
-        this.setHorizontalAlignment(SwingConstants.CENTER);
+        //apply cell style
+        this.setHorizontalAlignment(alignment);
+        c.setBackground(background);
+        c.setForeground(foreground);
         return c;
     }
 }
