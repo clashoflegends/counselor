@@ -114,6 +114,8 @@ public class CidadeConverter implements Serializable {
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("CLIMA"));
         classes.add(java.lang.String.class);
+        colNames.add(labels.getString("VENDA.BEST"));
+        classes.add(java.lang.Integer.class);
         if (WorldFacadeCounselor.getInstance().hasResourceManagement()) {
             for (Produto produto : getResourceList()) {
                 colNames.add(produto.getNome());
@@ -136,6 +138,7 @@ public class CidadeConverter implements Serializable {
     }
 
     private static Object[] toArray(Cidade cidade) {
+        final Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
         int ii = 0;
         Object[] cArray = new Object[getCidadeColNames(new ArrayList<Class>(30)).length];
         cArray[ii++] = cidadeFacade.getNome(cidade);
@@ -161,6 +164,7 @@ public class CidadeConverter implements Serializable {
         cArray[ii++] = cidadeFacade.getNacaoNome(cidade);
         cArray[ii++] = localFacade.getTerrenoNome(cidadeFacade.getLocal(cidade));
         cArray[ii++] = localFacade.getClima(cidadeFacade.getLocal(cidade));
+        cArray[ii++] = cidadeFacade.getResourceBestSell(cidade, mercado);
         if (WorldFacadeCounselor.getInstance().hasResourceManagement()) {
             for (Produto produto : getResourceList()) {
                 int estoque = cidadeFacade.getEstoque(cidade, produto);
@@ -275,13 +279,12 @@ public class CidadeConverter implements Serializable {
                 int i = 0;
                 final int estoque = cidadeFacade.getEstoque(cidade, produto);
                 final int producao = cidadeFacade.getProducao(cidade, produto);
-                Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
-                int unit = mercado.getProdutoVlVenda(produto);
+                final Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
                 ret[ii][i++] = produto.getNome();
                 ret[ii][i++] = estoque + producao;
                 ret[ii][i++] = producao;
                 ret[ii][i++] = estoque;
-                ret[ii][i++] = (estoque + producao) * unit;
+                ret[ii][i++] = cidadeFacade.getResourceSell(cidade, produto, mercado);
                 ii++;
                 //PENDING adicionar o clima
             }
@@ -318,6 +321,12 @@ public class CidadeConverter implements Serializable {
         } else if (filtro.equalsIgnoreCase("bigcitymy") && jAtivo != null) {
             for (Cidade cidade : listFactory.listCidades().values()) {
                 if (jAtivo.isNacao(cidadeFacade.getNacao(cidade)) && cidadeFacade.isBigCity(cidade)) {
+                    ret.add(cidade);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("team") && jAtivo != null) {
+            for (Cidade cidade : listFactory.listCidades().values()) {
+                if (jAtivo.isJogadorAliado(cidadeFacade.getNacao(cidade)) || jAtivo.isNacao(cidadeFacade.getNacao(cidade))) {
                     ret.add(cidade);
                 }
             }

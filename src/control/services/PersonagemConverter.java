@@ -29,6 +29,7 @@ import model.Nacao;
 import model.Ordem;
 import model.Personagem;
 import model.PersonagemFeitico;
+import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -69,15 +70,19 @@ public class PersonagemConverter implements Serializable {
         classes.add(java.lang.String.class);
         for (int nn = 1; nn <= qtOrdens; nn++) {
             colNames.add(String.format("%s %s", labels.getString("ACAO"), nn));
-            classes.add(java.lang.String.class);
+//            classes.add(String.class);
+            classes.add(PersonagemOrdem.class);
+
         }
         colNames.add(labels.getString("LOCAL"));
         classes.add(Local.class);
         colNames.add(labels.getString("COMANDANTE"));
         classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("AGENTE"));
-        classes.add(java.lang.Integer.class);
-        if (WorldFacadeCounselor.getInstance().hasEmissario()) {
+        if (WorldFacadeCounselor.getInstance().hasRogue() || !WorldFacadeCounselor.getInstance().getCenario().isLom()) {
+            colNames.add(labels.getString("AGENTE"));
+            classes.add(java.lang.Integer.class);
+        }
+        if (WorldFacadeCounselor.getInstance().hasDiplomat()) {
             colNames.add(labels.getString("EMISSARIO"));
             classes.add(java.lang.Integer.class);
         }
@@ -122,8 +127,10 @@ public class PersonagemConverter implements Serializable {
         }
         cArray[ii++] = localFacade.getCoordenadas(local);
         cArray[ii++] = personagem.getPericiaComandante();
-        cArray[ii++] = personagem.getPericiaAgente();
-        if (WorldFacadeCounselor.getInstance().hasEmissario()) {
+        if (WorldFacadeCounselor.getInstance().hasRogue() || !WorldFacadeCounselor.getInstance().getCenario().isLom()) {
+            cArray[ii++] = personagem.getPericiaAgente();
+        }
+        if (WorldFacadeCounselor.getInstance().hasDiplomat()) {
             cArray[ii++] = personagem.getPericiaEmissario();
         }
         if (WorldFacadeCounselor.getInstance().hasWizard()) {
@@ -348,6 +355,16 @@ public class PersonagemConverter implements Serializable {
             for (Personagem personagem : listFactory.listPersonagens()) {
                 try {
                     if (personagemFacade.isDoubleAgent(personagem)) {
+                        ret.add(personagem);
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("team")) {
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+            for (Personagem personagem : listFactory.listPersonagens()) {
+                try {
+                    if (jAtivo.isJogadorAliado(personagem.getNacao()) || jAtivo.isNacao(personagem.getNacao())) {
                         ret.add(personagem);
                     }
                 } catch (NullPointerException e) {

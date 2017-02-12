@@ -442,7 +442,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
                     }));
         } else {
             this.jtListaOrdens.setModel(model);
-//            calcColumnWidths(jtListaOrdens);
+//            doConfigTableColumns(jtListaOrdens);
         }
     }
 

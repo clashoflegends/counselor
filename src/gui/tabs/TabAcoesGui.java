@@ -192,7 +192,7 @@ public final class TabAcoesGui extends TabBase {
     public void setMainModel(TableModel model) {
         this.setHelp("");
         this.jtMainLista.setModel(model);
-        this.calcColumnWidths(jtMainLista);
+        this.doConfigTableColumns(jtMainLista);
         this.updateGui();
     }
 

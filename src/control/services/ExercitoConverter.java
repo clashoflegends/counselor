@@ -12,6 +12,7 @@ import business.facade.ExercitoFacade;
 import business.facade.LocalFacade;
 import business.facades.ListFactory;
 import business.facades.WorldFacadeCounselor;
+import business.interfaces.IExercito;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,9 +34,9 @@ import msgs.BaseMsgs;
 import msgs.TitleFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
-import persistence.local.WorldManager;
 import utils.StringRet;
 
 /**
@@ -217,28 +218,43 @@ public class ExercitoConverter implements Serializable {
         }
     }
 
-    public static GenericoTableModel getPelotaoModel(Exercito exercito) {
+    public static GenericoTableModel getPelotaoModel(List<Pelotao> platoons, IExercito exercito) {
+        return new GenericoTableModel(getPelotaoColNames(), getPelotaoAsArray(exercito, platoons),
+                new Class[]{java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
+                    java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class
+                });
+    }
+
+    public static GenericoTableModel getPelotaoModel(IExercito exercito) {
         return new GenericoTableModel(getPelotaoColNames(), getPelotaoAsArray(exercito),
                 new Class[]{java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class,
+                    java.lang.Integer.class, java.lang.Integer.class,
                     java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class
+                    java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class
                 });
     }
 
     private static String[] getPelotaoColNames() {
         String[] colNames = {labels.getString("NOME"), labels.getString("QTD"),
-            labels.getString("TREINO"), labels.getString("ARMA"),
-            labels.getString("ARMADURA"), labels.getString("TIPO"),
             labels.getString("TROPA.ATAQUE"), labels.getString("TROPA.DEFESA"),
+            labels.getString("TREINO"),
+            labels.getString("ARMA"),
+            labels.getString("ARMADURA"),
             labels.getString("TRANSPORTE.CAPACITY"),
-            labels.getString("TRANSPORTE.CARGOUSED"), labels.getString("TRANSPORTE.MINIMO")};
+            labels.getString("TRANSPORTE.CARGOUSED"), labels.getString("TRANSPORTE.MINIMO"),
+            labels.getString("TIPO")
+        };
 
         return (colNames);
     }
 
-    private static Object[][] getPelotaoAsArray(Exercito exercito) {
-        Collection<Pelotao> listaExibir = exercito.getPelotoes().values();
+    private static Object[][] getPelotaoAsArray(IExercito exercito) {
+        return getPelotaoAsArray(exercito, exercito.getPelotoes().values());
+    }
+
+    private static Object[][] getPelotaoAsArray(IExercito exercito, Collection<Pelotao> listaExibir) {
         if (listaExibir.isEmpty()) {
             Object[][] ret = {{"", "", "", "", "", ""}};
             return (ret);
@@ -249,15 +265,15 @@ public class ExercitoConverter implements Serializable {
                 int nn = 0;
                 ret[ii][nn++] = exercitoFacade.getNomeRaca(exercito, pelotao);
                 ret[ii][nn++] = pelotao.getQtd();
+                ret[ii][nn++] = exercitoFacade.getAtaquePelotao(pelotao, exercito);
+                ret[ii][nn++] = exercitoFacade.getDefesaPelotao(pelotao, exercito);
                 ret[ii][nn++] = pelotao.getTreino();
                 ret[ii][nn++] = pelotao.getModAtaque();
                 ret[ii][nn++] = pelotao.getModDefesa();
-                ret[ii][nn++] = pelotao.getNome();
-                ret[ii][nn++] = exercitoFacade.getAtaquePelotao(pelotao, exercito);
-                ret[ii][nn++] = exercitoFacade.getDefesaPelotao(pelotao, exercito);
                 ret[ii][nn++] = exercitoFacade.getTransportesCapacity(pelotao);
                 ret[ii][nn++] = (int) exercitoFacade.getTransportesCargoUsed(pelotao);
                 ret[ii][nn++] = exercitoFacade.getTransportesMinimo(pelotao);
+                ret[ii][nn++] = pelotao.getNome();
                 ii++;
             }
             return (ret);
@@ -317,6 +333,16 @@ public class ExercitoConverter implements Serializable {
             for (Exercito exercito : listFactory.listExercitos().values()) {
                 try {
                     if (jativo.isNacao(exercito.getNacao()) && exercitoFacade.isGuarnicao(exercito)) {
+                        ret.add(exercito);
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("team")) {
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+            for (Exercito exercito : listFactory.listExercitos().values()) {
+                try {
+                    if (jAtivo.isJogadorAliado(exercito.getNacao()) || jAtivo.isNacao(exercito.getNacao())) {
                         ret.add(exercito);
                     }
                 } catch (NullPointerException e) {
@@ -420,8 +446,7 @@ public class ExercitoConverter implements Serializable {
     public static List<String> getInfo(Exercito exercito) {
         StringRet ret = new StringRet();
         /**
-         * Um pequeno exército portando o estandarte do Rei-Fogo sob o comando
-         * do(a) Comandante Tertis está Aqui.
+         * Um pequeno exército portando o estandarte do Rei-Fogo sob o comando do(a) Comandante Tertis está Aqui.
          */
         ret.addTab(TitleFactory.displayExercitotitulo(exercito));
         return ret.getList();

@@ -11,6 +11,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import persistenceCommons.SettingsManager;
 
 /**
  *
@@ -37,14 +38,17 @@ public class ColumnWidthsAdjuster {
             if (h == null) {
                 h = defaultHeaderRenderer;
             }
-            if (h != null) // Not explicitly impossible
-            {
-                Component c = h.getTableCellRendererComponent(table, column.getHeaderValue(),
-                        false, false, -1, i);
+            if (h != null) {
+                // Not explicitly impossible
+                Component c = h.getTableCellRendererComponent(table, column.getHeaderValue(), false, false, -1, i);
                 width = c.getPreferredSize().width;
             }
             for (int row = rowCount - 1; row >= 0; --row) {
                 TableCellRenderer r = table.getCellRenderer(row, i);
+                if (r instanceof ActorOrderTableCellRenderer && SettingsManager.getInstance().isConfig("TableActionColumnAdjust", "0", "0")) {
+                    //don't readjust
+                    break;
+                }
                 Component c = r.getTableCellRendererComponent(table,
                         data.getValueAt(row, columnIndex),
                         false, false, row, i);

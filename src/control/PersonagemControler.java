@@ -56,11 +56,6 @@ public class PersonagemControler extends ControlBase implements Serializable, Ac
         return this.modelRowIndex;
     }
 
-//    private GenericoTableModel getMainTableModelOld(int filtro) {
-//        listaExibida = PersonagemConverter.listaByNacao(filtro);
-//        this.mainTableModel = PersonagemConverter.getPersonagemModel(listaExibida);
-//        return this.mainTableModel;
-//    }
     public GenericoTableModel getMainTableModel(GenericoComboObject filtro) {
         Nacao nacao = null;
         try {
@@ -69,9 +64,6 @@ public class PersonagemControler extends ControlBase implements Serializable, Ac
         } catch (ClassCastException e) {
             listaExibida = PersonagemConverter.listaByFiltro(filtro.getComboId());
         }
-//        if (filtro.getComboId().equals("all") || filtro.getComboId().equals("own")) {
-//        } else {
-//        }
         this.mainTableModel = PersonagemConverter.getPersonagemModel(listaExibida);
         return this.mainTableModel;
     }

@@ -212,7 +212,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         stPersonagens.setListModelClear();
         stProdutos.setListModelClear();
         this.jtMainLista.setModel(model);
-        this.calcColumnWidths(jtMainLista);
+        this.doConfigTableColumns(jtMainLista);
         this.updateGui();
         this.doTagHide();
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);

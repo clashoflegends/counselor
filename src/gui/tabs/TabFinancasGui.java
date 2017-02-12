@@ -187,7 +187,7 @@ public final class TabFinancasGui extends TabBase implements Serializable {
         stForecast.setListModelClear();
         stResources.setListModelClear();
         this.jtMainLista.setModel(model);
-        this.calcColumnWidths(jtMainLista);
+        this.doConfigTableColumns(jtMainLista);
         this.updateGui();
         this.doTagHide();
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);

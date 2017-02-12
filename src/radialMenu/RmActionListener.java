@@ -7,9 +7,10 @@ package radialMenu;
 import control.services.LocalConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
-import gui.ArmyMoveSimulator;
-import gui.BattleSimulator;
-import gui.TroopsCasualtiesList;
+import gui.accessories.ArmyMoveSimulator;
+import gui.accessories.BattleCasualtySimulator;
+import gui.accessories.BattleSimulator;
+import gui.accessories.TroopsCasualtiesList;
 import gui.components.DialogTextArea;
 import gui.services.ComponentFactory;
 import java.awt.event.MouseEvent;
@@ -233,9 +234,15 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
     }
 
     private void createBattleSim(RadialButton rb) {
-        BattleSimulator battleSim = new BattleSimulator(rb.getLocal());
-        battleSim.setLocationRelativeTo(rb);
-        battleSim.setVisible(true);
+        if (SettingsManager.getInstance().getConfig("BatleSimOld", "0").equalsIgnoreCase("1")) {
+            BattleSimulator battleSim = new BattleSimulator(rb.getLocal());
+            battleSim.setLocationRelativeTo(rb);
+            battleSim.setVisible(true);
+        } else {
+            BattleCasualtySimulator battleSim = new BattleCasualtySimulator(rb.getLocal());
+            battleSim.setLocationRelativeTo(rb);
+            battleSim.setVisible(true);
+        }
     }
 
     private void createArmyMovSim(RadialButton rb, boolean water) {

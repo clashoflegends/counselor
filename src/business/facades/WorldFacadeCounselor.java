@@ -19,6 +19,7 @@ import java.util.TreeMap;
 import model.Cenario;
 import model.Cidade;
 import model.Comando;
+import model.Exercito;
 import model.Habilidade;
 import model.Jogador;
 import model.Mercado;
@@ -28,9 +29,9 @@ import model.Partida;
 import model.Personagem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.WorldManager;
 import persistenceCommons.PersistenceException;
 import persistenceCommons.XmlManager;
-import persistence.local.WorldManager;
 
 /**
  *
@@ -139,6 +140,10 @@ public class WorldFacadeCounselor implements Serializable {
         return WorldManager.getInstance().getCidades().values();
     }
 
+    public Collection<Exercito> getExercitos() {
+        return WorldManager.getInstance().getExercitos().values();
+    }
+
     public SortedMap<String, Personagem> listPersonagens() {
         return WorldManager.getInstance().getPersonagens();
     }
@@ -201,8 +206,12 @@ public class WorldFacadeCounselor implements Serializable {
         return WorldManager.getInstance().getPartida().getNationPackagesLimit();
     }
 
-    public boolean hasEmissario() {
+    public boolean hasDiplomat() {
         return cf.hasDiplomat(getCenario());
+    }
+
+    public boolean hasRogue() {
+        return cf.hasRogue(getCenario());
     }
 
     public boolean hasWizard() {

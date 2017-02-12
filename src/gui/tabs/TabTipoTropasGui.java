@@ -361,7 +361,7 @@ public class TabTipoTropasGui extends TabBase {
         this.setMovimentacaoModel(null);
         this.setHabilidadeModel(null);
         this.jtMainLista.setModel(model);
-        this.calcColumnWidths(jtMainLista);
+        this.doConfigTableColumns(jtMainLista);
         this.updateGui();
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);
     }
@@ -383,7 +383,7 @@ public class TabTipoTropasGui extends TabBase {
                     }));
         } else {
             this.jtAtaque.setModel(model);
-            calcColumnWidths(jtAtaque);
+            doConfigTableColumns(jtAtaque);
         }
     }
 
@@ -400,7 +400,7 @@ public class TabTipoTropasGui extends TabBase {
                     }));
         } else {
             this.jtDefesa.setModel(model);
-            calcColumnWidths(jtDefesa);
+            doConfigTableColumns(jtDefesa);
         }
     }
 
@@ -417,7 +417,7 @@ public class TabTipoTropasGui extends TabBase {
                     }));
         } else {
             this.jtTatica.setModel(model);
-            calcColumnWidths(jtTatica);
+            doConfigTableColumns(jtTatica);
         }
     }
 
@@ -434,7 +434,7 @@ public class TabTipoTropasGui extends TabBase {
                     }));
         } else {
             this.jtMovimentacao.setModel(model);
-            calcColumnWidths(jtMovimentacao);
+            doConfigTableColumns(jtMovimentacao);
         }
     }
 
@@ -451,7 +451,7 @@ public class TabTipoTropasGui extends TabBase {
                     }));
         } else {
             this.jtHabilidade.setModel(model);
-            calcColumnWidths(jtHabilidade);
+            doConfigTableColumns(jtHabilidade);
         }
     }
 

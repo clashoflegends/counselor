@@ -67,7 +67,7 @@ public class SubTabTropas extends TabBase implements Serializable {
                 labels.getString("TROPA"), labels.getString("QTD")
             }));
         }
-        calcColumnWidths(jtMainLista);
+        doConfigTableColumns(jtMainLista);
         jtMainLista.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     }
 

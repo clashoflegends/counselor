@@ -15,7 +15,7 @@ import business.facade.PersonagemFacade;
 import business.facades.WorldFacadeCounselor;
 import control.support.ControlBase;
 import control.support.DispatchManager;
-import gui.MainAboutBox;
+import gui.accessories.MainAboutBox;
 import gui.MainResultWindowGui;
 import gui.MainSettingsGui;
 import java.awt.Dimension;

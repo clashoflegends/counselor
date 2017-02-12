@@ -111,14 +111,14 @@ public class ArtefatoConverter implements Serializable {
     }
 
     public static GenericoTableModel getArtefatoModel(List lista) {
-        GenericoTableModel artefatoModel =
-                new GenericoTableModel(getArtefatoColNames(), getArtefatosAsArray(lista),
-                new Class[]{
-                    java.lang.String.class, java.lang.String.class, java.lang.Integer.class,
-                    java.lang.String.class, Local.class, java.lang.String.class,
-                    java.lang.String.class, java.lang.String.class, java.lang.String.class, 
-                    java.lang.Integer.class
-                });
+        GenericoTableModel artefatoModel
+                = new GenericoTableModel(getArtefatoColNames(), getArtefatosAsArray(lista),
+                        new Class[]{
+                            java.lang.String.class, java.lang.String.class, java.lang.Integer.class,
+                            java.lang.String.class, Local.class, java.lang.String.class,
+                            java.lang.String.class, java.lang.String.class, java.lang.String.class,
+                            java.lang.Integer.class
+                        });
         return artefatoModel;
     }
 
@@ -181,6 +181,19 @@ public class ArtefatoConverter implements Serializable {
             Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
             for (Nacao nacao : jAtivo.getNacoes().values()) {
                 ret.addAll(artefatoFacade.getArtefatos(listFactory.listArtefatos(), nacao));
+            }
+        } else if (filtro.equalsIgnoreCase("itemlost")) {
+            for (Artefato item : listFactory.listArtefatos()) {
+                if (!artefatoFacade.isPosse(item)) {
+                    ret.add(item);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("team")) {
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+            for (Nacao nacao : listFactory.listNacoes().values()) {
+                if (jAtivo.isJogadorAliado(nacao) || jAtivo.isNacao(nacao)) {
+                    ret.addAll(artefatoFacade.getArtefatos(listFactory.listArtefatos(), nacao));
+                }
             }
         } else if (filtro.equalsIgnoreCase("allies")) {
             Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();

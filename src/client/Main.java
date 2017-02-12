@@ -31,7 +31,12 @@ public class Main implements Serializable {
         final SettingsManager sm = SettingsManager.getInstance();
         sm.setConfigurationMode("Client");
         sm.setLanguage(sm.getConfig("language", "en"));
-        final String autoload = sm.getConfig("autoLoad");
+        final String autoload;
+        if (args.length == 1) {
+            autoload = args[0];
+        } else {
+            autoload = sm.getConfig("autoLoad");
+        }
         sm.setWorldBuilder(sm.getConfig("worldBuilder", "0").equalsIgnoreCase("1"));
         sm.setRadialMenu(sm.getConfig("newUi", "1").equalsIgnoreCase("1"));
         //load application
