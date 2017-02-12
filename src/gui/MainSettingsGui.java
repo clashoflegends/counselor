@@ -8,6 +8,7 @@ package gui;
 import control.SettingsControler;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JTextField;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
@@ -60,6 +61,8 @@ public class MainSettingsGui extends javax.swing.JPanel {
       hexTagFrameCheckBox.addActionListener(settingsControler);
       armyPathComboBox.addActionListener(settingsControler);
       pcPathCheckBox.addActionListener(settingsControler);
+      autoLoadCheck.addActionListener(settingsControler);
+      autoLoadActionCheck.addActionListener(settingsControler);
               
     }
 
@@ -90,6 +93,8 @@ public class MainSettingsGui extends javax.swing.JPanel {
         autoLoadButton = new javax.swing.JButton();
         autoLoadActionTextField = new javax.swing.JTextField();
         autoLoadActionButton = new javax.swing.JButton();
+        autoLoadCheck = new javax.swing.JCheckBox();
+        autoLoadActionCheck = new javax.swing.JCheckBox();
         playerPanel = new javax.swing.JPanel();
         myEmailLabel = new javax.swing.JLabel();
         serverSmtpLabel = new javax.swing.JLabel();
@@ -169,16 +174,31 @@ public class MainSettingsGui extends javax.swing.JPanel {
         autoLoadTextField.setEditable(false);
         autoLoadTextField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         autoLoadTextField.setText(settingsManager.getConfig("autoLoad"));
+        autoLoadTextField.setEnabled(isAutoLoadFilled());
 
         autoLoadButton.setText("...");
         autoLoadButton.setActionCommand("fLoadAuto");
+        autoLoadButton.setEnabled(isAutoLoadFilled());
 
         autoLoadActionTextField.setEditable(false);
         autoLoadActionTextField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         autoLoadActionTextField.setText(settingsManager.getConfig("autoLoadActions"));
+        autoLoadActionTextField.setEnabled(isAutoLoadActionFilled());
 
         autoLoadActionButton.setText("...");
         autoLoadActionButton.setActionCommand("fLoadAutoAction");
+        autoLoadActionButton.setEnabled(isAutoLoadActionFilled());
+
+        autoLoadCheck.setSelected(isAutoLoadFilled());
+        autoLoadCheck.setActionCommand("autoLoadCheck");
+        autoLoadCheck.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                autoLoadCheckActionPerformed(evt);
+            }
+        });
+
+        autoLoadActionCheck.setSelected(isAutoLoadActionFilled());
+        autoLoadActionCheck.setActionCommand("autoLoadActionCheck");
 
         javax.swing.GroupLayout gamePanelLayout = new javax.swing.GroupLayout(gamePanel);
         gamePanel.setLayout(gamePanelLayout);
@@ -209,17 +229,23 @@ public class MainSettingsGui extends javax.swing.JPanel {
                                             .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                 .addComponent(autoLoadActionLabel)
                                                 .addComponent(autoLoadDirLabel))
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                                 .addComponent(autoLoadActionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addComponent(autoLoadTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(autoLoadActionButton)
-                                    .addComponent(autoLoadButton)
+                                    .addGroup(gamePanelLayout.createSequentialGroup()
+                                        .addComponent(autoLoadActionButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(autoLoadActionCheck))
+                                    .addGroup(gamePanelLayout.createSequentialGroup()
+                                        .addComponent(autoLoadButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(autoLoadCheck))
                                     .addComponent(saveDirButton)
                                     .addComponent(openSaveDir))))
-                        .addContainerGap(84, Short.MAX_VALUE))))
+                        .addContainerGap(61, Short.MAX_VALUE))))
         );
         gamePanelLayout.setVerticalGroup(
             gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -239,17 +265,21 @@ public class MainSettingsGui extends javax.swing.JPanel {
                     .addComponent(loadDirLabel)
                     .addComponent(saveDirButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(autoLoadButton, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(autoLoadDirLabel)
-                        .addComponent(autoLoadTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(autoLoadButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(autoLoadDirLabel)
+                            .addComponent(autoLoadTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(autoLoadCheck))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(autoLoadActionButton)
                     .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(autoLoadActionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(autoLoadActionLabel)))
+                        .addComponent(autoLoadActionLabel))
+                    .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(autoLoadActionCheck)
+                        .addComponent(autoLoadActionButton)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(overEliminCheckBox)
                 .addGap(0, 50, Short.MAX_VALUE))
@@ -449,7 +479,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                             .addComponent(tableColumnCheckBox)
                             .addComponent(copyOrdersCheckBox)
                             .addComponent(autoMoveCheckBox))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(minimizeWindowCheckBox)
                             .addComponent(copyActionsPopUpCheckBox)
@@ -464,7 +494,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                             .addGroup(displayPanelLayout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(splitSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(332, Short.MAX_VALUE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(displayPanelLayout.createSequentialGroup()
                                 .addGap(26, 26, 26)
                                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -660,6 +690,10 @@ public class MainSettingsGui extends javax.swing.JPanel {
         
     }//GEN-LAST:event_serverPasswordFieldFocusLost
 
+    private void autoLoadCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoLoadCheckActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_autoLoadCheckActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton allFiltroRadioButton;
@@ -667,9 +701,11 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private javax.swing.JComboBox armyPathComboBox;
     private javax.swing.JLabel armyPathLabel;
     private javax.swing.JButton autoLoadActionButton;
+    private javax.swing.JCheckBox autoLoadActionCheck;
     private javax.swing.JLabel autoLoadActionLabel;
     private javax.swing.JTextField autoLoadActionTextField;
     private javax.swing.JButton autoLoadButton;
+    private javax.swing.JCheckBox autoLoadCheck;
     private javax.swing.JLabel autoLoadDirLabel;
     private javax.swing.JTextField autoLoadTextField;
     private javax.swing.JCheckBox autoMoveCheckBox;
@@ -735,6 +771,14 @@ public class MainSettingsGui extends javax.swing.JPanel {
     
     public JTextField getAutoLoadTextField() {
         return autoLoadTextField;
+    }
+    
+    public JButton getAutoLoadActionButton() {
+        return autoLoadActionButton;
+    }
+    
+    public JButton getAutoLoadButton() {
+        return autoLoadButton;
     }
     
     
@@ -865,6 +909,24 @@ public class MainSettingsGui extends javax.swing.JPanel {
             alphabeticOrderButton.setSelected(false);
             sequenceRadioButton.setSelected(true);
         }
+    }
+    
+    private boolean isAutoLoadFilled() {
+        boolean filled = true;
+        String path = settingsManager.getConfig("autoLoad");
+        if (path == null || path.isEmpty() ) {
+            filled = false;
+        }
+        return filled;
+    }
+    
+    private boolean isAutoLoadActionFilled() {
+        boolean filled = true;
+        String path = settingsManager.getConfig("autoLoadActions");
+        if (path == null || path.isEmpty() ) {
+            filled = false;
+        }
+        return filled;
     }
 
 }
