@@ -421,14 +421,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @param autoLoad
      */
     public void doAutoLoad(String autoLoad) {
-        if (autoLoad != null) {
+        if (autoLoad != null && !autoLoad.isEmpty() ) {
 //            autoLoad = SettingsManager.getInstance().getConfig("loadDir") + autoLoad;
             try {
                 log.info(labels.getString("AUTOLOADING.OPENING") + autoLoad);
                 WorldFacadeCounselor.getInstance().doStart(new File(autoLoad));
                 getGui().iniciaConfig();
                 String autoLoadActions = SettingsManager.getInstance().getConfig("autoLoadActions", "none");
-                if (!autoLoadActions.equals("none")) {
+                if (!autoLoadActions.equals("none")  && !autoLoadActions.isEmpty() ) {
                     final File loadActions = new File(autoLoadActions);
                     setComando(loadActions);
                 }

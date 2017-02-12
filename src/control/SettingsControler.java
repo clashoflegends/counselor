@@ -184,6 +184,38 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             int selected = (pcPath.isSelected()) ? 1 : 0;
             SettingsManager.getInstance().setConfig("drawPcPath", String.valueOf(selected));
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        } else if (actionCommand.equals("autoLoadCheck")) {
+            JCheckBox autoLoad = (JCheckBox) e.getSource();
+                        
+            if (autoLoad.isSelected()) {
+                this.settingsGui.getAutoLoadTextField().setEnabled(true);
+                this.settingsGui.getAutoLoadButton().setEnabled(true);
+                this.settingsGui.getAutoLoadTextField().setText(SettingsManager.getInstance().getConfig("autoLoad"));
+                
+            } else {
+                this.settingsGui.getAutoLoadTextField().setEnabled(false);
+                this.settingsGui.getAutoLoadButton().setEnabled(false);
+                this.settingsGui.getAutoLoadTextField().setText("");
+                SettingsManager.getInstance().setConfig("autoLoad", "");
+               
+            }
+                       
+            
+        } else if (actionCommand.equals("autoLoadActionCheck")) {
+           JCheckBox autoLoadActions = (JCheckBox) e.getSource();
+                        
+            if (autoLoadActions.isSelected()) {
+                this.settingsGui.getAutoLoadActionTextField().setEnabled(true);
+                this.settingsGui.getAutoLoadActionButton().setEnabled(true);
+                this.settingsGui.getAutoLoadActionTextField().setText(SettingsManager.getInstance().getConfig("autoLoadActions"));
+                
+            } else {
+                this.settingsGui.getAutoLoadActionTextField().setEnabled(false);
+                this.settingsGui.getAutoLoadActionButton().setEnabled(false);
+                this.settingsGui.getAutoLoadActionTextField().setText("");
+                SettingsManager.getInstance().setConfig("autoLoadActions", "");
+               
+            }
         }
     }
 
