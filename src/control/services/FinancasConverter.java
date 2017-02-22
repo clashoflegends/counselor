@@ -98,7 +98,7 @@ public class FinancasConverter implements Serializable {
             int cidadesUpkeep = nacaoFacade.getCustoCidades(nacao, cenario) * -1;
             int personagens = nacaoFacade.getCustoPersonagens(nacao, cenario) * -1;
             int arrecadacao = nacaoFacade.getArrecadacao(nacao);
-            int ouroProd = nacaoFacade.getProducao(nacao, cenario.getMoney());
+            int ouroProd = nacaoFacade.getProducao(nacao, cenario.getMoney(), cenario, WorldFacadeCounselor.getInstance().getTurno());
             final int custos = exercitos + cidadesUpkeep + personagens + exeBonus;
             if (exeBonus != 0) {
                 dados[ii][0] = labels.getString("FINANCAS.CURRENT.DISCOUNT.ARMIES");
@@ -178,12 +178,13 @@ public class FinancasConverter implements Serializable {
             return (ret);
         } else {
             try {
-                Produto[] produtos = cenarioFacade.listProdutos(WorldFacadeCounselor.getInstance().getCenario(), 1);
+                final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
+                Produto[] produtos = cenarioFacade.listProdutos(cenario, 1);
                 int ii = 0, nn = 0;
                 Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
                 Object[][] ret = new Object[produtos.length][getMercadoColNames().length];
                 for (Produto produto : produtos) {
-                    int prod = nacaoFacade.getProducao(nacao, produto);
+                    int prod = nacaoFacade.getProducao(nacao, produto, cenario, WorldFacadeCounselor.getInstance().getTurno());
                     int est = nacaoFacade.getEstoque(nacao, produto);
                     int unit = mercado.getProdutoVlVenda(produto);
                     ret[ii][nn++] = produto.getNome();

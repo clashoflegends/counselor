@@ -146,7 +146,7 @@ public class CidadeConverter implements Serializable {
         cArray[ii++] = cidadeFacade.getCoordenadas(cidade);
 
         cArray[ii++] = cidadeFacade.getArrecadacaoImpostos(cidade);
-        cArray[ii++] = cidadeFacade.getProducao(cidade, WorldFacadeCounselor.getInstance().getCenario().getMoney());
+        cArray[ii++] = cidadeFacade.getProducao(cidade, WorldFacadeCounselor.getInstance().getCenario().getMoney(), WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getTurno());
         cArray[ii++] = cidadeFacade.getUpkeepMoney(cidade);
         cArray[ii++] = cidadeFacade.getLealdade(cidade);
         cArray[ii++] = cidadeFacade.getLealdadeDelta(cidade);
@@ -164,11 +164,11 @@ public class CidadeConverter implements Serializable {
         cArray[ii++] = cidadeFacade.getNacaoNome(cidade);
         cArray[ii++] = localFacade.getTerrenoNome(cidadeFacade.getLocal(cidade));
         cArray[ii++] = localFacade.getClima(cidadeFacade.getLocal(cidade));
-        cArray[ii++] = cidadeFacade.getResourceBestSell(cidade, mercado);
+        cArray[ii++] = cidadeFacade.getResourceBestSell(cidade, mercado, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getTurno());
         if (WorldFacadeCounselor.getInstance().hasResourceManagement()) {
             for (Produto produto : getResourceList()) {
                 int estoque = cidadeFacade.getEstoque(cidade, produto);
-                estoque += cidadeFacade.getProducao(cidade, produto);
+                estoque += cidadeFacade.getProducao(cidade, produto, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getTurno());
                 cArray[ii++] = estoque;
             }
         }
@@ -278,13 +278,13 @@ public class CidadeConverter implements Serializable {
                 Produto produto = (Produto) lista.next();
                 int i = 0;
                 final int estoque = cidadeFacade.getEstoque(cidade, produto);
-                final int producao = cidadeFacade.getProducao(cidade, produto);
+                final int producao = cidadeFacade.getProducao(cidade, produto, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getTurno());
                 final Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
                 ret[ii][i++] = produto.getNome();
                 ret[ii][i++] = estoque + producao;
                 ret[ii][i++] = producao;
                 ret[ii][i++] = estoque;
-                ret[ii][i++] = cidadeFacade.getResourceSell(cidade, produto, mercado);
+                ret[ii][i++] = cidadeFacade.getResourceSell(cidade, produto, mercado, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getTurno());
                 ii++;
                 //PENDING adicionar o clima
             }
