@@ -143,7 +143,7 @@ public class CidadeConverter implements Serializable {
         Object[] cArray = new Object[getCidadeColNames(new ArrayList<Class>(30)).length];
         cArray[ii++] = cidadeFacade.getNome(cidade);
         cArray[ii++] = cidadeFacade.getTamanhoNome(cidade);
-        cArray[ii++] = cidadeFacade.getCoordenadas(cidade);
+        cArray[ii++] = cidadeFacade.getLocal(cidade);
 
         cArray[ii++] = cidadeFacade.getArrecadacaoImpostos(cidade);
         cArray[ii++] = cidadeFacade.getProducao(cidade, WorldFacadeCounselor.getInstance().getCenario().getMoney(), WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getTurno());

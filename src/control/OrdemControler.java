@@ -24,6 +24,7 @@ import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import model.ActorAction;
 import model.Ordem;
 import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
@@ -73,8 +74,10 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         if (index < 0) {
             return;
         }
-        final String[] ordemDisplay = getTabGui().getActor().doOrderSave(index, getTabGui().getOrdemQuadro());
-        getTabGui().setValueAt(ordemDisplay, index);
+        final PersonagemOrdem po = getTabGui().getOrdemQuadro();
+        final String[] ordemDisplay = getTabGui().getActor().doOrderSave(index, po);
+        ActorAction actorAction = ordemFacade.getActorAction(po);
+        getTabGui().setValueAt(actorAction, index);
     }
 
     public ComboBoxModel getTaticasComboModel() {

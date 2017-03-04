@@ -15,9 +15,9 @@ import business.facade.PersonagemFacade;
 import business.facades.WorldFacadeCounselor;
 import control.support.ControlBase;
 import control.support.DispatchManager;
-import gui.accessories.MainAboutBox;
 import gui.MainResultWindowGui;
 import gui.MainSettingsGui;
+import gui.accessories.MainAboutBox;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -114,7 +114,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doAbout();
             } else if ("jbConfig".equals(jbTemp.getActionCommand())) {
                 doConfig();
-            }else if ("jbLoad".equals(jbTemp.getActionCommand())) {
+            } else if ("jbLoad".equals(jbTemp.getActionCommand())) {
                 doLoad(jbTemp);
             } else {
                 log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
@@ -271,51 +271,46 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         dAbout.pack();
         dAbout.setVisible(true);
     }
-    
-     private void doConfig() throws HeadlessException {    
-       
-        MainSettingsGui settingPanel = new MainSettingsGui(); 
-       
-        int option = JOptionPane.showOptionDialog(null,settingPanel,labels.getString("MENU.CONFIG"),
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, 
-                new javax.swing.ImageIcon(getClass().getResource("/images/icon_customize.gif")), null,null);   
-        
+
+    private void doConfig() throws HeadlessException {
+
+        MainSettingsGui settingPanel = new MainSettingsGui();
+
+        int option = JOptionPane.showOptionDialog(null, settingPanel, labels.getString("MENU.CONFIG"),
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
+                new javax.swing.ImageIcon(getClass().getResource("/images/icon_customize.gif")), null, null);
+
         if (option == JOptionPane.OK_OPTION) {
             log.debug("Saving settings from option window.");
-            
-            Enumeration keys  = SettingsManager.getInstance().listConfigs();
+
+            Enumeration keys = SettingsManager.getInstance().listConfigs();
             while (keys.hasMoreElements()) {
-                String key = (String)keys.nextElement();
+                String key = (String) keys.nextElement();
                 //FIXME Comparation is not working. All settings are saving to file.
-                if (SettingsManager.getInstance().isConfig(key,SettingsManager.getInstance().getConfig(key) , "")) {
+                if (SettingsManager.getInstance().isConfig(key, SettingsManager.getInstance().getConfig(key), "")) {
                     SettingsManager.getInstance().doConfigSave(key);
-                }                                   
+                }
             }
-            
+
         } else {
-           SettingsManager.getInstance().listConfigs();
+            SettingsManager.getInstance().listConfigs();
             log.debug("Cancel settings option window.");
-            
-            Enumeration keys  = SettingsManager.getInstance().listConfigs();
+
+            Enumeration keys = SettingsManager.getInstance().listConfigs();
             while (keys.hasMoreElements()) {
-                SettingsManager.getInstance().doConfigRestore((String)keys.nextElement());                
+                SettingsManager.getInstance().doConfigRestore((String) keys.nextElement());
             }
-        }       
+        }
     }
-     
-      /**
-     * Transictional method for development porpuse. Must be deleted after new methods 
-     * in SettingsManager would be implemented.
+
+    /**
+     * Transictional method for development porpuse. Must be deleted after new methods in SettingsManager would be implemented.
+     *
      * @param props
-     * @return 
-     
-    private Map<String, String> getMapProperties(SettingsManager settingsManager) {
-        Map<String, String> mapProperties = new HashMap<String, String>();
-        mapProperties.put("loadDir", settingsManager.getProperties("loadDir"));
-        mapProperties.put("saveDir", settingsManager.getProperties("saveDir"));
-        return mapProperties;
-    }
-*/
+     * @return * private Map<String, String> getMapProperties(SettingsManager settingsManager) { Map<String, String> mapProperties = new
+     * HashMap<String, String>(); mapProperties.put("loadDir", settingsManager.getProperties("loadDir")); mapProperties.put("saveDir",
+     * settingsManager.getProperties("saveDir")); return mapProperties; }
+     */
     private void doCopy() throws HeadlessException {
         //config text Area
         JTextArea jtaResultado = new javax.swing.JTextArea(80, 20);
@@ -421,14 +416,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @param autoLoad
      */
     public void doAutoLoad(String autoLoad) {
-        if (autoLoad != null && !autoLoad.isEmpty() ) {
+        if (autoLoad != null && !autoLoad.isEmpty()) {
 //            autoLoad = SettingsManager.getInstance().getConfig("loadDir") + autoLoad;
             try {
                 log.info(labels.getString("AUTOLOADING.OPENING") + autoLoad);
                 WorldFacadeCounselor.getInstance().doStart(new File(autoLoad));
                 getGui().iniciaConfig();
                 String autoLoadActions = SettingsManager.getInstance().getConfig("autoLoadActions", "none");
-                if (!autoLoadActions.equals("none")  && !autoLoadActions.isEmpty() ) {
+                if (!autoLoadActions.equals("none") && !autoLoadActions.isEmpty()) {
                     final File loadActions = new File(autoLoadActions);
                     setComando(loadActions);
                 }
@@ -666,10 +661,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     /**
-     * Carrega o arquivo verifica integridade do arquivo verifica se o
-     * turno/nacao/jogador eh correto limpa as ordens atuais existentes carrega
-     * as ordens personagem por personagem atualiza GUI indica quantas ordens
-     * foram carregadas/descartadas
+     * Carrega o arquivo verifica integridade do arquivo verifica se o turno/nacao/jogador eh correto limpa as ordens atuais existentes carrega as
+     * ordens personagem por personagem atualiza GUI indica quantas ordens foram carregadas/descartadas
      */
     private void setComando(File file) {
         try {
@@ -718,18 +711,19 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      */
     private int setOrdens(Comando comando, List<String> errorMsgs) {
         int ret = 0;
-        SortedMap<String, BaseModel> listPers = new TreeMap<String, BaseModel>();
-        //limpa todas as ordens
-        for (BaseModel actor : WorldFacadeCounselor.getInstance().getActors()) {
-            actor.remAcoes();
-            listPers.put(actor.getCodigo(), actor);
+        final SortedMap<String, BaseModel> actors = WorldFacadeCounselor.getInstance().getActorsAll();
+        if (SettingsManager.getInstance().isConfig("LoadActionsBehavior", "Clean", "Clean")) {
+            //limpa todas as ordens
+            for (BaseModel actor : actors.values()) {
+                actor.remAcoes();
+            }
+            //limpa financas.
+            getDispatchManager().sendDispatchForMsg(DispatchManager.CLEAR_FINANCES_FORECAST, "");
         }
-        //limpa financas.
-        getDispatchManager().sendDispatchForMsg(DispatchManager.CLEAR_FINANCES_FORECAST, "");
         try {
             //carrega as ordens personagem por personagem
             for (ComandoDetail comandoDetail : comando.getOrdens()) {
-                BaseModel actor = listPers.get(comandoDetail.getActorCodigo());
+                BaseModel actor = actors.get(comandoDetail.getActorCodigo());
                 Ordem ordem = WorldFacadeCounselor.getInstance().getOrdem(comandoDetail.getOrdemCodigo());
                 try {
                     //just to catch the NullPointerException

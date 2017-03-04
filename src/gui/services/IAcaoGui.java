@@ -4,11 +4,13 @@
  */
 package gui.services;
 
+import model.ActorAction;
+
 /**
  *
  * @author jmoura
  */
 public interface IAcaoGui {
 
-    public void setValueAt(String[] ordemDisplay, int ordIndex);
+    public void setValueAt(ActorAction actorAction, int ordIndex);
 }
