@@ -668,7 +668,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         try {
             Comando comando = (Comando) XmlManager.getInstance().get(file);
             //verificar serial violado
-            if (!comando.isSerial()) {
+             if (!comando.isSerial()) {
                 throw new IllegalStateException(labels.getString("SERIAL.VIOLATION") + file.getName());
             }
             //verificar se o turno 'e correto
