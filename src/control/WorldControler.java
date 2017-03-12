@@ -725,6 +725,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             for (ComandoDetail comandoDetail : comando.getOrdens()) {
                 BaseModel actor = actors.get(comandoDetail.getActorCodigo());
                 Ordem ordem = WorldFacadeCounselor.getInstance().getOrdem(comandoDetail.getOrdemCodigo());
+                
+                getDispatchManager().sendDispatchForMsg(DispatchManager.SET_NACAO_SELECTED, comandoDetail.getNacaoCodigo());
                 try {
                     //just to catch the NullPointerException
                     ordem.getNome();
