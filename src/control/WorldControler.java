@@ -717,9 +717,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             for (BaseModel actor : actors.values()) {
                 actor.remAcoes();
             }
-            //limpa financas.
-            getDispatchManager().sendDispatchForMsg(DispatchManager.CLEAR_FINANCES_FORECAST, "");
+            
         }
+        //limpa financas.
+        getDispatchManager().sendDispatchForMsg(DispatchManager.CLEAR_FINANCES_FORECAST, "");
+        
         try {
             //carrega as ordens personagem por personagem
             for (ComandoDetail comandoDetail : comando.getOrdens()) {
