@@ -6,10 +6,13 @@ package gui.services;
 
 import business.facade.LocalFacade;
 import control.MapaControler;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
 import java.io.Serializable;
-import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -54,7 +57,7 @@ public class LocalTableCellRenderer extends DefaultTableCellRenderer implements 
             c.setForeground(colorFgNotSelected);
 //            c.setFont(fontNotSelected);
         }
-        final boolean highlight = localFacade.getCoordenadas(mapaControler.getLocal()).equals(value);
+        final boolean highlight = mapaControler.getLocal() == value || localFacade.getCoordenadas(mapaControler.getLocal()).equals(value);
         if (highlight) {
             c.setBackground(new Color(128, 128, 255));
 //            c.setBackground(new Color(255, 255, 128));

@@ -4,13 +4,13 @@
  */
 package gui.services;
 
-import business.facade.OrdemFacade;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
+import model.ActorAction;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,14 +18,14 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jmoura
  */
-public class ActorOrderTableCellRenderer extends DefaultTableCellRenderer implements Serializable {
+public class ActorActionTableCellRenderer extends DefaultTableCellRenderer implements Serializable {
 
-    private static final Log log = LogFactory.getLog(ActorOrderTableCellRenderer.class);
+    private static final Log log = LogFactory.getLog(ActorActionTableCellRenderer.class);
     private final Color colorBgSelected = new Color(128, 128, 255), colorBgNotSelected = Color.WHITE;
     private final Color colorFgSelected = Color.WHITE, colorFgNotSelected = Color.BLACK;
-    private final Color colorBgMissing = new Color(255, 251, 251), colorFgDisable = Color.LIGHT_GRAY;
+    private final Color colorBgMissing = new Color(255, 230, 230), colorFgDisable = Color.LIGHT_GRAY;
 
-    public ActorOrderTableCellRenderer(JTable table) {
+    public ActorActionTableCellRenderer(JTable table) {
         super();
     }
 
@@ -42,12 +42,16 @@ public class ActorOrderTableCellRenderer extends DefaultTableCellRenderer implem
             background = colorBgSelected;
             foreground = colorFgSelected;
         }
-        if (value.equals(OrdemFacade.ACTIONMISSING)) {
+        ActorAction actorAction = (ActorAction) value;
+        if (actorAction.isBlank()) {
             background = colorBgMissing;
         }
-        if (value.equals(OrdemFacade.ACTIONDISABLED)) {
+        if (actorAction.isDisabled()) {
             foreground = colorFgDisable;
             alignment = SwingConstants.CENTER;
+        }
+        if (actorAction.isReadonly()) {
+            foreground = colorFgDisable;
         }
         //apply cell style
         this.setHorizontalAlignment(alignment);

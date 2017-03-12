@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import model.ActorAction;
 import model.Artefato;
 import model.Cenario;
 import model.Feitico;
@@ -29,7 +30,6 @@ import model.Nacao;
 import model.Ordem;
 import model.Personagem;
 import model.PersonagemFeitico;
-import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -71,7 +71,7 @@ public class PersonagemConverter implements Serializable {
         for (int nn = 1; nn <= qtOrdens; nn++) {
             colNames.add(String.format("%s %s", labels.getString("ACAO"), nn));
 //            classes.add(String.class);
-            classes.add(PersonagemOrdem.class);
+            classes.add(ActorAction.class);
 
         }
         colNames.add(labels.getString("LOCAL"));
@@ -120,12 +120,17 @@ public class PersonagemConverter implements Serializable {
         Local localOrigem = personagemFacade.getLocalOrigem(personagem);
         //inicia array
         cArray[ii++] = personagemFacade.getNome(personagem);
+//        for (int nn = 0; nn < qtOrdens; nn++) {
+//            temp = ordemFacade.getOrdemDisplay(personagem, nn, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
+//            cArray[ORDEM_COL_INDEX_START + nn] = temp[0] + temp[1];
+//            ii++;
+//        }
+        final int orderMax = ordemFacade.getOrdemMax(personagem, WorldFacadeCounselor.getInstance().getCenario());
         for (int nn = 0; nn < qtOrdens; nn++) {
-            temp = ordemFacade.getOrdemDisplay(personagem, nn, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-            cArray[ORDEM_COL_INDEX_START + nn] = temp[0] + temp[1];
+            cArray[ORDEM_COL_INDEX_START + nn] = ordemFacade.getActorAction(personagem, nn, orderMax, WorldFacadeCounselor.getInstance().getJogadorAtivo());
             ii++;
         }
-        cArray[ii++] = localFacade.getCoordenadas(local);
+        cArray[ii++] = local;
         cArray[ii++] = personagem.getPericiaComandante();
         if (WorldFacadeCounselor.getInstance().hasRogue() || !WorldFacadeCounselor.getInstance().getCenario().isLom()) {
             cArray[ii++] = personagem.getPericiaAgente();

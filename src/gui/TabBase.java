@@ -6,15 +6,15 @@
 package gui;
 
 import control.MapaControler;
-import gui.services.ActorOrderTableCellRenderer;
+import gui.services.ActorActionTableCellRenderer;
 import gui.services.ColumnWidthsAdjuster;
 import gui.services.LocalTableCellRenderer;
 import java.io.Serializable;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
+import model.ActorAction;
 import model.Local;
-import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -93,7 +93,7 @@ public class TabBase extends javax.swing.JRootPane implements Serializable {
 
     protected void doConfigTableColumns(JTable table) {
         //set renders for Action columns
-        table.setDefaultRenderer(PersonagemOrdem.class, new ActorOrderTableCellRenderer(table));
+        table.setDefaultRenderer(ActorAction.class, new ActorActionTableCellRenderer(table));
         if (this.mapaControler != null) {
             //set render for Local/Hex
             table.setDefaultRenderer(Local.class, new LocalTableCellRenderer(this.mapaControler, table));

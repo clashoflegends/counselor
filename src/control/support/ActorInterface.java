@@ -18,6 +18,7 @@ import control.services.CidadeConverter;
 import control.services.NacaoConverter;
 import java.io.Serializable;
 import javax.swing.ComboBoxModel;
+import model.ActorAction;
 import model.Cenario;
 import model.Exercito;
 import model.Jogador;
@@ -37,7 +38,7 @@ import persistenceCommons.SettingsManager;
  */
 public abstract class ActorInterface extends ControlBase implements Serializable {
 
-    private static final Log log = LogFactory.getLog(ActorInterfacePersonagem.class);
+    private static final Log log = LogFactory.getLog(ActorInterface.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final LocalFacade localFacade = new LocalFacade();
     private final NacaoFacade nacaoFacade = new NacaoFacade();
@@ -68,8 +69,7 @@ public abstract class ActorInterface extends ControlBase implements Serializable
     }
 
     /**
-     * 0 = Personagens 1 = Personagem-Comandante-Ex 2 = Personagem-Local 3 =
-     * Personagem-Nacao-Local 4 = Personagem-Local-NoNacao 5 = Personagem-Nacao
+     * 0 = Personagens 1 = Personagem-Comandante-Ex 2 = Personagem-Local 3 = Personagem-Nacao-Local 4 = Personagem-Local-NoNacao 5 = Personagem-Nacao
      * 5 = Personagem-local_self
      *
      * @param tipo
@@ -176,7 +176,7 @@ public abstract class ActorInterface extends ControlBase implements Serializable
 
     public abstract GenericoComboBoxModel getOrdemComboModel(int ordemAtiva, boolean allOrders);
 
-    public abstract String[] doOrderClear(int indexModelOrdem);
+    public abstract ActorAction doOrderClear(int indexModelOrdem);
 
     public abstract String[] doOrderSave(int indexModelOrdem, PersonagemOrdem po);
 

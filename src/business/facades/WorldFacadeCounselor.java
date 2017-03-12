@@ -158,6 +158,17 @@ public class WorldFacadeCounselor implements Serializable {
         return ret;
     }
 
+    public SortedMap<String, BaseModel> getActorsAll() {
+        SortedMap<String, BaseModel> ret = new TreeMap<String, BaseModel>();
+        for (BaseModel actor : WorldFacadeCounselor.getInstance().getActors()) {
+            ret.put(actor.getCodigo(), actor);
+        }
+//        ret.putAll(WorldManager.getInstance().getNacoes());
+//        ret.putAll(WorldManager.getInstance().getCidades());
+//        ret.putAll(WorldManager.getInstance().getPersonagens());
+        return ret;
+    }
+
     public SortedMap<String, Ordem> getOrdens() {
         return WorldManager.getInstance().getPartida().getCenario().getOrdens();
     }
