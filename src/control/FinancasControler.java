@@ -43,8 +43,8 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
     private GenericoTableModel mainTableModel;
     private final TabFinancasGui tabGui;
     private List<Nacao> listaExibida;
-  //  private final List<PersonagemOrdem> listaPersonagemOrdens = new ArrayList<PersonagemOrdem>();
-    private Map<Nacao, List<PersonagemOrdem>> mapPersonagemOrdens = new HashMap<Nacao, List<PersonagemOrdem>>();
+    //  private final List<PersonagemOrdem> listaPersonagemOrdens = new ArrayList<PersonagemOrdem>();
+    private final Map<Nacao, List<PersonagemOrdem>> mapPersonagemOrdens = new HashMap<Nacao, List<PersonagemOrdem>>();
     private Nacao nacao;
     private final AcaoFacade acaoFacade = new AcaoFacade();
 
@@ -69,7 +69,6 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
         return FinancasConverter.getMercadoModel(nacao);
     }
 
-    
     public GenericoTableModel getProjecaoTableModel(Nacao nacao) {
         List<PersonagemOrdem> listPo = new ArrayList<PersonagemOrdem>();
         if (mapPersonagemOrdens.containsKey(nacao)) {
@@ -77,13 +76,12 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
         }
         return FinancasConverter.getProjecaoTableModel(nacao, listPo);
     }
-    
-    public GenericoTableModel getProjecaoTableModel(Nacao nacao, List<PersonagemOrdem> listPo) {
-        mapPersonagemOrdens.put(nacao, listPo);
+
+    private GenericoTableModel getProjecaoTableModel(Nacao nacao, List<PersonagemOrdem> listPo) {
         return FinancasConverter.getProjecaoTableModel(nacao, listPo);
     }
 
-    public TabFinancasGui getTabGui() {
+    private TabFinancasGui getTabGui() {
         return tabGui;
     }
 
@@ -112,7 +110,7 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
                 //testes
                 int rowIndex = lsm.getAnchorSelectionIndex();
                 int modelIndex = table.convertRowIndexToModel(rowIndex);
-                nacao = (Nacao) listaExibida.get(modelIndex);               
+                nacao = (Nacao) listaExibida.get(modelIndex);
                 getTabGui().doMudaNacao(nacao);
                 //PENDING atualizar table mensagens
             }
@@ -122,59 +120,48 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
     }
 
     @Override
-    public void receiveDispatch(PersonagemOrdem antes, PersonagemOrdem depois) {
+    public void receiveDispatch(Nacao nation, PersonagemOrdem before, PersonagemOrdem after) {
         boolean refresh = false;
         //retira "antes" da lista
-        if (acaoFacade.getCusto(antes) > 0) {
-            if (mapPersonagemOrdens.containsKey(nacao)) {
-                mapPersonagemOrdens.get(nacao).remove(antes);
+        if (acaoFacade.getCusto(before) > 0) {
+            if (mapPersonagemOrdens.containsKey(nation)) {
+                mapPersonagemOrdens.get(nation).remove(before);
                 refresh = true;
             }
-            
+
         }
 
         //receive msg to add to finances forecast
-        if (acaoFacade.getCusto(depois) > 0) {
-            if (mapPersonagemOrdens.containsKey(nacao)) {
-                mapPersonagemOrdens.get(nacao).add(depois);
+        if (acaoFacade.getCusto(after) > 0) {
+            if (mapPersonagemOrdens.containsKey(nation)) {
+                mapPersonagemOrdens.get(nation).add(after);
                 refresh = true;
             }
-            
+
         }
-        if (refresh) {      
-           JTable table = this.getTabGui().getMainLista();
-          
-           Nacao selectedNacao = (Nacao) listaExibida.get(table.getSelectedRow()); 
-           if (selectedNacao.equals(nacao)) {
-               tabGui.setProjecaoModel(getProjecaoTableModel(nacao, mapPersonagemOrdens.get(nacao)));
-           }
+        if (refresh) {
+            JTable table = this.getTabGui().getMainLista();
+
+            Nacao selectedNacao = (Nacao) listaExibida.get(table.getSelectedRow());
+            if (selectedNacao.equals(nation)) {
+                tabGui.setProjecaoModel(getProjecaoTableModel(nation, mapPersonagemOrdens.get(nation)));
+            }
         }
     }
 
     @Override
-    public void receiveDispatch(int msgName, String txt) {
+    public void receiveDispatch(int msgName, String idNation) {
         if (msgName == DispatchManager.CLEAR_FINANCES_FORECAST) {
-            mapPersonagemOrdens.clear();
+            for (List<PersonagemOrdem> lists : mapPersonagemOrdens.values()) {
+                lists.clear();
+            }
         } else if (msgName == DispatchManager.SET_NACAO_SELECTED) {
-            this.nacao = findNacao(Integer.parseInt(txt));
+            //setting current nation
+            this.nacao = WorldManager.getInstance().getNacao(idNation);
+            //making sure the map is complete
             if (!mapPersonagemOrdens.containsKey(nacao)) {
                 mapPersonagemOrdens.put(nacao, new ArrayList<PersonagemOrdem>());
             }
         }
-    }
-    
-    /**
-     * Copied from WorldControler
-     * @param idNacao
-     * @return 
-     */
-    private Nacao findNacao(int idNacao) {
-        for (Nacao nacion : WorldManager.getInstance().getNacoes().values()) {
-            int id = nacion.getId();
-            if (nacion.getId() == idNacao) {
-                return nacion;
-            }
-        }
-        return null;
     }
 }

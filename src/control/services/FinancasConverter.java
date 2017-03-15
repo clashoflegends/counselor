@@ -152,7 +152,7 @@ public class FinancasConverter implements Serializable {
                 dados[ii][0] = labels.getString("FINANCAS.FORECAST.FINAL");
                 dados[ii++][1] = moneyFinal + valorAcoes + decay;
             }
-            final String label = String.format("%s: %s", labels.getString("MENU.ACTION.COST"), valorAcoes);
+            final String label = String.format(labels.getString("MENU.ACTION.COST"), nacaoFacade.getNome(nacao), valorAcoes);
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SET_LABEL_MONEY, label);
 
         }

@@ -135,17 +135,17 @@ public class ActorInterfacePersonagem extends ActorInterface {
 
     @Override
     public ActorAction doOrderClear(int indexModelOrdem) {
-        getDispatchManager().sendDispatchForChar(getPersonagem().getAcao(indexModelOrdem), null);
+        getDispatchManager().sendDispatchForChar(getNacao(), getPersonagem().getAcao(indexModelOrdem), null);
         setOrdem(indexModelOrdem, null);
         return ordemFacade.getActorActionBlank();
     }
 
     @Override
     public String[] doOrderSave(int indexModelOrdem, PersonagemOrdem po) {
-        Nacao personagemNacao = getNacao();
-        String idNacao =  String.valueOf(personagemNacao.getId());
+        final Nacao personagemNacao = getNacao();
+        final String idNacao = String.valueOf(personagemNacao.getId());
         getDispatchManager().sendDispatchForMsg(DispatchManager.SET_NACAO_SELECTED, idNacao);
-        getDispatchManager().sendDispatchForChar(getPersonagem().getAcao(indexModelOrdem), po);
+        getDispatchManager().sendDispatchForChar(getNacao(), getPersonagem().getAcao(indexModelOrdem), po);
         //recupera os parametros da ordem
         //{Ordem, List parametroId, List ParametroDisplay}
         po.setNome(getPersonagem().getNome());

@@ -143,7 +143,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         fc.setFileFilter(PathFactory.getFilterAcoes());
         int returnVal = fc.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
+            final File file = fc.getSelectedFile();
             log.info(labels.getString("LOADING: ") + file.getName());
             setComando(file);
             this.saved = false;
@@ -392,7 +392,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         int returnVal = fc.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             try {
-                File file = fc.getSelectedFile();
+                final File file = fc.getSelectedFile();
                 log.info(labels.getString("OPENING: ") + file.getName());
                 WorldFacadeCounselor.getInstance().doStart(file);
                 log.info(labels.getString("INICIALIZANDO.GUI"));
@@ -668,7 +668,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         try {
             Comando comando = (Comando) XmlManager.getInstance().get(file);
             //verificar serial violado
-             if (!comando.isSerial()) {
+            if (!comando.isSerial()) {
                 throw new IllegalStateException(labels.getString("SERIAL.VIOLATION") + file.getName());
             }
             //verificar se o turno 'e correto
@@ -717,17 +717,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             for (BaseModel actor : actors.values()) {
                 actor.remAcoes();
             }
-            
+            //limpa financas.
+            getDispatchManager().sendDispatchForMsg(DispatchManager.CLEAR_FINANCES_FORECAST, "");
         }
-        //limpa financas.
-        getDispatchManager().sendDispatchForMsg(DispatchManager.CLEAR_FINANCES_FORECAST, "");
-        
+
         try {
             //carrega as ordens personagem por personagem
             for (ComandoDetail comandoDetail : comando.getOrdens()) {
                 BaseModel actor = actors.get(comandoDetail.getActorCodigo());
                 Ordem ordem = WorldFacadeCounselor.getInstance().getOrdem(comandoDetail.getOrdemCodigo());
-                
+
                 getDispatchManager().sendDispatchForMsg(DispatchManager.SET_NACAO_SELECTED, comandoDetail.getNacaoCodigo());
                 try {
                     //just to catch the NullPointerException
@@ -739,8 +738,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     po.setOrdem(ordem);
                     po.setParametrosDisplay(comandoDetail.getParametroDisplay());
                     po.setParametrosId(comandoDetail.getParametroId());
+                    final Nacao nation = WorldManager.getInstance().getNacao(comandoDetail.getNacaoCodigo());
+                    log.info("Nacao: " + nation.getNome());
                     //atualiza financas e outras dependencias
-                    getDispatchManager().sendDispatchForChar(null, po);
+                    getDispatchManager().sendDispatchForChar(nation, null, po);
                     ordemFacade.setOrdem(actor, indexOrdem, po);
                     //atualiza GUI
 //                    this.getGui().getTabPersonagem().setValueFor(ordemDisplay, personagem.getNome(), indexOrdem);
@@ -783,13 +784,21 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     @Override
-    public void receiveDispatch(PersonagemOrdem antes, PersonagemOrdem depois) {
-        if (depois != null) {
+    public void receiveDispatch(Nacao nation, PersonagemOrdem before, PersonagemOrdem after) {
+        if (after != null) {
+            //replacing with something
             this.getGui().setStatusMsg(
                     String.format("%s: %s [$%s]",
-                            depois.getNome(),
-                            depois.getOrdem().getDescricao(),
-                            acaoFacade.getCusto(depois)));
+                            after.getNome(),
+                            after.getOrdem().getDescricao(),
+                            acaoFacade.getCusto(after)));
+        } else if (before != null) {
+            //Clear before
+            this.getGui().setStatusMsg(
+                    String.format("%s: %s [$%s]",
+                            before.getNome(),
+                            before.getOrdem().getDescricao(),
+                            acaoFacade.getCusto(before)));
         }
     }
 
@@ -917,26 +926,17 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private int setPackage(SortedMap<Integer, String> packages) {
         Nacao nacao = null;
-        for (Integer idNacao : packages.keySet()) {
+        for (Integer idNation : packages.keySet()) {
             try {
-                nacao = findNacao(idNacao);
+                nacao = WorldManager.getInstance().getNacao(idNation);
                 clearPackages(nacao);
-                nacao.addHabilidades(WorldFacadeCounselor.getInstance().getHabilidades(packages.get(idNacao)));
+                nacao.addHabilidades(WorldFacadeCounselor.getInstance().getHabilidades(packages.get(idNation)));
             } catch (NullPointerException ex) {
                 log.fatal("Something wrong loading packages.");
             }
         }
         getDispatchManager().sendDispatchForMsg(DispatchManager.PACKAGE_RELOAD, "reload");
         return packages.size();
-    }
-
-    private Nacao findNacao(int idNacao) {
-        for (Nacao nacao : WorldManager.getInstance().getNacoes().values()) {
-            if (nacao.getId() == idNacao) {
-                return nacao;
-            }
-        }
-        return null;
     }
 
     private void clearPackages(Nacao nacao) {

@@ -15,17 +15,15 @@ import control.services.FiltroConverter;
 import gui.TabBase;
 import gui.subtabs.SubTabBaseList;
 import java.io.Serializable;
-import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import model.Nacao;
-import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
-import persistence.local.WorldManager;
 
 /**
  *

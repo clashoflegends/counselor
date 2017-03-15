@@ -87,6 +87,11 @@ public class NacaoConverter implements Serializable {
         cArray[ii++] = nacaoFacade.getPersonagens(nacao);
         cArray[ii++] = nacaoFacade.getPersonagensSlot(nacao, cenario);
         cArray[ii++] = nacaoFacade.getTropasQt(nacao, exercitos);
+        int valorAcoes = 0;
+        for (Object acoe : nacao.getAcoes().values()) {
+//                    valorAcoes -= acaoFacade.getCusto(ordem);
+        }
+        cArray[ii++] = valorAcoes;
         cArray[ii++] = nacaoFacade.getMoneySaldo(nacao);
         cArray[ii++] = nacaoFacade.getImpostos(nacao);
         cArray[ii++] = nacaoFacade.getLealdade(nacao);
@@ -121,6 +126,8 @@ public class NacaoConverter implements Serializable {
         colNames.add(labels.getString("PERSONAGENS.SLOT"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("TROPAS"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("FINANCAS.COST.ACTIONS"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("TREASURY"));
         classes.add(java.lang.Integer.class);
