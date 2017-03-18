@@ -210,7 +210,7 @@ public class WorldFacadeCounselor implements Serializable {
     }
 
     public boolean isNationPackages() {
-        return WorldManager.getInstance().getPartida().isNationPackages();
+        return getTurno() == 0 && WorldManager.getInstance().getPartida().isNationPackages();
     }
 
     public int getNationPackagesLimit() {
