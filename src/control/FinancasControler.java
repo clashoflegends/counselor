@@ -7,6 +7,7 @@ package control;
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
 import business.facade.AcaoFacade;
+import business.facades.WorldFacadeCounselor;
 import control.services.FinancasConverter;
 import control.services.NacaoConverter;
 import control.support.ControlBase;
@@ -15,10 +16,7 @@ import gui.tabs.TabFinancasGui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -28,7 +26,6 @@ import model.Nacao;
 import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 
@@ -43,16 +40,14 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
     private GenericoTableModel mainTableModel;
     private final TabFinancasGui tabGui;
     private List<Nacao> listaExibida;
-    //  private final List<PersonagemOrdem> listaPersonagemOrdens = new ArrayList<PersonagemOrdem>();
-    private final Map<Nacao, List<PersonagemOrdem>> mapPersonagemOrdens = new HashMap<Nacao, List<PersonagemOrdem>>();
-    private Nacao nacao;
     private final AcaoFacade acaoFacade = new AcaoFacade();
+    private static final WorldFacadeCounselor WFC = WorldFacadeCounselor.getInstance();
+    private final FinancasConverter finConv = new FinancasConverter();
 
     public FinancasControler(TabFinancasGui tabGui) {
         this.tabGui = tabGui;
         registerDispatchManager();
         registerDispatchManagerForMsg(DispatchManager.CLEAR_FINANCES_FORECAST);
-        registerDispatchManagerForMsg(DispatchManager.SET_NACAO_SELECTED);
     }
 
     public GenericoTableModel getExtratoTableModel(Nacao nacao) {
@@ -69,16 +64,13 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
         return FinancasConverter.getMercadoModel(nacao);
     }
 
-    public GenericoTableModel getProjecaoTableModel(Nacao nacao) {
-        List<PersonagemOrdem> listPo = new ArrayList<PersonagemOrdem>();
-        if (mapPersonagemOrdens.containsKey(nacao)) {
-            listPo = mapPersonagemOrdens.get(nacao);
-        }
-        return FinancasConverter.getProjecaoTableModel(nacao, listPo);
+    public GenericoTableModel getProjecaoTableModel(Nacao nation) {
+        final List<PersonagemOrdem> listPo = WFC.getMapPersonagemOrdens(nation);
+        return finConv.getProjecaoTableModel(nation, listPo);
     }
 
     private GenericoTableModel getProjecaoTableModel(Nacao nacao, List<PersonagemOrdem> listPo) {
-        return FinancasConverter.getProjecaoTableModel(nacao, listPo);
+        return finConv.getProjecaoTableModel(nacao, listPo);
     }
 
     private TabFinancasGui getTabGui() {
@@ -110,8 +102,7 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
                 //testes
                 int rowIndex = lsm.getAnchorSelectionIndex();
                 int modelIndex = table.convertRowIndexToModel(rowIndex);
-                nacao = (Nacao) listaExibida.get(modelIndex);
-                getTabGui().doMudaNacao(nacao);
+                getTabGui().doMudaNacao((Nacao) listaExibida.get(modelIndex));
                 //PENDING atualizar table mensagens
             }
         } catch (IndexOutOfBoundsException ex) {
@@ -123,44 +114,28 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
     public void receiveDispatch(Nacao nation, PersonagemOrdem before, PersonagemOrdem after) {
         boolean refresh = false;
         //retira "antes" da lista
-        if (acaoFacade.getCusto(before) > 0) {
-            if (mapPersonagemOrdens.containsKey(nation)) {
-                mapPersonagemOrdens.get(nation).remove(before);
-                refresh = true;
-            }
-
+        if (acaoFacade.getCusto(before) > 0 && WFC.remNacaoPersonagemOrdens(nation, before)) {
+            refresh = true;
         }
 
         //receive msg to add to finances forecast
-        if (acaoFacade.getCusto(after) > 0) {
-            if (mapPersonagemOrdens.containsKey(nation)) {
-                mapPersonagemOrdens.get(nation).add(after);
-                refresh = true;
-            }
-
+        if (acaoFacade.getCusto(after) > 0 && WFC.addNacaoPersonagemOrdens(nation, after)) {
+            refresh = true;
         }
-        if (refresh) {
-            JTable table = this.getTabGui().getMainLista();
 
-            Nacao selectedNacao = (Nacao) listaExibida.get(table.getSelectedRow());
-            if (selectedNacao.equals(nation)) {
-                tabGui.setProjecaoModel(getProjecaoTableModel(nation, mapPersonagemOrdens.get(nation)));
-            }
+        if (refresh) {
+            //FIXMEURGENT: How to refresh the Cost of Orders in the main table?
+            tabGui.setProjecaoModel(getProjecaoTableModel(nation));
+            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SET_LABEL_MONEY, nation.getId() + "");
         }
     }
 
     @Override
     public void receiveDispatch(int msgName, String idNation) {
         if (msgName == DispatchManager.CLEAR_FINANCES_FORECAST) {
-            for (List<PersonagemOrdem> lists : mapPersonagemOrdens.values()) {
+            for (List<PersonagemOrdem> lists : WFC.getMapPersonagemOrdens().values()) {
+                //clear each array, no need to clear the array itself.
                 lists.clear();
-            }
-        } else if (msgName == DispatchManager.SET_NACAO_SELECTED) {
-            //setting current nation
-            this.nacao = WorldManager.getInstance().getNacao(idNation);
-            //making sure the map is complete
-            if (!mapPersonagemOrdens.containsKey(nacao)) {
-                mapPersonagemOrdens.put(nacao, new ArrayList<PersonagemOrdem>());
             }
         }
     }

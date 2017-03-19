@@ -41,6 +41,7 @@ public class NacaoConverter implements Serializable {
     private static final ListFactory listFactory = new ListFactory();
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private static final CenarioFacade cenarioFacade = new CenarioFacade();
+    private static final WorldFacadeCounselor WFC = WorldFacadeCounselor.getInstance();
 
     public static GenericoComboBoxModel getNacaoComboModel(Nacao nacaoExcluida) {
         Nacao[] items = listNacoesDisponiveis(nacaoExcluida);
@@ -76,22 +77,22 @@ public class NacaoConverter implements Serializable {
         cArray[ii++] = nacaoFacade.getRacaNome(nacao);
         cArray[ii++] = nacaoFacade.getPontosVitoria(nacao);
         cArray[ii++] = SysApoio.iif(nacaoFacade.isAtiva(nacao), labels.getString("ATIVA"), labels.getString("INATIVA"));
-        if (cenarioFacade.hasOrdensNacao(WorldFacadeCounselor.getInstance().getPartida())) {
+        if (cenarioFacade.hasOrdensNacao(WFC.getPartida())) {
             cArray[ii++] = acaoFacade.getPointsSetup(nacao);
         }
-        if (WorldFacadeCounselor.getInstance().hasCapitals()) {
+        if (WFC.hasCapitals()) {
             cArray[ii++] = nacaoFacade.getCoordenadasCapital(nacao);
         }
-        final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
-        final Collection<Exercito> exercitos = WorldFacadeCounselor.getInstance().getExercitos();
+        final Cenario cenario = WFC.getCenario();
+        final Collection<Exercito> exercitos = WFC.getExercitos();
         cArray[ii++] = nacaoFacade.getPersonagens(nacao);
         cArray[ii++] = nacaoFacade.getPersonagensSlot(nacao, cenario);
         cArray[ii++] = nacaoFacade.getTropasQt(nacao, exercitos);
-        int valorAcoes = 0;
-        for (Object acoe : nacao.getAcoes().values()) {
-//                    valorAcoes -= acaoFacade.getCusto(ordem);
-        }
-        cArray[ii++] = valorAcoes;
+//        int valorAcoes = 0;
+//        for (PersonagemOrdem po : WFC.getMapPersonagemOrdens(nacao)) {
+//            valorAcoes -= acaoFacade.getCusto(po);
+//        }
+//        cArray[ii++] = valorAcoes;
         cArray[ii++] = nacaoFacade.getMoneySaldo(nacao);
         cArray[ii++] = nacaoFacade.getImpostos(nacao);
         cArray[ii++] = nacaoFacade.getLealdade(nacao);
@@ -112,12 +113,12 @@ public class NacaoConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("ATIVA"));
         classes.add(java.lang.String.class);
-        if (cenarioFacade.hasOrdensNacao(WorldFacadeCounselor.getInstance().getPartida())) {
+        if (cenarioFacade.hasOrdensNacao(WFC.getPartida())) {
             //add if for startup points here.
             colNames.add(labels.getString("STARTUP.POINTS"));
             classes.add(java.lang.Integer.class);
         }
-        if (WorldFacadeCounselor.getInstance().hasCapitals()) {
+        if (WFC.hasCapitals()) {
             colNames.add(labels.getString("CIDADE.CAPITAL"));
             classes.add(Local.class);
         }
@@ -127,8 +128,8 @@ public class NacaoConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("TROPAS"));
         classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("FINANCAS.COST.ACTIONS"));
-        classes.add(java.lang.Integer.class);
+//        colNames.add(labels.getString("FINANCAS.COST.ACTIONS"));
+//        classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("TREASURY"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("IMPOSTOS"));
@@ -225,7 +226,7 @@ public class NacaoConverter implements Serializable {
     }
 
     public static List<Nacao> listaByFiltro(String filtro) {
-        final Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+        final Jogador jAtivo = WFC.getJogadorAtivo();
         List<Nacao> ret = new ArrayList();
         if (filtro.equalsIgnoreCase("all")) {
             //todos

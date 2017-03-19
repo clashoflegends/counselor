@@ -6,14 +6,17 @@ package business.facades;
 
 import baseLib.BaseModel;
 import business.BussinessException;
+import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import control.MapaControler;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import model.Cenario;
@@ -27,6 +30,7 @@ import model.Nacao;
 import model.Ordem;
 import model.Partida;
 import model.Personagem;
+import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.local.WorldManager;
@@ -43,6 +47,8 @@ public class WorldFacadeCounselor implements Serializable {
     private static WorldFacadeCounselor instance;
     private final CenarioFacade cf = new CenarioFacade();
     private MapaControler mapaControler;
+    private final AcaoFacade acaoFacade = new AcaoFacade();
+    private final Map<Nacao, List<PersonagemOrdem>> mapPersonagemOrdens = new HashMap<Nacao, List<PersonagemOrdem>>();
 
     private WorldFacadeCounselor() {
     }
@@ -256,4 +262,36 @@ public class WorldFacadeCounselor implements Serializable {
     public void setMapaControler(MapaControler mapaControler) {
         this.mapaControler = mapaControler;
     }
+
+    public Map<Nacao, List<PersonagemOrdem>> getMapPersonagemOrdens() {
+        return mapPersonagemOrdens;
+    }
+
+    public List<PersonagemOrdem> getMapPersonagemOrdens(Nacao nation) {
+        if (!getMapPersonagemOrdens().containsKey(nation)) {
+            getMapPersonagemOrdens().put(nation, new ArrayList<PersonagemOrdem>());
+        }
+        return getMapPersonagemOrdens().get(nation);
+    }
+
+    public boolean addNacaoPersonagemOrdens(Nacao nation, PersonagemOrdem order) {
+        return getMapPersonagemOrdens(nation).add(order);
+    }
+
+    public boolean remNacaoPersonagemOrdens(Nacao nation, PersonagemOrdem order) {
+        return getMapPersonagemOrdens(nation).remove(order);
+    }
+
+    public int getNacaoOrderCost(Nacao nacao) {
+        int cost = 0;
+        for (PersonagemOrdem po : getMapPersonagemOrdens(nacao)) {
+            cost += acaoFacade.getCusto(po);
+        }
+        return cost;
+    }
+
+    public Nacao getNacao(String idNacao) {
+        return WorldManager.getInstance().getNacao(idNacao);
+    }
+
 }
