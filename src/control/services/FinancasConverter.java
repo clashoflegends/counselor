@@ -12,7 +12,7 @@ import business.facades.ListFactory;
 import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 import model.Cenario;
 import model.ExtratoDetail;
 import model.Mercado;
@@ -76,13 +76,13 @@ public class FinancasConverter implements Serializable {
      Resultado esperado para o próximo turno 	-500
      Reservas de Ouro 	49.500
      */
-    public GenericoTableModel getProjecaoTableModel(Nacao nacao, List<PersonagemOrdem> listPo) {
+    public GenericoTableModel getProjecaoTableModel(Nacao nacao, Set<PersonagemOrdem> listPo) {
         String[] colNames = new String[]{labels.getString("NOME"), labels.getString("VALOR")};
         final int tableSize;
         if (listPo.isEmpty()) {
             tableSize = SIZE;
         } else {
-            tableSize = SIZE + listPo.size() + 3;
+            tableSize = SIZE + listPo.size() + 5;
         }
         Object[][] dados = new Object[tableSize][colNames.length];
         if (nacao == null) {

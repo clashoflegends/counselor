@@ -14,9 +14,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import model.Cenario;
@@ -48,7 +50,8 @@ public class WorldFacadeCounselor implements Serializable {
     private final CenarioFacade cf = new CenarioFacade();
     private MapaControler mapaControler;
     private final AcaoFacade acaoFacade = new AcaoFacade();
-    private final Map<Nacao, List<PersonagemOrdem>> mapPersonagemOrdens = new HashMap<Nacao, List<PersonagemOrdem>>();
+//    private final Map<Nacao, List<PersonagemOrdem>> mapPersonagemOrdens = new HashMap<Nacao, List<PersonagemOrdem>>();
+    private final Map<Nacao, Set<PersonagemOrdem>> mapPersonagemOrdens = new HashMap<Nacao, Set<PersonagemOrdem>>();
 
     private WorldFacadeCounselor() {
     }
@@ -263,13 +266,13 @@ public class WorldFacadeCounselor implements Serializable {
         this.mapaControler = mapaControler;
     }
 
-    public Map<Nacao, List<PersonagemOrdem>> getMapPersonagemOrdens() {
+    public Map<Nacao, Set<PersonagemOrdem>> getMapPersonagemOrdens() {
         return mapPersonagemOrdens;
     }
 
-    public List<PersonagemOrdem> getMapPersonagemOrdens(Nacao nation) {
+    public Set<PersonagemOrdem> getMapPersonagemOrdens(Nacao nation) {
         if (!getMapPersonagemOrdens().containsKey(nation)) {
-            getMapPersonagemOrdens().put(nation, new ArrayList<PersonagemOrdem>());
+            getMapPersonagemOrdens().put(nation, new HashSet<PersonagemOrdem>());
         }
         return getMapPersonagemOrdens().get(nation);
     }

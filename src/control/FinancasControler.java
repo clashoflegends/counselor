@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -65,12 +66,8 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
     }
 
     public GenericoTableModel getProjecaoTableModel(Nacao nation) {
-        final List<PersonagemOrdem> listPo = WFC.getMapPersonagemOrdens(nation);
+        final Set<PersonagemOrdem> listPo = WFC.getMapPersonagemOrdens(nation);
         return finConv.getProjecaoTableModel(nation, listPo);
-    }
-
-    private GenericoTableModel getProjecaoTableModel(Nacao nacao, List<PersonagemOrdem> listPo) {
-        return finConv.getProjecaoTableModel(nacao, listPo);
     }
 
     private TabFinancasGui getTabGui() {
@@ -133,7 +130,7 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
     @Override
     public void receiveDispatch(int msgName, String idNation) {
         if (msgName == DispatchManager.CLEAR_FINANCES_FORECAST) {
-            for (List<PersonagemOrdem> lists : WFC.getMapPersonagemOrdens().values()) {
+            for (Set<PersonagemOrdem> lists : WFC.getMapPersonagemOrdens().values()) {
                 //clear each array, no need to clear the array itself.
                 lists.clear();
             }
