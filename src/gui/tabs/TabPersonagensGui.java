@@ -17,7 +17,7 @@ import gui.TabBase;
 import gui.services.IAcaoGui;
 import gui.subtabs.SubTabBaseList;
 import gui.subtabs.SubTabOrdem;
-import gui.subtabs.SubTabTextArea;
+import gui.subtabs.SubTabPopup;
 import java.io.Serializable;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -42,7 +42,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     private final PersonagemFacade personagemFacade = new PersonagemFacade();
     private final JogadorFacade jogadorFacade = new JogadorFacade();
     private Personagem personagemAtivo;
-    private final SubTabTextArea stResults = new SubTabTextArea();
+    private final SubTabPopup stResults = new SubTabPopup();
     private final SubTabBaseList stMagicItems = new SubTabBaseList();
     private final SubTabBaseList stSpells = new SubTabBaseList();
     private SubTabOrdem stOrdens;
@@ -269,7 +269,8 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     }
 
     private void doConfigTabs() {
-        stResults.setText(personagemControl.getResultado());
+        final String popupTitle = labels.getString("RESULTADOS.OF") + ": " + personagemControl.getNome();
+        stResults.setText(popupTitle, personagemControl.getResultado());
         doTabMagicItem();
         doTabSpells();
     }

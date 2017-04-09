@@ -11,6 +11,7 @@ import control.support.ActorInterfaceFactory;
 import gui.TabBase;
 import gui.services.ComponentFactory;
 import gui.services.IAcaoGui;
+import gui.services.IPopupTabGui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.io.Serializable;
@@ -42,12 +43,11 @@ import persistenceCommons.SettingsManager;
  *
  * @author gurgel
  */
-public class SubTabOrdem extends TabBase implements Serializable {
+public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
 
     private static final Log log = LogFactory.getLog(SubTabOrdem.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private OrdemControler ordemControl;
-    private OrdemControlerFloater ordemControlFloater;
     private final ComponentFactory compFactory = new ComponentFactory();
     private final List<Component> parametrosCombos = new ArrayList();
     private final List<JLabel> parametrosLabels = new ArrayList();
@@ -355,7 +355,6 @@ public class SubTabOrdem extends TabBase implements Serializable {
     private void iniciaConfig() {
         //Cria o Controle da lista de Ordens
         ordemControl = new OrdemControler(this);
-        ordemControlFloater = new OrdemControlerFloater(this);
         compFactory.setMapaControler(getMapaControler());
         compFactory.setOrdemControl(ordemControl);
 
@@ -393,8 +392,9 @@ public class SubTabOrdem extends TabBase implements Serializable {
         dOrdem.setTitle(labels.getString("ACOES.DISPONIVEL"));
         dOrdem.setAlwaysOnTop(true);
         dOrdem.setPreferredSize(new Dimension(400, 500));
+        final OrdemControlerFloater ordemControlFloater = new OrdemControlerFloater(this);
         dOrdem.addComponentListener(ordemControlFloater);
-        dOrdem.setName("dOrdem");
+        dOrdem.setName("dPopup");
 
         //configs gerais das ordens
         jbOk.setActionCommand("jbOk");
@@ -414,7 +414,7 @@ public class SubTabOrdem extends TabBase implements Serializable {
         cbOrdersAll.addItemListener(ordemControl);
         jbHelp.addActionListener(ordemControl);
         jbClear.addActionListener(ordemControl);
-        jbDetach.addItemListener(ordemControl);
+        jbDetach.addItemListener(ordemControlFloater);
 
         this.setDefaultButton(jbOk);
     }
@@ -614,7 +614,8 @@ public class SubTabOrdem extends TabBase implements Serializable {
         this.stAjuda.setText(text);
     }
 
-    public void doDetachOrders() {
+    @Override
+    public void doDetachPopup() {
         //change triggered by CheckBox
         if (jbDetach.isSelected()) {
             //monta a floating window para ordens
@@ -629,7 +630,8 @@ public class SubTabOrdem extends TabBase implements Serializable {
         }
     }
 
-    public void doAttachOrders() {
+    @Override
+    public void doAttachPopup() {
         //closing dialog, forced to redraw
         jbDetach.setSelected(false);
         detOrdens.setViewportView(jpDetOrdens);
