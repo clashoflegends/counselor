@@ -16,7 +16,7 @@ import business.facades.WorldFacadeCounselor;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.MainResultWindowGui;
-import gui.MainSettingsGui;
+import gui.accessories.MainSettingsGui;
 import gui.accessories.MainAboutBox;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
