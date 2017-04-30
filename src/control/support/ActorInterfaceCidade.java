@@ -134,7 +134,7 @@ public class ActorInterfaceCidade extends ActorInterface {
 
     @Override
     public ActorAction doOrderClear(int indexModelOrdem) {
-        getDispatchManager().sendDispatchForChar(getCidade().getAcao(indexModelOrdem), null);
+        getDispatchManager().sendDispatchForChar(getNacao(), getCidade().getAcao(indexModelOrdem), null);
         setOrdem(indexModelOrdem, null);
         return ordemFacade.getActorActionBlank();
     }
@@ -144,7 +144,7 @@ public class ActorInterfaceCidade extends ActorInterface {
         //recupera os parametros da ordem
         //{Ordem, List parametroId, List ParametroDisplay}
         po.setNome(getCidade().getNome());
-        getDispatchManager().sendDispatchForChar(getCidade().getAcao(indexModelOrdem), po);
+        getDispatchManager().sendDispatchForChar(getNacao(), getCidade().getAcao(indexModelOrdem), po);
         return setOrdem(indexModelOrdem, po);
     }
 

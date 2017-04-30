@@ -90,6 +90,10 @@ public class PersonagemControler extends ControlBase implements Serializable, Ac
         return PersonagemConverter.getResultado(personagem);
     }
 
+    public String getNome() {
+        return personagem.getNome();
+    }
+
     private TabPersonagensGui getTabGui() {
         return this.tabGui;
     }

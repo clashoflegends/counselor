@@ -7,8 +7,8 @@ package control;
 
 import control.support.ControlBase;
 import control.support.DispatchManager;
-import gui.MainSettingsGui;
-import gui.MainSettingsGui.ComboItem;
+import gui.accessories.MainSettingsGui;
+import gui.accessories.MainSettingsGui.ComboItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -156,6 +156,27 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             JCheckBox keepPopUp = (JCheckBox) e.getSource();
             int selected = (keepPopUp.isSelected()) ? 1 : 0;
             SettingsManager.getInstance().setConfig("KeepPopupOpen", String.valueOf(selected));
+        } else if (actionCommand.equals("FogOfWar")) {
+            JCheckBox fogOfWar = (JCheckBox) e.getSource();
+            int selected = (fogOfWar.isSelected()) ? 1 : 0;
+            SettingsManager.getInstance().setConfig("FogOfWarType", String.valueOf(selected));
+            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        } else if (actionCommand.equals("LoadActionsOtherNations")) {
+            JCheckBox loadActionsOtherNations = (JCheckBox) e.getSource();
+            int selected = (loadActionsOtherNations.isSelected()) ? 1 : 0;
+            if (selected == 0) {
+                SettingsManager.getInstance().setConfig("LoadActionsOtherNations", "deny");
+            } else {
+                SettingsManager.getInstance().setConfig("LoadActionsOtherNations", "allow");
+            }
+        } else if (actionCommand.equals("LoadActionsBehavior")) {
+            JCheckBox loadActionsBehavior = (JCheckBox) e.getSource();
+            int selected = (loadActionsBehavior.isSelected()) ? 1 : 0;
+            if (selected == 0) {
+                SettingsManager.getInstance().setConfig("LoadActionsBehavior", "clean");
+            } else {
+                SettingsManager.getInstance().setConfig("LoadActionsBehavior", "append");
+            }
         } else if (actionCommand.equals("autoMoveAction")) {
             JCheckBox autoMoveAction = (JCheckBox) e.getSource();
             int selected = (autoMoveAction.isSelected()) ? 1 : 0;
@@ -186,35 +207,34 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         } else if (actionCommand.equals("autoLoadCheck")) {
             JCheckBox autoLoad = (JCheckBox) e.getSource();
-                        
+
             if (autoLoad.isSelected()) {
                 this.settingsGui.getAutoLoadTextField().setEnabled(true);
                 this.settingsGui.getAutoLoadButton().setEnabled(true);
                 this.settingsGui.getAutoLoadTextField().setText(SettingsManager.getInstance().getConfig("autoLoad"));
-                
+
             } else {
                 this.settingsGui.getAutoLoadTextField().setEnabled(false);
                 this.settingsGui.getAutoLoadButton().setEnabled(false);
                 this.settingsGui.getAutoLoadTextField().setText("");
                 SettingsManager.getInstance().setConfig("autoLoad", "");
-               
+
             }
-                       
-            
+
         } else if (actionCommand.equals("autoLoadActionCheck")) {
-           JCheckBox autoLoadActions = (JCheckBox) e.getSource();
-                        
+            JCheckBox autoLoadActions = (JCheckBox) e.getSource();
+
             if (autoLoadActions.isSelected()) {
                 this.settingsGui.getAutoLoadActionTextField().setEnabled(true);
                 this.settingsGui.getAutoLoadActionButton().setEnabled(true);
                 this.settingsGui.getAutoLoadActionTextField().setText(SettingsManager.getInstance().getConfig("autoLoadActions"));
-                
+
             } else {
                 this.settingsGui.getAutoLoadActionTextField().setEnabled(false);
                 this.settingsGui.getAutoLoadActionButton().setEnabled(false);
                 this.settingsGui.getAutoLoadActionTextField().setText("");
                 SettingsManager.getInstance().setConfig("autoLoadActions", "");
-               
+
             }
         }
     }

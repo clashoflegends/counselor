@@ -10,10 +10,9 @@ import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
 import business.facades.ListFactory;
 import business.facades.WorldFacadeCounselor;
-import control.support.DispatchManager;
 import java.io.Serializable;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 import model.Cenario;
 import model.ExtratoDetail;
 import model.Mercado;
@@ -77,13 +76,13 @@ public class FinancasConverter implements Serializable {
      Resultado esperado para o próximo turno 	-500
      Reservas de Ouro 	49.500
      */
-    public static GenericoTableModel getProjecaoTableModel(Nacao nacao, List<PersonagemOrdem> listPo) {
+    public GenericoTableModel getProjecaoTableModel(Nacao nacao, Set<PersonagemOrdem> listPo) {
         String[] colNames = new String[]{labels.getString("NOME"), labels.getString("VALOR")};
         final int tableSize;
         if (listPo.isEmpty()) {
             tableSize = SIZE;
         } else {
-            tableSize = SIZE + listPo.size() + 3;
+            tableSize = SIZE + listPo.size() + 5;
         }
         Object[][] dados = new Object[tableSize][colNames.length];
         if (nacao == null) {
@@ -141,7 +140,9 @@ public class FinancasConverter implements Serializable {
                     dados[ii++][1] = acaoFacade.getCusto(ordem) * -1;
                     valorAcoes -= acaoFacade.getCusto(ordem);
                 }
-
+                dados[ii][0] = labels.getString("FINANCAS.COST.ACTIONS");
+                dados[ii++][1] = valorAcoes;
+                //skip one row
                 dados[ii][0] = " ";
                 dados[ii++][1] = null;
                 final int decay = nacaoFacade.getGoldDecay(nacao, moneyFinal + valorAcoes, cenario) * -1;
@@ -152,9 +153,6 @@ public class FinancasConverter implements Serializable {
                 dados[ii][0] = labels.getString("FINANCAS.FORECAST.FINAL");
                 dados[ii++][1] = moneyFinal + valorAcoes + decay;
             }
-            final String label = String.format("%s: %s", labels.getString("MENU.ACTION.COST"), valorAcoes);
-            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SET_LABEL_MONEY, label);
-
         }
         GenericoTableModel model = new GenericoTableModel(colNames, dados,
                 new Class[]{java.lang.String.class, java.lang.Integer.class});

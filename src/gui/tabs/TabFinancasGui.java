@@ -216,9 +216,7 @@ public final class TabFinancasGui extends TabBase implements Serializable {
             this.doTagHide();
         }
         stBalance.setListModel(financasControl.getExtratoTableModel(nacao));
-        
-        
-        stForecast.setListModel(financasControl.getProjecaoTableModel(nacao));
+        stForecast.setListModel(financasControl.getProjecaoTableModel(nacao, new ArrayList<PersonagemOrdem>()));
         stResources.setListModel(financasControl.getMercadoTableModel(nacao));
     }
 

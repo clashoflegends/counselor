@@ -18,7 +18,7 @@ import gui.TabBase;
 import gui.services.IAcaoGui;
 import gui.subtabs.SubTabBaseList;
 import gui.subtabs.SubTabOrdem;
-import gui.subtabs.SubTabTextArea;
+import gui.subtabs.SubTabPopup;
 import java.io.Serializable;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -45,7 +45,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     private final CidadeFacade cidadeFacade = new CidadeFacade();
     private final JogadorFacade jogadorFacade = new JogadorFacade();
 //    private SubTabConfigActor stRename = new SubTabConfigActor();
-    private final SubTabTextArea stResults = new SubTabTextArea();
+    private final SubTabPopup stResults = new SubTabPopup();
     private final SubTabBaseList stPersonagens = new SubTabBaseList();
     private final SubTabBaseList stProdutos = new SubTabBaseList();
     private SubTabOrdem stOrdens;
@@ -268,14 +268,15 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         this.doTagHide();
         stProdutos.setListModelClear();
         stPersonagens.setListModelClear();
-        stResults.setText("");
+        stResults.setText("", "");
     }
 
     public void doMudaCidade(Cidade cidade) {
         doPrintTag(cidade);
         stProdutos.setListModel(CidadeConverter.getProdutoModel(cidade));
         stPersonagens.setListModel(CidadeConverter.getPresencasModel(cidade));
-        stResults.setText(cidadeControl.getResultados(cidade));
+        final String popupTitle = labels.getString("RESULTADOS.OF") + ": " + cidadeFacade.getNomeCoordenada(cidade);
+        stResults.setText(popupTitle, cidadeControl.getResultados(cidade));
         stOrdens.doMudaActor(cidade);
         if (jogadorFacade.isMine(cidade, WorldFacadeCounselor.getInstance().getJogadorAtivo())
                 && cidadeFacade.isAtivo(cidade)) {

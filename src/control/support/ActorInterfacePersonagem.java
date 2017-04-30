@@ -142,9 +142,6 @@ public class ActorInterfacePersonagem extends ActorInterface {
 
     @Override
     public String[] doOrderSave(int indexModelOrdem, PersonagemOrdem po) {
-        Nacao personagemNacao = getNacao();
-        String idNacao =  String.valueOf(personagemNacao.getId());
-        getDispatchManager().sendDispatchForMsg(DispatchManager.SET_NACAO_SELECTED, idNacao);
         getDispatchManager().sendDispatchForChar(getPersonagem().getAcao(indexModelOrdem), po);
         //recupera os parametros da ordem
         //{Ordem, List parametroId, List ParametroDisplay}

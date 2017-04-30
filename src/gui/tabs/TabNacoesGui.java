@@ -203,7 +203,9 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         //set model
         this.jtMainLista.setModel(model);
         //confid red background
-        jtMainLista.getColumnModel().getColumn(NacaoConverter.ORDEM_COL_INDEX_START).setCellRenderer(ltcr);
+        if (WorldFacadeCounselor.getInstance().isNationPackages()) {
+            jtMainLista.getColumnModel().getColumn(NacaoConverter.ORDEM_COL_INDEX_START).setCellRenderer(ltcr);
+        }
         //auto adjust columns
         this.doConfigTableColumns(jtMainLista);
         this.updateGui();

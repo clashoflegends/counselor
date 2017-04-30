@@ -19,16 +19,16 @@ import org.apache.commons.logging.LogFactory;
  * @author jmoura
  */
 public class ActorActionTableCellRenderer extends DefaultTableCellRenderer implements Serializable {
-
+    
     private static final Log log = LogFactory.getLog(ActorActionTableCellRenderer.class);
     private final Color colorBgSelected = new Color(128, 128, 255), colorBgNotSelected = Color.WHITE;
     private final Color colorFgSelected = Color.WHITE, colorFgNotSelected = Color.BLACK;
     private final Color colorBgMissing = new Color(255, 230, 230), colorFgDisable = Color.LIGHT_GRAY;
-
+    
     public ActorActionTableCellRenderer(JTable table) {
         super();
     }
-
+    
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -42,16 +42,20 @@ public class ActorActionTableCellRenderer extends DefaultTableCellRenderer imple
             background = colorBgSelected;
             foreground = colorFgSelected;
         }
-        ActorAction actorAction = (ActorAction) value;
-        if (actorAction.isBlank()) {
-            background = colorBgMissing;
-        }
-        if (actorAction.isDisabled()) {
-            foreground = colorFgDisable;
-            alignment = SwingConstants.CENTER;
-        }
-        if (actorAction.isReadonly()) {
-            foreground = colorFgDisable;
+        try {
+            ActorAction actorAction = (ActorAction) value;
+            if (actorAction.isBlank()) {
+                background = colorBgMissing;
+            }
+            if (actorAction.isDisabled()) {
+                foreground = colorFgDisable;
+                alignment = SwingConstants.CENTER;
+            }
+            if (actorAction.isReadonly()) {
+                foreground = colorFgDisable;
+            }
+        } catch (NullPointerException ex) {
+            log.error("ActorActionTableCellRenderer issue: " + value);
         }
         //apply cell style
         this.setHorizontalAlignment(alignment);

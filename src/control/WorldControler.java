@@ -717,18 +717,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             for (BaseModel actor : actors.values()) {
                 actor.remAcoes();
             }
-            
+            //limpa financas.
+            getDispatchManager().sendDispatchForMsg(DispatchManager.CLEAR_FINANCES_FORECAST, "");
         }
-        //limpa financas.
-        getDispatchManager().sendDispatchForMsg(DispatchManager.CLEAR_FINANCES_FORECAST, "");
-        
         try {
             //carrega as ordens personagem por personagem
             for (ComandoDetail comandoDetail : comando.getOrdens()) {
                 BaseModel actor = actors.get(comandoDetail.getActorCodigo());
                 Ordem ordem = WorldFacadeCounselor.getInstance().getOrdem(comandoDetail.getOrdemCodigo());
-                
-                getDispatchManager().sendDispatchForMsg(DispatchManager.SET_NACAO_SELECTED, comandoDetail.getNacaoCodigo());
                 try {
                     //just to catch the NullPointerException
                     ordem.getNome();

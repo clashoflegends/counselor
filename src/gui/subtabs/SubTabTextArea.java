@@ -51,7 +51,6 @@ public class SubTabTextArea extends TabBase implements Serializable {
         jtaTextArea = new javax.swing.JTextArea();
 
         detAjuda.setBorder(null);
-        detAjuda.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         jtaTextArea.setFont(jtaTextArea.getFont().deriveFont(jtaTextArea.getFont().getSize()-1f));
         jtaTextArea.setLineWrap(true);
