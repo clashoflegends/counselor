@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import model.Local;
+import model.Nacao;
 import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,6 +36,8 @@ public class DispatchManager implements Serializable {
     public static final int LOCAL_RANGE_CLICK = 6;
     public static final int PACKAGE_RELOAD = 7;
     public static final int ACTIONS_RELOAD = 8;
+    public static final int LOCAL_MAP_REDRAW_RELOAD_TILES = 9;
+    public static final int LOCAL_MAP_REDRAW_TAG = 10;
 
     private DispatchManager() {
     }
@@ -46,11 +49,11 @@ public class DispatchManager implements Serializable {
         return DispatchManager.instance;
     }
 
-    public void register(ControlBase controler) {
+    public final void register(ControlBase controler) {
         controlers.add(controler);
     }
 
-    public void registerForMsg(int msgName, ControlBase controler) {
+    public final void registerForMsg(int msgName, ControlBase controler) {
         if (lista.containsKey(msgName)) {
             lista.get(msgName).add(controler);
         } else {
@@ -60,7 +63,15 @@ public class DispatchManager implements Serializable {
         }
     }
 
-    public void sendDispatchForMsg(int msgName, String txt) {
+    public final void sendDispatchForMsg(int msgName) {
+        if (lista.containsKey(msgName)) {
+            for (ControlBase cb : lista.get(msgName)) {
+                cb.receiveDispatch(msgName);
+            }
+        }
+    }
+
+    public final void sendDispatchForMsg(int msgName, String txt) {
         if (lista.containsKey(msgName)) {
             for (ControlBase cb : lista.get(msgName)) {
                 cb.receiveDispatch(msgName, txt);
@@ -68,13 +79,13 @@ public class DispatchManager implements Serializable {
         }
     }
 
-    public void sendDispatchForChar(PersonagemOrdem antes, PersonagemOrdem depois) {
+    public final void sendDispatchForChar(Nacao nation, PersonagemOrdem before, PersonagemOrdem after) {
         for (ControlBase cb : controlers) {
-            cb.receiveDispatch(antes, depois);
+            cb.receiveDispatch(nation, before, after);
         }
     }
 
-    public void sendDispatchForMsg(int msgName, Local local) {
+    public final void sendDispatchForMsg(int msgName, Local local) {
         if (lista.containsKey(msgName)) {
             for (ControlBase cb : lista.get(msgName)) {
                 cb.receiveDispatch(msgName, local);
@@ -82,7 +93,7 @@ public class DispatchManager implements Serializable {
         }
     }
 
-    public void sendDispatchForMsg(int msgName, Local local, int range) {
+    public final void sendDispatchForMsg(int msgName, Local local, int range) {
         if (lista.containsKey(msgName)) {
             for (ControlBase cb : lista.get(msgName)) {
                 cb.receiveDispatch(msgName, local, range);
