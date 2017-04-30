@@ -11,7 +11,7 @@ import business.facade.BattleSimFacade;
 import business.facades.WorldFacadeCounselor;
 import control.services.AcaoConverter;
 import control.services.ExercitoConverter;
-import gui.BattleSimulator;
+import control.support.IBattleSimulator;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -46,14 +46,15 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
 
     private static final Log log = LogFactory.getLog(BattleSimulatorControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private final BattleSimulator tabGui;
+    private final IBattleSimulator tabGui;
     private final List<ExercitoSim> listaExibida = new ArrayList<ExercitoSim>();
     private ExercitoSim exercito;
     private final BattleSimFacade combSim = new BattleSimFacade();
     private Terreno terreno;
     private int rowIndex = 0;
+    private CasualtyControler casualtyControler;
 
-    public BattleSimulatorControler(BattleSimulator tabGui) {
+    public BattleSimulatorControler(IBattleSimulator tabGui) {
         this.tabGui = tabGui;
     }
 
@@ -61,8 +62,24 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
         return AcaoConverter.getAjuda(ordem);
     }
 
-    public BattleSimulator getTabGui() {
+    public IBattleSimulator getTabGui() {
         return tabGui;
+    }
+
+    public Terreno getTerreno() {
+        return terreno;
+    }
+
+    public void setTerreno(Terreno terreno) {
+        this.terreno = terreno;
+    }
+
+    public CasualtyControler getCasualtyControler() {
+        return casualtyControler;
+    }
+
+    public void setCasualtyControler(CasualtyControler casualtyControler) {
+        this.casualtyControler = casualtyControler;
     }
 
     @Override
@@ -71,7 +88,7 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
             JSlider source = (JSlider) event.getSource();
             if (!source.getValueIsAdjusting()) {
                 if ("jsLoyalty".equals(source.getName()) || "jsSize".equals(source.getName()) || "jsFortification".equals(source.getName())) {
-                    tabGui.updateCityLabels();
+                    this.getTabGui().updateCityLabels();
                 } else {
                     log.info(source.getName());
                 }
@@ -100,11 +117,13 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
             JTable table = this.getTabGui().getListaExercitos();
             ListSelectionModel lsm = (ListSelectionModel) event.getSource();
             if (!lsm.isSelectionEmpty()) {
-                //testes
                 rowIndex = lsm.getAnchorSelectionIndex();
                 int modelIndex = table.convertRowIndexToModel(rowIndex);
                 exercito = (ExercitoSim) listaExibida.get(modelIndex);
                 getTabGui().updateArmy(exercito);
+                //set short casualties list
+                getTabGui().setCasualtyBorder(exercito, getTerreno());
+                getCasualtyControler().updateArmy(exercito, getTerreno());
             }
         } catch (IndexOutOfBoundsException ex) {
             //lista vazia?
@@ -129,10 +148,15 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
         if ("jcbTerrain".equals(jcbTerrain.getActionCommand())) {
             try {
                 final GenericoComboObject obj = (GenericoComboObject) jcbTerrain.getModel().getSelectedItem();
+                final Terreno terrain = (Terreno) obj.getObject();
                 for (ExercitoSim army : listaExibida) {
-                    army.setTerreno((Terreno) obj.getObject());
+                    army.setTerreno(terrain);
                 }
                 this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
+                getTabGui().setCasualtyBorder(exercito, terrain);
+                this.setTerreno(terrain);
+                //set short casualties list
+                getCasualtyControler().updateArmy(exercito, terrain);
             } catch (NullPointerException ex) {
             }
         }
@@ -152,13 +176,5 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
         }
         GenericoComboBoxModel model = new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]));
         return model;
-    }
-
-    public Terreno getTerreno() {
-        return terreno;
-    }
-
-    public void setTerreno(Terreno terreno) {
-        this.terreno = terreno;
     }
 }

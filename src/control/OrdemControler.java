@@ -20,10 +20,10 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
-import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import model.ActorAction;
 import model.Ordem;
 import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
@@ -73,8 +73,10 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         if (index < 0) {
             return;
         }
-        final String[] ordemDisplay = getTabGui().getActor().doOrderSave(index, getTabGui().getOrdemQuadro());
-        getTabGui().setValueAt(ordemDisplay, index);
+        final PersonagemOrdem po = getTabGui().getOrdemQuadro();
+        final String[] ordemDisplay = getTabGui().getActor().doOrderSave(index, po);
+        ActorAction actorAction = ordemFacade.getActorAction(po);
+        getTabGui().setValueAt(actorAction, index);
     }
 
     public ComboBoxModel getTaticasComboModel() {
@@ -150,17 +152,6 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             try {
                 if ("cbOrdem".equals(cb.getActionCommand())) {
                     getTabGui().setOrdemParametrosQuadro((GenericoComboObject) cb.getModel().getSelectedItem());
-                }
-            } catch (ClassCastException ex) {
-                log.debug("hum... suspicious");
-            }
-        }
-        if (event.getSource() instanceof JToggleButton) {
-            final JToggleButton cb = (JToggleButton) event.getSource();
-            try {
-                if ("jbDetach".equals(cb.getActionCommand())) {
-                    //criar floating window para ordens
-                    getTabGui().doDetachOrders();
                 }
             } catch (ClassCastException ex) {
                 log.debug("hum... suspicious");

@@ -4,13 +4,13 @@
  */
 package gui.services;
 
-import model.ActorAction;
-
 /**
  *
  * @author jmoura
  */
-public interface IAcaoGui {
+public interface IPopupTabGui {
 
-    public void setValueAt(ActorAction actorAction, int ordIndex);
+    public void doDetachPopup();
+
+    public void doAttachPopup();
 }

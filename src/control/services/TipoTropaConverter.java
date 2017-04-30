@@ -50,6 +50,14 @@ public class TipoTropaConverter implements Serializable {
                 tropas.addAll(nacaoFacade.getTropas(nacao).keySet());
             }
             ret.addAll(tropas);
+        } else if (filtro.equalsIgnoreCase("team") && jAtivo != null) {
+            final Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
+            for (Nacao ally : listFactory.listNacoes().values()) {
+                if (jAtivo.isJogadorAliado(ally) || jAtivo.isNacao(ally)) {
+                    tropas.addAll(nacaoFacade.getTropas(ally).keySet());
+                }
+            }
+            ret.addAll(tropas);
         } else if (filtro.equalsIgnoreCase("allies") && jAtivo != null) {
             final Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
             for (Nacao ally : listFactory.listNacoes().values()) {

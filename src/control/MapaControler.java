@@ -70,6 +70,8 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     public MapaControler(JPanel form) {
         final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         mapaManager = new MapaManager(cenario, form);
+        registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_REDRAW_TAG);
+        registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_REDRAW);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_RANGE_CLICK);
         //inicialize locais
@@ -84,13 +86,14 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         mapMenuManager.setTerrenos(cenario.getTerrenos());
     }
 
-    public ImageIcon getTagImage() {
-        return mapaManager.getTagImage();
-    }
-
     public ImageIcon printMapaGeral() {
         final Jogador jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
         return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
+    }
+
+    public ImageIcon refreshMapaGeral() {
+        final Jogador jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
+        return new ImageIcon(mapaManager.redrawMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
     }
 
     public BufferedImage getMap() {
@@ -294,6 +297,15 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     public void receiveDispatch(int msgName, Local local) {
         if (msgName == DispatchManager.LOCAL_MAP_REDRAW) {
             tabGui.doMapa(this.printMapaGeral());
+        }
+    }
+
+    @Override
+    public void receiveDispatch(int msgName) {
+        if (msgName == DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES) {
+            tabGui.doMapa(this.refreshMapaGeral());
+        } else if (msgName == DispatchManager.LOCAL_MAP_REDRAW_TAG) {
+            tabGui.setTag();
         }
     }
 

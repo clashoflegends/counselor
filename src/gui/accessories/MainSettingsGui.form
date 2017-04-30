@@ -95,7 +95,6 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="languageComboBox" min="-2" pref="211" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="overEliminCheckBox" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="1" attributes="0">
                                       <Component id="saveDirTextField" min="-2" pref="213" max="-2" attributes="0"/>
@@ -110,7 +109,7 @@
                                                   <Component id="autoLoadActionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                                                   <Component id="autoLoadDirLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                                               </Group>
-                                              <EmptySpace pref="22" max="32767" attributes="0"/>
+                                              <EmptySpace max="32767" attributes="0"/>
                                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                                   <Component id="autoLoadActionTextField" min="-2" pref="213" max="-2" attributes="0"/>
                                                   <Component id="autoLoadTextField" min="-2" pref="213" max="-2" attributes="0"/>
@@ -120,15 +119,38 @@
                                   </Group>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="autoLoadActionButton" min="-2" max="-2" attributes="0"/>
-                                      <Component id="autoLoadButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" attributes="0">
+                                          <Component id="autoLoadActionButton" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="autoLoadActionCheck" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="autoLoadButton" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="autoLoadCheck" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                       <Component id="saveDirButton" min="-2" max="-2" attributes="0"/>
                                       <Component id="openSaveDir" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="84" max="32767" attributes="0"/>
+                          <EmptySpace pref="55" max="32767" attributes="0"/>
                       </Group>
+                  </Group>
+              </Group>
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="overEliminCheckBox2" min="-2" max="-2" attributes="0"/>
+                      <Component id="overEliminCheckBox" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
+              </Group>
+              <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="overEliminCheckBox1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="358" max="32767" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -154,24 +176,39 @@
                       <Component id="saveDirButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="autoLoadButton" alignment="1" min="-2" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="autoLoadDirLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="autoLoadTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="autoLoadButton" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="autoLoadDirLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="autoLoadTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
+                      <Component id="autoLoadCheck" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="autoLoadActionButton" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="autoLoadActionTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="autoLoadActionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <Group type="103" alignment="0" groupAlignment="1" attributes="0">
+                          <Component id="autoLoadActionCheck" min="-2" max="-2" attributes="0"/>
+                          <Component id="autoLoadActionButton" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="overEliminCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="0" pref="50" max="32767" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="overEliminCheckBox2" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="0" pref="96" max="32767" attributes="0"/>
+              </Group>
+              <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace pref="184" max="32767" attributes="0"/>
+                      <Component id="overEliminCheckBox1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="123" max="-2" attributes="0"/>
+                  </Group>
               </Group>
           </Group>
         </DimensionLayout>
@@ -226,6 +263,20 @@
         <Component class="javax.swing.JCheckBox" name="overEliminCheckBox">
           <Properties>
             <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="isLoadActionsOtherNationsSelected()" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.GAME.LOADACTIONSOTHERNATIONS" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.GAME.LOADACTIONSOTHERNATIONS.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="LoadActionsOtherNations"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="overEliminCheckBox1">
+          <Properties>
+            <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="isOverrideSelected()" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
@@ -235,6 +286,20 @@
               <ResourceString bundle="labels.properties" key="SETTINGS.GAME.OVERRIDE.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="overrideAction"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="overEliminCheckBox2">
+          <Properties>
+            <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="isLoadActionsBehaviorSelected()" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.GAME.LOADACTIONSBEHAVIOR" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.GAME.LOADACTIONSBEHAVIOR.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="LoadActionsBehavior"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="openSaveDir">
@@ -274,12 +339,18 @@
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="settingsManager.getConfig(&quot;autoLoad&quot;)" type="code"/>
             </Property>
+            <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="isAutoLoadFilled()" type="code"/>
+            </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="autoLoadButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="..."/>
             <Property name="actionCommand" type="java.lang.String" value="fLoadAuto"/>
+            <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="isAutoLoadFilled()" type="code"/>
+            </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="autoLoadActionTextField">
@@ -289,12 +360,37 @@
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="settingsManager.getConfig(&quot;autoLoadActions&quot;)" type="code"/>
             </Property>
+            <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="isAutoLoadActionFilled()" type="code"/>
+            </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="autoLoadActionButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="..."/>
             <Property name="actionCommand" type="java.lang.String" value="fLoadAutoAction"/>
+            <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="isAutoLoadActionFilled()" type="code"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="autoLoadCheck">
+          <Properties>
+            <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="isAutoLoadFilled()" type="code"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="autoLoadCheck"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="autoLoadCheckActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="autoLoadActionCheck">
+          <Properties>
+            <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="isAutoLoadActionFilled()" type="code"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="autoLoadActionCheck"/>
           </Properties>
         </Component>
       </SubComponents>
@@ -336,7 +432,7 @@
                               <Component id="serverPassLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="serverUserLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="serverPortLabel" alignment="0" min="-2" pref="119" max="-2" attributes="0"/>
-                              <Component id="serverSmtpLabel" pref="176" max="32767" attributes="0"/>
+                              <Component id="serverSmtpLabel" pref="180" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -349,7 +445,7 @@
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace pref="29" max="32767" attributes="0"/>
+                  <EmptySpace pref="33" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -536,11 +632,12 @@
                               <Component id="copyOrdersCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="autoMoveCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="122" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="minimizeWindowCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="copyActionsPopUpCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="keepPopUpCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="fogOfWarCheckBox" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="91" max="-2" attributes="0"/>
                       </Group>
@@ -554,7 +651,7 @@
                               <Group type="102" attributes="0">
                                   <EmptySpace max="32767" attributes="0"/>
                                   <Component id="splitSizeSpinner" min="-2" pref="72" max="-2" attributes="0"/>
-                                  <EmptySpace pref="332" max="32767" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
@@ -611,8 +708,11 @@
                       <Component id="keepPopUpCheckBox" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="autoMoveCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="16" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="autoMoveCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="fogOfWarCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="85" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -731,6 +831,20 @@
             <Property name="actionCommand" type="java.lang.String" value="keepPopUp"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JCheckBox" name="fogOfWarCheckBox">
+          <Properties>
+            <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="isFogOfWarSelected()" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.DISPLAY.FILTER.FOGOFWAR" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.DISPLAY.FILTER.FOGOFWAR.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="FogOfWar"/>
+          </Properties>
+        </Component>
         <Component class="javax.swing.JCheckBox" name="autoMoveCheckBox">
           <Properties>
             <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -825,7 +939,7 @@
                       <Component id="hexTagFrameCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="pcPathCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="210" max="32767" attributes="0"/>
+                  <EmptySpace pref="204" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

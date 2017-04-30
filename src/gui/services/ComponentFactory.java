@@ -123,8 +123,7 @@ public class ComponentFactory implements Serializable {
     private static final String VARIADO = "Variado";
 
     /**
-     * Prepara o componente do parametro da ordem [JComboBox ou
-     * JFormattedTextField]
+     * Prepara o componente do parametro da ordem [JComboBox ou JFormattedTextField]
      *
      * @param controle
      * @return componente
@@ -496,6 +495,9 @@ public class ComponentFactory implements Serializable {
         } else if (controle.equals(PERSONAGEM_LOCAL_EX_COMANDANTE)) {//Personagem-Comandante-Ex
             //é um combo com o model com os personagens da mesma nacao conhecidos que comandam exercitos
             JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(1));
+            if (isAllSelected()) {
+                cbTemp.setEditable(true);
+            }
             cNovo = cbTemp;
         } else if (controle.equals(PERSONAGEM_LOCAL)) {//Personagem-Local
             //é um combo com o model com os personagens conhecidos no local, independente da nacao.

@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gui;
+package gui.accessories;
 
 import control.SettingsControler;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JTextField;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
@@ -21,52 +22,55 @@ public class MainSettingsGui extends javax.swing.JPanel {
     /**
      * Creates new form MainSettingsGui
      */
-    
     private static final BundleManager LABELS = SettingsManager.getInstance().getBundleManager();
-    
+
     private final SettingsControler settingsControler;
-    private SettingsManager settingsManager;
-    
+    private final SettingsManager settingsManager;
+
     public MainSettingsGui() {
-    
-      this.settingsManager = SettingsManager.getInstance();
-      settingsControler = new SettingsControler(this);
-      initComponents();
-      openSaveDir.addActionListener(settingsControler);
-      saveDirButton.addActionListener(settingsControler);
-      languageComboBox.addActionListener(settingsControler);
-      autoLoadButton.addActionListener(settingsControler);
-      autoLoadActionButton.addActionListener(settingsControler);
-      overEliminCheckBox.addActionListener(settingsControler);
-      myEmailTextField.addActionListener(settingsControler);
-      sendConfirmPopUpCheckBox.addActionListener(settingsControler);
-      sendOrderRequestCheckBox.addActionListener(settingsControler);
-      
-      initFilterRadiobutton();
-      initSortOrdersRadiobutton();      
-      allFiltroRadioButton.addActionListener(settingsControler);
-      ownFiltroRadioButton.addActionListener(settingsControler);
-      alphabeticOrderButton.addActionListener(settingsControler);
-      sequenceRadioButton.addActionListener(settingsControler);
-      splitSizeSpinner.addChangeListener(settingsControler);
-      maximizeWindowCheckBox.addActionListener(settingsControler);
-      tableColumnCheckBox.addActionListener(settingsControler);
-      copyActionsPopUpCheckBox.addActionListener(settingsControler);
-      copyOrdersCheckBox.addActionListener(settingsControler);
-      keepPopUpCheckBox.addActionListener(settingsControler);
-      autoMoveCheckBox.addActionListener(settingsControler);
-      mapTilesComboBox.addActionListener(settingsControler);
-      hexTagStyleComboBox.addActionListener(settingsControler);
-      hexTagFrameCheckBox.addActionListener(settingsControler);
-      armyPathComboBox.addActionListener(settingsControler);
-      pcPathCheckBox.addActionListener(settingsControler);
-              
+
+        this.settingsManager = SettingsManager.getInstance();
+        settingsControler = new SettingsControler(this);
+        initComponents();
+        openSaveDir.addActionListener(settingsControler);
+        saveDirButton.addActionListener(settingsControler);
+        languageComboBox.addActionListener(settingsControler);
+        autoLoadButton.addActionListener(settingsControler);
+        autoLoadActionButton.addActionListener(settingsControler);
+        overEliminCheckBox.addActionListener(settingsControler);
+        overEliminCheckBox1.addActionListener(settingsControler);
+        overEliminCheckBox2.addActionListener(settingsControler);
+        myEmailTextField.addActionListener(settingsControler);
+        sendConfirmPopUpCheckBox.addActionListener(settingsControler);
+        sendOrderRequestCheckBox.addActionListener(settingsControler);
+
+        initFilterRadiobutton();
+        initSortOrdersRadiobutton();
+        allFiltroRadioButton.addActionListener(settingsControler);
+        ownFiltroRadioButton.addActionListener(settingsControler);
+        alphabeticOrderButton.addActionListener(settingsControler);
+        sequenceRadioButton.addActionListener(settingsControler);
+        splitSizeSpinner.addChangeListener(settingsControler);
+        maximizeWindowCheckBox.addActionListener(settingsControler);
+        tableColumnCheckBox.addActionListener(settingsControler);
+        copyActionsPopUpCheckBox.addActionListener(settingsControler);
+        copyOrdersCheckBox.addActionListener(settingsControler);
+        keepPopUpCheckBox.addActionListener(settingsControler);
+        fogOfWarCheckBox.addActionListener(settingsControler);
+        autoMoveCheckBox.addActionListener(settingsControler);
+        mapTilesComboBox.addActionListener(settingsControler);
+        hexTagStyleComboBox.addActionListener(settingsControler);
+        hexTagFrameCheckBox.addActionListener(settingsControler);
+        armyPathComboBox.addActionListener(settingsControler);
+        pcPathCheckBox.addActionListener(settingsControler);
+        autoLoadCheck.addActionListener(settingsControler);
+        autoLoadActionCheck.addActionListener(settingsControler);
+
     }
 
     /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -82,6 +86,8 @@ public class MainSettingsGui extends javax.swing.JPanel {
         autoLoadActionLabel = new javax.swing.JLabel();
         loadDirLabel = new javax.swing.JLabel();
         overEliminCheckBox = new javax.swing.JCheckBox();
+        overEliminCheckBox1 = new javax.swing.JCheckBox();
+        overEliminCheckBox2 = new javax.swing.JCheckBox();
         openSaveDir = new javax.swing.JButton();
         saveDirTextField = new javax.swing.JTextField();
         loadDirTextField = new javax.swing.JTextField();
@@ -90,6 +96,8 @@ public class MainSettingsGui extends javax.swing.JPanel {
         autoLoadButton = new javax.swing.JButton();
         autoLoadActionTextField = new javax.swing.JTextField();
         autoLoadActionButton = new javax.swing.JButton();
+        autoLoadCheck = new javax.swing.JCheckBox();
+        autoLoadActionCheck = new javax.swing.JCheckBox();
         playerPanel = new javax.swing.JPanel();
         myEmailLabel = new javax.swing.JLabel();
         serverSmtpLabel = new javax.swing.JLabel();
@@ -114,6 +122,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
         copyActionsPopUpCheckBox = new javax.swing.JCheckBox();
         copyOrdersCheckBox = new javax.swing.JCheckBox();
         keepPopUpCheckBox = new javax.swing.JCheckBox();
+        fogOfWarCheckBox = new javax.swing.JCheckBox();
         autoMoveCheckBox = new javax.swing.JCheckBox();
         maximizeWindowCheckBox = new javax.swing.JCheckBox();
         sortOrdersLabel = new javax.swing.JLabel();
@@ -146,10 +155,20 @@ public class MainSettingsGui extends javax.swing.JPanel {
 
         loadDirLabel.setText(bundle.getString("SETTINGS.GAME.LOADDIR")); // NOI18N
 
-        overEliminCheckBox.setSelected(isOverrideSelected());
-        overEliminCheckBox.setText(bundle.getString("SETTINGS.GAME.OVERRIDE")); // NOI18N
-        overEliminCheckBox.setToolTipText(bundle.getString("SETTINGS.GAME.OVERRIDE.TOOLTIP")); // NOI18N
-        overEliminCheckBox.setActionCommand("overrideAction");
+        overEliminCheckBox.setSelected(isLoadActionsOtherNationsSelected());
+        overEliminCheckBox.setText(bundle.getString("SETTINGS.GAME.LOADACTIONSOTHERNATIONS")); // NOI18N
+        overEliminCheckBox.setToolTipText(bundle.getString("SETTINGS.GAME.LOADACTIONSOTHERNATIONS.TOOLTIP")); // NOI18N
+        overEliminCheckBox.setActionCommand("LoadActionsOtherNations");
+
+        overEliminCheckBox1.setSelected(isOverrideSelected());
+        overEliminCheckBox1.setText(bundle.getString("SETTINGS.GAME.OVERRIDE")); // NOI18N
+        overEliminCheckBox1.setToolTipText(bundle.getString("SETTINGS.GAME.OVERRIDE.TOOLTIP")); // NOI18N
+        overEliminCheckBox1.setActionCommand("overrideAction");
+
+        overEliminCheckBox2.setSelected(isLoadActionsBehaviorSelected());
+        overEliminCheckBox2.setText(bundle.getString("SETTINGS.GAME.LOADACTIONSBEHAVIOR")); // NOI18N
+        overEliminCheckBox2.setToolTipText(bundle.getString("SETTINGS.GAME.LOADACTIONSBEHAVIOR.TOOLTIP")); // NOI18N
+        overEliminCheckBox2.setActionCommand("LoadActionsBehavior");
 
         openSaveDir.setText("...");
         openSaveDir.setActionCommand("fSaves");
@@ -169,16 +188,31 @@ public class MainSettingsGui extends javax.swing.JPanel {
         autoLoadTextField.setEditable(false);
         autoLoadTextField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         autoLoadTextField.setText(settingsManager.getConfig("autoLoad"));
+        autoLoadTextField.setEnabled(isAutoLoadFilled());
 
         autoLoadButton.setText("...");
         autoLoadButton.setActionCommand("fLoadAuto");
+        autoLoadButton.setEnabled(isAutoLoadFilled());
 
         autoLoadActionTextField.setEditable(false);
         autoLoadActionTextField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         autoLoadActionTextField.setText(settingsManager.getConfig("autoLoadActions"));
+        autoLoadActionTextField.setEnabled(isAutoLoadActionFilled());
 
         autoLoadActionButton.setText("...");
         autoLoadActionButton.setActionCommand("fLoadAutoAction");
+        autoLoadActionButton.setEnabled(isAutoLoadActionFilled());
+
+        autoLoadCheck.setSelected(isAutoLoadFilled());
+        autoLoadCheck.setActionCommand("autoLoadCheck");
+        autoLoadCheck.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                autoLoadCheckActionPerformed(evt);
+            }
+        });
+
+        autoLoadActionCheck.setSelected(isAutoLoadActionFilled());
+        autoLoadActionCheck.setActionCommand("autoLoadActionCheck");
 
         javax.swing.GroupLayout gamePanelLayout = new javax.swing.GroupLayout(gamePanel);
         gamePanel.setLayout(gamePanelLayout);
@@ -196,7 +230,6 @@ public class MainSettingsGui extends javax.swing.JPanel {
                                 .addComponent(languageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(languageComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(overEliminCheckBox)
                             .addGroup(gamePanelLayout.createSequentialGroup()
                                 .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(saveDirTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -209,17 +242,34 @@ public class MainSettingsGui extends javax.swing.JPanel {
                                             .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                 .addComponent(autoLoadActionLabel)
                                                 .addComponent(autoLoadDirLabel))
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                                 .addComponent(autoLoadActionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addComponent(autoLoadTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(autoLoadActionButton)
-                                    .addComponent(autoLoadButton)
+                                    .addGroup(gamePanelLayout.createSequentialGroup()
+                                        .addComponent(autoLoadActionButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(autoLoadActionCheck))
+                                    .addGroup(gamePanelLayout.createSequentialGroup()
+                                        .addComponent(autoLoadButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(autoLoadCheck))
                                     .addComponent(saveDirButton)
                                     .addComponent(openSaveDir))))
-                        .addContainerGap(84, Short.MAX_VALUE))))
+                        .addContainerGap(55, Short.MAX_VALUE))))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, gamePanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(overEliminCheckBox2)
+                    .addComponent(overEliminCheckBox))
+                .addGap(34, 34, 34))
+            .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(gamePanelLayout.createSequentialGroup()
+                    .addGap(20, 20, 20)
+                    .addComponent(overEliminCheckBox1)
+                    .addContainerGap(358, Short.MAX_VALUE)))
         );
         gamePanelLayout.setVerticalGroup(
             gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -239,20 +289,31 @@ public class MainSettingsGui extends javax.swing.JPanel {
                     .addComponent(loadDirLabel)
                     .addComponent(saveDirButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(autoLoadButton, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(autoLoadDirLabel)
-                        .addComponent(autoLoadTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(autoLoadButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(autoLoadDirLabel)
+                            .addComponent(autoLoadTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(autoLoadCheck))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(autoLoadActionButton)
                     .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(autoLoadActionTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(autoLoadActionLabel)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(autoLoadActionLabel))
+                    .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(autoLoadActionCheck)
+                        .addComponent(autoLoadActionButton)))
+                .addGap(18, 18, 18)
                 .addComponent(overEliminCheckBox)
-                .addGap(0, 50, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(overEliminCheckBox2)
+                .addGap(0, 96, Short.MAX_VALUE))
+            .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, gamePanelLayout.createSequentialGroup()
+                    .addContainerGap(184, Short.MAX_VALUE)
+                    .addComponent(overEliminCheckBox1)
+                    .addGap(123, 123, 123)))
         );
 
         playerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.PLAYER"))); // NOI18N
@@ -335,7 +396,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                             .addComponent(serverPassLabel)
                             .addComponent(serverUserLabel)
                             .addComponent(serverPortLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(serverSmtpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE))
+                            .addComponent(serverSmtpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(serverSMTPTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -343,7 +404,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                                 .addComponent(serverUserTextField)
                                 .addComponent(serverPortTextField)
                                 .addComponent(serverPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)))))
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
         playerPanelLayout.setVerticalGroup(
             playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -394,7 +455,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
         minimizeWindowCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.MINIMIZEMAP")); // NOI18N
         minimizeWindowCheckBox.setEnabled(false);
 
-        splitSizeSpinner.setModel(new javax.swing.SpinnerNumberModel(0, null, null, 5));
+        splitSizeSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), null, null, Integer.valueOf(5)));
         splitSizeSpinner.setValue(Integer.parseInt(settingsManager.getConfig("splitSize", "0")));
 
         tableColumnCheckBox.setSelected(isTableColumnAdjustSelected());
@@ -416,6 +477,11 @@ public class MainSettingsGui extends javax.swing.JPanel {
         keepPopUpCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.KEEPPOPUP")); // NOI18N
         keepPopUpCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.KEEPPOPUP.TOOLTIP")); // NOI18N
         keepPopUpCheckBox.setActionCommand("keepPopUp");
+
+        fogOfWarCheckBox.setSelected(isFogOfWarSelected());
+        fogOfWarCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.FOGOFWAR")); // NOI18N
+        fogOfWarCheckBox.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.FOGOFWAR.TOOLTIP")); // NOI18N
+        fogOfWarCheckBox.setActionCommand("FogOfWar");
 
         autoMoveCheckBox.setSelected(isAutoMoveNextSelected());
         autoMoveCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.MOVENEXT")); // NOI18N
@@ -449,11 +515,12 @@ public class MainSettingsGui extends javax.swing.JPanel {
                             .addComponent(tableColumnCheckBox)
                             .addComponent(copyOrdersCheckBox)
                             .addComponent(autoMoveCheckBox))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 122, Short.MAX_VALUE)
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(minimizeWindowCheckBox)
                             .addComponent(copyActionsPopUpCheckBox)
-                            .addComponent(keepPopUpCheckBox))
+                            .addComponent(keepPopUpCheckBox)
+                            .addComponent(fogOfWarCheckBox))
                         .addGap(91, 91, 91))
                     .addGroup(displayPanelLayout.createSequentialGroup()
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -464,7 +531,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                             .addGroup(displayPanelLayout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(splitSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(332, Short.MAX_VALUE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(displayPanelLayout.createSequentialGroup()
                                 .addGap(26, 26, 26)
                                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -506,8 +573,10 @@ public class MainSettingsGui extends javax.swing.JPanel {
                     .addComponent(copyOrdersCheckBox)
                     .addComponent(keepPopUpCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(autoMoveCheckBox)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(autoMoveCheckBox)
+                    .addComponent(fogOfWarCheckBox))
+                .addContainerGap(85, Short.MAX_VALUE))
         );
 
         mapPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.MAP"))); // NOI18N
@@ -561,7 +630,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                                 .addComponent(mapTilesComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addComponent(hexTagFrameCheckBox)
                     .addComponent(pcPathCheckBox))
-                .addContainerGap(210, Short.MAX_VALUE))
+                .addContainerGap(204, Short.MAX_VALUE))
         );
         mapPanelLayout.setVerticalGroup(
             mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -626,7 +695,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
         String playerEmail = myEmailTextField.getText();
         if (playerEmail != null && !playerEmail.isEmpty()) {
             SettingsManager.getInstance().setConfig("MyEmail", playerEmail);
-            }
+        }
     }//GEN-LAST:event_myEmailTextFieldFocusLost
 
     private void serverSMTPTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverSMTPTextFieldFocusLost
@@ -634,15 +703,15 @@ public class MainSettingsGui extends javax.swing.JPanel {
         String serverName = serverSMTPTextField.getText();
         if (serverName != null) {
             SettingsManager.getInstance().setConfig("mail.smtp.server", serverName);
-         }
+        }
     }//GEN-LAST:event_serverSMTPTextFieldFocusLost
 
     private void serverPortTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverPortTextFieldFocusLost
         // TODO add your handling code here:
         String port = serverPortTextField.getText();
-        if (port != null) {               
+        if (port != null) {
             SettingsManager.getInstance().setConfig("mail.smpt.port", port);
-         }
+        }
     }//GEN-LAST:event_serverPortTextFieldFocusLost
 
     private void serverUserTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverUserTextFieldFocusLost
@@ -650,15 +719,19 @@ public class MainSettingsGui extends javax.swing.JPanel {
         String user = serverUserTextField.getText();
         if (user != null) {
             SettingsManager.getInstance().setConfig("mail.smpt.user", user);
-         }
+        }
     }//GEN-LAST:event_serverUserTextFieldFocusLost
 
     private void serverPasswordFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverPasswordFieldFocusLost
         // TODO add your handling code here:
         String pass = new String(serverPasswordField.getPassword());
         SettingsManager.getInstance().setConfig("mail.smtp.passwd", pass);
-        
+
     }//GEN-LAST:event_serverPasswordFieldFocusLost
+
+    private void autoLoadCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoLoadCheckActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_autoLoadCheckActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -667,9 +740,11 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private javax.swing.JComboBox armyPathComboBox;
     private javax.swing.JLabel armyPathLabel;
     private javax.swing.JButton autoLoadActionButton;
+    private javax.swing.JCheckBox autoLoadActionCheck;
     private javax.swing.JLabel autoLoadActionLabel;
     private javax.swing.JTextField autoLoadActionTextField;
     private javax.swing.JButton autoLoadButton;
+    private javax.swing.JCheckBox autoLoadCheck;
     private javax.swing.JLabel autoLoadDirLabel;
     private javax.swing.JTextField autoLoadTextField;
     private javax.swing.JCheckBox autoMoveCheckBox;
@@ -678,6 +753,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private javax.swing.JPanel displayPanel;
     private javax.swing.ButtonGroup filtroButtonGroup;
     private javax.swing.JLabel filtroLabel;
+    private javax.swing.JCheckBox fogOfWarCheckBox;
     private javax.swing.JPanel gamePanel;
     private javax.swing.JCheckBox hexTagFrameCheckBox;
     private javax.swing.JComboBox hexTagStyleComboBox;
@@ -697,6 +773,8 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private javax.swing.JButton openSaveDir;
     private javax.swing.ButtonGroup ordersSortButtonGroup;
     private javax.swing.JCheckBox overEliminCheckBox;
+    private javax.swing.JCheckBox overEliminCheckBox1;
+    private javax.swing.JCheckBox overEliminCheckBox2;
     private javax.swing.JRadioButton ownFiltroRadioButton;
     private javax.swing.JCheckBox pcPathCheckBox;
     private javax.swing.JPanel playerPanel;
@@ -720,133 +798,147 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private javax.swing.JCheckBox tableColumnCheckBox;
     // End of variables declaration//GEN-END:variables
 
-
     public JTextField getSaveDirTextField() {
         return saveDirTextField;
     }
-    
+
     public JTextField getLoadDirTextField() {
         return loadDirTextField;
     }
-    
+
     public JTextField getAutoLoadActionTextField() {
         return autoLoadActionTextField;
     }
-    
+
     public JTextField getAutoLoadTextField() {
         return autoLoadTextField;
     }
-    
-    
-     
-    private boolean isOverrideSelected(){    
-        return settingsManager.getConfig("OverrideElimination", "0").equals("1");       
+
+    public JButton getAutoLoadActionButton() {
+        return autoLoadActionButton;
     }
 
-    private boolean isConfirmOrderSelected() {        
-        return settingsManager.getConfig("SendOrderConfirmationPopUp","0").equals("1");  
+    public JButton getAutoLoadButton() {
+        return autoLoadButton;
     }
-    
+
+    private boolean isOverrideSelected() {
+        return settingsManager.getConfig("OverrideElimination", "0").equals("1");
+    }
+
+    private boolean isLoadActionsBehaviorSelected() {
+        return settingsManager.getConfig("LoadActionsBehavior", "append").equals("append");
+    }
+
+    private boolean isLoadActionsOtherNationsSelected() {
+        return settingsManager.getConfig("LoadActionsOtherNations", "allow").equals("allow");
+    }
+
+    private boolean isConfirmOrderSelected() {
+        return settingsManager.getConfig("SendOrderConfirmationPopUp", "0").equals("1");
+    }
+
     private boolean isRecieveConfirmSelected() {
-        return settingsManager.getConfig("SendOrderReceiptRequest", "0").equals("1"); 
+        return settingsManager.getConfig("SendOrderReceiptRequest", "0").equals("1");
     }
-    
+
     private boolean isMaximizeWindowSelected() {
-        return settingsManager.getConfig("maximizeWindowOnStart", "0").equals("1"); 
+        return settingsManager.getConfig("maximizeWindowOnStart", "0").equals("1");
     }
-    
+
     private boolean isTableColumnAdjustSelected() {
-        return settingsManager.getConfig("TableColumnAdjust", "0").equals("1"); 
+        return settingsManager.getConfig("TableColumnAdjust", "0").equals("1");
     }
-    
+
     private boolean isCopyActionsPopUpSelected() {
-        return settingsManager.getConfig("CopyActionsPopUp", "0").equals("1"); 
+        return settingsManager.getConfig("CopyActionsPopUp", "0").equals("1");
     }
-    
+
     private boolean isCopyOrdersPopUpSelected() {
-        return settingsManager.getConfig("CopyActionsOrder", "0").equals("1"); 
+        return settingsManager.getConfig("CopyActionsOrder", "0").equals("1");
     }
-    
+
     private boolean isKeepPopUpSelected() {
-        return settingsManager.getConfig("KeepPopupOpen", "0").equals("1"); 
-    } 
-    
+        return settingsManager.getConfig("KeepPopupOpen", "0").equals("1");
+    }
+
+    private boolean isFogOfWarSelected() {
+        return settingsManager.getConfig("FogOfWarType", "1").equals("1");
+    }
+
     private boolean isAutoMoveNextSelected() {
-        return settingsManager.getConfig("AutoMoveNextAction", "0").equals("1"); 
+        return settingsManager.getConfig("AutoMoveNextAction", "0").equals("1");
     }
-    
+
     private boolean isTagFrameSelected() {
-        return settingsManager.getConfig("HexTagFrame", "0").equals("1"); 
+        return settingsManager.getConfig("HexTagFrame", "0").equals("1");
     }
-    
-    private int getArmyPathIndexSelected(){
+
+    private int getArmyPathIndexSelected() {
         int index = 0;
         String indexStr = settingsManager.getConfig("ShowArmyMovPath", "1");
         index = Integer.parseInt(indexStr);
         return index;
     }
-    
+
     private boolean isPcPathSelected() {
-        return settingsManager.getConfig("drawPcPath", "1").equals("1"); 
+        return settingsManager.getConfig("drawPcPath", "1").equals("1");
     }
-    
-    private ComboItem[] getLanguageComboModel(){
-        
-        String languages[] = new String[] {"PT","ES","EN","IT"};
+
+    private ComboItem[] getLanguageComboModel() {
+
+        String languages[] = new String[]{"PT", "ES", "EN", "IT"};
         ComboItem[] combo = new ComboItem[languages.length];
-       
+
         String langLabel = null;
         for (int i = 0; i < languages.length; i++) {
             langLabel = LABELS.getString("SETTINGS.LABEL.LANGUAGE.".concat(languages[i]));
-            combo[i] = new ComboItem(languages[i].toLowerCase(), langLabel);            
+            combo[i] = new ComboItem(languages[i].toLowerCase(), langLabel);
         }
-                    
+
         return combo;
     }
 
     private ComboBoxModel getLanguageModel() {
         ComboBoxModel comboBoxModel = new DefaultComboBoxModel(getLanguageComboModel());
-        
+
         String langSelected = settingsManager.getConfig("language", "EN").toUpperCase();
-        
+
         comboBoxModel.setSelectedItem(LABELS.getString("SETTINGS.LABEL.LANGUAGE.".concat(langSelected)));
-        
-        
+
         return comboBoxModel;
     }
-    
+
     private String[] getArmyPathComboLabels() {
         String[] combo = new String[3];
         combo[0] = LABELS.getString("SETTINGS.MAP.ARMYPATH.NONE");
         combo[1] = LABELS.getString("SETTINGS.MAP.ARMYPATH.ARMY");
-        combo[2] = LABELS.getString("SETTINGS.MAP.ARMYPATH.NAVY");        
+        combo[2] = LABELS.getString("SETTINGS.MAP.ARMYPATH.NAVY");
         return combo;
     }
-    
-    
-    
-    
+
     public class ComboItem {
+
         private final String value;
         private final String label;
-        
+
         private ComboItem(String value, String label) {
             this.value = value;
             this.label = label;
         }
-        
+
         @Override
         public String toString() {
             return this.label;
         }
-        
+
         public String getValue() {
             return this.value;
         }
     }
-    
+
     private void initFilterRadiobutton() {
-        boolean isAll = settingsManager.getConfig("filtro.default", "0").equals("0"); 
+        boolean isAll = settingsManager.getConfig("filtro.default", "0").equals("0");
         if (isAll) {
             allFiltroRadioButton.setSelected(true);
             ownFiltroRadioButton.setSelected(false);
@@ -855,9 +947,9 @@ public class MainSettingsGui extends javax.swing.JPanel {
             ownFiltroRadioButton.setSelected(true);
         }
     }
-    
+
     private void initSortOrdersRadiobutton() {
-        boolean isSorted = settingsManager.getConfig("SortAllCombos", "0").equals("1");         
+        boolean isSorted = settingsManager.getConfig("SortAllCombos", "0").equals("1");
         if (isSorted) {
             alphabeticOrderButton.setSelected(true);
             sequenceRadioButton.setSelected(false);
@@ -865,6 +957,24 @@ public class MainSettingsGui extends javax.swing.JPanel {
             alphabeticOrderButton.setSelected(false);
             sequenceRadioButton.setSelected(true);
         }
+    }
+
+    private boolean isAutoLoadFilled() {
+        boolean filled = true;
+        String path = settingsManager.getConfig("autoLoad");
+        if (path == null || path.isEmpty()) {
+            filled = false;
+        }
+        return filled;
+    }
+
+    private boolean isAutoLoadActionFilled() {
+        boolean filled = true;
+        String path = settingsManager.getConfig("autoLoadActions");
+        if (path == null || path.isEmpty()) {
+            filled = false;
+        }
+        return filled;
     }
 
 }

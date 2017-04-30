@@ -10,10 +10,9 @@ import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
 import business.facades.ListFactory;
 import business.facades.WorldFacadeCounselor;
-import control.support.DispatchManager;
 import java.io.Serializable;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 import model.Cenario;
 import model.ExtratoDetail;
 import model.Mercado;
@@ -77,13 +76,13 @@ public class FinancasConverter implements Serializable {
      Resultado esperado para o próximo turno 	-500
      Reservas de Ouro 	49.500
      */
-    public static GenericoTableModel getProjecaoTableModel(Nacao nacao, List<PersonagemOrdem> listPo) {
+    public GenericoTableModel getProjecaoTableModel(Nacao nacao, Set<PersonagemOrdem> listPo) {
         String[] colNames = new String[]{labels.getString("NOME"), labels.getString("VALOR")};
         final int tableSize;
         if (listPo.isEmpty()) {
             tableSize = SIZE;
         } else {
-            tableSize = SIZE + listPo.size() + 3;
+            tableSize = SIZE + listPo.size() + 5;
         }
         Object[][] dados = new Object[tableSize][colNames.length];
         if (nacao == null) {
@@ -98,7 +97,7 @@ public class FinancasConverter implements Serializable {
             int cidadesUpkeep = nacaoFacade.getCustoCidades(nacao, cenario) * -1;
             int personagens = nacaoFacade.getCustoPersonagens(nacao, cenario) * -1;
             int arrecadacao = nacaoFacade.getArrecadacao(nacao);
-            int ouroProd = nacaoFacade.getProducao(nacao, cenario.getMoney());
+            int ouroProd = nacaoFacade.getProducao(nacao, cenario.getMoney(), cenario, WorldFacadeCounselor.getInstance().getTurno());
             final int custos = exercitos + cidadesUpkeep + personagens + exeBonus;
             if (exeBonus != 0) {
                 dados[ii][0] = labels.getString("FINANCAS.CURRENT.DISCOUNT.ARMIES");
@@ -141,7 +140,9 @@ public class FinancasConverter implements Serializable {
                     dados[ii++][1] = acaoFacade.getCusto(ordem) * -1;
                     valorAcoes -= acaoFacade.getCusto(ordem);
                 }
-
+                dados[ii][0] = labels.getString("FINANCAS.COST.ACTIONS");
+                dados[ii++][1] = valorAcoes;
+                //skip one row
                 dados[ii][0] = " ";
                 dados[ii++][1] = null;
                 final int decay = nacaoFacade.getGoldDecay(nacao, moneyFinal + valorAcoes, cenario) * -1;
@@ -152,9 +153,6 @@ public class FinancasConverter implements Serializable {
                 dados[ii][0] = labels.getString("FINANCAS.FORECAST.FINAL");
                 dados[ii++][1] = moneyFinal + valorAcoes + decay;
             }
-            final String label = String.format("%s: %s", labels.getString("MENU.ACTION.COST"), valorAcoes);
-            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SET_LABEL_MONEY, label);
-
         }
         GenericoTableModel model = new GenericoTableModel(colNames, dados,
                 new Class[]{java.lang.String.class, java.lang.Integer.class});
@@ -178,12 +176,13 @@ public class FinancasConverter implements Serializable {
             return (ret);
         } else {
             try {
-                Produto[] produtos = cenarioFacade.listProdutos(WorldFacadeCounselor.getInstance().getCenario(), 1);
+                final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
+                Produto[] produtos = cenarioFacade.listProdutos(cenario, 1);
                 int ii = 0, nn = 0;
                 Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
                 Object[][] ret = new Object[produtos.length][getMercadoColNames().length];
                 for (Produto produto : produtos) {
-                    int prod = nacaoFacade.getProducao(nacao, produto);
+                    int prod = nacaoFacade.getProducao(nacao, produto, cenario, WorldFacadeCounselor.getInstance().getTurno());
                     int est = nacaoFacade.getEstoque(nacao, produto);
                     int unit = mercado.getProdutoVlVenda(produto);
                     ret[ii][nn++] = produto.getNome();

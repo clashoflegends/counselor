@@ -17,6 +17,7 @@ import control.services.CenarioConverter;
 import control.services.FeiticoConverter;
 import control.services.PersonagemConverter;
 import javax.swing.ComboBoxModel;
+import model.ActorAction;
 import model.Exercito;
 import model.Local;
 import model.Nacao;
@@ -129,9 +130,10 @@ public class ActorInterfaceNacao extends ActorInterface {
     }
 
     @Override
-    public String[] doOrderClear(int indexModelOrdem) {
-        getDispatchManager().sendDispatchForChar(getNacao().getAcao(indexModelOrdem), null);
-        return setOrdem(indexModelOrdem, null);
+    public ActorAction doOrderClear(int indexModelOrdem) {
+        getDispatchManager().sendDispatchForChar(getNacao(), getNacao().getAcao(indexModelOrdem), null);
+        setOrdem(indexModelOrdem, null);
+        return ordemFacade.getActorActionBlank();
     }
 
     @Override
@@ -139,7 +141,7 @@ public class ActorInterfaceNacao extends ActorInterface {
         //recupera os parametros da ordem
         //{Ordem, List parametroId, List ParametroDisplay}
         po.setNome(getNacao().getNome());
-        getDispatchManager().sendDispatchForChar(getNacao().getAcao(indexModelOrdem), po);
+        getDispatchManager().sendDispatchForChar(getNacao(), getNacao().getAcao(indexModelOrdem), po);
         return setOrdem(indexModelOrdem, po);
     }
 

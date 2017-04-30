@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import model.ActorAction;
 import model.Artefato;
 import model.Cenario;
 import model.Feitico;
@@ -69,15 +70,19 @@ public class PersonagemConverter implements Serializable {
         classes.add(java.lang.String.class);
         for (int nn = 1; nn <= qtOrdens; nn++) {
             colNames.add(String.format("%s %s", labels.getString("ACAO"), nn));
-            classes.add(java.lang.String.class);
+//            classes.add(String.class);
+            classes.add(ActorAction.class);
+
         }
         colNames.add(labels.getString("LOCAL"));
         classes.add(Local.class);
         colNames.add(labels.getString("COMANDANTE"));
         classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("AGENTE"));
-        classes.add(java.lang.Integer.class);
-        if (WorldFacadeCounselor.getInstance().hasEmissario()) {
+        if (WorldFacadeCounselor.getInstance().hasRogue() || !WorldFacadeCounselor.getInstance().getCenario().isLom()) {
+            colNames.add(labels.getString("AGENTE"));
+            classes.add(java.lang.Integer.class);
+        }
+        if (WorldFacadeCounselor.getInstance().hasDiplomat()) {
             colNames.add(labels.getString("EMISSARIO"));
             classes.add(java.lang.Integer.class);
         }
@@ -115,15 +120,22 @@ public class PersonagemConverter implements Serializable {
         Local localOrigem = personagemFacade.getLocalOrigem(personagem);
         //inicia array
         cArray[ii++] = personagemFacade.getNome(personagem);
+//        for (int nn = 0; nn < qtOrdens; nn++) {
+//            temp = ordemFacade.getOrdemDisplay(personagem, nn, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
+//            cArray[ORDEM_COL_INDEX_START + nn] = temp[0] + temp[1];
+//            ii++;
+//        }
+        final int orderMax = ordemFacade.getOrdemMax(personagem, WorldFacadeCounselor.getInstance().getCenario());
         for (int nn = 0; nn < qtOrdens; nn++) {
-            temp = ordemFacade.getOrdemDisplay(personagem, nn, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-            cArray[ORDEM_COL_INDEX_START + nn] = temp[0] + temp[1];
+            cArray[ORDEM_COL_INDEX_START + nn] = ordemFacade.getActorAction(personagem, nn, orderMax, WorldFacadeCounselor.getInstance().getJogadorAtivo());
             ii++;
         }
-        cArray[ii++] = localFacade.getCoordenadas(local);
+        cArray[ii++] = local;
         cArray[ii++] = personagem.getPericiaComandante();
-        cArray[ii++] = personagem.getPericiaAgente();
-        if (WorldFacadeCounselor.getInstance().hasEmissario()) {
+        if (WorldFacadeCounselor.getInstance().hasRogue() || !WorldFacadeCounselor.getInstance().getCenario().isLom()) {
+            cArray[ii++] = personagem.getPericiaAgente();
+        }
+        if (WorldFacadeCounselor.getInstance().hasDiplomat()) {
             cArray[ii++] = personagem.getPericiaEmissario();
         }
         if (WorldFacadeCounselor.getInstance().hasWizard()) {
@@ -348,6 +360,16 @@ public class PersonagemConverter implements Serializable {
             for (Personagem personagem : listFactory.listPersonagens()) {
                 try {
                     if (personagemFacade.isDoubleAgent(personagem)) {
+                        ret.add(personagem);
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("team")) {
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+            for (Personagem personagem : listFactory.listPersonagens()) {
+                try {
+                    if (jAtivo.isJogadorAliado(personagem.getNacao()) || jAtivo.isNacao(personagem.getNacao())) {
                         ret.add(personagem);
                     }
                 } catch (NullPointerException e) {

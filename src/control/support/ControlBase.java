@@ -4,9 +4,9 @@
  */
 package control.support;
 
-import control.support.DispatchManager;
 import java.io.Serializable;
 import model.Local;
+import model.Nacao;
 import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,7 +34,10 @@ public abstract class ControlBase implements Serializable {
         return DispatchManager.getInstance();
     }
 
-    public void receiveDispatch(PersonagemOrdem antes, PersonagemOrdem depois) {
+    public void receiveDispatch(Nacao nation, PersonagemOrdem before, PersonagemOrdem after) {
+    }
+
+    public void receiveDispatch(int msgName) {
     }
 
     public void receiveDispatch(int msgName, String txt) {
