@@ -1,9 +1,5 @@
 Starting...
-Counselor version: 424
-Commons version: 2,129
-Alterando modo de acesso: Client
-AutoLoading ... Opening:/Users/gurgel/Documents/tmpbm/saves/110_WarDwarfOrc110/001/game_110_1.fealonso.rr.egf
-File not found:C:\Users\gurgel\Documents\tmpbm\saves\110_WarDwarfOrc110\001\game_110_1.fealonso.rr.egf
-File not found:C:\Users\gurgel\Documents\tmpbm\saves\110_WarDwarfOrc110\001\game_110_1.fealonso.rr.egf
-business.BussinessException: File not found:C:\Users\gurgel\Documents\tmpbm\saves\110_WarDwarfOrc110\001\game_110_1.fealonso.rr.egf
+Counselor version: 526
+Commons version: 2,782
+Starting GUI
 Interface carregada and exibida.
