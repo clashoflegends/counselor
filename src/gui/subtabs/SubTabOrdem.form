@@ -66,13 +66,13 @@
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jpOrdens" alignment="1" max="32767" attributes="2"/>
-                      <Component id="jScrollPane1" alignment="0" pref="450" max="32767" attributes="0"/>
+                      <Component id="jspListaOrdens" alignment="0" pref="450" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="jScrollPane1" min="-2" pref="107" max="-2" attributes="0"/>
+                          <Component id="jspListaOrdens" min="-2" pref="107" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jpOrdens" max="32767" attributes="2"/>
                       </Group>
@@ -433,7 +433,7 @@
                     </Component>
                   </SubComponents>
                 </Container>
-                <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+                <Container class="javax.swing.JScrollPane" name="jspListaOrdens">
                   <Properties>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                       <Border info="null"/>
