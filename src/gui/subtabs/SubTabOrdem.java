@@ -447,7 +447,11 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
             //High res changes for Peter
             int rowHeight = this.jspListaOrdens.getHeight();
             rowHeight = Math.max(rowHeight, this.jtListaOrdens.getPreferredSize().height);
-            this.jspListaOrdens.setSize(this.jspListaOrdens.getWidth(),rowHeight);
+            final Dimension dimension = new Dimension(this.jspListaOrdens.getWidth(), rowHeight);
+            this.jspListaOrdens.setSize(dimension);
+            this.jspListaOrdens.setPreferredSize(dimension);
+            this.jspListaOrdens.getViewport().setViewSize(dimension);
+            this.jspListaOrdens.setMinimumSize(dimension);
         }
     }
 
