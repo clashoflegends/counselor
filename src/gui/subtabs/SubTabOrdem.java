@@ -99,7 +99,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         jbDetach = new javax.swing.JToggleButton();
         jbHelp = new javax.swing.JButton();
         cbOrdersAll = new javax.swing.JCheckBox();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jspListaOrdens = new javax.swing.JScrollPane();
         jtListaOrdens = new javax.swing.JTable();
 
         detOrdens.setBorder(null);
@@ -262,8 +262,8 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
                 .addComponent(cbOrdersAll))
         );
 
-        jScrollPane1.setBorder(null);
-        jScrollPane1.setToolTipText(labels.getString("ACOES.TOOLTIP")); // NOI18N
+        jspListaOrdens.setBorder(null);
+        jspListaOrdens.setToolTipText(labels.getString("ACOES.TOOLTIP")); // NOI18N
 
         jtListaOrdens.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -276,19 +276,19 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
                 "Ação", "Parâmetro"
             }
         ));
-        jScrollPane1.setViewportView(jtListaOrdens);
+        jspListaOrdens.setViewportView(jtListaOrdens);
 
         javax.swing.GroupLayout jpDetOrdensLayout = new javax.swing.GroupLayout(jpDetOrdens);
         jpDetOrdens.setLayout(jpDetOrdensLayout);
         jpDetOrdensLayout.setHorizontalGroup(
             jpDetOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jpOrdens, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+            .addComponent(jspListaOrdens, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
         );
         jpDetOrdensLayout.setVerticalGroup(
             jpDetOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpDetOrdensLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jspListaOrdens, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jpOrdens, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -333,7 +333,6 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     private javax.swing.JComboBox cbPar16;
     private javax.swing.JComboBox cbPar17;
     private javax.swing.JScrollPane detOrdens;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jbClear;
     private javax.swing.JToggleButton jbDetach;
     private javax.swing.JButton jbHelp;
@@ -348,6 +347,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     private javax.swing.JPanel jpDetOrdens;
     private javax.swing.JPanel jpMaster;
     private javax.swing.JPanel jpOrdens;
+    private javax.swing.JScrollPane jspListaOrdens;
     private javax.swing.JTable jtListaOrdens;
     // End of variables declaration//GEN-END:variables
 
@@ -443,7 +443,15 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
                     }));
         } else {
             this.jtListaOrdens.setModel(model);
-//            doConfigTableColumns(jtListaOrdens);
+            doConfigTableColumns(jtListaOrdens);
+            //High res changes for Peter
+            int rowHeight = this.jspListaOrdens.getHeight();
+            rowHeight = Math.max(rowHeight, this.jtListaOrdens.getPreferredSize().height);
+            final Dimension dimension = new Dimension(this.jspListaOrdens.getWidth(), rowHeight);
+            this.jspListaOrdens.setSize(dimension);
+            this.jspListaOrdens.setPreferredSize(dimension);
+            this.jspListaOrdens.getViewport().setViewSize(dimension);
+            this.jspListaOrdens.setMinimumSize(dimension);
         }
     }
 

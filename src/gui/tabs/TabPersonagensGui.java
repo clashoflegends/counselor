@@ -246,17 +246,6 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
                 PersonagemConverter.ORDEM_COL_INDEX_START + ordIndex);
     }
 
-//    public void setValueFor(String[] ordemDisplay, String nmPersonagem, int ordIndex) {
-//        for (int ii = 0; ii < this.jtMainLista.getRowCount(); ii++) {
-//            if (this.jtMainLista.getValueAt(ii, 0).equals(nmPersonagem)) {
-//                this.jtMainLista.getModel().setValueAt(
-//                        ordemDisplay[0] + ordemDisplay[1],
-//                        ii,
-//                        PersonagemConverter.ORDEM_COL_INDEX_START + ordIndex);
-//                break;
-//            }
-//        }
-//    }
     public void doLoadChars() {
         //carrega a lista de personagens
         TableModel model = personagemControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());

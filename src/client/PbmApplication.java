@@ -6,6 +6,7 @@ package client;
 
 import baseLib.Application;
 import baseLib.JgFrame;
+import business.ImageFactory;
 import gui.MainResultWindowGui;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
@@ -55,17 +56,20 @@ public class PbmApplication extends Application {
         });
 
         try {
+            //set icon
+            ImageFactory im = new ImageFactory();
             //Create and set up the main content pane.
             //contentMainPane.setOpaque(true); //content panes must be opaque
             MainResultWindowGui mainWin = new MainResultWindowGui(this.autoStart);
             frame.setContentPane(mainWin);
+            frame.setIconImage(im.getIconApp());
         } catch (MissingResourceException e) {
             log.fatal(e);
         }
         //default
         frame.pack();
         //frame.setLocationRelativeTo(null);
-        if (SettingsManager.getInstance().getConfig("maximizeWindowOnStart","0").equals("1")) {
+        if (SettingsManager.getInstance().getConfig("maximizeWindowOnStart", "0").equals("1")) {
             frame.setExtendedState(Frame.MAXIMIZED_BOTH);
         } else {
             frame.setExtendedState(Frame.NORMAL);
