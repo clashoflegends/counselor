@@ -6,7 +6,7 @@ package client;
 
 import baseLib.Application;
 import baseLib.JgFrame;
-import business.ImageFactory;
+import business.ImageManager;
 import gui.MainResultWindowGui;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
@@ -56,13 +56,12 @@ public class PbmApplication extends Application {
         });
 
         try {
-            //set icon
-            ImageFactory im = new ImageFactory();
             //Create and set up the main content pane.
             //contentMainPane.setOpaque(true); //content panes must be opaque
             MainResultWindowGui mainWin = new MainResultWindowGui(this.autoStart);
             frame.setContentPane(mainWin);
-            frame.setIconImage(im.getIconApp());
+            //set icon
+            frame.setIconImage(ImageManager.getInstance().getIconApp());
         } catch (MissingResourceException e) {
             log.fatal(e);
         }

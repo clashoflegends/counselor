@@ -5,7 +5,7 @@
 package radialMenu;
 
 import baseLib.BaseModel;
-import business.ImageFactory;
+import business.ImageManager;
 import control.MapaControler;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -108,13 +108,12 @@ public class RadialButton extends JButton {
             double currentXAngle = Math.cos(angle);
             double currentYAngle = Math.sin(angle);
             // Get current offset coordinates
-            double currentXCoordinate = ImageFactory.HEX_SIZE * currentXAngle * 2;
-            double currentYCoordinate = ImageFactory.HEX_SIZE * currentYAngle * 2;
+            double currentXCoordinate = ImageManager.HEX_SIZE * currentXAngle * 2;
+            double currentYCoordinate = ImageManager.HEX_SIZE * currentYAngle * 2;
             // Position buttons around circle
-            menu.setBounds(
-                    position.x + (int) currentXCoordinate,
+            menu.setBounds(position.x + (int) currentXCoordinate,
                     position.y - (int) currentYCoordinate,
-                    ImageFactory.HEX_SIZE, ImageFactory.HEX_SIZE);
+                    ImageManager.HEX_SIZE, ImageManager.HEX_SIZE);
             menu.setPosition(position);
             menu.setInitAngle(angle);
             menu.setVisible(true);

@@ -4,7 +4,7 @@
  */
 package radialMenu.mapmenu;
 
-import business.ImageFactory;
+import business.ImageManager;
 import java.awt.Point;
 import java.io.Serializable;
 import java.util.SortedMap;
@@ -26,7 +26,6 @@ public class MapMenuManager implements Serializable {
     private static final Log log = LogFactory.getLog(MapMenuManager.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private static RmActionListener listener;
-    private final ImageFactory imageFactory = new ImageFactory();
     private RadialMenu rmWorldBuilder;
     private SortedMap<String, Local> locais;
     private SortedMap<String, Nacao> nacoes;
@@ -112,12 +111,11 @@ public class MapMenuManager implements Serializable {
 //            rmWorldBuilder.add(subMenu);
 //        }
 //    }
-
     private RadialButton doConfigOption(MapMenuRadialActions ra) {
         RadialButton menu = new RadialButton(ra);
         menu.setText(labels.getString(ra.getLabel()));
-        menu.setIcon(imageFactory.getBlueBall());
-        menu.setRolloverIcon(imageFactory.getYellowBall());
+        menu.setIcon(ImageManager.getInstance().getBlueBall());
+        menu.setRolloverIcon(ImageManager.getInstance().getYellowBall());
         menu.setActionCommand(ra.toString());
         menu.addMouseListener(rmWorldBuilder.getOptionListener());
         rmWorldBuilder.addRootMenuItem(menu);

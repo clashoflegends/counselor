@@ -56,7 +56,7 @@ public class TabBase extends javax.swing.JRootPane implements Serializable {
         return dica;
     }
 
-    public void setDica(String toolTip) {
+    public final void setDica(String toolTip) {
         this.dica = toolTip;
     }
 
@@ -64,7 +64,7 @@ public class TabBase extends javax.swing.JRootPane implements Serializable {
         return title;
     }
 
-    public void setTitle(String title) {
+    public final void setTitle(String title) {
         this.title = title;
     }
 
@@ -83,7 +83,7 @@ public class TabBase extends javax.swing.JRootPane implements Serializable {
         return this.mapaControler;
     }
 
-    protected void setMapaControler(MapaControler mapaControl) {
+    protected final void setMapaControler(MapaControler mapaControl) {
         this.mapaControler = mapaControl;
     }
 

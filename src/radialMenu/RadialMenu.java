@@ -4,7 +4,7 @@
  */
 package radialMenu;
 
-import business.ImageFactory;
+import business.ImageManager;
 import business.facade.LocalFacade;
 import control.MapaControler;
 import java.awt.Point;
@@ -90,7 +90,7 @@ public class RadialMenu extends javax.swing.JPanel {
             //upper left corner
             totalArc = 90;
             startAngle = 0;
-        } else if (position.x >= this.getWidth() - ImageFactory.HEX_SIZE && position.y <= 0) {
+        } else if (position.x >= this.getWidth() - ImageManager.HEX_SIZE && position.y <= 0) {
             //upper right corner
             totalArc = 90;
             startAngle = 270;
@@ -98,11 +98,11 @@ public class RadialMenu extends javax.swing.JPanel {
             //upper border
             totalArc = 180;
             startAngle = 0;
-        } else if (position.x <= 0 && position.y >= this.getHeight() - ImageFactory.HEX_SIZE) {
+        } else if (position.x <= 0 && position.y >= this.getHeight() - ImageManager.HEX_SIZE) {
             //bottom left corner
             totalArc = 90;
             startAngle = 90;
-        } else if (position.x >= this.getWidth() - ImageFactory.HEX_SIZE && position.y >= this.getHeight() - ImageFactory.HEX_SIZE) {
+        } else if (position.x >= this.getWidth() - ImageManager.HEX_SIZE && position.y >= this.getHeight() - ImageManager.HEX_SIZE) {
             //bottom right corner
             totalArc = 90;
             startAngle = 180;
@@ -122,14 +122,13 @@ public class RadialMenu extends javax.swing.JPanel {
             double currentXAngle = Math.cos(Math.toRadians(getInitAngle()));
             double currentYAngle = Math.sin(Math.toRadians(getInitAngle()));
             // Get current offset coordinates
-            double currentXCoordinate = ImageFactory.HEX_SIZE * currentXAngle;
-            double currentYCoordinate = ImageFactory.HEX_SIZE * currentYAngle;
+            double currentXCoordinate = ImageManager.HEX_SIZE * currentXAngle;
+            double currentYCoordinate = ImageManager.HEX_SIZE * currentYAngle;
             // Position buttons around circle
             menu.setPosition(position);
-            menu.setBounds(
-                    position.x + (int) currentXCoordinate,
+            menu.setBounds(position.x + (int) currentXCoordinate,
                     position.y - (int) currentYCoordinate,
-                    ImageFactory.HEX_SIZE, ImageFactory.HEX_SIZE);
+                    ImageManager.HEX_SIZE, ImageManager.HEX_SIZE);
             menu.setInitAngle(getInitAngle() - angularSpacing);
             menu.setVisible(true);
             menu.closeSubMenu();

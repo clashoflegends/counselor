@@ -19,18 +19,18 @@ public abstract class ControlBase implements Serializable {
 
     private static final Log log = LogFactory.getLog(ControlBase.class);
 
-    protected void registerDispatchManager() {
+    protected final void registerDispatchManager() {
         getDispatchManager().register(this);
     }
 
-    protected void registerDispatchManagerForMsg(int msgName) {
+    protected final void registerDispatchManagerForMsg(int msgName) {
         getDispatchManager().registerForMsg(msgName, this);
     }
 
     /**
      * @return the dispatchManager
      */
-    protected DispatchManager getDispatchManager() {
+    protected final DispatchManager getDispatchManager() {
         return DispatchManager.getInstance();
     }
 
