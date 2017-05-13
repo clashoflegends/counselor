@@ -46,6 +46,8 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     private final SubTabBaseList stMagicItems = new SubTabBaseList();
     private final SubTabBaseList stSpells = new SubTabBaseList();
     private SubTabOrdem stOrdens;
+    private boolean showPortrait;
+    
 
     /**
      * Creates new form TabPersonagensGui
@@ -76,6 +78,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
         detalhesPersonagem = new javax.swing.JTabbedPane();
+        portraitPanel = new javax.swing.JPanel();
 
         jLabel3.setLabelFor(comboFiltro);
         jLabel3.setText(labels.getString("LISTAR:")); // NOI18N
@@ -126,18 +129,37 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         jtMainLista.setName(""); // NOI18N
         jScrollPane3.setViewportView(jtMainLista);
 
+        portraitPanel.setPreferredSize(new java.awt.Dimension(110, 0));
+
+        javax.swing.GroupLayout portraitPanelLayout = new javax.swing.GroupLayout(portraitPanel);
+        portraitPanel.setLayout(portraitPanelLayout);
+        portraitPanelLayout.setHorizontalGroup(
+            portraitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 110, Short.MAX_VALUE)
+        );
+        portraitPanelLayout.setVerticalGroup(
+            portraitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        showPortrait = Integer.parseInt(SettingsManager.getInstance().getConfig("show.character.portrait", "0")) == 1;
+        portraitPanel.setVisible(showPortrait);
+
         javax.swing.GroupLayout jpMasterLayout = new javax.swing.GroupLayout(jpMaster);
         jpMaster.setLayout(jpMasterLayout);
         jpMasterLayout.setHorizontalGroup(
             jpMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpMasterLayout.createSequentialGroup()
-                .addContainerGap(58, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(qtPersonagens, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
-            .addComponent(detalhesPersonagem, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpMasterLayout.createSequentialGroup()
+                .addComponent(portraitPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(detalhesPersonagem))
             .addGroup(jpMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jpMasterLayout.createSequentialGroup()
                     .addContainerGap()
@@ -156,7 +178,9 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(detalhesPersonagem, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE))
+                .addGroup(jpMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(detalhesPersonagem, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
+                    .addComponent(portraitPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)))
             .addGroup(jpMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jpMasterLayout.createSequentialGroup()
                     .addContainerGap()
@@ -187,6 +211,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JPanel jpMaster;
     private javax.swing.JTable jtMainLista;
+    private javax.swing.JPanel portraitPanel;
     private javax.swing.JLabel qtPersonagens;
     // End of variables declaration//GEN-END:variables
     // FIM das Constantes para busca das chaves no banco.
@@ -209,6 +234,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         //adiciona listeners
         comboFiltro.addActionListener(personagemControl);
         jtMainLista.getSelectionModel().addListSelectionListener(personagemControl);
+        
 
         doAddTabs();
 
