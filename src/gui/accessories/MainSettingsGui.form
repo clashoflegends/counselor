@@ -432,7 +432,7 @@
                               <Component id="serverPassLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="serverUserLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="serverPortLabel" alignment="0" min="-2" pref="119" max="-2" attributes="0"/>
-                              <Component id="serverSmtpLabel" pref="180" max="32767" attributes="0"/>
+                              <Component id="serverSmtpLabel" pref="149" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -445,7 +445,7 @@
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace pref="33" max="32767" attributes="0"/>
+                  <EmptySpace pref="64" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -624,7 +624,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
                               <Component id="maximizeWindowCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -667,6 +667,10 @@
                                   <EmptySpace max="32767" attributes="0"/>
                               </Group>
                           </Group>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="autoMoveCheckBox1" min="-2" pref="254" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -712,7 +716,9 @@
                       <Component id="autoMoveCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="fogOfWarCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="85" max="32767" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="autoMoveCheckBox1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="59" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -897,6 +903,20 @@
               <ResourceString bundle="labels.properties" key="SETTINGS.DISPLAY.FILTER.SORTORDERS.SEQUENCE" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="seqSort"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="autoMoveCheckBox1">
+          <Properties>
+            <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="isShowPortraitChecked()" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.DISPLAY.SHOWPORTRAITS" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="gui/accessories/Bundle.properties" key="SETTINGS.DISPLAY.FILTER.MOVENEXT.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="autoMoveAction"/>
           </Properties>
         </Component>
       </SubComponents>
