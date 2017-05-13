@@ -246,9 +246,9 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
     }
 
     private void createArmyMovSim(RadialButton rb, boolean water) {
-        ArmyMoveSimulator battleSim = new ArmyMoveSimulator(rb.getLocal(), water);
-        battleSim.setLocationRelativeTo(rb);
-        battleSim.setVisible(true);
+        ArmyMoveSimulator marchSim = new ArmyMoveSimulator(rb.getLocal(), water);
+        marchSim.setLocationRelativeTo(rb);
+        marchSim.setVisible(true);
     }
 
     private void showRangePlot(RadialButton rb) {

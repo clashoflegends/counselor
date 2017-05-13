@@ -7,6 +7,7 @@ package control;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.IBaseModel;
+import business.ImageManager;
 import business.facade.BattleSimFacade;
 import business.facades.WorldFacadeCounselor;
 import control.services.AcaoConverter;
@@ -70,7 +71,12 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
         return terreno;
     }
 
-    public void setTerreno(Terreno terreno) {
+    public void doChangeTerrain(Terreno terreno) {
+        setTerreno(terreno);
+        this.getTabGui().setIconImage(ImageManager.getInstance().getIconApp());
+    }
+
+    private void setTerreno(Terreno terreno) {
         this.terreno = terreno;
     }
 
@@ -154,7 +160,7 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
                 }
                 this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
                 getTabGui().setCasualtyBorder(exercito, terrain);
-                this.setTerreno(terrain);
+                this.doChangeTerrain(terrain);
                 //set short casualties list
                 getCasualtyControler().updateArmy(exercito, terrain);
             } catch (NullPointerException ex) {

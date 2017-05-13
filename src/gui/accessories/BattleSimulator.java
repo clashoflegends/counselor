@@ -5,7 +5,6 @@
 package gui.accessories;
 
 import baseLib.GenericoComboBoxModel;
-import business.facade.BattleSimFacade;
 import business.facade.CidadeFacade;
 import business.facade.LocalFacade;
 import control.BattleSimulatorControler;
@@ -34,13 +33,12 @@ public class BattleSimulator extends JFrame implements IBattleSimulator {
     private final LocalFacade localFacade = new LocalFacade();
     private final CidadeFacade cidadeFacade = new CidadeFacade();
     private final BattleSimulatorControler battleSimControler;
-    private final BattleSimFacade combSim = new BattleSimFacade();
 
     public BattleSimulator(Local local) {
         initComponents();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         battleSimControler = new BattleSimulatorControler(this);
-        battleSimControler.setTerreno(local.getTerreno());
+        battleSimControler.doChangeTerrain(local.getTerreno());
         configUI(local.getTerreno());
         setLocal(local);
     }

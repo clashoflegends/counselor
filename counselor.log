@@ -1,110 +1,54 @@
 Starting...
-Counselor version: 526
-Commons version: 2,782
+Counselor version: 534
+Commons version: 2,795
+AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
 Starting GUI
 Interface carregada and exibida.
 Starting...
-Counselor version: 528
-Commons version: 2,784
-AutoLoading ... Opening:C:\tmpbm\305\033\game_305_33.murazorgames.rr.egf
+Counselor version: 534
+Commons version: 2,795
+AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
 Starting GUI
 Interface carregada and exibida.
 Starting...
-Counselor version: 528
-Commons version: 2,784
-AutoLoading ... Opening:C:\tmpbm\305\033\game_305_33.murazorgames.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_391_6.default.rr.egf
-Starting GUI
-Starting GUI
-Opening:game_391_6.jchalmeta.rr.egf
-Starting GUI
-Starting GUI
-Starting...
-Counselor version: 528
-Commons version: 2,784
-AutoLoading ... Opening:C:\tmpbm\305\033\game_305_33.murazorgames.rr.egf
+Counselor version: 534
+Commons version: 2,795
+AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
 Starting GUI
 Interface carregada and exibida.
 Starting...
-Counselor version: 528
-Commons version: 2,784
-AutoLoading ... Opening:C:\tmpbm\305\033\game_305_33.murazorgames.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_391_7.elllopjuli.rr.egf
-Starting GUI
-Starting GUI
-Starting...
-Counselor version: 528
-Commons version: 2,784
-AutoLoading ... Opening:C:\tmpbm\305\033\game_305_33.murazorgames.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_391_7.novosurb.rr.egf
-Starting GUI
-Starting GUI
-Starting...
-Counselor version: 528
-Commons version: 2,784
-AutoLoading ... Opening:C:\tmpbm\305\033\game_305_33.murazorgames.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_391_7.elloborojo.rr.egf
-Starting GUI
-Starting GUI
-Starting...
-Counselor version: 529
-Commons version: 2,785
-AutoLoading ... Opening:C:\tmpbm\305\033\game_305_33.murazorgames.rr.egf
+Counselor version: 534
+Commons version: 2,795
+AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
 Starting GUI
 Interface carregada and exibida.
 Starting...
-Counselor version: 529
-Commons version: 2,785
-Oopps...
-java.lang.NullPointerException
-	at javax.swing.ImageIcon.<init>(ImageIcon.java:217)
-	at business.ImageFactory.doLoadIconsAll(ImageFactory.java:69)
-	at business.ImageFactory.<init>(ImageFactory.java:58)
-	at gui.MainResultWindowGui.doLoadTeaser(MainResultWindowGui.java:461)
-	at gui.MainResultWindowGui.<init>(MainResultWindowGui.java:45)
-	at client.PbmApplication.createAndShowGUI(PbmApplication.java:61)
-	at client.PbmApplication.init(PbmApplication.java:45)
-	at baseLib.Application.startOnEDT(Application.java:406)
-	at baseLib.Application.access$100(Application.java:84)
-	at baseLib.Application$Handler.run(Application.java:687)
-	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
-	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:756)
-	at java.awt.EventQueue.access$500(EventQueue.java:97)
-	at java.awt.EventQueue$3.run(EventQueue.java:709)
-	at java.awt.EventQueue$3.run(EventQueue.java:703)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:80)
-	at java.awt.EventQueue.dispatchEvent(EventQueue.java:726)
-	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
-	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
-	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
-	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
-java.lang.NullPointerException
-Starting...
-Counselor version: 529
-Commons version: 2,785
-AutoLoading ... Opening:C:\tmpbm\305\033\game_305_33.murazorgames.rr.egf
+Counselor version: 534
+Commons version: 2,795
+AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
 Starting GUI
 Interface carregada and exibida.
 Starting...
-Counselor version: 529
-Commons version: 2,785
-AutoLoading ... Opening:C:\tmpbm\305\033\game_305_33.murazorgames.rr.egf
+Counselor version: 534
+Commons version: 2,795
+AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
 Starting GUI
 Interface carregada and exibida.
 Starting...
-Counselor version: 529
-Commons version: 2,785
-AutoLoading ... Opening:C:\tmpbm\305\033\game_305_33.murazorgames.rr.egf
+Counselor version: 534
+Commons version: 2,795
+AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Starting...
+Counselor version: 534
+Commons version: 2,795
+AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Starting...
+Counselor version: 535
+Commons version: 2,798
+AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
 Starting GUI
 Interface carregada and exibida.

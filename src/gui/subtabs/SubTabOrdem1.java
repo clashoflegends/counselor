@@ -14,6 +14,7 @@ import gui.services.IAcaoGui;
 import gui.services.IPopupTabGui;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,15 +39,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
-import persistenceCommons.SysApoio;
 
 /**
  *
  * @author gurgel
  */
-public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
+public class SubTabOrdem1 extends TabBase implements IPopupTabGui, Serializable {
 
-    private static final Log log = LogFactory.getLog(SubTabOrdem.class);
+    private static final Log log = LogFactory.getLog(SubTabOrdem1.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private OrdemControler ordemControl;
     private final ComponentFactory compFactory = new ComponentFactory();
@@ -58,7 +58,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     private final SubTabTextArea stAjuda = new SubTabTextArea();
     private final IAcaoGui parentTab;
 
-    public SubTabOrdem(IAcaoGui parentTab, MapaControler mapaControl) {
+    public SubTabOrdem1(IAcaoGui parentTab, MapaControler mapaControl) {
         initComponents();
         //Basico do constructor
         this.setMapaControler(mapaControl);
@@ -289,7 +289,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         jpDetOrdensLayout.setVerticalGroup(
             jpDetOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpDetOrdensLayout.createSequentialGroup()
-                .addComponent(jspListaOrdens, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jspListaOrdens, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jpOrdens, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -355,7 +355,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     // FIM das Constantes para busca das chaves no banco.
     private void iniciaConfig() {
         //Cria o Controle da lista de Ordens
-        ordemControl = new OrdemControler(this);
+//        ordemControl = new OrdemControler(this);
         compFactory.setMapaControler(getMapaControler());
         compFactory.setOrdemControl(ordemControl);
 
@@ -381,14 +381,8 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         jtListaOrdens.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jtListaOrdens.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_NEXT_COLUMN);
         jtListaOrdens.setAutoCreateRowSorter(true);
-//        Font font = jtListaOrdens.getFont();
-//        jtListaOrdens.setFont(new Font(font.getName(), Font.PLAIN, font.getSize() * 2));
-        //High res changes for Peter
-        int compHeight = SysApoio.parseInt(SettingsManager.getInstance().getConfig("ActionListHeight", "1"));
-        if (compHeight < 100) {
-            compHeight = Math.max(107, this.jtListaOrdens.getPreferredSize().height);
-        }
-        this.jspListaOrdens.setPreferredSize(new Dimension(this.jspListaOrdens.getWidth(), compHeight));
+        Font font = jtListaOrdens.getFont();
+        jtListaOrdens.setFont(new Font(font.getName(), Font.PLAIN, font.getSize() * 2));
 
         //configura jDialog
         stAjuda.setFontMonospaced();
@@ -453,6 +447,15 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         } else {
             this.jtListaOrdens.setModel(model);
             doConfigTableColumns(jtListaOrdens);
+            //High res changes for Peter
+            int rowHeight = this.jspListaOrdens.getHeight();
+            rowHeight = Math.max(rowHeight, this.jtListaOrdens.getPreferredSize().height);
+            final Dimension dimension = new Dimension(this.jspListaOrdens.getWidth(), rowHeight*2);
+            this.jspListaOrdens.setSize(dimension);
+            this.jspListaOrdens.setPreferredSize(dimension);
+            this.jspListaOrdens.getViewport().setViewSize(dimension);
+            this.jspListaOrdens.setMinimumSize(dimension);
+            this.jspListaOrdens.setMaximumSize(dimension);
         }
     }
 

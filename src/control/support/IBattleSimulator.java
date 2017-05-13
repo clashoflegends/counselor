@@ -1,5 +1,6 @@
 package control.support;
 
+import java.awt.Image;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 import model.ExercitoSim;
@@ -24,4 +25,6 @@ public interface IBattleSimulator {
     public void updateArmy(ExercitoSim exercito);
 
     public void setCasualtyBorder(ExercitoSim exercito, Terreno terrain);
+
+    public void setIconImage(Image image);
 }

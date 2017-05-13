@@ -43,7 +43,7 @@ public class BattleCasualtySimulator extends JFrame implements IBattleSimulator 
         initComponents();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         battleSimControler = new BattleSimulatorControler(this);
-        battleSimControler.setTerreno(local.getTerreno());
+        battleSimControler.doChangeTerrain(local.getTerreno());
         setLocal(local);
         configUI(local);
     }

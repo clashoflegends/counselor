@@ -6,7 +6,7 @@
 package gui;
 
 import business.ArmyPath;
-import business.ImageFactory;
+import business.ImageManager;
 import business.MovimentoExercito;
 import business.converter.ConverterFactory;
 import business.services.TagManager;
@@ -47,7 +47,6 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     private final List<JLabel> movTags = new ArrayList();
     private int counter = 0;
     private int dx = 0, dy = 0;
-    private final ImageFactory imageFactory;
     private RadialMenu radialMenu;
 
     /**
@@ -64,7 +63,6 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         getTagLabel().setVisible(false);
 
         jLayeredPane1.add(tagLabel, new Integer(10));
-        imageFactory = new ImageFactory();
     }
 
     /**
@@ -127,7 +125,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
      * Display hex tag on map and bring it into viewport
      */
     public void setFocusTag(int x, int y) {
-        final Rectangle tagRectangle = new Rectangle(x - dx, y - dy, ImageFactory.HEX_SIZE + 2 * dx, ImageFactory.HEX_SIZE + 2 * dy);
+        final Rectangle tagRectangle = new Rectangle(x - dx, y - dy, ImageManager.HEX_SIZE + 2 * dx, ImageManager.HEX_SIZE + 2 * dy);
         getTagLabel().setBounds(tagRectangle);
         getTagLabel().setVisible(true);
         final JViewport vp = jScrollPane1.getViewport();
@@ -185,7 +183,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         //prepara tag, chamar depois do printMapaGeral, pois ele carrega todas as imagens.
         JLabel tagMovement = new JLabel(this.getMovementTagIcon(custoMov, limitMov, move, cumulativeCounter));
         tagMovement.setOpaque(false);
-        final Rectangle rectangle = new Rectangle(x, y, ImageFactory.HEX_SIZE, ImageFactory.HEX_SIZE);
+        final Rectangle rectangle = new Rectangle(x, y, ImageManager.HEX_SIZE, ImageManager.HEX_SIZE);
         tagMovement.setBounds(rectangle);
         tagMovement.setVisible(true);
         movTags.add(tagMovement);
@@ -221,7 +219,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         Graphics2D g = img.createGraphics();
 
         if (move != null) {
-            imageFactory.doDrawRastro(g, ConverterFactory.getDirecao(move.getDirecao() + 3), Color.BLUE);
+            ImageManager.getInstance().doDrawRastro(g, ConverterFactory.getDirecao(move.getDirecao() + 3), Color.BLUE);
         }
 
         /**

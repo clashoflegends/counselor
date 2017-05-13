@@ -5,7 +5,7 @@
  */
 package gui;
 
-import business.ImageFactory;
+import business.ImageManager;
 import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
 import control.WorldControler;
@@ -458,8 +458,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     }
 
     private void doLoadTeaser() {
-        final ImageFactory imfac = new ImageFactory();
-        final ImageIcon teaser = imfac.getTeaser();
+        final ImageIcon teaser = ImageManager.getInstance().getTeaser();
         //Gera o mapa
         Dimension tamanho = new Dimension(teaser.getIconWidth(), teaser.getIconHeight());
         this.splitMainPanel.setPreferredSize(tamanho);
