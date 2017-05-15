@@ -401,7 +401,12 @@ public class BattleCasualtySimulator extends JFrame implements IBattleSimulator 
     @Override
     public void setCasualtyBorder(ExercitoSim exercito, Terreno terrain) {
         //config border
-        final String title = String.format(labels.getString("TROOPCASUALTIES.COMMANDER.TITLE"), exercito.getNome(), terrain.getNome());
+        final String title;
+        if (exercito != null) {
+            title = String.format(labels.getString("TROOPCASUALTIES.COMMANDER.TITLE"), exercito.getNome(), terrain.getNome());
+        } else {
+            title = labels.getString("TROOPCASUALTIES.BORDER.TITLE");
+        }
         jpQuadro.setBorder(javax.swing.BorderFactory.createTitledBorder(title));
     }
 

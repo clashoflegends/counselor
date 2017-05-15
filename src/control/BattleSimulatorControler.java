@@ -71,9 +71,9 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
         return terreno;
     }
 
-    public void doChangeTerrain(Terreno terreno) {
-        setTerreno(terreno);
-        this.getTabGui().setIconImage(ImageManager.getInstance().getIconApp());
+    public void doChangeTerrain(Terreno terrain) {
+        setTerreno(terrain);
+        this.getTabGui().setIconImage(ImageManager.getInstance().getTerrainImages(terrain.getCodigo()));
     }
 
     private void setTerreno(Terreno terreno) {
@@ -159,8 +159,8 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
                     army.setTerreno(terrain);
                 }
                 this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
-                getTabGui().setCasualtyBorder(exercito, terrain);
                 this.doChangeTerrain(terrain);
+                getTabGui().setCasualtyBorder(exercito, terrain);
                 //set short casualties list
                 getCasualtyControler().updateArmy(exercito, terrain);
             } catch (NullPointerException ex) {

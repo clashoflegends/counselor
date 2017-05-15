@@ -4,6 +4,7 @@
  */
 package gui.accessories;
 
+import business.ImageManager;
 import gui.subtabs.SubTabCasualtyGui;
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
@@ -25,12 +26,8 @@ public class TroopsCasualtiesList extends JFrame {
 
     public TroopsCasualtiesList(Local local) {
         initComponents();
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocal(local);
         configUi();
-        SubTabCasualtyGui jtabMain = new SubTabCasualtyGui(local);
-        GroupLayout parLayout = (GroupLayout) jpQuadro.getLayout();
-        parLayout.replace(jPanel1, jtabMain);
     }
 
     /**
@@ -91,9 +88,14 @@ public class TroopsCasualtiesList extends JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void configUi() {
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         final String title = String.format(labels.getString("TROOPCASUALTIES.TITLE"), getLocal().getTerreno().getNome());
         setTitle(title);
+        this.setIconImage(ImageManager.getInstance().getTerrainImages(getLocal().getTerreno().getCodigo()));
         jpQuadro.setBorder(javax.swing.BorderFactory.createTitledBorder(title));
+        SubTabCasualtyGui jtabMain = new SubTabCasualtyGui(local);
+        GroupLayout parLayout = (GroupLayout) jpQuadro.getLayout();
+        parLayout.replace(jPanel1, jtabMain);
     }
 
     private Local getLocal() {

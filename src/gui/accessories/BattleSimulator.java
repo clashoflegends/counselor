@@ -374,6 +374,5 @@ public class BattleSimulator extends JFrame implements IBattleSimulator {
 
     @Override
     public void setCasualtyBorder(ExercitoSim exercito, Terreno terrain) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
