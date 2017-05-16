@@ -1,301 +1,91 @@
 Starting...
-Counselor version: 534
-Commons version: 2,795
+Counselor version: 537
+Commons version: 2,803
 AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
+Starting GUI
+File not found:C:\tmpbm\PbmCounselor\orders_391_7.novosurb.rc.egf
+File not found:C:\tmpbm\PbmCounselor\orders_391_7.novosurb.rc.egf
+File not found:C:\tmpbm\PbmCounselor\orders_391_7.novosurb.rc.egf
+Starting...
+Counselor version: 537
+Commons version: 2,803
+AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
+Starting GUI
+Starting...
+Counselor version: 537
+Commons version: 2,803
+AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
+Starting GUI
+Starting...
+Counselor version: 537
+Commons version: 2,803
+AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
+Starting GUI
+toPath C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
+getParent C:\tmpbm\Saves\391_WDO10_391\006
+separator \
+File not found:C:\tmpbm\Saves\391_WDO10_391\006\orders_391_7.novosurb.rc.egf
+File not found:C:\tmpbm\Saves\391_WDO10_391\006\orders_391_7.novosurb.rc.egf
+File not found:C:\tmpbm\Saves\391_WDO10_391\006\orders_391_7.novosurb.rc.egf
+Interface carregada and exibida.
+Starting...
+Counselor version: 537
+Commons version: 2,803
+AutoLoading ... Opening:C:\tmpbm\377\game_377_16.murazorgames.rr.egf
+Starting GUI
+toPath C:\tmpbm\377\game_377_16.murazorgames.rr.egf
+getParent C:\tmpbm\377
+separator \
+Interface carregada and exibida.
+Starting...
+Counselor version: 537
+Commons version: 2,803
+AutoLoading ... Opening:C:\tmpbm\377\game_377_16.murazorgames.rr.egf
 Starting GUI
 Interface carregada and exibida.
 Starting...
-Counselor version: 534
-Commons version: 2,795
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
+Counselor version: 537
+Commons version: 2,803
+AutoLoading ... Opening:C:\tmpbm\Saves\game_398_0.barreno.rr.egf
 Starting GUI
 Interface carregada and exibida.
 Starting...
-Counselor version: 534
-Commons version: 2,795
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
+Counselor version: 538
+Commons version: 2,804
+AutoLoading ... Opening:C:\tmpbm\Saves\game_398_0.barreno.rr.egf
 Starting GUI
 Interface carregada and exibida.
 Starting...
-Counselor version: 534
-Commons version: 2,795
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
+Counselor version: 538
+Commons version: 2,804
+AutoLoading ... Opening:C:\tmpbm\377\game_377_16.murazorgames.rr.egf
 Starting GUI
 Interface carregada and exibida.
 Starting...
-Counselor version: 534
-Commons version: 2,795
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
+Counselor version: 538
+Commons version: 2,804
+AutoLoading ... Opening:C:\tmpbm\377\game_377_16.murazorgames.rr.egf
 Starting GUI
 Interface carregada and exibida.
+Saved file:C:\tmpbm\377\orders_377_17.murazorgames.rc.egf
+Saved file:C:\tmpbm\377\orders_377_17.murazorgames.rc.egf
+Saved file:C:\tmpbm\377\orders_377_17.murazorgames.rc.egf
+Saved file:C:\tmpbm\377\orders_377_17.murazorgames.rc.egf
+Saved file:C:\tmpbm\377\orders_377_17.murazorgames.rc.egf
+Saved file:C:\tmpbm\377\orders_377_17.murazorgames.rc.egf
+Actions submitted to the Judge => orders_377_17.murazorgames.rc.egf
 Starting...
-Counselor version: 534
-Commons version: 2,795
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
+Counselor version: 538
+Commons version: 2,804
+AutoLoading ... Opening:C:\tmpbm\377\game_377_16.murazorgames.rr.egf
 Starting GUI
 Interface carregada and exibida.
-Starting...
-Counselor version: 534
-Commons version: 2,795
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 534
-Commons version: 2,795
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 535
-Commons version: 2,798
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 535
-Commons version: 2,798
-Oopps...
-java.lang.NullPointerException
-	at business.ImageManager.getDesenhoProperties(ImageManager.java:476)
-	at business.ImageManager.carregaTerrenos(ImageManager.java:462)
-	at business.ImageManager.getInstance(ImageManager.java:60)
-	at gui.MainResultWindowGui.doLoadTeaser(MainResultWindowGui.java:461)
-	at gui.MainResultWindowGui.<init>(MainResultWindowGui.java:45)
-	at client.PbmApplication.createAndShowGUI(PbmApplication.java:61)
-	at client.PbmApplication.init(PbmApplication.java:45)
-	at baseLib.Application.startOnEDT(Application.java:406)
-	at baseLib.Application.access$100(Application.java:84)
-	at baseLib.Application$Handler.run(Application.java:687)
-	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
-	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:756)
-	at java.awt.EventQueue.access$500(EventQueue.java:97)
-	at java.awt.EventQueue$3.run(EventQueue.java:709)
-	at java.awt.EventQueue$3.run(EventQueue.java:703)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:80)
-	at java.awt.EventQueue.dispatchEvent(EventQueue.java:726)
-	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
-	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
-	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
-	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
-java.lang.NullPointerException
-Starting...
-Counselor version: 536
-Commons version: 2,799
-Oopps...
-java.lang.NullPointerException
-	at business.ImageManager.getDesenhoProperties(ImageManager.java:476)
-	at business.ImageManager.carregaTerrenos(ImageManager.java:462)
-	at business.ImageManager.getInstance(ImageManager.java:60)
-	at gui.MainResultWindowGui.doLoadTeaser(MainResultWindowGui.java:461)
-	at gui.MainResultWindowGui.<init>(MainResultWindowGui.java:45)
-	at client.PbmApplication.createAndShowGUI(PbmApplication.java:61)
-	at client.PbmApplication.init(PbmApplication.java:45)
-	at baseLib.Application.startOnEDT(Application.java:406)
-	at baseLib.Application.access$100(Application.java:84)
-	at baseLib.Application$Handler.run(Application.java:687)
-	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
-	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:756)
-	at java.awt.EventQueue.access$500(EventQueue.java:97)
-	at java.awt.EventQueue$3.run(EventQueue.java:709)
-	at java.awt.EventQueue$3.run(EventQueue.java:703)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:80)
-	at java.awt.EventQueue.dispatchEvent(EventQueue.java:726)
-	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
-	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
-	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
-	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
-java.lang.NullPointerException
-Starting...
-Counselor version: 536
-Commons version: 2,799
-Oopps...
-java.lang.NullPointerException
-	at business.ImageManager.getDesenhoProperties(ImageManager.java:476)
-	at business.ImageManager.carregaTerrenos(ImageManager.java:462)
-	at business.ImageManager.<init>(ImageManager.java:72)
-	at business.ImageManager.getInstance(ImageManager.java:59)
-	at gui.MainResultWindowGui.doLoadTeaser(MainResultWindowGui.java:461)
-	at gui.MainResultWindowGui.<init>(MainResultWindowGui.java:45)
-	at client.PbmApplication.createAndShowGUI(PbmApplication.java:61)
-	at client.PbmApplication.init(PbmApplication.java:45)
-	at baseLib.Application.startOnEDT(Application.java:406)
-	at baseLib.Application.access$100(Application.java:84)
-	at baseLib.Application$Handler.run(Application.java:687)
-	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
-	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:756)
-	at java.awt.EventQueue.access$500(EventQueue.java:97)
-	at java.awt.EventQueue$3.run(EventQueue.java:709)
-	at java.awt.EventQueue$3.run(EventQueue.java:703)
-	at java.security.AccessController.doPrivileged(Native Method)
-	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:80)
-	at java.awt.EventQueue.dispatchEvent(EventQueue.java:726)
-	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
-	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
-	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
-	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
-	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
-java.lang.NullPointerException
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Open command canceled by user.
-Opening:game_387_8.hielofosi.rr.egf
+Opening:game_398_0.barreno.rr.egf
 Starting GUI
 Starting GUI
-Opening:game_398_0.frangomezgomez.rr.egf
+Opening:game_396_1.glumbreras.rr.egf
 Starting GUI
 Starting GUI
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Opening:game_387_8.hielofosi.rr.egf
+Opening:game_399_2.magicjordi.rr.egf
 Starting GUI
 Starting GUI
-Opening:game_399_2.carlosquiles.rr.egf
-Starting GUI
-Starting GUI
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.
-Starting...
-Counselor version: 536
-Commons version: 2,799
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Interface carregada and exibida.

@@ -132,10 +132,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @throws HeadlessException
      */
     private void doLoad(JButton jbTemp) throws HeadlessException {
-        Partida partida = WorldManager.getInstance().getPartida();
-        String nomeArquivo = String.format(labels.getString("FILENAME.ORDERS"),
-                partida.getId(), partida.getTurno() + 1,
-                partida.getJogadorAtivo().getLogin());
+        String nomeArquivo = getFileOrdersName();
         //salva o arquivo
         fc.setSelectedFile(new File(nomeArquivo));
         //Create a file chooser
@@ -152,6 +149,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         } else {
             this.getGui().setStatusMsg(labels.getString("LOAD.CANCELLED"));
         }
+    }
+
+    protected String getFileOrdersName() {
+        Partida partida = WorldManager.getInstance().getPartida();
+        String nomeArquivo = String.format(labels.getString("FILENAME.ORDERS"),
+                partida.getId(), partida.getTurno() + 1,
+                partida.getJogadorAtivo().getLogin());
+        return nomeArquivo;
     }
 
     /**
@@ -393,14 +398,20 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         int returnVal = fc.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             try {
-                final File file = fc.getSelectedFile();
-                log.info(labels.getString("OPENING: ") + file.getName());
-                WFC.doStart(file);
+                final File resultsFile = fc.getSelectedFile();
+                log.info(labels.getString("OPENING: ") + resultsFile.getName());
+                WFC.doStart(resultsFile);
                 log.info(labels.getString("INICIALIZANDO.GUI"));
                 getGui().iniciaConfig();
-                this.getGui().setStatusMsg(labels.getString("OPENING: ") + file.getName());
+                this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
                 this.saved = false;
                 this.savedWorld = false;
+                final String ordersFile = String.format("%s%s%s", resultsFile.getParent(), File.separator, getFileOrdersName());
+                //check for the file on the same folder with same name
+                final File loadActions = new File(ordersFile);
+                if (loadActions.exists()) {
+                    setComando(loadActions);
+                }
             } catch (BussinessException ex) {
                 SysApoio.showDialogError(ex.getMessage());
                 this.getGui().setStatusMsg(ex.getMessage());
@@ -432,17 +443,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 final File loadActions = new File(autoLoadActions);
                 setComando(loadActions);
             } else {
-                Partida partida = WFC.getPartida();
-                final String autoLoadActionsFileName = String.format(labels.getString("FILENAME.ORDERS"),
-                        partida.getId(), partida.getTurno() + 1,
-                        partida.getJogadorAtivo().getLogin());
-                final String ordersFile = String.format("%s%s%s", resultsFile.getParent(), File.separator, autoLoadActionsFileName);
+                final String ordersFile = String.format("%s%s%s", resultsFile.getParent(), File.separator, getFileOrdersName());
                 //check for the file on the same folder with same name
                 final File loadActions = new File(ordersFile);
                 if (loadActions.exists()) {
                     setComando(loadActions);
                 }
             }
+            fc.setSelectedFile(resultsFile);
             this.saved = false;
         } catch (BussinessException ex) {
             SysApoio.showDialogError(ex.getMessage());
