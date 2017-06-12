@@ -333,7 +333,6 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
             //can receive orders
             stOrdens.doMudaActor(nacao);
         } else {
-            //refem ou morto, nao pode dar ordem
             //forca selecao para vazio, limpando quadro de parametros
             stOrdens.doOrdemClear();
         }

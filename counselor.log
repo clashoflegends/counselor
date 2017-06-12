@@ -1,91 +1,231 @@
 Starting...
-Counselor version: 537
-Commons version: 2,803
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-File not found:C:\tmpbm\PbmCounselor\orders_391_7.novosurb.rc.egf
-File not found:C:\tmpbm\PbmCounselor\orders_391_7.novosurb.rc.egf
-File not found:C:\tmpbm\PbmCounselor\orders_391_7.novosurb.rc.egf
-Starting...
-Counselor version: 537
-Commons version: 2,803
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Starting...
-Counselor version: 537
-Commons version: 2,803
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-Starting...
-Counselor version: 537
-Commons version: 2,803
-AutoLoading ... Opening:C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-Starting GUI
-toPath C:\tmpbm\Saves\391_WDO10_391\006\game_391_6.novosurb.rr.egf
-getParent C:\tmpbm\Saves\391_WDO10_391\006
-separator \
-File not found:C:\tmpbm\Saves\391_WDO10_391\006\orders_391_7.novosurb.rc.egf
-File not found:C:\tmpbm\Saves\391_WDO10_391\006\orders_391_7.novosurb.rc.egf
-File not found:C:\tmpbm\Saves\391_WDO10_391\006\orders_391_7.novosurb.rc.egf
-Interface carregada and exibida.
-Starting...
-Counselor version: 537
-Commons version: 2,803
-AutoLoading ... Opening:C:\tmpbm\377\game_377_16.murazorgames.rr.egf
-Starting GUI
-toPath C:\tmpbm\377\game_377_16.murazorgames.rr.egf
-getParent C:\tmpbm\377
-separator \
-Interface carregada and exibida.
-Starting...
-Counselor version: 537
-Commons version: 2,803
+Counselor version: 539
+Commons version: 2,819
 AutoLoading ... Opening:C:\tmpbm\377\game_377_16.murazorgames.rr.egf
 Starting GUI
 Interface carregada and exibida.
+Opening:game_411_0.murazorgames.rr.egf
+Starting GUI
+Starting GUI
+Oopps...
+java.lang.ClassCastException: java.lang.String cannot be cast to model.ActorAction
+	at gui.services.ActorActionTableCellRenderer.getTableCellRendererComponent(ActorActionTableCellRenderer.java:46)
+	at javax.swing.JTable.prepareRenderer(JTable.java:5723)
+	at gui.services.ColumnWidthsAdjuster.updateRowHeights(ColumnWidthsAdjuster.java:72)
+	at gui.services.ColumnWidthsAdjuster.calcColumnWidths(ColumnWidthsAdjuster.java:63)
+	at gui.TabBase.doConfigTableColumns(TabBase.java:104)
+	at gui.tabs.TabPersonagensGui.setMainModel(TabPersonagensGui.java:235)
+	at control.PersonagemControler.actionPerformed(PersonagemControler.java:114)
+	at javax.swing.JComboBox.fireActionEvent(JComboBox.java:1258)
+	at javax.swing.JComboBox.setSelectedItem(JComboBox.java:586)
+	at javax.swing.JComboBox.setSelectedIndex(JComboBox.java:622)
+	at javax.swing.plaf.basic.BasicComboPopup$Handler.mouseReleased(BasicComboPopup.java:861)
+	at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:290)
+	at java.awt.Component.processMouseEvent(Component.java:6533)
+	at javax.swing.JComponent.processMouseEvent(JComponent.java:3324)
+	at javax.swing.plaf.basic.BasicComboPopup$1.processMouseEvent(BasicComboPopup.java:510)
+	at java.awt.Component.processEvent(Component.java:6298)
+	at java.awt.Container.processEvent(Container.java:2236)
+	at java.awt.Component.dispatchEventImpl(Component.java:4889)
+	at java.awt.Container.dispatchEventImpl(Container.java:2294)
+	at java.awt.Component.dispatchEvent(Component.java:4711)
+	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4888)
+	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4525)
+	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4466)
+	at java.awt.Container.dispatchEventImpl(Container.java:2280)
+	at java.awt.Window.dispatchEventImpl(Window.java:2746)
+	at java.awt.Component.dispatchEvent(Component.java:4711)
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:758)
+	at java.awt.EventQueue.access$500(EventQueue.java:97)
+	at java.awt.EventQueue$3.run(EventQueue.java:709)
+	at java.awt.EventQueue$3.run(EventQueue.java:703)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:80)
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:90)
+	at java.awt.EventQueue$4.run(EventQueue.java:731)
+	at java.awt.EventQueue$4.run(EventQueue.java:729)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:80)
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:728)
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+java.lang.ClassCastException: java.lang.String cannot be cast to model.ActorAction
 Starting...
-Counselor version: 537
-Commons version: 2,803
-AutoLoading ... Opening:C:\tmpbm\Saves\game_398_0.barreno.rr.egf
+Counselor version: 539
+Commons version: 2,819
+AutoLoading ... Opening:C:\tmpbm\377\game_377_16.murazorgames.rr.egf
 Starting GUI
 Interface carregada and exibida.
-Starting...
-Counselor version: 538
-Commons version: 2,804
-AutoLoading ... Opening:C:\tmpbm\Saves\game_398_0.barreno.rr.egf
+Opening:game_411_0.murazorgames.rr.egf
 Starting GUI
-Interface carregada and exibida.
+Starting GUI
+Oopps...
+java.lang.ClassCastException: java.lang.String cannot be cast to model.ActorAction
+	at gui.services.ActorActionTableCellRenderer.getTableCellRendererComponent(ActorActionTableCellRenderer.java:46)
+	at javax.swing.JTable.prepareRenderer(JTable.java:5723)
+	at gui.services.ColumnWidthsAdjuster.updateRowHeights(ColumnWidthsAdjuster.java:72)
+	at gui.services.ColumnWidthsAdjuster.calcColumnWidths(ColumnWidthsAdjuster.java:63)
+	at gui.TabBase.doConfigTableColumns(TabBase.java:104)
+	at gui.tabs.TabPersonagensGui.setMainModel(TabPersonagensGui.java:235)
+	at control.PersonagemControler.actionPerformed(PersonagemControler.java:114)
+	at javax.swing.JComboBox.fireActionEvent(JComboBox.java:1258)
+	at javax.swing.JComboBox.setSelectedItem(JComboBox.java:586)
+	at javax.swing.JComboBox.setSelectedIndex(JComboBox.java:622)
+	at javax.swing.plaf.basic.BasicComboPopup$Handler.mouseReleased(BasicComboPopup.java:861)
+	at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:290)
+	at java.awt.Component.processMouseEvent(Component.java:6533)
+	at javax.swing.JComponent.processMouseEvent(JComponent.java:3324)
+	at javax.swing.plaf.basic.BasicComboPopup$1.processMouseEvent(BasicComboPopup.java:510)
+	at java.awt.Component.processEvent(Component.java:6298)
+	at java.awt.Container.processEvent(Container.java:2236)
+	at java.awt.Component.dispatchEventImpl(Component.java:4889)
+	at java.awt.Container.dispatchEventImpl(Container.java:2294)
+	at java.awt.Component.dispatchEvent(Component.java:4711)
+	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4888)
+	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4525)
+	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4466)
+	at java.awt.Container.dispatchEventImpl(Container.java:2280)
+	at java.awt.Window.dispatchEventImpl(Window.java:2746)
+	at java.awt.Component.dispatchEvent(Component.java:4711)
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:758)
+	at java.awt.EventQueue.access$500(EventQueue.java:97)
+	at java.awt.EventQueue$3.run(EventQueue.java:709)
+	at java.awt.EventQueue$3.run(EventQueue.java:703)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:80)
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:90)
+	at java.awt.EventQueue$4.run(EventQueue.java:731)
+	at java.awt.EventQueue$4.run(EventQueue.java:729)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:80)
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:728)
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:201)
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)
+java.lang.ClassCastException: java.lang.String cannot be cast to model.ActorAction
 Starting...
-Counselor version: 538
-Commons version: 2,804
+Counselor version: 539
+Commons version: 2,819
 AutoLoading ... Opening:C:\tmpbm\377\game_377_16.murazorgames.rr.egf
 Starting GUI
 Interface carregada and exibida.
 Starting...
-Counselor version: 538
-Commons version: 2,804
-AutoLoading ... Opening:C:\tmpbm\377\game_377_16.murazorgames.rr.egf
+Counselor version: 539
+Commons version: 2,819
+AutoLoading ... Opening:C:\tmpbm\411\000\game_411_0.murazorgames.rr.egf
 Starting GUI
 Interface carregada and exibida.
-Saved file:C:\tmpbm\377\orders_377_17.murazorgames.rc.egf
-Saved file:C:\tmpbm\377\orders_377_17.murazorgames.rc.egf
-Saved file:C:\tmpbm\377\orders_377_17.murazorgames.rc.egf
-Saved file:C:\tmpbm\377\orders_377_17.murazorgames.rc.egf
-Saved file:C:\tmpbm\377\orders_377_17.murazorgames.rc.egf
-Saved file:C:\tmpbm\377\orders_377_17.murazorgames.rc.egf
-Actions submitted to the Judge => orders_377_17.murazorgames.rc.egf
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
+ClassCastException issue: 
 Starting...
-Counselor version: 538
-Commons version: 2,804
-AutoLoading ... Opening:C:\tmpbm\377\game_377_16.murazorgames.rr.egf
+Counselor version: 540
+Commons version: 2,820
+AutoLoading ... Opening:C:\tmpbm\411\000\game_411_0.murazorgames.rr.egf
 Starting GUI
 Interface carregada and exibida.
-Opening:game_398_0.barreno.rr.egf
+Starting...
+Counselor version: 540
+Commons version: 2,820
+AutoLoading ... Opening:C:\tmpbm\411\000\game_411_0.murazorgames.rr.egf
 Starting GUI
+Interface carregada and exibida.
+Loading:orders_411_1.manolomunoz.rc.egf
+problems loading actions: 10-pkgKnightsSupport[[]]
+problems loading actions: 10-pkgIronBankLoan50K[[]]
+Starting...
+Counselor version: 540
+Commons version: 2,820
+AutoLoading ... Opening:C:\tmpbm\411\000\game_411_0.murazorgames.rr.egf
 Starting GUI
-Opening:game_396_1.glumbreras.rr.egf
+Interface carregada and exibida.
+Loading:orders_411_1.manolomunoz.rc.egf
+problems loading actions: 10-pkgKnightsSupport[[]]
+Starting...
+Counselor version: 540
+Commons version: 2,820
+AutoLoading ... Opening:C:\tmpbm\411\000\game_411_0.murazorgames.rr.egf
 Starting GUI
+Interface carregada and exibida.
+Loading:orders_411_1.manolomunoz.rc.egf
+Starting...
+Counselor version: 540
+Commons version: 2,820
+AutoLoading ... Opening:C:\tmpbm\411\000\game_411_0.murazorgames.rr.egf
 Starting GUI
-Opening:game_399_2.magicjordi.rr.egf
+Interface carregada and exibida.
+Loading:orders_411_1.manolomunoz.rc.egf
+Open command canceled by user.
+Loading:orders_411_1.murazorgames.rc.egf
+Starting...
+Counselor version: 540
+Commons version: 2,820
+AutoLoading ... Opening:C:\tmpbm\411\000\game_411_0.murazorgames.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Loading:orders_411_1.manolomunoz.rc.egf
+Loading:orders_411_1.murazorgames.rc.egf
+File not found:C:\tmpbm\411\000\orders_411_1.murazorgames.rc.egf
+File not found:C:\tmpbm\411\000\orders_411_1.murazorgames.rc.egf
+File not found:C:\tmpbm\411\000\orders_411_1.murazorgames.rc.egf
+Loading:orders_411_1.muraxzorgames.rc.egf
+Starting...
+Counselor version: 540
+Commons version: 2,820
+AutoLoading ... Opening:C:\tmpbm\411\000\game_411_0.murazorgames.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Starting...
+Counselor version: 540
+Commons version: 2,820
+AutoLoading ... Opening:C:\tmpbm\411\000\game_411_0.murazorgames.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Starting...
+Counselor version: 540
+Commons version: 2,820
+AutoLoading ... Opening:C:\tmpbm\411\000\game_411_0.murazorgames.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Loading:orders_411_1.manolomunoz.rc.egf
+Starting...
+Counselor version: 540
+Commons version: 2,820
+AutoLoading ... Opening:C:\tmpbm\411\000\game_411_0.murazorgames.rr.egf
+Starting GUI
+Interface carregada and exibida.
+Error while creating new config file.
+Error while creating new config file.
+Error while creating new config file.
+Error while creating new config file.
+Error while creating new config file.
+Error while creating new config file.
+Error while creating new config file.
+Error while creating new config file.
+Error while creating new config file.
+Opening:game_396_4.adamonmars.rr.egf
 Starting GUI
 Starting GUI

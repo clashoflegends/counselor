@@ -56,6 +56,8 @@ public class ActorActionTableCellRenderer extends DefaultTableCellRenderer imple
             }
         } catch (NullPointerException ex) {
             log.error("ActorActionTableCellRenderer issue: " + value);
+        } catch (ClassCastException ex) {
+            log.debug("ClassCastException issue, no doubles? " + value);
         }
         //apply cell style
         this.setHorizontalAlignment(alignment);
