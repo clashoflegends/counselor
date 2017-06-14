@@ -12,7 +12,9 @@ import business.converter.ConverterFactory;
 import business.services.TagManager;
 import control.MapaControler;
 import control.services.MapaDragListener;
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -225,10 +227,15 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         /**
          * Draw a slightly larger black circle first to give the impression of a dark border
          */
-        g.setColor(Color.BLACK);
-        g.fillOval(21, 21, 19, 19);
+//        g.setColor(Color.BLACK);
+//        g.fillOval(21, 21, 19, 19);
+        ImageManager.getInstance().doDrawCircle(g, 21, 19, Color.BLACK);
 
         //Draw a circle
+        final Composite compositeBefore = g.getComposite();
+        if (SettingsManager.getInstance().isConfig("MoveTagTransparency", "1", "1")) {
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        }
         if (limitMov >= 9999) {
             //high value. marca como amarelo
             g.setColor(Color.yellow);
@@ -238,6 +245,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
             g.setColor(Color.cyan);
         }
         g.fillOval(22, 22, 17, 17);
+        g.setComposite(compositeBefore);
 
         // Create white background
         //g.setColor(Color.WHITE);
