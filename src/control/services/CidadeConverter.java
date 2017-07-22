@@ -10,12 +10,14 @@ import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
 import business.facade.ExercitoFacade;
 import business.facade.LocalFacade;
+import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
 import business.facade.PersonagemFacade;
 import business.facades.ListFactory;
 import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.ComboBoxModel;
@@ -27,10 +29,13 @@ import model.Mercado;
 import model.Nacao;
 import model.Personagem;
 import model.Produto;
+import msgs.BaseMsgs;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
+import utils.StringRet;
 
 /**
  *
@@ -43,6 +48,7 @@ public class CidadeConverter implements Serializable {
     private static final ExercitoFacade exercitoFacade = new ExercitoFacade();
     private static final LocalFacade localFacade = new LocalFacade();
     private static final OrdemFacade ordemFacade = new OrdemFacade();
+    private static final NacaoFacade nacaoFacade = new NacaoFacade();
     private static final PersonagemFacade personagemFacade = new PersonagemFacade();
     private static final ListFactory listFactory = new ListFactory();
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
@@ -395,7 +401,67 @@ public class CidadeConverter implements Serializable {
     }
 
     public static List<String> getInfo(Cidade cidade) {
-        return cidadeFacade.getInfo(cidade, WorldFacadeCounselor.getInstance().getJogadorAtivo().getNacoes().values());
+        return getInfo(cidade, WorldFacadeCounselor.getInstance().getJogadorAtivo().getNacoes().values());
+    }
+
+    private static List<String> getInfo(Cidade cidade, Collection<Nacao> nations) {
+        StringRet ret = new StringRet();
+        if (cidade == null) {
+            return ret.getList();
+        }
+        ret = getInfoDetailed(cidade);
+        for (Nacao nation : nations) {
+            final Nacao targetNation = cidadeFacade.getNacao(cidade);
+            if (targetNation == null || targetNation == nation) {
+                continue;
+            }
+            //print diplomacy
+            ret.addTab(String.format("%s: %s", nation.getNome(), nacaoFacade.getRelacionamento(nation, targetNation)));
+            //print if inactive
+            if (!nacaoFacade.isAtiva(targetNation)) {
+                ret.addTab(String.format("%s: %s", nation.getNome(), labels.getString("INATIVA")));
+            }
+        }
+        return ret.getList();
+    }
+
+    private static StringRet getInfoDetailed(Cidade cidade) {
+        StringRet ret = new StringRet();
+        ret.add(String.format(labels.getString("CIDADE.CAPITAL.DA.NACAO"),
+                cidade.getComboDisplay(),
+                SysApoio.iif(cidade.isCapital(), labels.getString("(CAPITAL)"), ""),
+                nacaoFacade.getNome(cidade.getNacao())));
+        ret.addTab(String.format("%s: %s", labels.getString("TAMANHO"), BaseMsgs.cidadeTamanho[cidade.getTamanho()]));
+        ret.addTab(String.format("%s: %s", labels.getString("FORTIFICACOES"), BaseMsgs.cidadeFortificacao[cidade.getFortificacao()]));
+        if (cidade.getLealdade() > 0) {
+            ret.addTab(String.format("%s: %s (%s)",
+                    labels.getString("LEALDADE"),
+                    cidade.getLealdade(),
+                    cidade.getLealdade() - cidade.getLealdadeAnterior()));
+        } else {
+            ret.addTab(String.format("%s: %s", labels.getString("LEALDADE"), "?"));
+        }
+        ret.addTab(String.format("%s: %s", labels.getString("CIDADE.DOCAS"), BaseMsgs.cidadeDocas[cidade.getDocas()]));
+        ret.addTab(String.format("%s: %s", labels.getString("OCULTO"), cidadeFacade.getOculto(cidade)));
+        ret.addTab(String.format("%s: %s", labels.getString("SITIADO"), cidadeFacade.getSitiado(cidade)));
+        getInfoResources(ret, cidade);
+        return ret;
+    }
+
+    private static void getInfoResources(StringRet ret, Cidade cidade) {
+        ret.add(String.format("%s %s %s %s %s", getProdutoColNames()));
+        Object[][] resources = getProdutosAsArray(cidade);
+        int qtRes = 0;
+        for (Object[] resource : resources) {
+            if ((Integer) resource[4] <= 0) {
+                continue;
+            }
+            ret.addTab(String.format("%s: %s %s %s %s", resource));
+            qtRes++;
+        }
+        if (qtRes == 0) {
+            ret.add(String.format(labels.getString("NENHUM")));
+        }
     }
 
     private static List<Produto> getResourceList() {
