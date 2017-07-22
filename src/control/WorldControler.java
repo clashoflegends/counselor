@@ -132,7 +132,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @throws HeadlessException
      */
     private void doLoad(JButton jbTemp) throws HeadlessException {
-        String nomeArquivo = getFileOrdersName();
+        String nomeArquivo = getCommandFileName();
         //salva o arquivo
         fc.setSelectedFile(new File(nomeArquivo));
         //Create a file chooser
@@ -151,11 +151,18 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    protected String getFileOrdersName() {
+    private String getCommandFileName() {
         Partida partida = WorldManager.getInstance().getPartida();
         String nomeArquivo = String.format(labels.getString("FILENAME.ORDERS"),
                 partida.getId(), partida.getTurno() + 1,
                 partida.getJogadorAtivo().getLogin());
+        return nomeArquivo;
+    }
+
+    private String getCommandFileMask() {
+        Partida partida = WorldManager.getInstance().getPartida();
+        String nomeArquivo = String.format(labels.getString("FILENAME.ORDERS.MASK"),
+                partida.getId(), partida.getTurno() + 1);
         return nomeArquivo;
     }
 
@@ -406,12 +413,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
                 this.saved = false;
                 this.savedWorld = false;
-                final String ordersFile = String.format("%s%s%s", resultsFile.getParent(), File.separator, getFileOrdersName());
-                //check for the file on the same folder with same name
-                final File loadActions = new File(ordersFile);
-                if (loadActions.exists()) {
-                    setComando(loadActions);
-                }
+                doAutoLoadCommands(resultsFile);
             } catch (BussinessException ex) {
                 SysApoio.showDialogError(ex.getMessage());
                 this.getGui().setStatusMsg(ex.getMessage());
@@ -419,6 +421,25 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             }
         } else {
             log.info(labels.getString("OPEN.CANCELLED"));
+        }
+    }
+
+    private void doAutoLoadCommands(final File resultsFile) {
+        if (isLoadTeamOrders()) {
+            //check for the file on the same folder with same name
+            List<File> commandFiles = PathFactory.getInstance().listCommandFile(resultsFile.getParentFile(), getCommandFileMask());
+            for (File ordersFile : commandFiles) {
+                if (ordersFile.exists()) {
+                    setComando(ordersFile);
+                }
+            }
+        } else {
+            final String ordersFile = String.format("%s%s%s", resultsFile.getParent(), File.separator, getCommandFileName());
+            //check for the file on the same folder with same name
+            final File loadActions = new File(ordersFile);
+            if (loadActions.exists()) {
+                setComando(loadActions);
+            }
         }
     }
 
@@ -443,12 +464,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 final File loadActions = new File(autoLoadActions);
                 setComando(loadActions);
             } else {
-                final String ordersFile = String.format("%s%s%s", resultsFile.getParent(), File.separator, getFileOrdersName());
-                //check for the file on the same folder with same name
-                final File loadActions = new File(ordersFile);
-                if (loadActions.exists()) {
-                    setComando(loadActions);
-                }
+                doAutoLoadCommands(resultsFile);
             }
             fc.setSelectedFile(resultsFile);
             this.saved = false;
@@ -1086,4 +1102,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return from;
     }
 
+    private boolean isLoadTeamOrders() {
+        return SettingsManager.getInstance().isConfig("LoadActionsBehavior", "append", "0") && SettingsManager.getInstance().isConfig("LoadActionsOtherNations", "allow", "0");
+    }
 }
