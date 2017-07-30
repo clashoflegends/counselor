@@ -16,8 +16,8 @@ import business.facades.WorldFacadeCounselor;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.MainResultWindowGui;
-import gui.accessories.MainSettingsGui;
 import gui.accessories.MainAboutBox;
+import gui.accessories.MainSettingsGui;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -132,10 +132,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @throws HeadlessException
      */
     private void doLoad(JButton jbTemp) throws HeadlessException {
-        Partida partida = WorldManager.getInstance().getPartida();
-        String nomeArquivo = String.format(labels.getString("FILENAME.ORDERS"),
-                partida.getId(), partida.getTurno() + 1,
-                partida.getJogadorAtivo().getLogin());
+        String nomeArquivo = getCommandFileName();
         //salva o arquivo
         fc.setSelectedFile(new File(nomeArquivo));
         //Create a file chooser
@@ -152,6 +149,21 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         } else {
             this.getGui().setStatusMsg(labels.getString("LOAD.CANCELLED"));
         }
+    }
+
+    private String getCommandFileName() {
+        Partida partida = WorldManager.getInstance().getPartida();
+        String nomeArquivo = String.format(labels.getString("FILENAME.ORDERS"),
+                partida.getId(), partida.getTurno() + 1,
+                partida.getJogadorAtivo().getLogin());
+        return nomeArquivo;
+    }
+
+    private String getCommandFileMask() {
+        Partida partida = WorldManager.getInstance().getPartida();
+        String nomeArquivo = String.format(labels.getString("FILENAME.ORDERS.MASK"),
+                partida.getId(), partida.getTurno() + 1);
+        return nomeArquivo;
     }
 
     /**
@@ -393,14 +405,15 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         int returnVal = fc.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             try {
-                final File file = fc.getSelectedFile();
-                log.info(labels.getString("OPENING: ") + file.getName());
-                WFC.doStart(file);
+                final File resultsFile = fc.getSelectedFile();
+                log.info(labels.getString("OPENING: ") + resultsFile.getName());
+                WFC.doStart(resultsFile);
                 log.info(labels.getString("INICIALIZANDO.GUI"));
                 getGui().iniciaConfig();
-                this.getGui().setStatusMsg(labels.getString("OPENING: ") + file.getName());
+                this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
                 this.saved = false;
                 this.savedWorld = false;
+                doAutoLoadCommands(resultsFile);
             } catch (BussinessException ex) {
                 SysApoio.showDialogError(ex.getMessage());
                 this.getGui().setStatusMsg(ex.getMessage());
@@ -411,30 +424,54 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
+    private void doAutoLoadCommands(final File resultsFile) {
+        if (isLoadTeamOrders()) {
+            //check for the file on the same folder with same name
+            List<File> commandFiles = PathFactory.getInstance().listCommandFile(resultsFile.getParentFile(), getCommandFileMask());
+            for (File ordersFile : commandFiles) {
+                if (ordersFile.exists()) {
+                    setComando(ordersFile);
+                }
+            }
+        } else {
+            final String ordersFile = String.format("%s%s%s", resultsFile.getParent(), File.separator, getCommandFileName());
+            //check for the file on the same folder with same name
+            final File loadActions = new File(ordersFile);
+            if (loadActions.exists()) {
+                setComando(loadActions);
+            }
+        }
+    }
+
     /**
      * Verifica e carrega a partida default definida no properties
      *
      * @param autoLoad
      */
     public void doAutoLoad(String autoLoad) {
-        if (autoLoad != null && !autoLoad.isEmpty()) {
-//            autoLoad = SettingsManager.getInstance().getConfig("loadDir") + autoLoad;
-            try {
-                log.info(labels.getString("AUTOLOADING.OPENING") + autoLoad);
-                WFC.doStart(new File(autoLoad));
-                getGui().iniciaConfig();
-                String autoLoadActions = SettingsManager.getInstance().getConfig("autoLoadActions", "none");
-                if (!autoLoadActions.equals("none") && !autoLoadActions.isEmpty()) {
-                    final File loadActions = new File(autoLoadActions);
-                    setComando(loadActions);
-                }
-                this.getGui().setStatusMsg(labels.getString("AUTOLOADING.OPENING") + autoLoad);
-                this.saved = false;
-            } catch (BussinessException ex) {
-                SysApoio.showDialogError(ex.getMessage());
-                this.getGui().setStatusMsg(ex.getMessage());
-                log.error(ex);
+        if (autoLoad == null || autoLoad.isEmpty()) {
+            return;
+        }
+        try {
+            log.info(labels.getString("AUTOLOADING.OPENING") + autoLoad);
+            this.getGui().setStatusMsg(labels.getString("AUTOLOADING.OPENING") + autoLoad);
+            final File resultsFile = new File(autoLoad);
+            WFC.doStart(resultsFile);
+            getGui().iniciaConfig();
+            String autoLoadActions = SettingsManager.getInstance().getConfig("autoLoadActions", "none");
+            if (!autoLoadActions.equals("none") && !autoLoadActions.isEmpty()) {
+                //check if there's a defined orders file to be loaded
+                final File loadActions = new File(autoLoadActions);
+                setComando(loadActions);
+            } else {
+                doAutoLoadCommands(resultsFile);
             }
+            fc.setSelectedFile(resultsFile);
+            this.saved = false;
+        } catch (BussinessException ex) {
+            SysApoio.showDialogError(ex.getMessage());
+            this.getGui().setStatusMsg(ex.getMessage());
+            log.error(ex);
         }
     }
 
@@ -956,29 +993,30 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             //int ret = WebCounselorManager.getInstance().doSendViaPost(attachment, partida, listaOrdens());
             PartidaJogadorWebInfo info = doPrepPost(attachment);
             int ret = WebCounselorManager.getInstance().doSendViaPost(info);
-            if (ret == WebCounselorManager.OK) {
-                final String msg = String.format(labels.getString("POST.DONE"), attachment.getName());
-                log.info(msg);
-                this.getGui().setStatusMsg(msg);
-                if (SettingsManager.getInstance().getConfig("SendOrderConfirmationPopUp", "1").equals("1")) {
-                    SysApoio.showDialogInfo(labels.getString("POST.DONE.TITLE"), labels.getString("POST.DONE.TITLE"));
-                }
-                return true;
-            } else if (ret == WebCounselorManager.ERROR_GAMECLOSED) {
-                //display alert!
-                SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"));
-                this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
-                return true; //dont try email
-            } else if (ret == WebCounselorManager.ERROR_TURN) {
-                final String expectedTurn = String.format(labels.getString("ENVIAR.ERRO.WRONGTURN"), WebCounselorManager.getInstance().getLastResponseString());
-                //display alert!
-                SysApoio.showDialogError(expectedTurn, labels.getString("ENVIAR.ERRO"));
-                this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
-                return true; //dont try email
-            } else {
-                SysApoio.showDialogError(labels.getString("ERROR"), labels.getString("ENVIAR.ERRO"));
-                this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
-                return false;
+            switch (ret) {
+                case WebCounselorManager.OK:
+                    final String msg = String.format(labels.getString("POST.DONE"), attachment.getName());
+                    log.info(msg);
+                    this.getGui().setStatusMsg(msg);
+                    if (SettingsManager.getInstance().getConfig("SendOrderConfirmationPopUp", "1").equals("1")) {
+                        SysApoio.showDialogInfo(labels.getString("POST.DONE.TITLE"), labels.getString("POST.DONE.TITLE"));
+                    }
+                    return true;
+                case WebCounselorManager.ERROR_GAMECLOSED:
+                    //display alert!
+                    SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"));
+                    this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
+                    return true; //dont try email
+                case WebCounselorManager.ERROR_TURN:
+                    final String expectedTurn = String.format(labels.getString("ENVIAR.ERRO.WRONGTURN"), WebCounselorManager.getInstance().getLastResponseString());
+                    //display alert!
+                    SysApoio.showDialogError(expectedTurn, labels.getString("ENVIAR.ERRO"));
+                    this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
+                    return true; //dont try email
+                default:
+                    SysApoio.showDialogError(labels.getString("ERROR"), labels.getString("ENVIAR.ERRO"));
+                    this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
+                    return false;
             }
         } catch (PersistenceException ex) {
             this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
@@ -1064,4 +1102,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return from;
     }
 
+    private boolean isLoadTeamOrders() {
+        return SettingsManager.getInstance().isConfig("LoadActionsBehavior", "append", "0") && SettingsManager.getInstance().isConfig("LoadActionsOtherNations", "allow", "0");
+    }
 }

@@ -4,11 +4,13 @@
  */
 package control.services;
 
+import business.converter.ConverterFactory;
 import business.facade.LocalFacade;
 import business.facades.ListFactory;
 import java.io.Serializable;
 import model.Artefato;
 import model.Exercito;
+import model.Habilidade;
 import model.Local;
 import model.Personagem;
 import msgs.BaseMsgs;
@@ -39,25 +41,32 @@ public class LocalConverter implements Serializable {
                 local.getTerreno().getNome(),
                 BaseMsgs.localClima[local.getClima()]));
         //personagens
+        if (localFacade.isTerrainLandmark(local)) {
+            ret.add(labels.getString("LANDMARK.LOCAL")+";");
+            for (Habilidade feature : localFacade.getTerrainLandmark(local)) {
+                ret.addTab(ConverterFactory.getLandmarkName(feature.getCodigo()));
+            }
+        }
+        //personagens
         if (local.getPersonagens().values().size() > 0) {
             ret.add(labels.getString("PERSONAGENS.LOCAL"));
-        }
-        for (Personagem personagem : local.getPersonagens().values()) {
-            ret.add(PersonagemConverter.getInfo(personagem));
+            for (Personagem personagem : local.getPersonagens().values()) {
+                ret.add(PersonagemConverter.getInfo(personagem));
+            }
         }
         //exercitos
         if (local.getExercitos().values().size() > 0) {
             ret.add(labels.getString("EXERCITOS"));
-        }
-        for (Exercito exercito : local.getExercitos().values()) {
-            ret.add(ExercitoConverter.getInfo(exercito));
+            for (Exercito exercito : local.getExercitos().values()) {
+                ret.add(ExercitoConverter.getInfo(exercito));
+            }
         }
         //artefatos
         if (local.getArtefatos().values().size() > 0) {
             ret.add(labels.getString("ARTEFATOS"));
-        }
-        for (Artefato artefato : local.getArtefatos().values()) {
-            ret.add(ArtefatoConverter.getInfo(artefato));
+            for (Artefato artefato : local.getArtefatos().values()) {
+                ret.add(ArtefatoConverter.getInfo(artefato));
+            }
         }
         return ret.getText();
     }

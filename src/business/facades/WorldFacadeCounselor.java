@@ -161,7 +161,7 @@ public class WorldFacadeCounselor implements Serializable {
         final int initialCapacity = 25 + WorldManager.getInstance().getPersonagens().size()
                 + WorldManager.getInstance().getCidades().size();
         final List<BaseModel> ret = new ArrayList<BaseModel>(initialCapacity);
-        ret.addAll(WorldManager.getInstance().getNacoesJogadorAtivo());
+        ret.addAll(WorldManager.getInstance().getNacoes().values());
         ret.addAll(WorldManager.getInstance().getCidades().values());
         ret.addAll(WorldManager.getInstance().getPersonagens().values());
         return ret;

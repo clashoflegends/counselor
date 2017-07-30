@@ -72,7 +72,7 @@ public class TabBase extends javax.swing.JRootPane implements Serializable {
         return icone;
     }
 
-    public void setIcone(String iconeName) {
+    public final void setIcone(String iconeName) {
         try {
             this.icone = new ImageIcon(getClass().getResource(iconeName));
         } catch (NullPointerException ex) {

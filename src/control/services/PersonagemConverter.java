@@ -445,6 +445,18 @@ public class PersonagemConverter implements Serializable {
                 } catch (NullPointerException e) {
                 }
             }
+        } else if (filtro.equalsIgnoreCase("openslot")) {
+            Jogador jAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
+            for (Personagem personagem : listFactory.listPersonagens()) {
+                try {
+                    if (jAtivo.isNacao(personagem.getNacao())) {
+                        if (ordemFacade.isOpenOrdem(personagem)) {
+                            ret.add(personagem);
+                        }
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
         }
         return ret;
     }
