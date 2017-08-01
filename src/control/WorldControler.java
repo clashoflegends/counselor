@@ -183,16 +183,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         BaseModel missingAction = doSaveActorActions(jogadorAtivo, comando);
         boolean missingPackage = doSavePackages(comando);
         if (comando.size() == 0) {
-            SysApoio.showDialogAlert(labels.getString("NONE.ORDERS"));
+            SysApoio.showDialogAlert(labels.getString("NONE.ORDERS"), this.getGui());
             this.getGui().setStatusMsg(labels.getString("NONE.ORDERS"));
         } else {
             if (missingAction != null) {
                 final String msg = String.format(labels.getString("MISSING.ORDERS"), missingAction.getNome());
-                SysApoio.showDialogAlert(msg);
+                SysApoio.showDialogAlert(msg, this.getGui());
                 this.getGui().setStatusMsg(msg);
             }
             if (missingPackage) {
-                SysApoio.showDialogAlert(labels.getString("MISSING.PACKAGE"));
+                SysApoio.showDialogAlert(labels.getString("MISSING.PACKAGE"), this.getGui());
                 this.getGui().setStatusMsg(labels.getString("MISSING.PACKAGE"));
             }
 
@@ -249,7 +249,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.saved = true;
         } catch (BussinessException ex) {
             log.error(ex.getMessage());
-            SysApoio.showDialogError(ex.getMessage());
+            SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
         }
         return ret;
@@ -373,7 +373,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         File attachment = doSave(jbTemp);
         if (attachment == null) {
             this.getGui().setStatusMsg(labels.getString("ENVIAR.FALTOU.ARQUIVO"));
-            SysApoio.showDialogError(labels.getString("ENVIAR.FALTOU.ARQUIVO"));
+            SysApoio.showDialogError(labels.getString("ENVIAR.FALTOU.ARQUIVO"), this.getGui());
             return;
         }
         /*
@@ -421,7 +421,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 this.savedWorld = false;
                 doAutoLoadCommands(resultsFile);
             } catch (BussinessException ex) {
-                SysApoio.showDialogError(ex.getMessage());
+                SysApoio.showDialogError(ex.getMessage(), this.getGui());
                 this.getGui().setStatusMsg(ex.getMessage());
                 log.error(ex);
             }
@@ -475,7 +475,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             fc.setSelectedFile(resultsFile);
             this.saved = false;
         } catch (BussinessException ex) {
-            SysApoio.showDialogError(ex.getMessage());
+            SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             log.error(ex);
         }
@@ -730,18 +730,18 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     msg += line + "\n";
                 }
                 SysApoio.showDialogError(String.format("%d %s %s\n%s",
-                        errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(), msg));
+                        errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(), msg), this.getGui());
             }
         } catch (IllegalStateException ex) {
-            SysApoio.showDialogError(ex.getMessage());
+            SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             log.info(ex.getMessage());
         } catch (ClassCastException ex) {
-            SysApoio.showDialogError(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName());
+            SysApoio.showDialogError(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName(), this.getGui());
             this.getGui().setStatusMsg(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName());
             log.error(ex.getMessage());
         } catch (PersistenceException ex) {
-            SysApoio.showDialogError(ex.getMessage());
+            SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             log.info(ex.getMessage());
         }
@@ -1005,22 +1005,22 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     log.info(msg);
                     this.getGui().setStatusMsg(msg);
                     if (SettingsManager.getInstance().getConfig("SendOrderConfirmationPopUp", "1").equals("1")) {
-                        SysApoio.showDialogInfo(labels.getString("POST.DONE.TITLE"), labels.getString("POST.DONE.TITLE"));
+                        SysApoio.showDialogInfo(labels.getString("POST.DONE.TITLE"), labels.getString("POST.DONE.TITLE"), this.getGui());
                     }
                     return true;
                 case WebCounselorManager.ERROR_GAMECLOSED:
                     //display alert!
-                    SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"));
+                    SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"), this.getGui());
                     this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                     return true; //dont try email
                 case WebCounselorManager.ERROR_TURN:
                     final String expectedTurn = String.format(labels.getString("ENVIAR.ERRO.WRONGTURN"), WebCounselorManager.getInstance().getLastResponseString());
                     //display alert!
-                    SysApoio.showDialogError(expectedTurn, labels.getString("ENVIAR.ERRO"));
+                    SysApoio.showDialogError(expectedTurn, labels.getString("ENVIAR.ERRO"), this.getGui());
                     this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                     return true; //dont try email
                 default:
-                    SysApoio.showDialogError(labels.getString("ERROR"), labels.getString("ENVIAR.ERRO"));
+                    SysApoio.showDialogError(labels.getString("ERROR"), labels.getString("ENVIAR.ERRO"), this.getGui());
                     this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                     return false;
             }
@@ -1079,16 +1079,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 return true;
             } else {
                 this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO"));
-                SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"));
+                SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), this.getGui());
                 return false;
             }
         } catch (PersistenceException ex) {
             this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO") + " => " + ex.getMessage());
-            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"));
+            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), this.getGui());
             return false;
         } catch (AddressException ex) {
             this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO.MALFORMED") + " => " + ex.getMessage());
-            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO.MALFORMED"));
+            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO.MALFORMED"), this.getGui());
             return false;
         }
     }
@@ -1099,7 +1099,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             from = JOptionPane.showInputDialog(labels.getString("ENVIAR.INPUT.EMAIL"), from);
             if (from == null || from.equals("none")) {
                 this.getGui().setStatusMsg(labels.getString("ENVIAR.FALTOU.FROM"));
-                SysApoio.showDialogError(labels.getString("ENVIAR.FALTOU.FROM"));
+                SysApoio.showDialogError(labels.getString("ENVIAR.FALTOU.FROM"), this.getGui());
                 return "none";
             }
             //salva novas informacoes no properties

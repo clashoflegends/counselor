@@ -449,6 +449,9 @@ public class ExercitoConverter implements Serializable {
          * Um pequeno exército portando o estandarte do Rei-Fogo sob o comando do(a) Comandante Tertis está Aqui.
          */
         ret.addTab(TitleFactory.displayExercitotitulo(exercito));
+        for (Pelotao platoon : exercito.getPelotoes().values()) {
+            ret.addTabTab(String.format("%s %s",platoon.getQtd(), platoon.getTipoTropa().getNome()));
+        }
         return ret.getList();
     }
 
