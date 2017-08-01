@@ -52,6 +52,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbCopy.addActionListener(wc);
         jbSend.addActionListener(wc);
         jbAbout.addActionListener(wc);
+        jbHexview.addActionListener(wc);
         jbConfigs.addActionListener(wc);
         wc.doAutoLoad(autoLoad);
     }
@@ -81,6 +82,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbCopy = new javax.swing.JButton();
         jbMap = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        jbHexview = new javax.swing.JButton();
         jbConfigs = new javax.swing.JButton();
         jbAbout = new javax.swing.JButton();
         splitMainPanel = new javax.swing.JSplitPane();
@@ -199,6 +201,14 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar1.add(jbMap);
         jToolBar1.add(filler1);
 
+        jbHexview.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_icon.png"))); // NOI18N
+        jbHexview.setText(bundle.getString("MENU.HEXVIEW")); // NOI18N
+        jbHexview.setToolTipText(bundle.getString("MENU.HEXVIEW.TOOLTIP")); // NOI18N
+        jbHexview.setActionCommand("jbHexview");
+        jbHexview.setFocusable(false);
+        jbHexview.setName("jbConfig"); // NOI18N
+        jToolBar1.add(jbHexview);
+
         jbConfigs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icon_customize.gif"))); // NOI18N
         jbConfigs.setText(bundle.getString("MENU.CONFIG")); // NOI18N
         jbConfigs.setToolTipText(bundle.getString("MENU.CONFIG.TOOLTIP")); // NOI18N
@@ -241,7 +251,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(labelMoney, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
                     .addComponent(labelJogador, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)))
-            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 1166, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 1166, Short.MAX_VALUE)
         );
         infoPanelLayout.setVerticalGroup(
             infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -318,6 +328,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JButton jbAbout;
     private javax.swing.JButton jbConfigs;
     private javax.swing.JButton jbCopy;
+    private javax.swing.JButton jbHexview;
     private javax.swing.JButton jbLoad;
     private javax.swing.JButton jbMap;
     private javax.swing.JButton jbOpen;
@@ -398,6 +409,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbCopy.setEnabled(true);
         jbSend.setEnabled(true);
         jbAbout.setEnabled(true);
+        jbHexview.setEnabled(true);
         jbConfigs.setEnabled(true);
         // Joga a janela toda para a esquerda = 0
         // divide a janela ao meio = -1

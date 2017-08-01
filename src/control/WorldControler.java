@@ -113,6 +113,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doSend(jbTemp);
             } else if ("jbAbout".equals(jbTemp.getActionCommand())) {
                 doAbout();
+            } else if ("jbHexview".equals(jbTemp.getActionCommand())) {
+                doHexview();
             } else if ("jbConfig".equals(jbTemp.getActionCommand())) {
                 doConfig();
             } else if ("jbLoad".equals(jbTemp.getActionCommand())) {
@@ -283,6 +285,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         dAbout.setLocationRelativeTo(this.getGui());
         dAbout.pack();
         dAbout.setVisible(true);
+    }
+
+    private void doHexview() {
+        WFC.getMapaControler().doHexViewToggle();
     }
 
     private void doConfig() throws HeadlessException {
@@ -964,7 +970,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private int setPackage(SortedMap<Integer, String> packages) {
-        Nacao nacao = null;
+        Nacao nacao;
         for (Integer idNation : packages.keySet()) {
             try {
                 nacao = WorldManager.getInstance().getNacao(idNation);
@@ -1056,7 +1062,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             email.addToCc(from);
             email.setFrom(from);
             email.setBody(listaOrdensEmailBody(msg));
-            String subject = null;
+            String subject;
             try {
                 subject = String.format("[Orders] %s - %s (%s) [%s]",
                         WorldManager.getInstance().getPartida().getCodigo(),
@@ -1105,4 +1111,5 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private boolean isLoadTeamOrders() {
         return SettingsManager.getInstance().isConfig("LoadActionsBehavior", "append", "0") && SettingsManager.getInstance().isConfig("LoadActionsOtherNations", "allow", "0");
     }
+
 }
