@@ -720,7 +720,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             if (comando.getTurno() != partida.getTurno()) {
                 throw new IllegalStateException(labels.getString("TURNO.ERRADO") + file.getName());
             }
-            int qtPackageCarregadas = this.setPackage(comando.getPackages());
+            final int qtPackageCarregadas = this.setPackage(comando.getPackages());
             List<String> errorMsgs = new ArrayList<String>();
             int qtOrdensCarregadas = this.setOrdens(comando, errorMsgs);
             this.getGui().setStatusMsg(String.format("%d %s %s", qtOrdensCarregadas, labels.getString("ORDENS.CARREGADAS"), file.getName()));
@@ -765,12 +765,20 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             getDispatchManager().sendDispatchForMsg(DispatchManager.CLEAR_FINANCES_FORECAST, "");
         }
 
+        for (ComandoDetail comandoDetail : comando.getOrdens()) {
+            BaseModel actor = actors.get(comandoDetail.getActorCodigo());
+            try {
+                actor.remAcoes();
+            } catch (NullPointerException ex) {
+                //nao faz nada, ordens nao disponiveis...
+                log.fatal("problems loading actor: " + comandoDetail.getActorCodigo());
+            }
+        }
         try {
             //carrega as ordens personagem por personagem
             for (ComandoDetail comandoDetail : comando.getOrdens()) {
                 BaseModel actor = actors.get(comandoDetail.getActorCodigo());
                 Ordem ordem = WFC.getOrdem(comandoDetail.getOrdemCodigo());
-
                 try {
                     //just to catch the NullPointerException
                     ordem.getNome();
