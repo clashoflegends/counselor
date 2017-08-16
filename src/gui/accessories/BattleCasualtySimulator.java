@@ -71,7 +71,8 @@ public class BattleCasualtySimulator extends JFrame implements IBattleSimulator 
         jsCommander = new javax.swing.JSpinner();
         jLabel2 = new javax.swing.JLabel();
         jsMorale = new javax.swing.JSpinner();
-        jlHint = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jlHint = new javax.swing.JTextArea();
         jpQuadro = new javax.swing.JPanel();
         jpPlaceholder = new javax.swing.JPanel();
 
@@ -188,7 +189,19 @@ public class BattleCasualtySimulator extends JFrame implements IBattleSimulator 
         jsMorale.setModel(new javax.swing.SpinnerNumberModel(0, 0, 1000, 1));
         jsMorale.setName("jsMorale"); // NOI18N
 
-        jlHint.setText("jLabel3");
+        jScrollPane2.setBorder(null);
+
+        jlHint.setEditable(false);
+        jlHint.setBackground(java.awt.SystemColor.menu);
+        jlHint.setColumns(20);
+        jlHint.setLineWrap(true);
+        jlHint.setRows(5);
+        jlHint.setWrapStyleWord(true);
+        jlHint.setAutoscrolls(false);
+        jlHint.setEnabled(false);
+        jlHint.setFocusable(false);
+        jlHint.setOpaque(false);
+        jScrollPane2.setViewportView(jlHint);
 
         javax.swing.GroupLayout jpOptionsLayout = new javax.swing.GroupLayout(jpOptions);
         jpOptions.setLayout(jpOptionsLayout);
@@ -197,7 +210,6 @@ public class BattleCasualtySimulator extends JFrame implements IBattleSimulator 
             .addGroup(jpOptionsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jpOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jlHint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jcbTerrain, 0, 186, Short.MAX_VALUE)
                     .addGroup(jpOptionsLayout.createSequentialGroup()
                         .addGroup(jpOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -208,6 +220,7 @@ public class BattleCasualtySimulator extends JFrame implements IBattleSimulator 
                             .addComponent(jsMorale)
                             .addComponent(jsCommander))
                         .addContainerGap())))
+            .addComponent(jScrollPane2)
         );
         jpOptionsLayout.setVerticalGroup(
             jpOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -221,8 +234,8 @@ public class BattleCasualtySimulator extends JFrame implements IBattleSimulator 
                 .addGroup(jpOptionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(jsMorale, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
-                .addComponent(jlHint, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2))
         );
 
         jpQuadro.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("TROOPCASUALTIES.BORDER.TITLE"))); // NOI18N
@@ -283,10 +296,11 @@ public class BattleCasualtySimulator extends JFrame implements IBattleSimulator 
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JComboBox jcbTerrain;
     private javax.swing.JLabel jlDefense;
     private javax.swing.JLabel jlFortification;
-    private javax.swing.JLabel jlHint;
+    private javax.swing.JTextArea jlHint;
     private javax.swing.JLabel jlLoyalty;
     private javax.swing.JLabel jlSize;
     private javax.swing.JPanel jpArmies;
@@ -374,6 +388,7 @@ public class BattleCasualtySimulator extends JFrame implements IBattleSimulator 
 
     private void configUI(Local local) {
         jlHint.setText(labels.getString("BATTLECAUSUALITYSIM.HINT"));
+        jlHint.setFont(jsMorale.getFont());
 
         configCitySliders();
         jsCommander.addChangeListener(battleSimControler);
