@@ -238,6 +238,10 @@ public class WorldFacadeCounselor implements Serializable {
         return cf.hasWizard(getCenario());
     }
 
+    public boolean hasCombatCasualtiesTactics() {
+        return cf.hasCombatCasualtiesTactics(getCenario());
+    }
+
     public boolean hasResourceManagement() {
         return cf.hasResourceManagement(getCenario());
     }
