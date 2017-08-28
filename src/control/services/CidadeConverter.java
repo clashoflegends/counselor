@@ -17,7 +17,6 @@ import business.facades.ListFactory;
 import business.facades.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -370,16 +369,12 @@ public class CidadeConverter implements Serializable {
      */
     public static ComboBoxModel getCidadeComboModel(int tipo, Nacao nacao) {
         Cidade[] items = null;
-        switch (tipo) {
-            case 0:
-                items = listaCidadesAll();
-                break;
-            case 1:
-                items = listaCidadesNacao(nacao);
-                break;
+        if (tipo == 0) {
+            items = listaCidadesAll();
+        } else if (tipo == 1) {
+            items = listaCidadesNacao(nacao);
+        } else {
 //            throw new UnsupportedOperationException("Not yet implemented");
-            default:
-                break;
         }
         GenericoComboBoxModel model = new GenericoComboBoxModel(items);
         return model;
@@ -454,7 +449,7 @@ public class CidadeConverter implements Serializable {
     }
 
     private static void getInfoResources(StringRet ret, Cidade cidade) {
-        ret.add(String.format("%s %s %s %s %s", Arrays.toString(getProdutoColNames())));
+        ret.add(String.format("%s %s %s %s %s", (Object[]) getProdutoColNames()));
         Object[][] resources = getProdutosAsArray(cidade);
         int qtRes = 0;
         for (Object[] resource : resources) {
