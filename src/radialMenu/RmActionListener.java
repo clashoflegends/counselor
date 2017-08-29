@@ -235,7 +235,7 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
     }
 
     private void createBattleSim(RadialButton rb) {
-        final boolean oldBattleSim = SettingsManager.getInstance().getConfig("BatleSimOld", "0").equalsIgnoreCase("1") || WorldFacadeCounselor.getInstance().hasResourceManagement();
+        final boolean oldBattleSim = SettingsManager.getInstance().getConfig("BatleSimOld", "0").equalsIgnoreCase("1") || !WorldFacadeCounselor.getInstance().hasCombatCasualtiesTactics();
         if (oldBattleSim) {
             BattleSimulator battleSim = new BattleSimulator(rb.getLocal());
             battleSim.setLocationRelativeTo(rb);
