@@ -399,6 +399,8 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         //habilita o toolbar
         jbLoad.setEnabled(true);
         jbSave.setEnabled(true);
+        jbSave.setVisible(!SettingsManager.getInstance().isAutoSaveActions());
+
         if (SettingsManager.getInstance().isWorldBuilder()) {
             jbSaveWorld.setEnabled(true);
         } else {

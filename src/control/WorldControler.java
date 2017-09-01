@@ -177,7 +177,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @throws HeadlessException
      */
     private File doSave(Component jbTemp) throws HeadlessException {
-        File ret = null;
         Partida partida = WFC.getPartida();
         Jogador jogadorAtivo = partida.getJogadorAtivo();
         Comando comando = new Comando();
@@ -197,6 +196,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         String fileName = String.format(labels.getString("FILENAME.ORDERS"), partida.getId(), partida.getTurno() + 1, partida.getJogadorAtivo().getLogin());
 
         //salva o arquivo
+        File ret = null;
         if (!this.saved) {
             //monta o dialogo
             //define default
@@ -868,7 +868,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     @Override
     public void receiveDispatch(int msgName, Component cmpnt) {
-        if (msgName == DispatchManager.ACTIONS_AUTOSAVE && SettingsManager.getInstance().isConfig("AutoSaveActions", "1", "0")) {
+        if (msgName == DispatchManager.ACTIONS_AUTOSAVE && SettingsManager.getInstance().isAutoSaveActions()) {
             doSave(cmpnt);
         }
     }

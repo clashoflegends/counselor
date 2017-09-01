@@ -57,6 +57,13 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         return getTabGui().getActor().getPersonagemOrdem(indexModelOrdem);
     }
 
+    private void doRemoveAction() {
+        getTabGui().setValueAt(getTabGui().getActor().doOrderClear(indexModelOrdem), indexModelOrdem);
+        if (SettingsManager.getInstance().isAutoSaveActions()) {
+            getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_AUTOSAVE, this.getTabGui());
+        }
+    }
+
     private void doSalvaAction() {
         try {
             doSalvaAction(indexModelOrdem);
@@ -76,7 +83,7 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         }
         final PersonagemOrdem po = getTabGui().getOrdemQuadro();
         getTabGui().getActor().doOrderSave(index, po);
-        if (SettingsManager.getInstance().isConfig("AutoSaveActions", "1", "0")) {
+        if (SettingsManager.getInstance().isAutoSaveActions()) {
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_AUTOSAVE, this.getTabGui());
         }
         final ActorAction actorAction = ordemFacade.getActorAction(po);
@@ -112,11 +119,11 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             JButton button = (JButton) actionEvent.getSource();
             if ("jbOk".equals(button.getActionCommand())) {
                 doSalvaAction();
+            } else if ("jbClear".equals(button.getActionCommand())) {
+                doRemoveAction();
             } else if ("jbHelp".equals(button.getActionCommand())) {
                 //exibir ajuda.
                 getTabGui().doDisplayAjuda();
-            } else if ("jbClear".equals(button.getActionCommand())) {
-                getTabGui().setValueAt(getTabGui().getActor().doOrderClear(indexModelOrdem), indexModelOrdem);
             }
         } else if (actionEvent.getSource() instanceof JComboBox) {
             JComboBox jcMagia = (JComboBox) actionEvent.getSource();
