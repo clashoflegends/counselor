@@ -9,6 +9,7 @@ import business.facade.OrdemFacade;
 import control.services.AcaoConverter;
 import control.services.CenarioConverter;
 import control.support.ControlBase;
+import control.support.DispatchManager;
 import gui.subtabs.SubTabOrdem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -74,8 +75,11 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             return;
         }
         final PersonagemOrdem po = getTabGui().getOrdemQuadro();
-        final String[] ordemDisplay = getTabGui().getActor().doOrderSave(index, po);
-        ActorAction actorAction = ordemFacade.getActorAction(po);
+        getTabGui().getActor().doOrderSave(index, po);
+        if (SettingsManager.getInstance().isConfig("AutoSaveActions", "1", "0")) {
+            getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_AUTOSAVE, this.getTabGui());
+        }
+        final ActorAction actorAction = ordemFacade.getActorAction(po);
         getTabGui().setValueAt(actorAction, index);
     }
 

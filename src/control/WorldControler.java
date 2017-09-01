@@ -18,6 +18,7 @@ import control.support.DispatchManager;
 import gui.MainResultWindowGui;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -92,6 +93,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         registerDispatchManager();
         registerDispatchManagerForMsg(DispatchManager.SET_LABEL_MONEY);
         registerDispatchManagerForMsg(DispatchManager.SAVE_WORLDBUILDER_FILE);
+        registerDispatchManagerForMsg(DispatchManager.ACTIONS_AUTOSAVE);
     }
 
     @Override
@@ -174,49 +176,44 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @param jbTemp
      * @throws HeadlessException
      */
-    private File doSave(JButton jbTemp) throws HeadlessException {
+    private File doSave(Component jbTemp) throws HeadlessException {
         File ret = null;
         Partida partida = WFC.getPartida();
         Jogador jogadorAtivo = partida.getJogadorAtivo();
         Comando comando = new Comando();
         comando.setInfos(partida);
-        BaseModel missingAction = doSaveActorActions(jogadorAtivo, comando);
-        boolean missingPackage = doSavePackages(comando);
+        String missingActionMsg = doSaveActorActions(jogadorAtivo, comando);
         if (comando.size() == 0) {
             SysApoio.showDialogAlert(labels.getString("NONE.ORDERS"), this.getGui());
             this.getGui().setStatusMsg(labels.getString("NONE.ORDERS"));
-        } else {
-            if (missingAction != null) {
-                final String msg = String.format(labels.getString("MISSING.ORDERS"), missingAction.getNome());
-                SysApoio.showDialogAlert(msg, this.getGui());
-                this.getGui().setStatusMsg(msg);
-            }
-            if (missingPackage) {
-                SysApoio.showDialogAlert(labels.getString("MISSING.PACKAGE"), this.getGui());
-                this.getGui().setStatusMsg(labels.getString("MISSING.PACKAGE"));
-            }
+            //we're done here, nothing to save
+            return null;
+        }
+        if (!missingActionMsg.equalsIgnoreCase("") && SettingsManager.getInstance().isConfig("ActionsMissingPopup", "1", "0")) {
+            SysApoio.showDialogAlert(missingActionMsg, this.getGui());
+        }
 
-            //define nome default
-            String nomeArquivo = String.format(labels.getString("FILENAME.ORDERS"), partida.getId(), partida.getTurno() + 1, partida.getJogadorAtivo().getLogin());
+        //define nome default
+        String fileName = String.format(labels.getString("FILENAME.ORDERS"), partida.getId(), partida.getTurno() + 1, partida.getJogadorAtivo().getLogin());
 
-            //salva o arquivo
-            if (!this.saved) {
-                //monta o dialogo
-                //define default
-                fc.setSelectedFile(new File(nomeArquivo));
-                //seta filters
-                fc.resetChoosableFileFilters();
-                fc.setFileFilter(PathFactory.getFilterAcoes());
-                //exibe dialogo
-                if (fc.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
-                    ret = doFileSave(comando);
-                } else {
-                    this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
-                }
+        //salva o arquivo
+        if (!this.saved) {
+            //monta o dialogo
+            //define default
+            fc.setSelectedFile(new File(fileName));
+            //seta filters
+            fc.resetChoosableFileFilters();
+            fc.setFileFilter(PathFactory.getFilterAcoes());
+            //exibe dialogo
+            if (fc.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
+                ret = doFileSave(comando, missingActionMsg);
+                log.info("Saved Server file:" + ret.getAbsolutePath());
             } else {
-                //salva com o nome anterior.
-                ret = doFileSave(comando);
+                this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
             }
+        } else {
+            //salva com o nome anterior.
+            ret = doFileSave(comando, missingActionMsg);
         }
         return ret;
     }
@@ -240,12 +237,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private File doFileSave(Comando comando) {
+    private File doFileSave(Comando comando, String missingActionMsg) {
         File ret = null;
         try {
             ret = fc.getSelectedFile();
             WFC.doSaveOrdens(comando, ret);
-            this.getGui().setStatusMsg(String.format(labels.getString("ORDENS.SALVAS"), comando.size(), fc.getSelectedFile().getName()));
+            this.getGui().setStatusMsg(missingActionMsg + " " + String.format(labels.getString("ORDENS.SALVAS"), comando.size(), fc.getSelectedFile().getName()));
             this.saved = true;
         } catch (BussinessException ex) {
             log.error(ex.getMessage());
@@ -869,12 +866,20 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
+    @Override
+    public void receiveDispatch(int msgName, Component cmpnt) {
+        if (msgName == DispatchManager.ACTIONS_AUTOSAVE && SettingsManager.getInstance().isConfig("AutoSaveActions", "1", "0")) {
+            doSave(cmpnt);
+        }
+    }
+
     public void saveWorldFile(World world) {
         //salva o arquivo
         try {
             String filename = PersistFactory.getWorldDao().save(world, fc.getSelectedFile());
             this.getGui().setStatusMsg(String.format(labels.getString("WORLD.SALVAS"), world.getLocais().size(), filename));
             this.savedWorld = true;
+            log.info("Saved World file:" + fc.getSelectedFile().getAbsolutePath());
         } catch (PersistenceException ex) {
             log.fatal("Can't save???", ex);
         }
@@ -892,10 +897,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private BaseModel doSaveActorActions(Jogador jogadorAtivo, Comando comando) {
-        BaseModel ret = null;
+    private String doSaveActorActions(Jogador jogadorAtivo, Comando comando) {
         //lista todos os personagens, carregando para o xml
         final int nationPackagesLimit = WFC.getNationPackagesLimit();
+        String ret = "";
         for (BaseModel actor : WFC.getActors()) {
             if (!ordemFacade.isAtivo(jogadorAtivo, actor)) {
                 continue;
@@ -909,59 +914,17 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     } else if (actor.isNacao()) {
                         //count points, not open slots
                         if (acaoFacade.isPointsSetupUnderLimit(actor, nationPackagesLimit)) {
-                            ret = actor;
+                            ret = String.format(labels.getString("MISSING.PACKAGE.NATION"), actor.getNome());
                         }
                     } else {
-                        ret = actor;
+                        ret = String.format(labels.getString("MISSING.ORDERS"), actor.getNome());
                     }
                 }
             } else if (cenarioFacade.hasOrdens(WFC.getPartida(), actor)) {
-                ret = actor;
+                ret = String.format(labels.getString("MISSING.ORDERS"), actor.getNome());
             }
         }
         return ret;
-    }
-
-    private boolean doSaveActorActionsOLD(Jogador jogadorAtivo, Comando comando) {
-        boolean missing = false;
-        //lista todos os personagens, carregando para o xml
-        for (BaseModel actor : WFC.getActors()) {
-            if (!ordemFacade.isAtivo(jogadorAtivo, actor)) {
-                continue;
-            }
-            if (actor.getAcaoSize() > 0) {
-                for (int index = 0; index < actor.getOrdensQt(); index++) {
-                    if (ordemFacade.getOrdem(actor, index) != null) {
-                        comando.addComando(actor, ordemFacade.getOrdem(actor, index),
-                                ordemFacade.getParametrosId(actor, index),
-                                ordemFacade.getParametrosDisplay(actor, index));
-                    } else {
-                        missing = true;
-                    }
-                }
-            } else if (cenarioFacade.hasOrdens(WFC.getPartida(), actor)) {
-                missing = true;
-            }
-        }
-        return missing;
-    }
-
-    private boolean doSavePackages(Comando comando) {
-        if (WFC.isStartupPackages() && WFC.getTurno() == 0) {
-            return getPackagesAll(comando);
-        } else {
-            return false;
-        }
-    }
-
-    private boolean getPackagesAll(Comando comando) {
-        boolean missing = true;
-        for (Nacao nacao : WorldManager.getInstance().getNacoesJogadorAtivo()) {
-            comando.addPackage(nacao, getPackages(nacao));
-            missing = false;
-            log.info(nacao.getNome() + " + " + getPackages(nacao));
-        }
-        return missing;
     }
 
     private List<Habilidade> getPackages(Nacao nacao) {
