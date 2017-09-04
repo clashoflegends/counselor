@@ -146,6 +146,7 @@ public class ExercitoConverter implements Serializable {
         cArray[ii++] = exercitoFacade.getUpkeepFood(exercito);
         cArray[ii++] = exercitoFacade.getMoral(exercito);
         cArray[ii++] = exercitoFacade.getDescricaoTamanho(exercito);
+        cArray[ii++] = exercitoFacade.getTacticNameSelected(exercito);
         cArray[ii++] = exercitoFacade.getUpkeepCost(exercito);
         cArray[ii++] = exercitoFacade.getSiege(exercito);
         cArray[ii++] = exercitoFacade.getAtaqueExercito(exercito, true);
@@ -176,6 +177,7 @@ public class ExercitoConverter implements Serializable {
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class,
+                            java.lang.String.class,
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
@@ -191,6 +193,7 @@ public class ExercitoConverter implements Serializable {
             labels.getString("CAVALARIAS"), labels.getString("INFANTARIAS"), labels.getString("NAVIOS"),
             labels.getString("COMIDA"), labels.getString("COMIDA.CONSUMO"), labels.getString("MORAL"),
             labels.getString("TAMANHO"),
+            labels.getString("TATICA"),
             labels.getString("CUSTO.MANUTENCAO"), labels.getString("MAQUINAS.GUERRA"),
             labels.getString("TROPA.ATAQUE.NAVAL"), labels.getString("TROPA.DEFESA.NAVAL"),
             labels.getString("TROPA.ATAQUE.TERRA"), labels.getString("TROPA.DEFESA.TERRA"),
@@ -398,17 +401,20 @@ public class ExercitoConverter implements Serializable {
      */
     private static Object[][] getTropaTiposAsArray(Exercito exercito, SortedMap<String, Integer> vlInicial, int filtro) {
         List<Pelotao> list = new ArrayList<Pelotao>();
-        if (filtro == 1) {
-            try {
-                list.addAll(exercito.getPelotoes().values());
-            } catch (NullPointerException ex) {
-                //no garrison at the scene.
-                list = new ArrayList<Pelotao>();
-            }
-        } else if (filtro == 2) {
-            list = listTropasTipoTransfer(exercito);
-        } else {
-            list = listTropasTipoAll(exercito);
+        switch (filtro) {
+            case 1:
+                try {
+                    list.addAll(exercito.getPelotoes().values());
+                } catch (NullPointerException ex) {
+                    //no garrison at the scene.
+                    list = new ArrayList<Pelotao>();
+                }   break;
+            case 2:
+                list = listTropasTipoTransfer(exercito);
+                break;
+            default:
+                list = listTropasTipoAll(exercito);
+                break;
         }
         //check if vlInicial is in list. If not, then add.
         if (vlInicial != null) {
