@@ -9,6 +9,7 @@ import business.facade.OrdemFacade;
 import control.services.AcaoConverter;
 import control.services.CenarioConverter;
 import control.support.ControlBase;
+import control.support.DispatchManager;
 import gui.subtabs.SubTabOrdem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -56,6 +57,13 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         return getTabGui().getActor().getPersonagemOrdem(indexModelOrdem);
     }
 
+    private void doRemoveAction() {
+        getTabGui().setValueAt(getTabGui().getActor().doOrderClear(indexModelOrdem), indexModelOrdem);
+        if (SettingsManager.getInstance().isAutoSaveActions()) {
+            getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_AUTOSAVE, this.getTabGui());
+        }
+    }
+
     private void doSalvaAction() {
         try {
             doSalvaAction(indexModelOrdem);
@@ -74,8 +82,11 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             return;
         }
         final PersonagemOrdem po = getTabGui().getOrdemQuadro();
-        final String[] ordemDisplay = getTabGui().getActor().doOrderSave(index, po);
-        ActorAction actorAction = ordemFacade.getActorAction(po);
+        getTabGui().getActor().doOrderSave(index, po);
+        if (SettingsManager.getInstance().isAutoSaveActions()) {
+            getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_AUTOSAVE, this.getTabGui());
+        }
+        final ActorAction actorAction = ordemFacade.getActorAction(po);
         getTabGui().setValueAt(actorAction, index);
     }
 
@@ -108,11 +119,11 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             JButton button = (JButton) actionEvent.getSource();
             if ("jbOk".equals(button.getActionCommand())) {
                 doSalvaAction();
+            } else if ("jbClear".equals(button.getActionCommand())) {
+                doRemoveAction();
             } else if ("jbHelp".equals(button.getActionCommand())) {
                 //exibir ajuda.
                 getTabGui().doDisplayAjuda();
-            } else if ("jbClear".equals(button.getActionCommand())) {
-                getTabGui().setValueAt(getTabGui().getActor().doOrderClear(indexModelOrdem), indexModelOrdem);
             }
         } else if (actionEvent.getSource() instanceof JComboBox) {
             JComboBox jcMagia = (JComboBox) actionEvent.getSource();

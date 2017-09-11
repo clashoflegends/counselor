@@ -42,7 +42,7 @@ public class LocalConverter implements Serializable {
                 BaseMsgs.localClima[local.getClima()]));
         //personagens
         if (localFacade.isTerrainLandmark(local)) {
-            ret.add(labels.getString("LANDMARK.LOCAL")+";");
+            ret.add(labels.getString("LANDMARK.LOCAL") + ";");
             for (Habilidade feature : localFacade.getTerrainLandmark(local)) {
                 ret.addTab(ConverterFactory.getLandmarkName(feature.getCodigo()));
             }

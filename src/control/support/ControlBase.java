@@ -4,6 +4,7 @@
  */
 package control.support;
 
+import java.awt.Component;
 import java.io.Serializable;
 import model.Local;
 import model.Nacao;
@@ -47,5 +48,8 @@ public abstract class ControlBase implements Serializable {
     }
 
     public void receiveDispatch(int msgName, Local local, int range) {
+    }
+
+    public void receiveDispatch(int msgName, Component cmpnt) {
     }
 }
