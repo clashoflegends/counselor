@@ -78,6 +78,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final JFileChooser fc = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
     private boolean saved = false;
+    private boolean msgSubmitReady = false;
     private boolean savedWorld = false;
     private MainResultWindowGui gui = null;
     private final AcaoFacade acaoFacade = new AcaoFacade();
@@ -190,6 +191,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
         if (!missingActionMsg.equalsIgnoreCase("") && SettingsManager.getInstance().isConfig("ActionsMissingPopup", "1", "0")) {
             SysApoio.showDialogAlert(missingActionMsg, this.getGui());
+        }
+        if (missingActionMsg.equalsIgnoreCase("") && !this.msgSubmitReady) {
+            SysApoio.showDialogAlert(labels.getString("ORDERS.READY.SUBMIT"), this.getGui());
+            this.msgSubmitReady = true;
         }
 
         //define nome default
@@ -414,6 +419,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 log.info(labels.getString("INICIALIZANDO.GUI"));
                 getGui().iniciaConfig();
                 this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
+                this.msgSubmitReady = false;
                 this.saved = false;
                 this.savedWorld = false;
                 doAutoLoadCommands(resultsFile);
