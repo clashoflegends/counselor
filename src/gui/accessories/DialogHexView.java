@@ -15,16 +15,16 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jmoura
  */
-public class DialogHexInfo extends javax.swing.JDialog implements Serializable {
+public class DialogHexView extends javax.swing.JDialog implements Serializable {
 //make this follow hex selection
-    private static final Log log = LogFactory.getLog(DialogHexInfo.class);
+    private static final Log log = LogFactory.getLog(DialogHexView.class);
     // Variables declaration - do not modify
     private javax.swing.JScrollPane detContent;
     private javax.swing.JPanel jpContent;
     private javax.swing.JTextArea jtaTextArea;
     // End of variables declaration
 
-    public DialogHexInfo(boolean modal) {
+    public DialogHexView(boolean modal) {
         super(new JFrame(), modal);
         this.setAlwaysOnTop(true);
         this.setPreferredSize(new Dimension(500, 400));

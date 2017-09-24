@@ -80,8 +80,11 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
         this.terreno = terreno;
     }
 
-    public CasualtyControler getCasualtyControler() {
-        return casualtyControler;
+    private void updateArmyCasualtyControler(ExercitoSim exercito, Terreno terreno) {
+        if (this.casualtyControler == null) {
+            return;
+        }
+        this.casualtyControler.updateArmy(exercito, terreno);
     }
 
     public void setCasualtyControler(CasualtyControler casualtyControler) {
@@ -129,7 +132,7 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
                 getTabGui().updateArmy(exercito);
                 //set short casualties list
                 getTabGui().setCasualtyBorder(exercito, getTerreno());
-                getCasualtyControler().updateArmy(exercito, getTerreno());
+                updateArmyCasualtyControler(exercito, getTerreno());
             }
         } catch (IndexOutOfBoundsException ex) {
             //lista vazia?
@@ -162,7 +165,7 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
                 this.doChangeTerrain(terrain);
                 getTabGui().setCasualtyBorder(exercito, terrain);
                 //set short casualties list
-                getCasualtyControler().updateArmy(exercito, terrain);
+                updateArmyCasualtyControler(exercito, getTerreno());
             } catch (NullPointerException ex) {
             }
         }

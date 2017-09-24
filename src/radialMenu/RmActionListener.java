@@ -4,6 +4,7 @@
  */
 package radialMenu;
 
+import business.facades.WorldFacadeCounselor;
 import control.services.LocalConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
@@ -234,7 +235,8 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
     }
 
     private void createBattleSim(RadialButton rb) {
-        if (SettingsManager.getInstance().getConfig("BatleSimOld", "0").equalsIgnoreCase("1")) {
+        final boolean oldBattleSim = SettingsManager.getInstance().getConfig("BatleSimOld", "0").equalsIgnoreCase("1") || !WorldFacadeCounselor.getInstance().hasCombatCasualtiesTactics();
+        if (oldBattleSim) {
             BattleSimulator battleSim = new BattleSimulator(rb.getLocal());
             battleSim.setLocationRelativeTo(rb);
             battleSim.setVisible(true);
