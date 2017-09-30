@@ -189,7 +189,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             //we're done here, nothing to save
             return null;
         }
-        if (!missingActionMsg.equalsIgnoreCase("") && SettingsManager.getInstance().isConfig("ActionsMissingPopup", "1", "0")) {
+        if (!missingActionMsg.equalsIgnoreCase("") && SettingsManager.getInstance().isConfig("ActionsMissingPopup", "1", "0") && !SettingsManager.getInstance().isConfig("AutoSaveActions", "1", "0")) {
             SysApoio.showDialogAlert(missingActionMsg, this.getGui());
         }
         if (missingActionMsg.equalsIgnoreCase("") && !this.msgSubmitReady) {
