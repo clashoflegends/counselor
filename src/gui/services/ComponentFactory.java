@@ -10,6 +10,7 @@ import business.facade.ExercitoFacade;
 import control.MapaControler;
 import control.OrdemControler;
 import control.support.ActorInterface;
+import gui.accessories.DialogHexView;
 import gui.components.DialogTextArea;
 import gui.subtabs.SubTabCoordenadas;
 import gui.subtabs.SubTabDirecao;
@@ -769,5 +770,16 @@ public class ComponentFactory implements Serializable {
         localTextArea.pack();
         localTextArea.setVisible(true);
         return localTextArea;
+    }
+
+    public static DialogHexView showDialogHexView(Component relativeTo) {
+        DialogHexView hexViewDialog = new DialogHexView(false);
+        //configura jDialog
+        if (relativeTo != null) {
+            hexViewDialog.setLocationRelativeTo(relativeTo);
+        }
+        hexViewDialog.pack();
+        hexViewDialog.setVisible(true);
+        return hexViewDialog;
     }
 }

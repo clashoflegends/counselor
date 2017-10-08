@@ -17,6 +17,7 @@ import control.services.LocalConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.MainMapaGui;
+import gui.accessories.DialogHexView;
 import gui.components.DialogTextArea;
 import gui.services.ComponentFactory;
 import java.awt.Point;
@@ -66,6 +67,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     private final List<JTable> tables = new ArrayList<JTable>();
     private RadialMenu rmActive;
     private final MapMenuManager mapMenuManager;
+    private DialogHexView hexView;
 
     public MapaControler(JPanel form) {
         final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
@@ -258,6 +260,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         for (JTable table : tables) {
             table.repaint();
         }
+        doHexViewUpdate();
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_CLICK, local);
     }
 
@@ -342,5 +345,24 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         rmActive.doHide();
         rmActive = WorldBuilderMenuManager.getInstance().getRmDirectionsCentre(action);
         showActiveRadialMenu(local);
+    }
+
+    public void doHexViewToggle() {
+        if (hexView != null) {
+            hexView.setVisible(!hexView.isVisible());
+        } else {
+            hexView = ComponentFactory.showDialogHexView(this.getTabGui());
+            doHexViewUpdate();
+        }
+    }
+
+    private void doHexViewUpdate() {
+        if (hexView == null) {
+            return;
+        }
+        final String title = String.format(labels.getString("LOCAL.TITLE"), getLocal().getCoordenadas());
+        final String text = LocalConverter.getInfo(getLocal());
+        hexView.setText(text);
+        hexView.setTitle(title);
     }
 }

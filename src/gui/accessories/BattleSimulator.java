@@ -345,7 +345,6 @@ public class BattleSimulator extends JFrame implements IBattleSimulator {
         jtArmyList.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
 //        jtArmyList.setAutoCreateRowSorter(true);
         jtArmyList.getSelectionModel().addListSelectionListener(battleSimControler);
-
     }
 
     @Override

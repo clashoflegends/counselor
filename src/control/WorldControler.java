@@ -18,6 +18,7 @@ import control.support.DispatchManager;
 import gui.MainResultWindowGui;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -77,6 +78,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final JFileChooser fc = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
     private boolean saved = false;
+    private boolean msgSubmitReady = false;
     private boolean savedWorld = false;
     private MainResultWindowGui gui = null;
     private final AcaoFacade acaoFacade = new AcaoFacade();
@@ -92,6 +94,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         registerDispatchManager();
         registerDispatchManagerForMsg(DispatchManager.SET_LABEL_MONEY);
         registerDispatchManagerForMsg(DispatchManager.SAVE_WORLDBUILDER_FILE);
+        registerDispatchManagerForMsg(DispatchManager.ACTIONS_AUTOSAVE);
     }
 
     @Override
@@ -113,6 +116,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doSend(jbTemp);
             } else if ("jbAbout".equals(jbTemp.getActionCommand())) {
                 doAbout();
+            } else if ("jbHexview".equals(jbTemp.getActionCommand())) {
+                doHexview();
             } else if ("jbConfig".equals(jbTemp.getActionCommand())) {
                 doConfig();
             } else if ("jbLoad".equals(jbTemp.getActionCommand())) {
@@ -172,49 +177,48 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @param jbTemp
      * @throws HeadlessException
      */
-    private File doSave(JButton jbTemp) throws HeadlessException {
-        File ret = null;
+    private File doSave(Component jbTemp) throws HeadlessException {
         Partida partida = WFC.getPartida();
         Jogador jogadorAtivo = partida.getJogadorAtivo();
         Comando comando = new Comando();
         comando.setInfos(partida);
-        BaseModel missingAction = doSaveActorActions(jogadorAtivo, comando);
-        boolean missingPackage = doSavePackages(comando);
+        String missingActionMsg = doSaveActorActions(jogadorAtivo, comando);
         if (comando.size() == 0) {
-            SysApoio.showDialogAlert(labels.getString("NONE.ORDERS"));
+            SysApoio.showDialogAlert(labels.getString("NONE.ORDERS"), this.getGui());
             this.getGui().setStatusMsg(labels.getString("NONE.ORDERS"));
-        } else {
-            if (missingAction != null) {
-                final String msg = String.format(labels.getString("MISSING.ORDERS"), missingAction.getNome());
-                SysApoio.showDialogAlert(msg);
-                this.getGui().setStatusMsg(msg);
-            }
-            if (missingPackage) {
-                SysApoio.showDialogAlert(labels.getString("MISSING.PACKAGE"));
-                this.getGui().setStatusMsg(labels.getString("MISSING.PACKAGE"));
-            }
+            //we're done here, nothing to save
+            return null;
+        }
+        if (!missingActionMsg.equalsIgnoreCase("") && SettingsManager.getInstance().isConfig("ActionsMissingPopup", "1", "0") && !SettingsManager.getInstance().isConfig("AutoSaveActions", "1", "0")) {
+            SysApoio.showDialogAlert(missingActionMsg, this.getGui());
+        }
+        if (missingActionMsg.equalsIgnoreCase("") && !this.msgSubmitReady) {
+            SysApoio.showDialogAlert(labels.getString("ORDERS.READY.SUBMIT"), this.getGui());
+            this.msgSubmitReady = true;
+        }
 
-            //define nome default
-            String nomeArquivo = String.format(labels.getString("FILENAME.ORDERS"), partida.getId(), partida.getTurno() + 1, partida.getJogadorAtivo().getLogin());
+        //define nome default
+        String fileName = String.format(labels.getString("FILENAME.ORDERS"), partida.getId(), partida.getTurno() + 1, partida.getJogadorAtivo().getLogin());
 
-            //salva o arquivo
-            if (!this.saved) {
-                //monta o dialogo
-                //define default
-                fc.setSelectedFile(new File(nomeArquivo));
-                //seta filters
-                fc.resetChoosableFileFilters();
-                fc.setFileFilter(PathFactory.getFilterAcoes());
-                //exibe dialogo
-                if (fc.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
-                    ret = doFileSave(comando);
-                } else {
-                    this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
-                }
+        //salva o arquivo
+        File ret = null;
+        if (!this.saved) {
+            //monta o dialogo
+            //define default
+            fc.setSelectedFile(new File(fileName));
+            //seta filters
+            fc.resetChoosableFileFilters();
+            fc.setFileFilter(PathFactory.getFilterAcoes());
+            //exibe dialogo
+            if (fc.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
+                ret = doFileSave(comando, missingActionMsg);
+                log.info("Saved Server file:" + ret.getAbsolutePath());
             } else {
-                //salva com o nome anterior.
-                ret = doFileSave(comando);
+                this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
             }
+        } else {
+            //salva com o nome anterior.
+            ret = doFileSave(comando, missingActionMsg);
         }
         return ret;
     }
@@ -238,16 +242,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private File doFileSave(Comando comando) {
+    private File doFileSave(Comando comando, String missingActionMsg) {
         File ret = null;
         try {
             ret = fc.getSelectedFile();
             WFC.doSaveOrdens(comando, ret);
-            this.getGui().setStatusMsg(String.format(labels.getString("ORDENS.SALVAS"), comando.size(), fc.getSelectedFile().getName()));
+            this.getGui().setStatusMsg(missingActionMsg + " " + String.format(labels.getString("ORDENS.SALVAS"), comando.size(), fc.getSelectedFile().getName()));
             this.saved = true;
         } catch (BussinessException ex) {
             log.error(ex.getMessage());
-            SysApoio.showDialogError(ex.getMessage());
+            SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
         }
         return ret;
@@ -283,6 +287,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         dAbout.setLocationRelativeTo(this.getGui());
         dAbout.pack();
         dAbout.setVisible(true);
+    }
+
+    private void doHexview() {
+        WFC.getMapaControler().doHexViewToggle();
     }
 
     private void doConfig() throws HeadlessException {
@@ -367,7 +375,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         File attachment = doSave(jbTemp);
         if (attachment == null) {
             this.getGui().setStatusMsg(labels.getString("ENVIAR.FALTOU.ARQUIVO"));
-            SysApoio.showDialogError(labels.getString("ENVIAR.FALTOU.ARQUIVO"));
+            SysApoio.showDialogError(labels.getString("ENVIAR.FALTOU.ARQUIVO"), this.getGui());
             return;
         }
         /*
@@ -411,11 +419,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 log.info(labels.getString("INICIALIZANDO.GUI"));
                 getGui().iniciaConfig();
                 this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
+                this.msgSubmitReady = false;
                 this.saved = false;
                 this.savedWorld = false;
                 doAutoLoadCommands(resultsFile);
             } catch (BussinessException ex) {
-                SysApoio.showDialogError(ex.getMessage());
+                SysApoio.showDialogError(ex.getMessage(), this.getGui());
                 this.getGui().setStatusMsg(ex.getMessage());
                 log.error(ex);
             }
@@ -469,7 +478,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             fc.setSelectedFile(resultsFile);
             this.saved = false;
         } catch (BussinessException ex) {
-            SysApoio.showDialogError(ex.getMessage());
+            SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             log.error(ex);
         }
@@ -714,7 +723,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             if (comando.getTurno() != partida.getTurno()) {
                 throw new IllegalStateException(labels.getString("TURNO.ERRADO") + file.getName());
             }
-            int qtPackageCarregadas = this.setPackage(comando.getPackages());
+            final int qtPackageCarregadas = this.setPackage(comando.getPackages());
             List<String> errorMsgs = new ArrayList<String>();
             int qtOrdensCarregadas = this.setOrdens(comando, errorMsgs);
             this.getGui().setStatusMsg(String.format("%d %s %s", qtOrdensCarregadas, labels.getString("ORDENS.CARREGADAS"), file.getName()));
@@ -724,18 +733,18 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     msg += line + "\n";
                 }
                 SysApoio.showDialogError(String.format("%d %s %s\n%s",
-                        errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(), msg));
+                        errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(), msg), this.getGui());
             }
         } catch (IllegalStateException ex) {
-            SysApoio.showDialogError(ex.getMessage());
+            SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             log.info(ex.getMessage());
         } catch (ClassCastException ex) {
-            SysApoio.showDialogError(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName());
+            SysApoio.showDialogError(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName(), this.getGui());
             this.getGui().setStatusMsg(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName());
             log.error(ex.getMessage());
         } catch (PersistenceException ex) {
-            SysApoio.showDialogError(ex.getMessage());
+            SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             log.info(ex.getMessage());
         }
@@ -759,12 +768,20 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             getDispatchManager().sendDispatchForMsg(DispatchManager.CLEAR_FINANCES_FORECAST, "");
         }
 
+        for (ComandoDetail comandoDetail : comando.getOrdens()) {
+            BaseModel actor = actors.get(comandoDetail.getActorCodigo());
+            try {
+                actor.remAcoes();
+            } catch (NullPointerException ex) {
+                //nao faz nada, ordens nao disponiveis...
+                log.fatal("problems loading actor: " + comandoDetail.getActorCodigo());
+            }
+        }
         try {
             //carrega as ordens personagem por personagem
             for (ComandoDetail comandoDetail : comando.getOrdens()) {
                 BaseModel actor = actors.get(comandoDetail.getActorCodigo());
                 Ordem ordem = WFC.getOrdem(comandoDetail.getOrdemCodigo());
-
                 try {
                     //just to catch the NullPointerException
                     ordem.getNome();
@@ -855,12 +872,20 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
+    @Override
+    public void receiveDispatch(int msgName, Component cmpnt) {
+        if (msgName == DispatchManager.ACTIONS_AUTOSAVE && SettingsManager.getInstance().isAutoSaveActions()) {
+            doSave(cmpnt);
+        }
+    }
+
     public void saveWorldFile(World world) {
         //salva o arquivo
         try {
             String filename = PersistFactory.getWorldDao().save(world, fc.getSelectedFile());
             this.getGui().setStatusMsg(String.format(labels.getString("WORLD.SALVAS"), world.getLocais().size(), filename));
             this.savedWorld = true;
+            log.info("Saved World file:" + fc.getSelectedFile().getAbsolutePath());
         } catch (PersistenceException ex) {
             log.fatal("Can't save???", ex);
         }
@@ -878,10 +903,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private BaseModel doSaveActorActions(Jogador jogadorAtivo, Comando comando) {
-        BaseModel ret = null;
+    private String doSaveActorActions(Jogador jogadorAtivo, Comando comando) {
         //lista todos os personagens, carregando para o xml
         final int nationPackagesLimit = WFC.getNationPackagesLimit();
+        String ret = "";
         for (BaseModel actor : WFC.getActors()) {
             if (!ordemFacade.isAtivo(jogadorAtivo, actor)) {
                 continue;
@@ -895,59 +920,17 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     } else if (actor.isNacao()) {
                         //count points, not open slots
                         if (acaoFacade.isPointsSetupUnderLimit(actor, nationPackagesLimit)) {
-                            ret = actor;
+                            ret = String.format(labels.getString("MISSING.PACKAGE.NATION"), actor.getNome());
                         }
                     } else {
-                        ret = actor;
+                        ret = String.format(labels.getString("MISSING.ORDERS"), actor.getNome());
                     }
                 }
             } else if (cenarioFacade.hasOrdens(WFC.getPartida(), actor)) {
-                ret = actor;
+                ret = String.format(labels.getString("MISSING.ORDERS"), actor.getNome());
             }
         }
         return ret;
-    }
-
-    private boolean doSaveActorActionsOLD(Jogador jogadorAtivo, Comando comando) {
-        boolean missing = false;
-        //lista todos os personagens, carregando para o xml
-        for (BaseModel actor : WFC.getActors()) {
-            if (!ordemFacade.isAtivo(jogadorAtivo, actor)) {
-                continue;
-            }
-            if (actor.getAcaoSize() > 0) {
-                for (int index = 0; index < actor.getOrdensQt(); index++) {
-                    if (ordemFacade.getOrdem(actor, index) != null) {
-                        comando.addComando(actor, ordemFacade.getOrdem(actor, index),
-                                ordemFacade.getParametrosId(actor, index),
-                                ordemFacade.getParametrosDisplay(actor, index));
-                    } else {
-                        missing = true;
-                    }
-                }
-            } else if (cenarioFacade.hasOrdens(WFC.getPartida(), actor)) {
-                missing = true;
-            }
-        }
-        return missing;
-    }
-
-    private boolean doSavePackages(Comando comando) {
-        if (WFC.isStartupPackages() && WFC.getTurno() == 0) {
-            return getPackagesAll(comando);
-        } else {
-            return false;
-        }
-    }
-
-    private boolean getPackagesAll(Comando comando) {
-        boolean missing = true;
-        for (Nacao nacao : WorldManager.getInstance().getNacoesJogadorAtivo()) {
-            comando.addPackage(nacao, getPackages(nacao));
-            missing = false;
-            log.info(nacao.getNome() + " + " + getPackages(nacao));
-        }
-        return missing;
     }
 
     private List<Habilidade> getPackages(Nacao nacao) {
@@ -964,7 +947,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private int setPackage(SortedMap<Integer, String> packages) {
-        Nacao nacao = null;
+        Nacao nacao;
         for (Integer idNation : packages.keySet()) {
             try {
                 nacao = WorldManager.getInstance().getNacao(idNation);
@@ -999,22 +982,22 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     log.info(msg);
                     this.getGui().setStatusMsg(msg);
                     if (SettingsManager.getInstance().getConfig("SendOrderConfirmationPopUp", "1").equals("1")) {
-                        SysApoio.showDialogInfo(labels.getString("POST.DONE.TITLE"), labels.getString("POST.DONE.TITLE"));
+                        SysApoio.showDialogInfo(labels.getString("POST.DONE.TITLE"), labels.getString("POST.DONE.TITLE"), this.getGui());
                     }
                     return true;
                 case WebCounselorManager.ERROR_GAMECLOSED:
                     //display alert!
-                    SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"));
+                    SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"), this.getGui());
                     this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                     return true; //dont try email
                 case WebCounselorManager.ERROR_TURN:
                     final String expectedTurn = String.format(labels.getString("ENVIAR.ERRO.WRONGTURN"), WebCounselorManager.getInstance().getLastResponseString());
                     //display alert!
-                    SysApoio.showDialogError(expectedTurn, labels.getString("ENVIAR.ERRO"));
+                    SysApoio.showDialogError(expectedTurn, labels.getString("ENVIAR.ERRO"), this.getGui());
                     this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                     return true; //dont try email
                 default:
-                    SysApoio.showDialogError(labels.getString("ERROR"), labels.getString("ENVIAR.ERRO"));
+                    SysApoio.showDialogError(labels.getString("ERROR"), labels.getString("ENVIAR.ERRO"), this.getGui());
                     this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                     return false;
             }
@@ -1056,7 +1039,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             email.addToCc(from);
             email.setFrom(from);
             email.setBody(listaOrdensEmailBody(msg));
-            String subject = null;
+            String subject;
             try {
                 subject = String.format("[Orders] %s - %s (%s) [%s]",
                         WorldManager.getInstance().getPartida().getCodigo(),
@@ -1073,16 +1056,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 return true;
             } else {
                 this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO"));
-                SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"));
+                SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), this.getGui());
                 return false;
             }
         } catch (PersistenceException ex) {
             this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO") + " => " + ex.getMessage());
-            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"));
+            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), this.getGui());
             return false;
         } catch (AddressException ex) {
             this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO.MALFORMED") + " => " + ex.getMessage());
-            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO.MALFORMED"));
+            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO.MALFORMED"), this.getGui());
             return false;
         }
     }
@@ -1093,7 +1076,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             from = JOptionPane.showInputDialog(labels.getString("ENVIAR.INPUT.EMAIL"), from);
             if (from == null || from.equals("none")) {
                 this.getGui().setStatusMsg(labels.getString("ENVIAR.FALTOU.FROM"));
-                SysApoio.showDialogError(labels.getString("ENVIAR.FALTOU.FROM"));
+                SysApoio.showDialogError(labels.getString("ENVIAR.FALTOU.FROM"), this.getGui());
                 return "none";
             }
             //salva novas informacoes no properties
@@ -1105,4 +1088,5 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private boolean isLoadTeamOrders() {
         return SettingsManager.getInstance().isConfig("LoadActionsBehavior", "append", "0") && SettingsManager.getInstance().isConfig("LoadActionsOtherNations", "allow", "0");
     }
+
 }
