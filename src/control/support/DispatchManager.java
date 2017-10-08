@@ -4,6 +4,7 @@
  */
 package control.support;
 
+import java.awt.Component;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,7 +39,8 @@ public class DispatchManager implements Serializable {
     public static final int ACTIONS_RELOAD = 8;
     public static final int LOCAL_MAP_REDRAW_RELOAD_TILES = 9;
     public static final int LOCAL_MAP_REDRAW_TAG = 10;
-    public static final int SWITCH_PORTRAIT_PANEL = 11;
+    public static final int ACTIONS_AUTOSAVE = 11;
+    public static final int SWITCH_PORTRAIT_PANEL = 12;
 
     private DispatchManager() {
     }
