@@ -21,10 +21,15 @@ import gui.subtabs.SubTabOrdem;
 import gui.subtabs.SubTabPopup;
 import java.awt.BorderLayout;
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import javax.swing.BoxLayout;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import model.ActorAction;
+import model.Habilidade;
 import model.Personagem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -145,7 +150,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         );
         portraitPanelLayout.setVerticalGroup(
             portraitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 171, Short.MAX_VALUE)
         );
 
         showPortrait = Integer.parseInt(SettingsManager.getInstance().getConfig("ShowCharacterPortraits", "0")) == 1;
@@ -182,11 +187,11 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
                     .addComponent(qtPersonagens)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(detalhesPersonagem, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
-                    .addComponent(portraitPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)))
+                    .addComponent(detalhesPersonagem)
+                    .addComponent(portraitPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)))
             .addGroup(jpMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jpMasterLayout.createSequentialGroup()
                     .addContainerGap()
@@ -360,11 +365,25 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         System.out.println(portraitFileName);
         javax.swing.JLabel portrait = new javax.swing.JLabel(ImageManager.getInstance().getPortrait(portraitFileName));
         if (portraitPanel.getComponentCount() > 0) {
-            portraitPanel.remove(0);
+            portraitPanel.removeAll();
         }
-        this.portraitPanel.setLayout(new BorderLayout());
+        this.portraitPanel.setAlignmentX(CENTER_ALIGNMENT);
+        this.portraitPanel.setLayout(new BoxLayout(this.portraitPanel, BoxLayout.Y_AXIS));
         this.portraitPanel.add(portrait);
-        portraitPanel.revalidate();
+      
+        
+        Map<String, Habilidade> habilidadesMap = personagem.getHabilidades();
+        Iterator<Entry<String, Habilidade>> iterator = habilidadesMap.entrySet().iterator();
+        Entry<String, Habilidade> entradaMap = null;
+        
+        javax.swing.JLabel habilidad = null;
+        while (iterator.hasNext()) {
+            entradaMap = iterator.next();
+            habilidad = new javax.swing.JLabel(entradaMap.getKey());
+            this.portraitPanel.add(habilidad);
+        }
        
+        
+        portraitPanel.revalidate();
     }
 }
