@@ -72,6 +72,14 @@ public class DispatchManager implements Serializable {
         }
     }
 
+    public final void sendDispatchForMsg(int msgName, Component cmpnt) {
+        if (lista.containsKey(msgName)) {
+            for (ControlBase cb : lista.get(msgName)) {
+                cb.receiveDispatch(msgName, cmpnt);
+            }
+        }
+    }
+
     public final void sendDispatchForMsg(int msgName, String txt) {
         if (lista.containsKey(msgName)) {
             for (ControlBase cb : lista.get(msgName)) {
