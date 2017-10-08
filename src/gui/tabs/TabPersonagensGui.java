@@ -6,6 +6,7 @@
 package gui.tabs;
 
 import baseLib.GenericoComboObject;
+import business.ImageManager;
 import business.facade.JogadorFacade;
 import business.facade.PersonagemFacade;
 import business.facades.WorldFacadeCounselor;
@@ -18,6 +19,7 @@ import gui.services.IAcaoGui;
 import gui.subtabs.SubTabBaseList;
 import gui.subtabs.SubTabOrdem;
 import gui.subtabs.SubTabPopup;
+import java.awt.BorderLayout;
 import java.io.Serializable;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -61,6 +63,10 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         setDica(dica);
 
         iniciaConfig();
+        
+        if(showPortrait) {
+            ImageManager.getInstance().doLoadPortraits();
+        }
     }
 
     /**
@@ -129,20 +135,20 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         jtMainLista.setName(""); // NOI18N
         jScrollPane3.setViewportView(jtMainLista);
 
-        portraitPanel.setPreferredSize(new java.awt.Dimension(110, 0));
+        portraitPanel.setPreferredSize(new java.awt.Dimension(140, 0));
 
         javax.swing.GroupLayout portraitPanelLayout = new javax.swing.GroupLayout(portraitPanel);
         portraitPanel.setLayout(portraitPanelLayout);
         portraitPanelLayout.setHorizontalGroup(
             portraitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 110, Short.MAX_VALUE)
+            .addGap(0, 140, Short.MAX_VALUE)
         );
         portraitPanelLayout.setVerticalGroup(
             portraitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        showPortrait = Integer.parseInt(SettingsManager.getInstance().getConfig("show.character.portrait", "0")) == 1;
+        showPortrait = Integer.parseInt(SettingsManager.getInstance().getConfig("ShowCharacterPortraits", "0")) == 1;
         portraitPanel.setVisible(showPortrait);
 
         javax.swing.GroupLayout jpMasterLayout = new javax.swing.GroupLayout(jpMaster);
@@ -329,6 +335,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         setPersonagem(personagem);
         getMapaControler().printTag(personagemFacade.getLocal(personagem));
         doConfigTabs();
+        showPortrait(personagem);
         //verifica se o personagem pode receber ordens...
         if (jogadorFacade.isMine(personagem, WorldFacadeCounselor.getInstance().getJogadorAtivo())
                 && personagemFacade.isAtivo(personagem)) {
@@ -339,5 +346,25 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
             //forca selecao para vazio, limpando quadro de parametros
             stOrdens.doOrdemClear();
         }
+    }
+    
+    public void switchPortrait(boolean showPortrait){
+        showPortrait(getPersonagem());
+        this.portraitPanel.setVisible(showPortrait);
+        
+        
+    }
+    
+    private void showPortrait(Personagem personagem) {
+        String portraitFileName = personagem.getPortraitFilename();
+        System.out.println(portraitFileName);
+        javax.swing.JLabel portrait = new javax.swing.JLabel(ImageManager.getInstance().getPortrait(portraitFileName));
+        if (portraitPanel.getComponentCount() > 0) {
+            portraitPanel.remove(0);
+        }
+        this.portraitPanel.setLayout(new BorderLayout());
+        this.portraitPanel.add(portrait);
+        portraitPanel.revalidate();
+       
     }
 }

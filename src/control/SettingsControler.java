@@ -5,6 +5,7 @@
  */
 package control;
 
+import business.ImageManager;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.accessories.MainSettingsGui;
@@ -236,6 +237,15 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 SettingsManager.getInstance().setConfig("autoLoadActions", "");
 
             }
+        } else if (actionCommand.equals("showPortraits")) {
+            JCheckBox showPortraits = (JCheckBox) e.getSource();
+            int selected = (showPortraits.isSelected()) ? 1 : 0;
+            
+            SettingsManager.getInstance().setConfig("ShowCharacterPortraits", String.valueOf(selected));
+            ImageManager.getInstance().doLoadPortraits();
+            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(selected));
+            
+            
         }
     }
 
