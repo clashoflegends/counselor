@@ -6,6 +6,7 @@
 package gui.accessories;
 
 import control.SettingsControler;
+import java.io.File;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -65,6 +66,8 @@ public class MainSettingsGui extends javax.swing.JPanel {
         pcPathCheckBox.addActionListener(settingsControler);
         autoLoadCheck.addActionListener(settingsControler);
         autoLoadActionCheck.addActionListener(settingsControler);
+        displayPortraitCheckBox.addActionListener(settingsControler);
+        
 
     }
 
@@ -128,7 +131,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
         sortOrdersLabel = new javax.swing.JLabel();
         alphabeticOrderButton = new javax.swing.JRadioButton();
         sequenceRadioButton = new javax.swing.JRadioButton();
-        autoMoveCheckBox1 = new javax.swing.JCheckBox();
+        displayPortraitCheckBox = new javax.swing.JCheckBox();
         mapPanel = new javax.swing.JPanel();
         hexTagStyleLabel = new javax.swing.JLabel();
         armyPathLabel = new javax.swing.JLabel();
@@ -503,11 +506,10 @@ public class MainSettingsGui extends javax.swing.JPanel {
         sequenceRadioButton.setText(bundle.getString("SETTINGS.DISPLAY.FILTER.SORTORDERS.SEQUENCE")); // NOI18N
         sequenceRadioButton.setActionCommand("seqSort");
 
-        autoMoveCheckBox1.setSelected(isShowPortraitChecked());
-        autoMoveCheckBox1.setText(bundle.getString("SETTINGS.DISPLAY.SHOWPORTRAITS")); // NOI18N
-        java.util.ResourceBundle bundle1 = java.util.ResourceBundle.getBundle("gui/accessories/Bundle"); // NOI18N
-        autoMoveCheckBox1.setToolTipText(bundle1.getString("SETTINGS.DISPLAY.FILTER.MOVENEXT.TOOLTIP")); // NOI18N
-        autoMoveCheckBox1.setActionCommand("autoMoveAction");
+        displayPortraitCheckBox.setSelected(isShowPortraitChecked());
+        displayPortraitCheckBox.setText(bundle.getString("SETTINGS.DISPLAY.SHOWPORTRAITS")); // NOI18N
+        displayPortraitCheckBox.setActionCommand("showPortraits");
+        displayPortraitCheckBox.setEnabled(isShowPortraitCheckEnabled());
 
         javax.swing.GroupLayout displayPanelLayout = new javax.swing.GroupLayout(displayPanel);
         displayPanel.setLayout(displayPanelLayout);
@@ -550,7 +552,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                                     .addComponent(sequenceRadioButton))
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(displayPanelLayout.createSequentialGroup()
-                        .addComponent(autoMoveCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(displayPortraitCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         displayPanelLayout.setVerticalGroup(
@@ -587,7 +589,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
                     .addComponent(autoMoveCheckBox)
                     .addComponent(fogOfWarCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(autoMoveCheckBox1)
+                .addComponent(displayPortraitCheckBox)
                 .addContainerGap(59, Short.MAX_VALUE))
         );
 
@@ -760,10 +762,10 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private javax.swing.JLabel autoLoadDirLabel;
     private javax.swing.JTextField autoLoadTextField;
     private javax.swing.JCheckBox autoMoveCheckBox;
-    private javax.swing.JCheckBox autoMoveCheckBox1;
     private javax.swing.JCheckBox copyActionsPopUpCheckBox;
     private javax.swing.JCheckBox copyOrdersCheckBox;
     private javax.swing.JPanel displayPanel;
+    private javax.swing.JCheckBox displayPortraitCheckBox;
     private javax.swing.ButtonGroup filtroButtonGroup;
     private javax.swing.JLabel filtroLabel;
     private javax.swing.JCheckBox fogOfWarCheckBox;
@@ -991,7 +993,12 @@ public class MainSettingsGui extends javax.swing.JPanel {
     }
 
     private boolean isShowPortraitChecked() {
-        boolean showPortrait = Integer.parseInt(SettingsManager.getInstance().getConfig("show.character.portrait", "0")) == 1;
+        boolean showPortrait = Integer.parseInt(SettingsManager.getInstance().getConfig("ShowCharacterPortraits", "0")) == 1;
         return showPortrait;
+    }
+    
+    private boolean isShowPortraitCheckEnabled() {
+        File portraitsFolder = new File("portraits");            
+        return portraitsFolder.exists();
     }
 }

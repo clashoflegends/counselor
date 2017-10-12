@@ -169,17 +169,17 @@
         <Container class="javax.swing.JPanel" name="portraitPanel">
           <Properties>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-              <Dimension value="[110, 0]"/>
+              <Dimension value="[140, 0]"/>
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="showPortrait = Integer.parseInt(SettingsManager.getInstance().getConfig(&quot;show.character.portrait&quot;, &quot;0&quot;)) == 1;&#xd;&#xa;portraitPanel.setVisible(showPortrait);&#xd;&#xa;"/>
+            <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="showPortrait = Integer.parseInt(SettingsManager.getInstance().getConfig(&quot;ShowCharacterPortraits&quot;, &quot;0&quot;)) == 1;&#xd;&#xa;portraitPanel.setVisible(showPortrait);&#xd;&#xa;"/>
           </AuxValues>
 
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="110" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="140" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
