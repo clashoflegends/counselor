@@ -286,7 +286,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         }
         for (Habilidade elem : nacaoFacade.getHabilidades(nacao)) {
             try {
-                if (!elem.isHidden()) {
+                if (!elem.isFilter()) {
                     hab += String.format("- %s\n", elem.getNome());
                 }
             } catch (NullPointerException ex) {
