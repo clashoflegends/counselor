@@ -6,6 +6,7 @@ package control;
 
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
+import business.ImageManager;
 import control.services.PersonagemConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
@@ -43,12 +44,16 @@ public class PersonagemControler extends ControlBase implements Serializable, Ac
     public PersonagemControler(TabPersonagensGui tabPersonagensGui) {
         this.tabGui = tabPersonagensGui;
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_RELOAD);
+        registerDispatchManagerForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL);
     }
 
     @Override
     public void receiveDispatch(int msgName, String txt) {
         if (msgName == DispatchManager.ACTIONS_RELOAD) {
             getTabGui().doLoadChars();
+        } else if (msgName == DispatchManager.SWITCH_PORTRAIT_PANEL) {
+            boolean showPortrait = txt.equals("1");            
+            tabGui.switchPortrait(showPortrait);
         }
     }
 
@@ -144,4 +149,5 @@ public class PersonagemControler extends ControlBase implements Serializable, Ac
             //lista vazia?
         }
     }
+       
 }
