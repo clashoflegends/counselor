@@ -72,6 +72,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     public MapaControler(JPanel form) {
         final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         mapaManager = new MapaManager(cenario, form);
+        mapaManager.setLocais(listFactory.listLocais());
         registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_REDRAW_TAG);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_REDRAW);
@@ -203,7 +204,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     @Override
     public void mouseClicked(MouseEvent event) {
         try {
-            final Local local = mapaManager.doPositionToCoord(event.getPoint(), listFactory.listLocais());
+            final Local local = mapaManager.doPositionToCoord(event.getPoint());
             if (SwingUtilities.isRightMouseButton(event) && !SettingsManager.getInstance().isRadialMenu()) {
                 showLocalInfo(local);
             } else if (SwingUtilities.isRightMouseButton(event) && SettingsManager.getInstance().isRadialMenu()) {
