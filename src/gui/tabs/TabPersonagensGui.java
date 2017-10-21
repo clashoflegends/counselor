@@ -142,7 +142,6 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
 
         portraitPanel.setFocusable(false);
         portraitPanel.setPreferredSize(new java.awt.Dimension(140, 250));
-        portraitPanel.setRequestFocusEnabled(false);
 
         javax.swing.GroupLayout portraitPanelLayout = new javax.swing.GroupLayout(portraitPanel);
         portraitPanel.setLayout(portraitPanelLayout);
