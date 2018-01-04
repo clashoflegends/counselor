@@ -246,7 +246,21 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(selected));
             
             
+        } else if (actionCommand.equals("fPortraitsAction")) {
+
+            JFileChooser fc = new JFileChooser();
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+            int returnVal = fc.showOpenDialog(settingsGui);
+
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                SettingsManager.getInstance().setConfig("portraitsFolder", file.getPath());
+                settingsGui.getPortraitsFolderTextField().setText(file.getPath());
+                settingsGui.checkDisplayPortraitCheckBox();
+            }
         }
+        
     }
 
     @Override
