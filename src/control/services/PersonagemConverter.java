@@ -34,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 import utils.StringRet;
 
 /**
@@ -106,6 +107,8 @@ public class PersonagemConverter implements Serializable {
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("TERRENO"));
         classes.add(java.lang.String.class);
+        colNames.add(labels.getString("EPIC.HERO"));
+        classes.add(java.lang.String.class);
         colNames.add(labels.getString("OBS"));
         classes.add(java.lang.String.class);
         return (colNames.toArray(new String[0]));
@@ -149,6 +152,7 @@ public class PersonagemConverter implements Serializable {
         cArray[ii++] = personagemFacade.getArtefatos(personagem).size();
         cArray[ii++] = localFacade.getClima(local);
         cArray[ii++] = localFacade.getTerrenoNome(local);
+        cArray[ii++] = SysApoio.iif(personagemFacade.isHero(personagem), labels.getString("SIM"), labels.getString("NAO"));
         if (isProprio(personagem)) {
             cArray[ii++] = labels.getString("PROPRIO");
         } else if (personagemFacade.isComandaExercito(personagem)) {

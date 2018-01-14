@@ -6,7 +6,6 @@ package control;
 
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
-import business.ImageManager;
 import control.services.PersonagemConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
