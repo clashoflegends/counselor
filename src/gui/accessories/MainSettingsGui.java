@@ -69,6 +69,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
         autoLoadActionCheck.addActionListener(settingsControler);
         displayPortraitCheckBox.addActionListener(settingsControler);
         portraitsFolderButton.addActionListener(settingsControler);
+        downloadPortraitsButton.addActionListener(settingsControler);
         
 
     }
@@ -137,6 +138,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
         portraitsFolderLabel = new javax.swing.JLabel();
         portraitsFolderTextField = new javax.swing.JTextField();
         portraitsFolderButton = new javax.swing.JButton();
+        downloadPortraitsButton = new javax.swing.JButton();
         mapPanel = new javax.swing.JPanel();
         hexTagStyleLabel = new javax.swing.JLabel();
         armyPathLabel = new javax.swing.JLabel();
@@ -520,6 +522,15 @@ public class MainSettingsGui extends javax.swing.JPanel {
         portraitsFolderButton.setText("...");
         portraitsFolderButton.setActionCommand("fPortraitsAction");
 
+        downloadPortraitsButton.setText(bundle.getString("SETTINGS.DISPLAY.PORTRAITS.BUTTON.DOWNLOAD")); // NOI18N
+        downloadPortraitsButton.setToolTipText(bundle.getString("SETTINGS.DISPLAY.PORTRAITS.BUTTON.DOWNLOAD.TOOLTIP")); // NOI18N
+        downloadPortraitsButton.setActionCommand("downloadPortraits");
+        downloadPortraitsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                downloadPortraitsButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout displayPanelLayout = new javax.swing.GroupLayout(displayPanel);
         displayPanel.setLayout(displayPanelLayout);
         displayPanelLayout.setHorizontalGroup(
@@ -569,7 +580,9 @@ public class MainSettingsGui extends javax.swing.JPanel {
                         .addComponent(portraitsFolderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(portraitsFolderButton)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(downloadPortraitsButton)
+                        .addContainerGap())))
         );
         displayPanelLayout.setVerticalGroup(
             displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -608,10 +621,12 @@ public class MainSettingsGui extends javax.swing.JPanel {
                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(portraitsFolderLabel)
                     .addComponent(portraitsFolderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(portraitsFolderButton))
-                .addGap(25, 25, 25)
+                    .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(portraitsFolderButton)
+                        .addComponent(downloadPortraitsButton)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(displayPortraitCheckBox)
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(49, Short.MAX_VALUE))
         );
 
         mapPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.MAP"))); // NOI18N
@@ -767,6 +782,10 @@ public class MainSettingsGui extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_autoLoadCheckActionPerformed
 
+    private void downloadPortraitsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadPortraitsButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_downloadPortraitsButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton allFiltroRadioButton;
@@ -786,6 +805,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
     private javax.swing.JCheckBox copyOrdersCheckBox;
     private javax.swing.JPanel displayPanel;
     private javax.swing.JCheckBox displayPortraitCheckBox;
+    private javax.swing.JButton downloadPortraitsButton;
     private javax.swing.ButtonGroup filtroButtonGroup;
     private javax.swing.JLabel filtroLabel;
     private javax.swing.JCheckBox fogOfWarCheckBox;
