@@ -85,10 +85,10 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
     public File downloadPortraisFile(String portraitsFileName, String portraitsFolderName) throws FileNotFoundException {
         File file = null;
         try {
-            //   URL website = new URL(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + portraitsFileName);
+            URL website = new URL(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + portraitsFileName);
             //https://www.colorado.edu/conflict/peace/download/peace.zip
             // speedtest.ftp.otenet.gr/files/test10Mb.db
-            URL website = new URL("https://www.colorado.edu/conflict/peace/download/peace.zip");
+          //  URL website = new URL("https://www.colorado.edu/conflict/peace/download/peace.zip");
             file = new File(portraitsFolderName + File.separator + portraitsFileName);
             ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 
@@ -111,8 +111,8 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
         URL website;
         URLConnection conn = null;
         try {            
-         //   website = new URL(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + portraitsFileName);
-            website = new URL("https://www.colorado.edu/conflict/peace/download/peace.zip");
+            website = new URL(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + portraitsFileName);
+         //   website = new URL("https://www.colorado.edu/conflict/peace/download/peace.zip");
             
             conn = website.openConnection();
             if (conn instanceof HttpURLConnection) {
