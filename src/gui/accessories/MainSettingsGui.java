@@ -10,7 +10,7 @@ import java.io.File;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
@@ -19,7 +19,7 @@ import persistenceCommons.SettingsManager;
  *
  * @author serguei
  */
-public class MainSettingsGui extends javax.swing.JPanel {
+public class MainSettingsGui extends JPanel {
 
     /**
      * Creates new form MainSettingsGui
@@ -70,7 +70,6 @@ public class MainSettingsGui extends javax.swing.JPanel {
         displayPortraitCheckBox.addActionListener(settingsControler);
         portraitsFolderButton.addActionListener(settingsControler);
         downloadPortraitsButton.addActionListener(settingsControler);
-        
 
     }
 
@@ -516,7 +515,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
 
         portraitsFolderTextField.setEditable(false);
         portraitsFolderTextField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        portraitsFolderTextField.setText(settingsManager.getConfig("portraitsFolder"));
+        portraitsFolderTextField.setText(settingsManager.getConfig("PortraitsFolder"));
         portraitsFolderTextField.setEnabled(isAutoLoadActionFilled());
 
         portraitsFolderButton.setText("...");
@@ -871,11 +870,10 @@ public class MainSettingsGui extends javax.swing.JPanel {
     public JTextField getAutoLoadTextField() {
         return autoLoadTextField;
     }
-    
+
     public JTextField getPortraitsFolderTextField() {
         return portraitsFolderTextField;
     }
-    
 
     public JButton getAutoLoadActionButton() {
         return autoLoadActionButton;
@@ -884,7 +882,7 @@ public class MainSettingsGui extends javax.swing.JPanel {
     public JButton getAutoLoadButton() {
         return autoLoadButton;
     }
-    
+
     public void checkDisplayPortraitCheckBox() {
         boolean isEnable = isShowPortraitCheckEnabled();
         displayPortraitCheckBox.setEnabled(isEnable);
@@ -943,9 +941,8 @@ public class MainSettingsGui extends javax.swing.JPanel {
     }
 
     private int getArmyPathIndexSelected() {
-        int index = 0;
         String indexStr = settingsManager.getConfig("ShowArmyMovPath", "1");
-        index = Integer.parseInt(indexStr);
+        int index = Integer.parseInt(indexStr);
         return index;
     }
 
@@ -958,9 +955,8 @@ public class MainSettingsGui extends javax.swing.JPanel {
         String languages[] = new String[]{"PT", "ES", "EN", "IT"};
         ComboItem[] combo = new ComboItem[languages.length];
 
-        String langLabel = null;
         for (int i = 0; i < languages.length; i++) {
-            langLabel = LABELS.getString("SETTINGS.LABEL.LANGUAGE.".concat(languages[i]));
+            final String langLabel = LABELS.getString("SETTINGS.LABEL.LANGUAGE.".concat(languages[i]));
             combo[i] = new ComboItem(languages[i].toLowerCase(), langLabel);
         }
 
@@ -1046,17 +1042,16 @@ public class MainSettingsGui extends javax.swing.JPanel {
     }
 
     private boolean isShowPortraitChecked() {
-        boolean showPortrait = Integer.parseInt(SettingsManager.getInstance().getConfig("ShowCharacterPortraits", "0")) == 1;
+        boolean showPortrait = SettingsManager.getInstance().isConfig("ShowCharacterPortraits", "1", "0");
         return showPortrait;
     }
-    
+
     private boolean isShowPortraitCheckEnabled() {
-        String folderPath = settingsManager.getConfig("portraitsFolder","");
-        boolean enableCheck = false;
-       
-        File portraitsFolder = new File(folderPath);   
-        enableCheck = portraitsFolder.exists() && portraitsFolder.list().length > 0;
-        
+        String folderPath = settingsManager.getConfig("PortraitsFolder", "");
+
+        final File portraitsFolder = new File(folderPath);
+        boolean enableCheck = portraitsFolder.exists() && portraitsFolder.list().length > 0;
+
         return enableCheck;
     }
 }

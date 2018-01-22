@@ -53,8 +53,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     private final SubTabBaseList stMagicItems = new SubTabBaseList();
     private final SubTabBaseList stSpells = new SubTabBaseList();
     private SubTabOrdem stOrdens;
-    private boolean showPortrait;
-    
+    private final boolean showPortrait = SettingsManager.getInstance().isConfig("ShowCharacterPortraits", "1", "0"); //must be initialized BEFORE initComponents();
 
     /**
      * Creates new form TabPersonagensGui
@@ -68,8 +67,8 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         setDica(dica);
 
         iniciaConfig();
-        
-        if(showPortrait) {
+
+        if (showPortrait) {
             ImageManager.getInstance().doLoadPortraits();
         }
     }
@@ -154,7 +153,6 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
             .addGap(0, 250, Short.MAX_VALUE)
         );
 
-        showPortrait = Integer.parseInt(SettingsManager.getInstance().getConfig("ShowCharacterPortraits", "0")) == 1;
         portraitPanel.setVisible(showPortrait);
 
         javax.swing.GroupLayout jpMasterLayout = new javax.swing.GroupLayout(jpMaster);
@@ -246,10 +244,8 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         //adiciona listeners
         comboFiltro.addActionListener(personagemControl);
         jtMainLista.getSelectionModel().addListSelectionListener(personagemControl);
-        
 
         doAddTabs();
-
         doLoadChars();
     }
 
@@ -353,19 +349,18 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
             stOrdens.doOrdemClear();
         }
     }
-    
-    public void switchPortrait(boolean showPortrait){
+
+    public void switchPortrait(boolean showPortrait) {
         showPortrait(getPersonagem());
         this.portraitPanel.setVisible(showPortrait);
-        
-        
+
     }
-    
+
     private void showPortrait(Personagem personagem) {
         String portraitFileName = personagem.getPortraitFilename();
-       
+
         javax.swing.JLabel portrait = new javax.swing.JLabel(ImageManager.getInstance().getPortrait(portraitFileName));
-        portrait.setBorder(new javax.swing.border.EmptyBorder(0,5,0,0)); 
+        portrait.setBorder(new javax.swing.border.EmptyBorder(0, 5, 0, 0));
         if (portraitPanel.getComponentCount() > 0) {
             portraitPanel.removeAll();
             portraitPanel.repaint();
@@ -373,84 +368,82 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         this.portraitPanel.setAlignmentX(CENTER_ALIGNMENT);
         this.portraitPanel.setLayout(new BoxLayout(this.portraitPanel, BoxLayout.Y_AXIS));
         this.portraitPanel.add(portrait);
-      
-         
+
         javax.swing.JLabel habilidad; // = null;
-        
+
         Map<Integer, javax.swing.JLabel> rankMap = new TreeMap<Integer, javax.swing.JLabel>(Collections.reverseOrder());
-                
-        if(personagem.getPericiaComandanteNatural() > 0) {          
+
+        if (personagem.getPericiaComandanteNatural() > 0) {
             habilidad = getRankLabel("COMANDANTE", personagem.getPericiaComandanteNatural(), personagem.getPericiaComandante());
             rankMap.put(personagem.getPericiaComandanteNatural(), habilidad);
         }
-        
-        
+
         if (WorldFacadeCounselor.getInstance().hasRogue() || !WorldFacadeCounselor.getInstance().getCenario().isLom() && personagem.getPericiaAgenteNatural() > 0) {
             habilidad = getRankLabel("AGENTE", personagem.getPericiaAgenteNatural(), personagem.getPericiaAgente());
             if (rankMap.containsKey(personagem.getPericiaAgenteNatural())) {
-                rankMap.put(personagem.getPericiaAgenteNatural() -1, habilidad);
+                rankMap.put(personagem.getPericiaAgenteNatural() - 1, habilidad);
             } else {
                 rankMap.put(personagem.getPericiaAgenteNatural(), habilidad);
             }
         }
-                
+
         if (WorldFacadeCounselor.getInstance().hasDiplomat() && personagem.getPericiaEmissarioNatural() > 0) {
             habilidad = getRankLabel("EMISSARIO", personagem.getPericiaEmissarioNatural(), personagem.getPericiaEmissario());
             if (rankMap.containsKey(personagem.getPericiaEmissarioNatural())) {
-                rankMap.put(personagem.getPericiaEmissarioNatural()-2, habilidad);
+                rankMap.put(personagem.getPericiaEmissarioNatural() - 2, habilidad);
             } else {
-                rankMap.put(personagem.getPericiaEmissarioNatural(), habilidad);                
+                rankMap.put(personagem.getPericiaEmissarioNatural(), habilidad);
             }
         }
-        
+
         if (WorldFacadeCounselor.getInstance().hasWizard() && personagem.getPericiaMagoNatural() > 0) {
             habilidad = getRankLabel("MAGO", personagem.getPericiaMagoNatural(), personagem.getPericiaMago());
             if (rankMap.containsKey(personagem.getPericiaMagoNatural())) {
-                rankMap.put(personagem.getPericiaMagoNatural() -3, habilidad);
+                rankMap.put(personagem.getPericiaMagoNatural() - 3, habilidad);
             } else {
                 rankMap.put(personagem.getPericiaMagoNatural(), habilidad);
-            }            
+            }
         }
-        Iterator<Entry<Integer,javax.swing.JLabel>> iterator = rankMap.entrySet().iterator();
-        Entry<Integer,javax.swing.JLabel> entrada;
-        
+        Iterator<Entry<Integer, javax.swing.JLabel>> iterator = rankMap.entrySet().iterator();
+        Entry<Integer, javax.swing.JLabel> entrada;
+
         while (iterator.hasNext()) {
             entrada = iterator.next();
             this.portraitPanel.add(entrada.getValue());
         }
-        
-        if(personagem.getPericiaFurtividadeNatural() > 0) {          
+
+        if (personagem.getPericiaFurtividadeNatural() > 0) {
             habilidad = getRankLabel("FURTIVIDADE", personagem.getPericiaFurtividadeNatural(), personagem.getPericiaFurtividade());
             this.portraitPanel.add(habilidad);
         }
-        
-        if(personagem.getDuelo()> 0) {          
+
+        if (personagem.getDuelo() > 0) {
             habilidad = getRankLabel("DUELO", (personagem.getDuelo() - personagem.getDueloBonus()), personagem.getDuelo());
             this.portraitPanel.add(habilidad);
         }
-        
-        if(personagem.getVida() > 0) {          
+
+        if (personagem.getVida() > 0) {
             habilidad = getRankLabel("VITALIDADE", personagem.getVida(), personagem.getVida());
             this.portraitPanel.add(habilidad);
         }
-        
+
         portraitPanel.repaint();
         portraitPanel.revalidate();
     }
-    
+
     javax.swing.JLabel getRankLabel(String rankName, int periciaNatural, int pericia) {
         javax.swing.JLabel habilidadLabel = null;
         String labelText;
         if (periciaNatural > 0) {
             labelText = labels.getString(rankName) + ": " + periciaNatural;
             if (periciaNatural != pericia) {
-               labelText = labelText.concat(" (" + pericia + ")");
-                
+                labelText = labelText.concat(" (" + pericia + ")");
+
             }
             habilidadLabel = new javax.swing.JLabel(labelText);
-            habilidadLabel.setBorder(new javax.swing.border.EmptyBorder(5,5,0,0)); //top,left,bottom,right
-        } 
-           
+            habilidadLabel.setBorder(new javax.swing.border.EmptyBorder(5, 5, 0, 0)); //top,left,bottom,right
+        }
+
         return habilidadLabel;
     }
 }

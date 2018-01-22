@@ -942,7 +942,7 @@
             <Property name="editable" type="boolean" value="false"/>
             <Property name="horizontalAlignment" type="int" value="2"/>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="settingsManager.getConfig(&quot;portraitsFolder&quot;)" type="code"/>
+              <Connection code="settingsManager.getConfig(&quot;PortraitsFolder&quot;)" type="code"/>
             </Property>
             <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="isAutoLoadActionFilled()" type="code"/>
