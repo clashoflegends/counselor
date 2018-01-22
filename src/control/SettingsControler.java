@@ -5,21 +5,38 @@
  */
 package control;
 
+import business.DownloadPortraitsService;
 import business.ImageManager;
+import control.services.DownloadPortraitsHttpServiceImpl;
 import control.support.ControlBase;
 import control.support.DispatchManager;
+import gui.accessories.DownloadProgressWork;
 import gui.accessories.MainSettingsGui;
 import gui.accessories.MainSettingsGui.ComboItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.ConnectException;
+import java.text.DecimalFormat;
+import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipInputStream;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.ProgressMonitor;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import persistenceCommons.SettingsManager;
@@ -29,9 +46,11 @@ import persistenceLocal.PathFactory;
  *
  * @author serguei
  */
-public class SettingsControler extends ControlBase implements Serializable, ActionListener, ChangeListener {
+public class SettingsControler extends ControlBase implements Serializable, ActionListener, ChangeListener, PropertyChangeListener {
 
     private final MainSettingsGui settingsGui;
+
+    private ProgressMonitor progressMonitor;
 
     public SettingsControler(MainSettingsGui jpanel) {
         this.settingsGui = jpanel;
@@ -240,12 +259,76 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
         } else if (actionCommand.equals("showPortraits")) {
             JCheckBox showPortraits = (JCheckBox) e.getSource();
             int selected = (showPortraits.isSelected()) ? 1 : 0;
-            
+
             SettingsManager.getInstance().setConfig("ShowCharacterPortraits", String.valueOf(selected));
             ImageManager.getInstance().doLoadPortraits();
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(selected));
-            
-            
+
+        } else if (actionCommand.equals("fPortraitsAction")) {
+
+            JFileChooser fc = new JFileChooser();
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+            int returnVal = fc.showOpenDialog(settingsGui);
+
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                SettingsManager.getInstance().setConfig("portraitsFolder", file.getPath());
+                settingsGui.getPortraitsFolderTextField().setText(file.getPath());
+                settingsGui.checkDisplayPortraitCheckBox();
+            }
+        } else if (actionCommand.equals("downloadPortraits")) {
+
+            DownloadPortraitsService downloadService = new DownloadPortraitsHttpServiceImpl();
+            int filesCount = 0;
+            DownloadProgressWork dpw = null;
+            try {
+                // First check network connection
+                downloadService.checkNetworkConnection();
+
+                // Read server properties file
+                Properties propServer = downloadService.getServerPropertiesFile();
+
+                String portraitsFileName = propServer.getProperty("portraistFileNameFull");
+                int fileSizeByte = downloadService.getSize(portraitsFileName);
+                float fileSize = fileSizeByte / (1024f * 1024f);
+                DecimalFormat df = new DecimalFormat("####.##");
+
+                int returnVal = JOptionPane.showConfirmDialog(settingsGui, "A compressed file of " + df.format(fileSize) + " Mb will be downloaded into the file system.",
+                        "Ready to download", JOptionPane.OK_CANCEL_OPTION);
+
+                if (returnVal == JOptionPane.OK_OPTION) {
+                    String portraitFolder = SettingsManager.getInstance().getConfig("portraitsFolder");
+
+                    //        File downloadedFile = downloadService.downloadPortraisFile(portraitsFileName, portraitFolder);; 
+                    File downloadedFile = new File(new File(portraitFolder), portraitsFileName);
+                    dpw = new DownloadProgressWork(portraitsFileName, portraitFolder, (int) fileSizeByte);
+                    dpw.addPropertyChangeListener(this);
+                    //      dpw.execute();
+
+                    progressMonitor = new ProgressMonitor(settingsGui, "Downloading file...", "", 0, 100);
+                    progressMonitor.setProgress(0);
+                    //            progressMonitor.setMillisToDecideToPopup(50);
+                    dpw.execute();
+                    
+                }
+
+            } catch (FileNotFoundException ex) {
+                String errorLabel = "Zip file could not be downloaded.";
+                JOptionPane.showMessageDialog(settingsGui, errorLabel, "Internal error", JOptionPane.ERROR_MESSAGE);
+
+            } catch (ConnectException ex) {
+                String errorLabel = "Netowrk connection is no avalaible or web site is unreachable.";
+                JOptionPane.showMessageDialog(settingsGui, errorLabel, actionCommand, JOptionPane.ERROR_MESSAGE);
+
+            }  catch (IOException ex) {
+                String errorLabel = "Properties file could not be read from server.";
+                JOptionPane.showMessageDialog(settingsGui, errorLabel, "Internal error", JOptionPane.ERROR_MESSAGE);
+            } finally {
+
+                settingsGui.checkDisplayPortraitCheckBox();
+
+            }
         }
     }
 
@@ -254,5 +337,19 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
         JSpinner jspiner = (JSpinner) ce.getSource();
         int sizeValue = (Integer) jspiner.getValue();
         SettingsManager.getInstance().setConfig("splitSize", String.valueOf(sizeValue));
+    }
+
+    
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if ("progress".equals(evt.getPropertyName())) {
+            int progress = (Integer) evt.getNewValue();
+            progressMonitor.setProgress(progress);
+
+            String message = String.format("Completed %d%%.\n", progress);
+            progressMonitor.setNote(message);           
+          
+        }
     }
 }
