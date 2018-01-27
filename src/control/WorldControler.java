@@ -296,7 +296,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private void doConfig() throws HeadlessException {
 
         MainSettingsGui settingPanel = new MainSettingsGui();
-
+        
         int option = JOptionPane.showOptionDialog(null, settingPanel, labels.getString("MENU.CONFIG"),
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
                 new javax.swing.ImageIcon(getClass().getResource("/images/icon_customize.gif")), null, null);

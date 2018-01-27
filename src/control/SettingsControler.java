@@ -18,17 +18,12 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.ConnectException;
 import java.text.DecimalFormat;
 import java.util.Properties;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipInputStream;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -49,7 +44,6 @@ import persistenceLocal.PathFactory;
 public class SettingsControler extends ControlBase implements Serializable, ActionListener, ChangeListener, PropertyChangeListener {
 
     private final MainSettingsGui settingsGui;
-
     private ProgressMonitor progressMonitor;
 
     public SettingsControler(MainSettingsGui jpanel) {
@@ -273,7 +267,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fc.getSelectedFile();
-                SettingsManager.getInstance().setConfig("portraitsFolder", file.getPath());
+                SettingsManager.getInstance().setConfig("PortraitsFolder", file.getPath());
                 settingsGui.getPortraitsFolderTextField().setText(file.getPath());
                 settingsGui.checkDisplayPortraitCheckBox();
             }
@@ -281,7 +275,6 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
 
             DownloadPortraitsService downloadService = new DownloadPortraitsHttpServiceImpl();
             int filesCount = 0;
-            DownloadProgressWork dpw = null;
             try {
                 // First check network connection
                 downloadService.checkNetworkConnection();
@@ -298,11 +291,11 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                         "Ready to download", JOptionPane.OK_CANCEL_OPTION);
 
                 if (returnVal == JOptionPane.OK_OPTION) {
-                    String portraitFolder = SettingsManager.getInstance().getConfig("portraitsFolder");
+                    String portraitFolder = SettingsManager.getInstance().getConfig("PortraitsFolder");
 
                     //        File downloadedFile = downloadService.downloadPortraisFile(portraitsFileName, portraitFolder);; 
                     File downloadedFile = new File(new File(portraitFolder), portraitsFileName);
-                    dpw = new DownloadProgressWork(portraitsFileName, portraitFolder, (int) fileSizeByte);
+                    final DownloadProgressWork dpw = new DownloadProgressWork(portraitsFileName, portraitFolder, (int) fileSizeByte);
                     dpw.addPropertyChangeListener(this);
                     //      dpw.execute();
 
@@ -310,7 +303,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                     progressMonitor.setProgress(0);
                     //            progressMonitor.setMillisToDecideToPopup(50);
                     dpw.execute();
-                    
+
                 }
 
             } catch (FileNotFoundException ex) {
@@ -321,7 +314,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 String errorLabel = "Netowrk connection is no avalaible or web site is unreachable.";
                 JOptionPane.showMessageDialog(settingsGui, errorLabel, actionCommand, JOptionPane.ERROR_MESSAGE);
 
-            }  catch (IOException ex) {
+            } catch (IOException ex) {
                 String errorLabel = "Properties file could not be read from server.";
                 JOptionPane.showMessageDialog(settingsGui, errorLabel, "Internal error", JOptionPane.ERROR_MESSAGE);
             } finally {
@@ -339,8 +332,6 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
         SettingsManager.getInstance().setConfig("splitSize", String.valueOf(sizeValue));
     }
 
-    
-
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if ("progress".equals(evt.getPropertyName())) {
@@ -348,8 +339,8 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             progressMonitor.setProgress(progress);
 
             String message = String.format("Completed %d%%.\n", progress);
-            progressMonitor.setNote(message);           
-          
+            progressMonitor.setNote(message);
+
         }
     }
 }
