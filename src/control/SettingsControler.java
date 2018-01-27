@@ -274,7 +274,6 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
         } else if (actionCommand.equals("downloadPortraits")) {
 
             DownloadPortraitsService downloadService = new DownloadPortraitsHttpServiceImpl();
-            int filesCount = 0;
             try {
                 // First check network connection
                 downloadService.checkNetworkConnection();
@@ -292,18 +291,13 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
 
                 if (returnVal == JOptionPane.OK_OPTION) {
                     String portraitFolder = SettingsManager.getInstance().getConfig("PortraitsFolder");
-
-                    //        File downloadedFile = downloadService.downloadPortraisFile(portraitsFileName, portraitFolder);; 
-                    File downloadedFile = new File(new File(portraitFolder), portraitsFileName);
+               
                     final DownloadProgressWork dpw = new DownloadProgressWork(portraitsFileName, portraitFolder, (int) fileSizeByte);
-                    dpw.addPropertyChangeListener(this);
-                    //      dpw.execute();
+                    dpw.addPropertyChangeListener(this);             
 
                     progressMonitor = new ProgressMonitor(settingsGui, "Downloading file...", "", 0, 100);
-                    progressMonitor.setProgress(0);
-                    //            progressMonitor.setMillisToDecideToPopup(50);
+                    progressMonitor.setProgress(0);                 
                     dpw.execute();
-
                 }
 
             } catch (FileNotFoundException ex) {
@@ -318,9 +312,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 String errorLabel = "Properties file could not be read from server.";
                 JOptionPane.showMessageDialog(settingsGui, errorLabel, "Internal error", JOptionPane.ERROR_MESSAGE);
             } finally {
-
                 settingsGui.checkDisplayPortraitCheckBox();
-
             }
         }
     }
