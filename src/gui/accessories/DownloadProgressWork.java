@@ -122,6 +122,7 @@ public class DownloadProgressWork extends SwingWorker<Void, Void> {
                 fileoutputstream.close();
                 fileCount++;
             }
+            zipFile.close();
            
         }  catch (IOException ex) {
             throw new ZipException(ex.getMessage());
