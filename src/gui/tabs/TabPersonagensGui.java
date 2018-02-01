@@ -417,8 +417,9 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
             this.portraitPanel.add(habilidad);
         }
 
-        if (personagem.getDuelo() > 0) {
-            habilidad = getRankLabel("DUELO", (personagem.getDuelo() - personagem.getDueloBonus()), personagem.getDuelo());
+            final int dueloNat = personagem.getDuelo() - personagem.getDueloBonus();
+        if (dueloNat > 0) {
+            habilidad = getRankLabel("DUELO", dueloNat, personagem.getDuelo());
             this.portraitPanel.add(habilidad);
         }
 
