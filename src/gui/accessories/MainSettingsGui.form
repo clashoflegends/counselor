@@ -991,14 +991,17 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
+                      <Component id="hexTagFrameCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="armyPathLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="hexTagStyleLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="mapTilesLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="pcPathLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="pcPathComboBox" min="-2" max="-2" attributes="0"/>
                               <Component id="armyPathComboBox" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
                                   <Component id="hexTagStyleComboBox" alignment="0" max="32767" attributes="0"/>
@@ -1006,8 +1009,6 @@
                               </Group>
                           </Group>
                       </Group>
-                      <Component id="hexTagFrameCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="pcPathCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="204" max="32767" attributes="0"/>
               </Group>
@@ -1034,8 +1035,11 @@
                       <Component id="armyPathComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="pcPathCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="84" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="pcPathLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="pcPathComboBox" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -1130,16 +1134,29 @@
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value=""/>
           </AuxValues>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="pcPathCheckBox">
+        <Component class="javax.swing.JLabel" name="pcPathLabel">
           <Properties>
-            <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="isPcPathSelected()" type="code"/>
-            </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
               <ResourceString bundle="labels.properties" key="SETTINGS.MAP.PCPATH" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.MAP.PCPATH.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="pcPathComboBox">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new javax.swing.DefaultComboBoxModel(getPcPathComboLabels())" type="code"/>
+            </Property>
+            <Property name="selectedIndex" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="getPcPathIndexSelected()" type="code"/>
+            </Property>
             <Property name="actionCommand" type="java.lang.String" value="pcPath"/>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value=""/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

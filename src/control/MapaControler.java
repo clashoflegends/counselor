@@ -92,7 +92,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         mapMenuManager.setTerrenos(cenario.getTerrenos());
     }
 
-    public ImageIcon printActionsOnMap() {
+    private ImageIcon printActionsOnMap() {
         return new ImageIcon(mapaManager.printActionsOnMap(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
     }
 
@@ -100,7 +100,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
     }
 
-    public ImageIcon refreshMapaGeral() {
+    private ImageIcon refreshMapaGeral() {
         return new ImageIcon(mapaManager.redrawMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
     }
 
@@ -315,10 +315,11 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
                 tabGui.doMapa(this.refreshMapaGeral());
                 break;
             case DispatchManager.ACTIONS_MAP_REDRAW:
-                if (!SettingsManager.getInstance().isConfig("drawPcPath", "1", "1")) {
-                    break;
+                if (!SettingsManager.getInstance().isConfig("drawPcPath", "1", "1") && !SettingsManager.getInstance().isConfig("drawPcPath", "3", "1")) {
+                    tabGui.doActionsOnMapHide();
+                } else {
+                    tabGui.doActionsOnMap(this.printActionsOnMap());
                 }
-                tabGui.doActionsOnMap(this.printActionsOnMap());
                 break;
             case DispatchManager.LOCAL_MAP_REDRAW_TAG:
                 tabGui.setTag();

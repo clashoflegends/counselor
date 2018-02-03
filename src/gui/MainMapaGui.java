@@ -306,6 +306,10 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         getJlActionsOnMap().setVisible(true);
     }
 
+    public void doActionsOnMapHide() {
+        getJlActionsOnMap().setVisible(false);
+    }
+
     public void addRadialMenu(RadialMenu aRadialMenu) {
         if (this.radialMenu != null) {
             jLayeredPane1.remove(this.radialMenu);

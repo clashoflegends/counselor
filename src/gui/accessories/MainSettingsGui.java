@@ -64,7 +64,7 @@ public class MainSettingsGui extends JPanel {
         hexTagStyleComboBox.addActionListener(settingsControler);
         hexTagFrameCheckBox.addActionListener(settingsControler);
         armyPathComboBox.addActionListener(settingsControler);
-        pcPathCheckBox.addActionListener(settingsControler);
+        pcPathComboBox.addActionListener(settingsControler);
         autoLoadCheck.addActionListener(settingsControler);
         autoLoadActionCheck.addActionListener(settingsControler);
         displayPortraitCheckBox.addActionListener(settingsControler);
@@ -146,7 +146,8 @@ public class MainSettingsGui extends JPanel {
         hexTagFrameCheckBox = new javax.swing.JCheckBox();
         armyPathComboBox = new javax.swing.JComboBox();
         mapTilesComboBox = new javax.swing.JComboBox();
-        pcPathCheckBox = new javax.swing.JCheckBox();
+        pcPathLabel = new javax.swing.JLabel();
+        pcPathComboBox = new javax.swing.JComboBox();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
         gamePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.GAME"))); // NOI18N
@@ -655,9 +656,12 @@ public class MainSettingsGui extends JPanel {
         mapTilesComboBox.setSelectedItem(settingsManager.getConfig("MapTiles"));
         mapTilesComboBox.setActionCommand("mapTiles");
 
-        pcPathCheckBox.setSelected(isPcPathSelected());
-        pcPathCheckBox.setText(bundle.getString("SETTINGS.MAP.PCPATH")); // NOI18N
-        pcPathCheckBox.setActionCommand("pcPath");
+        pcPathLabel.setText(bundle.getString("SETTINGS.MAP.PCPATH")); // NOI18N
+        pcPathLabel.setToolTipText(bundle.getString("SETTINGS.MAP.PCPATH.TOOLTIP")); // NOI18N
+
+        pcPathComboBox.setModel(new javax.swing.DefaultComboBoxModel(getPcPathComboLabels()));
+        pcPathComboBox.setSelectedIndex(getPcPathIndexSelected());
+        pcPathComboBox.setActionCommand("pcPath");
 
         javax.swing.GroupLayout mapPanelLayout = new javax.swing.GroupLayout(mapPanel);
         mapPanel.setLayout(mapPanelLayout);
@@ -666,19 +670,20 @@ public class MainSettingsGui extends JPanel {
             .addGroup(mapPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(hexTagFrameCheckBox)
                     .addGroup(mapPanelLayout.createSequentialGroup()
                         .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(armyPathLabel)
                             .addComponent(hexTagStyleLabel)
-                            .addComponent(mapTilesLabel))
+                            .addComponent(mapTilesLabel)
+                            .addComponent(pcPathLabel))
                         .addGap(18, 18, 18)
                         .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(pcPathComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(armyPathComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(hexTagStyleComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(mapTilesComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                    .addComponent(hexTagFrameCheckBox)
-                    .addComponent(pcPathCheckBox))
+                                .addComponent(mapTilesComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addContainerGap(204, Short.MAX_VALUE))
         );
         mapPanelLayout.setVerticalGroup(
@@ -699,8 +704,10 @@ public class MainSettingsGui extends JPanel {
                     .addComponent(armyPathLabel)
                     .addComponent(armyPathComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(pcPathCheckBox)
-                .addContainerGap(84, Short.MAX_VALUE))
+                .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pcPathLabel)
+                    .addComponent(pcPathComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -830,7 +837,8 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JCheckBox overEliminCheckBox1;
     private javax.swing.JCheckBox overEliminCheckBox2;
     private javax.swing.JRadioButton ownFiltroRadioButton;
-    private javax.swing.JCheckBox pcPathCheckBox;
+    private javax.swing.JComboBox pcPathComboBox;
+    private javax.swing.JLabel pcPathLabel;
     private javax.swing.JPanel playerPanel;
     private javax.swing.JButton portraitsFolderButton;
     private javax.swing.JLabel portraitsFolderLabel;
@@ -946,12 +954,11 @@ public class MainSettingsGui extends JPanel {
         return index;
     }
 
-    private boolean isPcPathSelected() {
-        return settingsManager.getConfig("drawPcPath", "1").equals("1");
+    private int getPcPathIndexSelected() {
+        return settingsManager.getConfigAsInt("drawPcPath", "1");
     }
 
     private ComboItem[] getLanguageComboModel() {
-
         String languages[] = new String[]{"PT", "ES", "EN", "IT"};
         ComboItem[] combo = new ComboItem[languages.length];
 
@@ -978,6 +985,15 @@ public class MainSettingsGui extends JPanel {
         combo[0] = LABELS.getString("SETTINGS.MAP.ARMYPATH.NONE");
         combo[1] = LABELS.getString("SETTINGS.MAP.ARMYPATH.ARMY");
         combo[2] = LABELS.getString("SETTINGS.MAP.ARMYPATH.NAVY");
+        return combo;
+    }
+
+    private String[] getPcPathComboLabels() {
+        String[] combo = new String[4];
+        combo[0] = LABELS.getString("SETTINGS.MAP.PCPATH.NONE");
+        combo[1] = LABELS.getString("SETTINGS.MAP.PCPATH.BOTH");
+        combo[2] = LABELS.getString("SETTINGS.MAP.PCPATH.PAST");
+        combo[3] = LABELS.getString("SETTINGS.MAP.PCPATH.FUTURE");
         return combo;
     }
 
