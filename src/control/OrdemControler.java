@@ -88,6 +88,10 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         }
         final ActorAction actorAction = ordemFacade.getActorAction(po);
         getTabGui().setValueAt(actorAction, index);
+        //draw orders on map
+        if (SettingsManager.getInstance().isConfig("drawPcPath", "1", "1")) {
+            getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+        }
     }
 
     public ComboBoxModel getTaticasComboModel() {
