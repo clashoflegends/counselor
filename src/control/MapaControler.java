@@ -68,8 +68,10 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     private RadialMenu rmActive;
     private final MapMenuManager mapMenuManager;
     private DialogHexView hexView;
+    private final Jogador jogadorAtivo;
 
     public MapaControler(JPanel form) {
+        this.jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
         final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         mapaManager = new MapaManager(cenario, form);
         mapaManager.setLocais(listFactory.listLocais());
@@ -77,6 +79,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_REDRAW);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_RANGE_CLICK);
+        registerDispatchManagerForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
         //inicialize locais
         WorldBuilderMenuManager.getInstance().doCanvasReset(mapaManager.getMapMaxSize(listFactory.listLocais().values()));
         WorldBuilderMenuManager.getInstance().setLocais(listFactory.listLocais());
@@ -89,18 +92,19 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         mapMenuManager.setTerrenos(cenario.getTerrenos());
     }
 
+    public ImageIcon printActionsOnMap() {
+        return new ImageIcon(mapaManager.printActionsOnMap(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
+    }
+
     public ImageIcon printMapaGeral() {
-        final Jogador jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
         return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
     }
 
     public ImageIcon refreshMapaGeral() {
-        final Jogador jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
         return new ImageIcon(mapaManager.redrawMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
     }
 
     public BufferedImage getMap() {
-        final Jogador jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
         return mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo);
     }
 
@@ -306,10 +310,21 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
 
     @Override
     public void receiveDispatch(int msgName) {
-        if (msgName == DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES) {
-            tabGui.doMapa(this.refreshMapaGeral());
-        } else if (msgName == DispatchManager.LOCAL_MAP_REDRAW_TAG) {
-            tabGui.setTag();
+        switch (msgName) {
+            case DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES:
+                tabGui.doMapa(this.refreshMapaGeral());
+                break;
+            case DispatchManager.ACTIONS_MAP_REDRAW:
+                if (!SettingsManager.getInstance().isConfig("drawPcPath", "1", "1")) {
+                    break;
+                }
+                tabGui.doActionsOnMap(this.printActionsOnMap());
+                break;
+            case DispatchManager.LOCAL_MAP_REDRAW_TAG:
+                tabGui.setTag();
+                break;
+            default:
+                break;
         }
     }
 
