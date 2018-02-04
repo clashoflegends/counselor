@@ -71,6 +71,20 @@ public class MainSettingsGui extends JPanel {
         portraitsFolderButton.addActionListener(settingsControler);
         downloadPortraitsButton.addActionListener(settingsControler);
 
+        //FIXME: Hiding controls until they are tested. Set ShowCharacterPortraitsBeta=1 to test.
+        if (SettingsManager.getInstance().isConfig("ShowCharacterPortraitsBeta", "1", "0")) {
+            displayPortraitCheckBox.setVisible(true);
+            portraitsFolderButton.setVisible(true);
+            portraitsFolderLabel.setVisible(true);
+            portraitsFolderTextField.setVisible(true);
+            downloadPortraitsButton.setVisible(true);
+        } else {
+            displayPortraitCheckBox.setVisible(false);
+            portraitsFolderButton.setVisible(false);
+            portraitsFolderLabel.setVisible(false);
+            portraitsFolderTextField.setVisible(false);
+            downloadPortraitsButton.setVisible(false);
+        }
     }
 
     /**
