@@ -62,6 +62,7 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         if (SettingsManager.getInstance().isAutoSaveActions()) {
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_AUTOSAVE, this.getTabGui());
         }
+        getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
 
     private void doSalvaAction() {
@@ -88,6 +89,8 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         }
         final ActorAction actorAction = ordemFacade.getActorAction(po);
         getTabGui().setValueAt(actorAction, index);
+        //draw orders on map
+        getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
 
     public ComboBoxModel getTaticasComboModel() {

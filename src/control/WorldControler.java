@@ -189,7 +189,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             //we're done here, nothing to save
             return null;
         }
-        if (!missingActionMsg.equalsIgnoreCase("") && SettingsManager.getInstance().isConfig("ActionsMissingPopup", "1", "0") && !SettingsManager.getInstance().isConfig("AutoSaveActions", "1", "0")) {
+        if (!missingActionMsg.equalsIgnoreCase("") && SettingsManager.getInstance().isConfig("ActionsMissingPopup", "1", "0") && !SettingsManager.getInstance().isAutoSaveActions()) {
             SysApoio.showDialogAlert(missingActionMsg, this.getGui());
         }
         if (missingActionMsg.equalsIgnoreCase("") && !this.msgSubmitReady) {
@@ -296,7 +296,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private void doConfig() throws HeadlessException {
 
         MainSettingsGui settingPanel = new MainSettingsGui();
-        
+
         int option = JOptionPane.showOptionDialog(null, settingPanel, labels.getString("MENU.CONFIG"),
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
                 new javax.swing.ImageIcon(getClass().getResource("/images/icon_customize.gif")), null, null);
@@ -715,7 +715,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         try {
             Comando comando = (Comando) XmlManager.getInstance().get(file);
             //verificar serial violado
-             if (!comando.isSerial()) {
+            if (!comando.isSerial()) {
                 throw new IllegalStateException(labels.getString("SERIAL.VIOLATION") + file.getName());
             }
             //verificar se o turno 'e correto
@@ -735,6 +735,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 SysApoio.showDialogError(String.format("%d %s %s\n%s",
                         errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(), msg), this.getGui());
             }
+            getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
         } catch (IllegalStateException ex) {
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());

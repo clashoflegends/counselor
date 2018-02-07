@@ -215,10 +215,11 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             int index = tagStyle.getSelectedIndex();
             SettingsManager.getInstance().setConfig("ShowArmyMovPath", String.valueOf(index));
         } else if (actionCommand.equals("pcPath")) {
-            JCheckBox pcPath = (JCheckBox) e.getSource();
-            int selected = (pcPath.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("drawPcPath", String.valueOf(selected));
+            JComboBox tagStyle = (JComboBox) e.getSource();
+            int index = tagStyle.getSelectedIndex();
+            SettingsManager.getInstance().setConfig("drawPcPath", String.valueOf(index));
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
         } else if (actionCommand.equals("autoLoadCheck")) {
             JCheckBox autoLoad = (JCheckBox) e.getSource();
 
