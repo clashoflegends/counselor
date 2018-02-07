@@ -39,6 +39,7 @@ public class MainSettingsGui extends JPanel {
         languageComboBox.addActionListener(settingsControler);
         autoLoadButton.addActionListener(settingsControler);
         autoLoadActionButton.addActionListener(settingsControler);
+        autoSaveOrdersCheck.addActionListener(settingsControler);
         overEliminCheckBox.addActionListener(settingsControler);
         overEliminCheckBox1.addActionListener(settingsControler);
         overEliminCheckBox2.addActionListener(settingsControler);
@@ -117,6 +118,7 @@ public class MainSettingsGui extends JPanel {
         autoLoadActionButton = new javax.swing.JButton();
         autoLoadCheck = new javax.swing.JCheckBox();
         autoLoadActionCheck = new javax.swing.JCheckBox();
+        autoSaveOrdersCheck = new javax.swing.JCheckBox();
         playerPanel = new javax.swing.JPanel();
         myEmailLabel = new javax.swing.JLabel();
         serverSmtpLabel = new javax.swing.JLabel();
@@ -239,6 +241,11 @@ public class MainSettingsGui extends JPanel {
         autoLoadActionCheck.setSelected(isAutoLoadActionFilled());
         autoLoadActionCheck.setActionCommand("autoLoadActionCheck");
 
+        autoSaveOrdersCheck.setSelected(isAutoSaveActionsSelected());
+        autoSaveOrdersCheck.setText(bundle.getString("SETTINGS.GAME.AUTOSAVEORDERS")); // NOI18N
+        autoSaveOrdersCheck.setToolTipText(bundle.getString("SETTINGS.GAME.AUTOSAVEORDERS.TOOLTIP")); // NOI18N
+        autoSaveOrdersCheck.setActionCommand("autoSaveOrders");
+
         javax.swing.GroupLayout gamePanelLayout = new javax.swing.GroupLayout(gamePanel);
         gamePanel.setLayout(gamePanelLayout);
         gamePanelLayout.setHorizontalGroup(
@@ -285,7 +292,9 @@ public class MainSettingsGui extends JPanel {
                                     .addComponent(openSaveDir))))
                         .addContainerGap(55, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, gamePanelLayout.createSequentialGroup()
-                        .addComponent(overEliminCheckBox1)
+                        .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(overEliminCheckBox1)
+                            .addComponent(autoSaveOrdersCheck))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(overEliminCheckBox2)
@@ -330,7 +339,9 @@ public class MainSettingsGui extends JPanel {
                     .addComponent(overEliminCheckBox)
                     .addComponent(overEliminCheckBox1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(overEliminCheckBox2)
+                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(overEliminCheckBox2)
+                    .addComponent(autoSaveOrdersCheck))
                 .addGap(0, 96, Short.MAX_VALUE))
         );
 
@@ -821,6 +832,7 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JLabel autoLoadDirLabel;
     private javax.swing.JTextField autoLoadTextField;
     private javax.swing.JCheckBox autoMoveCheckBox;
+    private javax.swing.JCheckBox autoSaveOrdersCheck;
     private javax.swing.JCheckBox copyActionsPopUpCheckBox;
     private javax.swing.JCheckBox copyOrdersCheckBox;
     private javax.swing.JPanel displayPanel;
@@ -912,6 +924,10 @@ public class MainSettingsGui extends JPanel {
 
     private boolean isOverrideSelected() {
         return settingsManager.getConfig("OverrideElimination", "0").equals("1");
+    }
+
+    private boolean isAutoSaveActionsSelected() {
+        return settingsManager.getConfig("AutoSaveActions", "1").equals("1");
     }
 
     private boolean isLoadActionsBehaviorSelected() {
