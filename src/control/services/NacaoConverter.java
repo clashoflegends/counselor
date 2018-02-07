@@ -21,6 +21,7 @@ import model.Exercito;
 import model.Jogador;
 import model.Local;
 import model.Nacao;
+import model.Produto;
 import model.TipoTropa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,6 +38,7 @@ public class NacaoConverter implements Serializable {
     public static final int ORDEM_COL_INDEX_START = 4;
     private static final Log log = LogFactory.getLog(NacaoConverter.class);
     private static final NacaoFacade nacaoFacade = new NacaoFacade();
+    private static final FinancasConverter financasConverter = new FinancasConverter();
     private static final AcaoFacade acaoFacade = new AcaoFacade();
     private static final ListFactory listFactory = new ListFactory();
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
@@ -95,6 +97,12 @@ public class NacaoConverter implements Serializable {
 //        cArray[ii++] = valorAcoes;
         cArray[ii++] = nacaoFacade.getMoneySaldo(nacao);
         cArray[ii++] = nacaoFacade.getImpostos(nacao);
+        Produto[] produtos = cenarioFacade.listProdutos(cenario, 1);
+        for (Produto produto : produtos) {
+            int prod = nacaoFacade.getProducao(nacao, produto, cenario, WorldFacadeCounselor.getInstance().getTurno());
+            int est = nacaoFacade.getEstoque(nacao, produto);
+            cArray[ii++] = prod + est;
+        }
         cArray[ii++] = nacaoFacade.getLealdade(nacao);
         cArray[ii++] = nacaoFacade.getLealdadeAnterior(nacao);
         cArray[ii++] = nacaoFacade.getTeamFlag(nacao);
@@ -134,6 +142,12 @@ public class NacaoConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("IMPOSTOS"));
         classes.add(java.lang.Integer.class);
+        final Cenario cenario = WFC.getCenario();
+        Produto[] produtos = cenarioFacade.listProdutos(cenario, 1);
+        for (Produto produto : produtos) {
+            colNames.add(produto.getNome());
+            classes.add(java.lang.Integer.class);
+        }
         colNames.add(labels.getString("LEALDADE"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("LEALDADE.VARIACAO"));
