@@ -139,7 +139,10 @@
                           <EmptySpace pref="55" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
-                          <Component id="overEliminCheckBox1" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="overEliminCheckBox1" min="-2" max="-2" attributes="0"/>
+                              <Component id="autoSaveOrdersCheck" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="overEliminCheckBox2" min="-2" max="-2" attributes="0"/>
@@ -199,7 +202,10 @@
                       <Component id="overEliminCheckBox1" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="overEliminCheckBox2" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="overEliminCheckBox2" min="-2" max="-2" attributes="0"/>
+                      <Component id="autoSaveOrdersCheck" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <EmptySpace min="0" pref="96" max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -383,6 +389,20 @@
               <Connection code="isAutoLoadActionFilled()" type="code"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="autoLoadActionCheck"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="autoSaveOrdersCheck">
+          <Properties>
+            <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="isAutoSaveActionsSelected()" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.GAME.AUTOSAVEORDERS" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.GAME.AUTOSAVEORDERS.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="autoSaveOrders"/>
           </Properties>
         </Component>
       </SubComponents>

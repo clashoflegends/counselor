@@ -110,6 +110,11 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             int selected = (overCheck.isSelected()) ? 1 : 0;
             SettingsManager.getInstance().setConfig("OverrideElimination", String.valueOf(selected));
 
+        } else if (actionCommand.equals("autoSaveOrders")) {
+            JCheckBox overCheck = (JCheckBox) e.getSource();
+            int selected = (overCheck.isSelected()) ? 1 : 0;
+            SettingsManager.getInstance().setConfig("AutoSaveActions", String.valueOf(selected));
+
         } else if (actionCommand.equals("playerEmail")) {
 
             String playerEmail = ((JTextField) e.getSource()).getText();
