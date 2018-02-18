@@ -6,7 +6,6 @@
 package control;
 
 import business.DownloadPortraitsService;
-import business.ImageManager;
 import control.services.DownloadPortraitsHttpServiceImpl;
 import control.support.ControlBase;
 import control.support.DispatchManager;
@@ -259,9 +258,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
         } else if (actionCommand.equals("showPortraits")) {
             JCheckBox showPortraits = (JCheckBox) e.getSource();
             int selected = (showPortraits.isSelected()) ? 1 : 0;
-
             SettingsManager.getInstance().setConfig("ShowCharacterPortraits", String.valueOf(selected));
-            ImageManager.getInstance().doLoadPortraits();
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(selected));
 
         } else if (actionCommand.equals("fPortraitsAction")) {

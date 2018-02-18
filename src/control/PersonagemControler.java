@@ -43,16 +43,12 @@ public class PersonagemControler extends ControlBase implements Serializable, Ac
     public PersonagemControler(TabPersonagensGui tabPersonagensGui) {
         this.tabGui = tabPersonagensGui;
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_RELOAD);
-        registerDispatchManagerForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL);
     }
 
     @Override
     public void receiveDispatch(int msgName, String txt) {
         if (msgName == DispatchManager.ACTIONS_RELOAD) {
             getTabGui().doLoadChars();
-        } else if (msgName == DispatchManager.SWITCH_PORTRAIT_PANEL) {
-            boolean showPortrait = txt.equals("1");            
-            tabGui.switchPortrait(showPortrait);
         }
     }
 
@@ -61,9 +57,8 @@ public class PersonagemControler extends ControlBase implements Serializable, Ac
     }
 
     public GenericoTableModel getMainTableModel(GenericoComboObject filtro) {
-        Nacao nacao = null;
         try {
-            nacao = (Nacao) filtro.getObject();
+            Nacao nacao = (Nacao) filtro.getObject();
             listaExibida = PersonagemConverter.listaByNacao(nacao);
         } catch (ClassCastException e) {
             listaExibida = PersonagemConverter.listaByFiltro(filtro.getComboId());
@@ -148,5 +143,5 @@ public class PersonagemControler extends ControlBase implements Serializable, Ac
             //lista vazia?
         }
     }
-       
+
 }
