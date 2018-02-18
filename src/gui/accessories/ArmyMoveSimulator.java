@@ -30,7 +30,8 @@ public class ArmyMoveSimulator extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocal(local);
         configUi();
-        SubTabDirecaoExercito jtabDirecao = new SubTabDirecaoExercito(local, 14, waterMovement, WorldFacadeCounselor.getInstance().getMapaControler());
+        int armyMoveMaxPoints = WorldFacadeCounselor.getInstance().getCenarioArmyMoveMaxPoints();
+        SubTabDirecaoExercito jtabDirecao = new SubTabDirecaoExercito(local, armyMoveMaxPoints, waterMovement, WorldFacadeCounselor.getInstance().getMapaControler());
         GroupLayout parLayout = (GroupLayout) jpQuadro.getLayout();
         parLayout.replace(jPanel1, jtabDirecao);
     }
