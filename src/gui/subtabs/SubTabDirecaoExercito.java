@@ -460,18 +460,10 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
     }
 
     private void doMovementTagsPaint(String vlInicial) {
-        if (vlInicial.equals("")) {
-            return;
-        }
-        String[] movs = vlInicial.split(";");
-        for (String elem : movs) {
-            //tipo de movimentacao ou vazio, ignorar.
-            if (!elem.equals("nr") && !elem.equals("ev") && !elem.equals("")) {
-                if (ConverterFactory.isDirecaoValid(elem)) {
-                    //validates if there is garbage as parameter and clean it up.
-                    this.doMovementTagAdd(elem);
-                }
-            }
+        final List<String> directions = new ArrayList<String>();
+        directions.addAll(ConverterFactory.armyPathToList(vlInicial));
+        for (String elem : directions) {
+            this.doMovementTagAdd(elem);
         }
     }
 
