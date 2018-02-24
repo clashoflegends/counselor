@@ -90,6 +90,10 @@ public class WorldFacadeCounselor implements Serializable {
         return WorldManager.getInstance().getPartida().getCenario().getNome();
     }
 
+    public int getCenarioArmyMoveMaxPoints() {
+        return cf.getArmyMoveMaxPoints(WorldManager.getInstance().getPartida().getCenario());
+    }
+
     public Cenario getCenario() {
         return WorldManager.getInstance().getPartida().getCenario();
     }

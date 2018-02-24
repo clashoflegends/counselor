@@ -286,7 +286,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         //set starting point
         movEx.setOrigem(exercitoFacade.getLocal(exercito));
         movEx.setPorAgua(isAgua);
-        movEx.setLimiteMovimento(14); //exercito.getMovPontos()
+        movEx.setLimiteMovimento(WorldFacadeCounselor.getInstance().getCenarioArmyMoveMaxPoints()); //exercito.getMovPontos()
         movEx.setEvasivo(false);
 
         HashMap<Local, ArmyPath> range = exercitoFacade.calculateArmyRangeHexes(listFactory.listLocais(), movEx);
