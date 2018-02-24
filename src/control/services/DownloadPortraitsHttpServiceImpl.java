@@ -60,7 +60,6 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
         if (!networkAvalaible) {
             throw new ConnectException();
         }
-
     }
 
     @Override
@@ -100,7 +99,6 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
             LOG.error(ex);
             throw new FileNotFoundException();
         }
-
         return file;
     }
 
