@@ -60,7 +60,6 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
         if (!networkAvalaible) {
             throw new ConnectException();
         }
-
     }
 
     @Override
