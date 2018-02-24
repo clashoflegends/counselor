@@ -99,7 +99,6 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
             LOG.error(ex);
             throw new FileNotFoundException();
         }
-
         return file;
     }
 
