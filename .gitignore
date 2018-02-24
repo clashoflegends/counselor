@@ -1,0 +1,4 @@
+*.log
+counselor.log
+/dist/
+/build/
