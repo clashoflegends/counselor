@@ -105,7 +105,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             if ("jbOpen".equals(jbTemp.getActionCommand())) {
                 doOpen(jbTemp);
             } else if ("jbSave".equals(jbTemp.getActionCommand())) {
-                doSave(jbTemp);
+                doSave(jbTemp, false);
             } else if ("jbSaveWorld".equals(jbTemp.getActionCommand())) {
                 doSaveWorld(jbTemp);
             } else if ("jbExportMap".equals(jbTemp.getActionCommand())) {
@@ -177,7 +177,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @param jbTemp
      * @throws HeadlessException
      */
-    private File doSave(Component jbTemp) throws HeadlessException {
+    private File doSave(Component jbTemp, boolean forceMissingPopup) throws HeadlessException {
         Partida partida = WFC.getPartida();
         Jogador jogadorAtivo = partida.getJogadorAtivo();
         Comando comando = new Comando();
@@ -189,8 +189,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             //we're done here, nothing to save
             return null;
         }
-        if (!missingActionMsg.equalsIgnoreCase("") && SettingsManager.getInstance().isConfig("ActionsMissingPopup", "1", "0") && !SettingsManager.getInstance().isAutoSaveActions()) {
-            SysApoio.showDialogAlert(missingActionMsg, this.getGui());
+        if (!missingActionMsg.equalsIgnoreCase("") && SettingsManager.getInstance().isConfig("ActionsMissingPopup", "1", "0")) {
+            if (forceMissingPopup || !SettingsManager.getInstance().isAutoSaveActions()) {
+                SysApoio.showDialogAlert(missingActionMsg, this.getGui());
+            }
         }
         if (missingActionMsg.equalsIgnoreCase("") && !this.msgSubmitReady) {
             SysApoio.showDialogAlert(labels.getString("ORDERS.READY.SUBMIT"), this.getGui());
@@ -372,7 +374,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
          * se sim, salva com o mesmo nome sem exibir o dialogo 
          * se nao, pede para salvar pela primeira vez (exibe o dialogo)
          */
-        File attachment = doSave(jbTemp);
+        File attachment = doSave(jbTemp, true);
         if (attachment == null) {
             this.getGui().setStatusMsg(labels.getString("ENVIAR.FALTOU.ARQUIVO"));
             SysApoio.showDialogError(labels.getString("ENVIAR.FALTOU.ARQUIVO"), this.getGui());
@@ -876,7 +878,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     @Override
     public void receiveDispatch(int msgName, Component cmpnt) {
         if (msgName == DispatchManager.ACTIONS_AUTOSAVE && SettingsManager.getInstance().isAutoSaveActions()) {
-            doSave(cmpnt);
+            doSave(cmpnt, false);
         }
     }
 
