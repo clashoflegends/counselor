@@ -43,59 +43,75 @@ public class ArtefatoConverter implements Serializable {
     public static ComboBoxModel getArtefatoComboModel(int tipo, Personagem personagem) {
         //cria lista completa
         List todos = new ArrayList(200);
-        if (tipo == 0) {
-            //adiciona um blank
-            todos.add(getArtefatoBlank());
-            //é um combo com TODOS os artefatos disponiveis
-            todos.addAll(listFactory.listArtefatos());
-        } else if (tipo == 1) {
-            //adiciona um blank
-            todos.add(getArtefatoBlank());
-            //é um combo com os artefatos que o personagem carrega
-            PersonagemFacade personagemFacade = new PersonagemFacade();
-            Collection artefatosPersonagem = personagemFacade.getArtefatos(personagem);
-            todos.addAll(artefatosPersonagem);
-        } else if (tipo == 2) {
-            //adiciona um blank
-            todos.add(getArtefatoBlank());
-            //é um combo com os artefatos que a nacao possui
-            //lista os artefatos da nacao
-            //nao basta percorrer os personagens, pois podem haver artefatos caidos.
-            //TODO: colocar uma lsita de artefatos na nacao?
-            PersonagemFacade personagemFacade = new PersonagemFacade();
-            Collection<Artefato> artefatosNacao = artefatoFacade.getArtefatos(listFactory.listArtefatos(), personagemFacade.getNacao(personagem));
-            todos.addAll(artefatosNacao);
-        } else if (tipo == 3) {
-            todos.add(getArtefatoBlank());
-            todos.addAll(listFactory.listArtefatos());
-            //remove os artefatos da nacao
-            PersonagemFacade personagemFacade = new PersonagemFacade();
-            Collection<Artefato> artefatosNacao = artefatoFacade.getArtefatos(listFactory.listArtefatos(), personagemFacade.getNacao(personagem));
-            todos.removeAll(artefatosNacao);
-        } else if (tipo == 4) {
-            //é um combo com os artefatos de Scry que o personagem carrega
-            PersonagemFacade personagemFacade = new PersonagemFacade();
-            for (Artefato artefato : personagemFacade.getArtefatos(personagem)) {
-                if (artefato.isExploracao()) {
-                    todos.add(artefato);
-                }
+        switch (tipo) {
+            case 0:
+                //adiciona um blank
+                todos.add(getArtefatoBlank());
+                //é um combo com TODOS os artefatos disponiveis
+                todos.addAll(listFactory.listArtefatos());
+                break;
+            case 1: {
+                //adiciona um blank
+                todos.add(getArtefatoBlank());
+                //é um combo com os artefatos que o personagem carrega
+                PersonagemFacade personagemFacade = new PersonagemFacade();
+                Collection artefatosPersonagem = personagemFacade.getArtefatos(personagem);
+                todos.addAll(artefatosPersonagem);
+                break;
             }
-        } else if (tipo == 5) {
-            //é um combo com os artefatos de Summon que o personagem carrega
-            PersonagemFacade personagemFacade = new PersonagemFacade();
-            for (Artefato artefato : personagemFacade.getArtefatos(personagem)) {
-                if (artefato.isSummon()) {
-                    todos.add(artefato);
-                }
+            case 2: {
+                //adiciona um blank
+                todos.add(getArtefatoBlank());
+                //é um combo com os artefatos que a nacao possui
+                //lista os artefatos da nacao
+                //nao basta percorrer os personagens, pois podem haver artefatos caidos.
+                //TODO: colocar uma lsita de artefatos na nacao?
+                PersonagemFacade personagemFacade = new PersonagemFacade();
+                Collection<Artefato> artefatosNacao = artefatoFacade.getArtefatos(listFactory.listArtefatos(), personagemFacade.getNacao(personagem));
+                todos.addAll(artefatosNacao);
+                break;
             }
-        } else if (tipo == 6) {
-            //é um combo com os artefatos de DragonEgg que o personagem carrega
-            PersonagemFacade personagemFacade = new PersonagemFacade();
-            for (Artefato artefato : personagemFacade.getArtefatos(personagem)) {
-                if (artefato.isDragonEgg()) {
-                    todos.add(artefato);
-                }
+            case 3: {
+                todos.add(getArtefatoBlank());
+                todos.addAll(listFactory.listArtefatos());
+                //remove os artefatos da nacao
+                PersonagemFacade personagemFacade = new PersonagemFacade();
+                Collection<Artefato> artefatosNacao = artefatoFacade.getArtefatos(listFactory.listArtefatos(), personagemFacade.getNacao(personagem));
+                todos.removeAll(artefatosNacao);
+                break;
             }
+            case 4: {
+                //é um combo com os artefatos de Scry que o personagem carrega
+                PersonagemFacade personagemFacade = new PersonagemFacade();
+                for (Artefato artefato : personagemFacade.getArtefatos(personagem)) {
+                    if (artefato.isExploracao()) {
+                        todos.add(artefato);
+                    }
+                }
+                break;
+            }
+            case 5: {
+                //é um combo com os artefatos de Summon que o personagem carrega
+                PersonagemFacade personagemFacade = new PersonagemFacade();
+                for (Artefato artefato : personagemFacade.getArtefatos(personagem)) {
+                    if (artefato.isSummon()) {
+                        todos.add(artefato);
+                    }
+                }
+                break;
+            }
+            case 6: {
+                //é um combo com os artefatos de DragonEgg que o personagem carrega
+                PersonagemFacade personagemFacade = new PersonagemFacade();
+                for (Artefato artefato : personagemFacade.getArtefatos(personagem)) {
+                    if (artefato.isDragonEgg()) {
+                        todos.add(artefato);
+                    }
+                }
+                break;
+            }
+            default:
+                break;
         }
         //cria a combo e retorna a lista
         GenericoComboBoxModel model = new GenericoComboBoxModel((Artefato[]) todos.toArray(new Artefato[0]));
