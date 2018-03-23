@@ -33,10 +33,10 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <Component id="infoPanel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="splitMainPanel" pref="666" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="statusBar" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="statusBar" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -56,9 +56,9 @@
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <Component id="labelTurno" min="-2" pref="72" max="-2" attributes="0"/>
+                          <Component id="labelTurno" pref="74" max="32767" attributes="0"/>
                           <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-                          <Component id="labelDeadline" max="32767" attributes="0"/>
+                          <Component id="labelDeadline" pref="55" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <Component id="labelNacao" max="32767" attributes="2"/>
@@ -67,13 +67,13 @@
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="labelJogo" pref="406" max="32767" attributes="2"/>
-                      <Component id="labelCenario" alignment="0" pref="406" max="32767" attributes="2"/>
+                      <Component id="labelJogo" pref="411" max="32767" attributes="2"/>
+                      <Component id="labelCenario" alignment="0" pref="411" max="32767" attributes="2"/>
                   </Group>
                   <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="labelMoney" pref="438" max="32767" attributes="2"/>
-                      <Component id="labelJogador" alignment="1" pref="438" max="32767" attributes="2"/>
+                      <Component id="labelMoney" pref="443" max="32767" attributes="2"/>
+                      <Component id="labelJogador" alignment="1" pref="443" max="32767" attributes="2"/>
                   </Group>
               </Group>
               <Component id="jToolBar1" alignment="0" pref="1166" max="32767" attributes="0"/>
@@ -82,23 +82,23 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="jToolBar1" min="-2" pref="25" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jToolBar1" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="labelJogo" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="labelNacao" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="labelJogo" alignment="3" max="32767" attributes="0"/>
+                          <Component id="labelNacao" alignment="3" max="32767" attributes="0"/>
                       </Group>
-                      <Component id="labelJogador" min="-2" max="-2" attributes="0"/>
+                      <Component id="labelJogador" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="labelCenario" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="labelMoney" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="labelTurno" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="labelDeadline" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="labelCenario" alignment="3" max="32767" attributes="0"/>
+                      <Component id="labelMoney" alignment="3" max="32767" attributes="0"/>
+                      <Component id="labelTurno" alignment="3" max="32767" attributes="0"/>
+                      <Component id="labelDeadline" alignment="3" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -184,9 +184,7 @@
                 </Property>
                 <Property name="actionCommand" type="java.lang.String" value="jbOpen"/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="horizontalTextPosition" type="int" value="4"/>
                 <Property name="name" type="java.lang.String" value="jbOpen" noResource="true"/>
-                <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="jbLoad">
@@ -203,9 +201,7 @@
                 <Property name="actionCommand" type="java.lang.String" value="jbLoad"/>
                 <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="horizontalTextPosition" type="int" value="4"/>
                 <Property name="name" type="java.lang.String" value="jbLoad" noResource="true"/>
-                <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="jbSave">
@@ -222,9 +218,7 @@
                 <Property name="actionCommand" type="java.lang.String" value="jbSave"/>
                 <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="horizontalTextPosition" type="int" value="4"/>
                 <Property name="name" type="java.lang.String" value="jbSave" noResource="true"/>
-                <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="jbSend">
@@ -241,9 +235,7 @@
                 <Property name="actionCommand" type="java.lang.String" value="jbSend"/>
                 <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="horizontalTextPosition" type="int" value="4"/>
                 <Property name="name" type="java.lang.String" value="jbSend" noResource="true"/>
-                <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
             </Component>
             <Component class="javax.swing.Box$Filler" name="filler2">
@@ -270,9 +262,7 @@
                 <Property name="actionCommand" type="java.lang.String" value="jbSaveWorld"/>
                 <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="horizontalTextPosition" type="int" value="4"/>
                 <Property name="name" type="java.lang.String" value="jbSaveWorld" noResource="true"/>
-                <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="jbCopy">
@@ -289,9 +279,7 @@
                 <Property name="actionCommand" type="java.lang.String" value="jbCopy"/>
                 <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="horizontalTextPosition" type="int" value="4"/>
                 <Property name="name" type="java.lang.String" value="jbCopy" noResource="true"/>
-                <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="jbMap">
@@ -308,9 +296,7 @@
                 <Property name="actionCommand" type="java.lang.String" value="jbExportMap"/>
                 <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="horizontalTextPosition" type="int" value="4"/>
                 <Property name="name" type="java.lang.String" value="jbExportMap" noResource="true"/>
-                <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
             </Component>
             <Component class="javax.swing.Box$Filler" name="filler1">
@@ -352,9 +338,7 @@
                 </Property>
                 <Property name="actionCommand" type="java.lang.String" value="jbConfig"/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="horizontalTextPosition" type="int" value="4"/>
                 <Property name="name" type="java.lang.String" value="jbConfig" noResource="true"/>
-                <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="jbAbout">
@@ -370,9 +354,7 @@
                 </Property>
                 <Property name="actionCommand" type="java.lang.String" value="jbAbout"/>
                 <Property name="focusable" type="boolean" value="false"/>
-                <Property name="horizontalTextPosition" type="int" value="4"/>
                 <Property name="name" type="java.lang.String" value="jbAbout" noResource="true"/>
-                <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -431,7 +413,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="statusLabel" min="-2" max="-2" attributes="0"/>
+              <Component id="statusLabel" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>

@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+<Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
     <Component class="javax.swing.ButtonGroup" name="filtroButtonGroup">
     </Component>
     <Component class="javax.swing.ButtonGroup" name="ordersSortButtonGroup">
     </Component>
   </NonVisualComponents>
-  <SyntheticProperties>
-    <SyntheticProperty name="formSizePolicy" type="int" value="2"/>
-  </SyntheticProperties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -26,20 +23,14 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="displayPanel" min="-2" pref="513" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="mapPanel" min="-2" max="-2" attributes="0"/>
-                  <Component id="playerPanel" min="-2" max="-2" attributes="0"/>
+                  <Component id="gamePanel" pref="523" max="32767" attributes="0"/>
+                  <Component id="displayPanel" pref="523" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
-          </Group>
-          <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="gamePanel" min="-2" pref="511" max="-2" attributes="0"/>
-                  <EmptySpace pref="541" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="playerPanel" pref="533" max="32767" attributes="0"/>
+                  <Component id="mapPanel" pref="533" max="32767" attributes="0"/>
               </Group>
           </Group>
       </Group>
@@ -47,19 +38,14 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="playerPanel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="displayPanel" pref="325" max="32767" attributes="0"/>
-                  <Component id="mapPanel" pref="325" max="32767" attributes="0"/>
+                  <Component id="playerPanel" pref="362" max="32767" attributes="0"/>
+                  <Component id="gamePanel" pref="362" max="32767" attributes="0"/>
               </Group>
-          </Group>
-          <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="gamePanel" min="-2" pref="353" max="-2" attributes="0"/>
-                  <EmptySpace pref="341" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="displayPanel" pref="337" max="32767" attributes="0"/>
+                  <Component id="mapPanel" pref="337" max="32767" attributes="0"/>
               </Group>
           </Group>
       </Group>
@@ -136,7 +122,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="55" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -206,7 +192,7 @@
                       <Component id="overEliminCheckBox2" min="-2" max="-2" attributes="0"/>
                       <Component id="autoSaveOrdersCheck" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="0" pref="96" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -444,7 +430,7 @@
                               <Component id="serverPassLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="serverUserLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="serverPortLabel" alignment="0" min="-2" pref="119" max="-2" attributes="0"/>
-                              <Component id="serverSmtpLabel" pref="137" max="32767" attributes="0"/>
+                              <Component id="serverSmtpLabel" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -457,7 +443,7 @@
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace pref="76" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -682,7 +668,7 @@
                       </Group>
                       <Group type="102" attributes="0">
                           <Component id="displayPortraitCheckBox" min="-2" pref="254" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="237" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="portraitsFolderLabel" min="-2" max="-2" attributes="0"/>
@@ -690,7 +676,7 @@
                           <Component id="portraitsFolderTextField" min="-2" pref="213" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="portraitsFolderButton" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="29" max="32767" attributes="0"/>
                           <Component id="downloadPortraitsButton" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -749,7 +735,7 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="displayPortraitCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="49" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -1012,7 +998,7 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="hexTagFrameCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
@@ -1022,9 +1008,12 @@
                               <Component id="mapTilesLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="pcPathLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="pcPathComboBox" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="pcPathComboBox" max="32767" attributes="0"/>
+                                  <EmptySpace min="9" pref="9" max="-2" attributes="0"/>
+                              </Group>
                               <Component id="armyPathComboBox" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
                                   <Component id="hexTagStyleComboBox" alignment="0" max="32767" attributes="0"/>
@@ -1033,36 +1022,36 @@
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace pref="204" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="237" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="mapTilesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="mapTilesComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="hexTagStyleLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="hexTagStyleComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                   <Component id="hexTagFrameCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="armyPathLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="armyPathComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="pcPathLabel" min="-2" max="-2" attributes="0"/>
-                      <Component id="pcPathComboBox" min="-2" max="-2" attributes="0"/>
+                      <Component id="pcPathComboBox" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="164" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
