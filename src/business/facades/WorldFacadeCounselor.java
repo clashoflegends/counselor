@@ -174,6 +174,10 @@ public class WorldFacadeCounselor implements Serializable {
     public SortedMap<String, BaseModel> getActorsAll() {
         SortedMap<String, BaseModel> ret = new TreeMap<String, BaseModel>();
         for (BaseModel actor : WorldFacadeCounselor.getInstance().getActors()) {
+            if (actor.getCodigo() == null) {
+                //FIXME: Why cod would be null? Happening in game 88.
+                continue;
+            }
             ret.put(actor.getCodigo(), actor);
         }
 //        ret.putAll(WorldManager.getInstance().getNacoes());
