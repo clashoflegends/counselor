@@ -9,6 +9,7 @@ import business.ImageManager;
 import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
 import control.WorldControler;
+import gui.services.ComponentFactory;
 import gui.tabs.TabPersonagensGui;
 import java.awt.Color;
 import java.awt.Container;
@@ -16,8 +17,10 @@ import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.Serializable;
+import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,12 +38,14 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final WorldControler wc = new WorldControler(this);
     private TabPersonagensGui tabPersonagem;
+    private JLabel labelStatusBar;
 
     /**
      * Creates new form MainResultWindowGui
      */
     public MainResultWindowGui(String autoLoad) {
         initComponents();
+        doConfigStatusBar();
         //load teaser
         doLoadTeaser();
         //adiciona listeners
@@ -91,6 +96,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jlRight = new javax.swing.JLabel();
         statusBar = new javax.swing.JPanel();
         statusLabel = new javax.swing.JLabel();
+        jlActionCount = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(1024, 768));
 
@@ -272,15 +278,22 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         statusLabel.setText(labels.getString("STATUS.MESSAGES")); // NOI18N
 
+        jlActionCount.setText("jLabel1");
+
         javax.swing.GroupLayout statusBarLayout = new javax.swing.GroupLayout(statusBar);
         statusBar.setLayout(statusBarLayout);
         statusBarLayout.setHorizontalGroup(
             statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 1154, Short.MAX_VALUE)
+            .addGroup(statusBarLayout.createSequentialGroup()
+                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 946, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jlActionCount, javax.swing.GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE))
         );
         statusBarLayout.setVerticalGroup(
             statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jlActionCount, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -318,6 +331,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JButton jbSave;
     private javax.swing.JButton jbSaveWorld;
     private javax.swing.JButton jbSend;
+    private javax.swing.JLabel jlActionCount;
     private javax.swing.JLabel jlLeft;
     private javax.swing.JLabel jlRight;
     private javax.swing.JLabel labelCenario;
@@ -442,7 +456,11 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     }
 
     public void setStatusMsg(String txt) {
-        statusLabel.setText(txt);
+        labelStatusBar.setText(txt);
+    }
+
+    public void setActionsCount(String txt) {
+        jlActionCount.setText(txt);
     }
 
     public void setLabelMoney(String txt) {
@@ -463,4 +481,12 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         this.jlRight.setIcon(teaser);
     }
 
+    private void doConfigStatusBar() {
+        labelStatusBar = statusLabel;
+        final ComponentFactory cf = new ComponentFactory();
+        labelStatusBar = cf.getLabelGradient();
+        //replace component in UI
+        GroupLayout parLayout = (GroupLayout) statusBar.getLayout();
+        parLayout.replace(statusLabel, labelStatusBar);
+    }
 }

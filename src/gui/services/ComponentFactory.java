@@ -17,7 +17,15 @@ import gui.subtabs.SubTabDirecao;
 import gui.subtabs.SubTabDirecaoExercito;
 import gui.subtabs.SubTabRelacionamento;
 import gui.subtabs.SubTabTropas;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.LinearGradientPaint;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.List;
 import javax.swing.JComboBox;
@@ -781,5 +789,70 @@ public class ComponentFactory implements Serializable {
         hexViewDialog.pack();
         hexViewDialog.setVisible(true);
         return hexViewDialog;
+    }
+
+    public JLabel getLabelGradient() {
+
+        JLabel testLabel = new JLabel(labels.getString("STATUS.MESSAGES")) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Color colorFinal = Color.RED;
+                Color colorStart = Color.BLUE;
+
+//                Point2D start = new Point2D.Float(0, 0);
+//                Point2D end = new Point2D.Float(50, 50);
+//                float[] dist = {0.0f, 0.2f, 1.0f};
+//                Color[] colors = {Color.RED, Color.WHITE, Color.BLUE};
+//                LinearGradientPaint p = new LinearGradientPaint(start, end, dist, colors);
+                LinearGradientPaint linearGradientPaintOriginal = new LinearGradientPaint(
+                        new Point(0, 25), new Point(0, getHeight()),
+                        new float[]{0.240f, 0.250f}, new Color[]{
+                            getBackground(), Color.RED});
+
+                Point2D start = new Point2D.Float(0, 25);
+                Point2D end = new Point2D.Float(0, getHeight());
+                float[] dist = {0.0f, 0.2f, 1.0f};
+                Color[] colors = {Color.RED, Color.YELLOW, Color.BLUE};
+                LinearGradientPaint linearGradientPaint = new LinearGradientPaint(start, end, dist, colors);
+
+                Graphics2D graphics2d = (Graphics2D) g.create();
+                graphics2d.setPaint(linearGradientPaintOriginal);
+                graphics2d.fill(new Rectangle(0, 0, getWidth(), getHeight()));
+                graphics2d.dispose();
+
+                super.paintComponent(g);
+            }
+        };
+        JLabel labelGradient2 = new JLabel(labels.getString("STATUS.MESSAGES")) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Color colorFinal = new Color(255, 1, 1);
+
+                Graphics2D graphics2d = (Graphics2D) g.create();
+                LinearGradientPaint lpg = new LinearGradientPaint(0, 0, 0, getHeight() / 2,
+                        new float[]{0f, 0.3f, 1f},
+                        new Color[]{new Color(0.8f, 0.8f, 1f), new Color(0.7f, 0.7f, 1f), new Color(0.6f, 0.6f, 1f)});
+                graphics2d.setPaint(lpg);
+                graphics2d.fillRect(getWidth() / 2, 0, getWidth(), getHeight());
+                graphics2d.dispose();
+
+                super.paintComponent(g);
+            }
+        };
+        JLabel labelGradientBar = new JLabel(labels.getString("STATUS.MESSAGES")) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Color colorFinal = Color.RED;
+                Color colorStart = getBackground();
+                Graphics2D graphics2d = (Graphics2D) g.create();
+                graphics2d.setPaint(new GradientPaint(0, 0, colorStart, getWidth(), 0, colorFinal));
+                graphics2d.fillRect(getWidth() / 3, getHeight() * 3 / 4, getWidth(), getHeight());
+                graphics2d.dispose();
+
+                super.paintComponent(g);
+            }
+        };
+        return labelGradientBar;
+//        return labelGradient2;
     }
 }

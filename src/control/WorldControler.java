@@ -78,8 +78,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final JFileChooser fc = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
     private boolean saved = false;
-    private boolean msgSubmitReady = false;
     private boolean savedWorld = false;
+    private boolean msgSubmitReady = false;
+    private int actionsSlots = 0;
     private MainResultWindowGui gui = null;
     private final AcaoFacade acaoFacade = new AcaoFacade();
     private final OrdemFacade ordemFacade = new OrdemFacade();
@@ -90,7 +91,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private static final WorldFacadeCounselor WFC = WorldFacadeCounselor.getInstance();
 
     public WorldControler(MainResultWindowGui aGui) {
-        this.gui = aGui;
+        setGui(aGui);
         registerDispatchManager();
         registerDispatchManagerForMsg(DispatchManager.SET_LABEL_MONEY);
         registerDispatchManagerForMsg(DispatchManager.SAVE_WORLDBUILDER_FILE);
@@ -299,7 +300,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
         MainSettingsGui settingPanel = new MainSettingsGui();
 
-        int option = JOptionPane.showOptionDialog(this.gui, settingPanel, labels.getString("MENU.CONFIG"),
+        int option = JOptionPane.showOptionDialog(getGui(), settingPanel, labels.getString("MENU.CONFIG"),
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
                 new javax.swing.ImageIcon(getClass().getResource("/images/icon_customize.gif")), null, null);
 
@@ -729,6 +730,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             List<String> errorMsgs = new ArrayList<String>();
             int qtOrdensCarregadas = this.setOrdens(comando, errorMsgs);
             this.getGui().setStatusMsg(String.format("%d %s %s", qtOrdensCarregadas, labels.getString("ORDENS.CARREGADAS"), file.getName()));
+            this.setActionsSlots(doCountActorActions(partida.getJogadorAtivo()));
             if (!errorMsgs.isEmpty()) {
                 String msg = "";
                 for (String line : errorMsgs) {
@@ -907,7 +909,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private String doSaveActorActions(Jogador jogadorAtivo, Comando comando) {
-        //lista todos os personagens, carregando para o xml
+        //lista todos os actors, carregando para o xml
         final int nationPackagesLimit = WFC.getNationPackagesLimit();
         String ret = "";
         for (BaseModel actor : WFC.getActors()) {
@@ -915,7 +917,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 continue;
             }
             if (actor.getAcaoSize() > 0) {
-                for (int index = 0; index < actor.getOrdensQt(); index++) {
+                for (int index = 0; index < ordemFacade.getOrdemMax(actor); index++) {
                     if (ordemFacade.getOrdem(actor, index) != null) {
                         comando.addComando(actor, ordemFacade.getOrdem(actor, index),
                                 ordemFacade.getParametrosId(actor, index),
@@ -932,6 +934,21 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             } else if (cenarioFacade.hasOrdens(WFC.getPartida(), actor)) {
                 ret = String.format(labels.getString("MISSING.ORDERS"), actor.getNome());
             }
+        }
+        return ret;
+    }
+
+    private int doCountActorActions(Jogador jogadorAtivo) {
+        //lista todos os actors, count actions
+        Partida partida = WFC.getPartida();
+        int ret = 0;
+        for (BaseModel actor : WFC.getActors()) {
+            if (!ordemFacade.isAtivo(jogadorAtivo, actor)) {
+                continue;
+            }
+            //count actions
+            ret += ordemFacade.getOrdemMax(actor, partida);
+            log.info(String.format("Actor: %s [%s] %s", actor.getNome(), ordemFacade.getOrdemMax(actor), actor.toString()));
         }
         return ret;
     }
@@ -1092,4 +1109,18 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return SettingsManager.getInstance().isConfig("LoadActionsBehavior", "append", "0") && SettingsManager.getInstance().isConfig("LoadActionsOtherNations", "allow", "0");
     }
 
+    /**
+     * @return the actionsSlots
+     */
+    private int getActionsSlots() {
+        return actionsSlots;
+    }
+
+    /**
+     * @param slots the actionsSlots to set
+     */
+    private void setActionsSlots(int slots) {
+        this.actionsSlots = slots;
+        getGui().setActionsCount(String.format("%s / %s ", 0, slots));
+    }
 }
