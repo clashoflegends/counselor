@@ -12,6 +12,7 @@ import control.OrdemControler;
 import control.support.ActorInterface;
 import gui.accessories.DialogHexView;
 import gui.components.DialogTextArea;
+import gui.components.JLabelGradient;
 import gui.subtabs.SubTabCoordenadas;
 import gui.subtabs.SubTabDirecao;
 import gui.subtabs.SubTabDirecaoExercito;
@@ -19,7 +20,6 @@ import gui.subtabs.SubTabRelacionamento;
 import gui.subtabs.SubTabTropas;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
@@ -839,20 +839,7 @@ public class ComponentFactory implements Serializable {
                 super.paintComponent(g);
             }
         };
-        JLabel labelGradientBar = new JLabel(labels.getString("STATUS.MESSAGES")) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Color colorFinal = Color.RED;
-                Color colorStart = getBackground();
-                Graphics2D graphics2d = (Graphics2D) g.create();
-                graphics2d.setPaint(new GradientPaint(0, 0, colorStart, getWidth(), 0, colorFinal));
-                graphics2d.fillRect(getWidth() / 3, getHeight() * 3 / 4, getWidth(), getHeight());
-                graphics2d.dispose();
-
-                super.paintComponent(g);
-            }
-        };
-        return labelGradientBar;
+        return new JLabelGradient(labels.getString("STATUS.MESSAGES"));
 //        return labelGradient2;
     }
 }

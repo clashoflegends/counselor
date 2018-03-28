@@ -459,10 +459,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         labelStatusBar.setText(txt);
     }
 
-    public void setActionsCount(String txt) {
-        jlActionCount.setText(txt);
-    }
-
     public void setLabelMoney(String txt) {
         if (SysApoio.parseInt(txt) > 0) {
             this.labelMoney.setForeground(Color.black);
@@ -479,6 +475,10 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         this.splitMainPanel.setPreferredSize(tamanho);
         this.jlRight.setSize(tamanho);
         this.jlRight.setIcon(teaser);
+    }
+
+    public void setActionsCount(String txt) {
+        jlActionCount.setText(txt);
     }
 
     private void doConfigStatusBar() {

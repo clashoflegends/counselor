@@ -81,6 +81,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private boolean savedWorld = false;
     private boolean msgSubmitReady = false;
     private int actionsSlots = 0;
+    private int actionsCount = 0;
     private MainResultWindowGui gui = null;
     private final AcaoFacade acaoFacade = new AcaoFacade();
     private final OrdemFacade ordemFacade = new OrdemFacade();
@@ -96,6 +97,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         registerDispatchManagerForMsg(DispatchManager.SET_LABEL_MONEY);
         registerDispatchManagerForMsg(DispatchManager.SAVE_WORLDBUILDER_FILE);
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_AUTOSAVE);
+        registerDispatchManagerForMsg(DispatchManager.ACTIONS_COUNT);
     }
 
     @Override
@@ -740,6 +742,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                         errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(), msg), this.getGui());
             }
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+            getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_COUNT);
         } catch (IllegalStateException ex) {
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
@@ -802,7 +805,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     getDispatchManager().sendDispatchForChar(nation, null, po);
                     ordemFacade.setOrdem(actor, indexOrdem, po);
                     //atualiza GUI
-//                    this.getGui().getTabPersonagem().setValueFor(ordemDisplay, personagem.getNome(), indexOrdem);
                     ret++;
                 } catch (NullPointerException ex) {
                     errorMsgs.add(comandoDetail.getOrdemDisplay());
@@ -837,7 +839,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     /**
      * @param gui the gui to set
      */
-    public void setGui(MainResultWindowGui gui) {
+    public final void setGui(MainResultWindowGui gui) {
         this.gui = gui;
     }
 
@@ -857,6 +859,17 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                             before.getNome(),
                             before.getOrdem().getDescricao(),
                             acaoFacade.getCusto(before)));
+        }
+    }
+
+    @Override
+    public void receiveDispatch(int msgName) {
+        switch (msgName) {
+            case DispatchManager.ACTIONS_COUNT:
+                doCountActions();
+                break;
+            default:
+                break;
         }
     }
 
@@ -948,7 +961,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             }
             //count actions
             ret += ordemFacade.getOrdemMax(actor, partida);
-            log.info(String.format("Actor: %s [%s] %s", actor.getNome(), ordemFacade.getOrdemMax(actor), actor.toString()));
         }
         return ret;
     }
@@ -1121,6 +1133,19 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      */
     private void setActionsSlots(int slots) {
         this.actionsSlots = slots;
-        getGui().setActionsCount(String.format("%s / %s ", 0, slots));
+        doUpdateGuiActionCount();
+    }
+
+    private void doCountActions() {
+        int ret = 0;
+        for (BaseModel actor : WFC.getActors()) {
+            ret += actor.getAcaoSize();
+        }
+        this.actionsCount = ret;
+        doUpdateGuiActionCount();
+    }
+
+    private void doUpdateGuiActionCount() {
+        getGui().setActionsCount(String.format("%s / %s ", this.actionsCount, this.actionsSlots));
     }
 }
