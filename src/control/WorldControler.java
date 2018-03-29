@@ -1135,7 +1135,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      */
     private void setActionsSlots(int slots) {
         this.actionsSlots = slots;
-        doUpdateGuiActionCount();
+        doCountActions();//and refresh the UI
     }
 
     private void doCountActions() {
@@ -1144,7 +1144,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             if (!ordemFacade.isAtivo(WFC.getJogadorAtivo(), actor)) {
                 continue;
             }
-            ret += actor.getAcaoSize();
+            ret += ordemFacade.getActionCount(actor);
         }
         this.actionsCount = ret;
         doUpdateGuiActionCount();
@@ -1153,6 +1153,5 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private void doUpdateGuiActionCount() {
         getGui().setActionsCount(this.actionsCount, this.actionsSlots);
         //TODO: update nations count. Test GOT. Test WDO
-        //TODO: Test GOT with packages on turn 1. check the action count /15 or /30.
     }
 }
