@@ -22,11 +22,8 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="infoPanel" alignment="0" max="32767" attributes="0"/>
-          <Group type="102" alignment="0" attributes="0">
-              <Component id="statusBar" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-          </Group>
           <Component id="splitMainPanel" alignment="0" pref="1166" max="32767" attributes="0"/>
+          <Component id="statusBar" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -409,9 +406,9 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="statusLabel" pref="946" max="32767" attributes="0"/>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="jlActionCount" pref="62" max="32767" attributes="0"/>
+                  <Component id="statusLabel" pref="952" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jlActionCountPlaceholder" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -419,7 +416,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="statusLabel" alignment="3" max="32767" attributes="0"/>
-                  <Component id="jlActionCount" alignment="3" max="32767" attributes="0"/>
+                  <Component id="jlActionCountPlaceholder" alignment="3" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -433,9 +430,14 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="jlActionCount">
+        <Component class="javax.swing.JLabel" name="jlActionCountPlaceholder">
           <Properties>
-            <Property name="text" type="java.lang.String" value="jLabel1"/>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="cc" red="cc" type="rgb"/>
+            </Property>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="String.format(&quot;%s: 0 / 0 &quot;, labels.getString(&quot;ACOES&quot;))" type="code"/>
+            </Property>
           </Properties>
         </Component>
       </SubComponents>

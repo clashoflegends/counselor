@@ -421,6 +421,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 final File resultsFile = fc.getSelectedFile();
                 log.info(labels.getString("OPENING: ") + resultsFile.getName());
                 WFC.doStart(resultsFile);
+                this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
                 log.info(labels.getString("INICIALIZANDO.GUI"));
                 getGui().iniciaConfig();
                 this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
@@ -471,6 +472,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.getGui().setStatusMsg(labels.getString("AUTOLOADING.OPENING") + autoLoad);
             final File resultsFile = new File(autoLoad);
             WFC.doStart(resultsFile);
+            this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
             getGui().iniciaConfig();
             String autoLoadActions = SettingsManager.getInstance().getConfig("autoLoadActions", "none");
             if (!autoLoadActions.equals("none") && !autoLoadActions.isEmpty()) {
@@ -732,7 +734,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             List<String> errorMsgs = new ArrayList<String>();
             int qtOrdensCarregadas = this.setOrdens(comando, errorMsgs);
             this.getGui().setStatusMsg(String.format("%d %s %s", qtOrdensCarregadas, labels.getString("ORDENS.CARREGADAS"), file.getName()));
-            this.setActionsSlots(doCountActorActions(partida.getJogadorAtivo()));
+            doCountActions();
             if (!errorMsgs.isEmpty()) {
                 String msg = "";
                 for (String line : errorMsgs) {
@@ -1139,6 +1141,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private void doCountActions() {
         int ret = 0;
         for (BaseModel actor : WFC.getActors()) {
+            if (!ordemFacade.isAtivo(WFC.getJogadorAtivo(), actor)) {
+                continue;
+            }
             ret += actor.getAcaoSize();
         }
         this.actionsCount = ret;
@@ -1146,6 +1151,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private void doUpdateGuiActionCount() {
-        getGui().setActionsCount(String.format("%s / %s ", this.actionsCount, this.actionsSlots));
+        getGui().setActionsCount(this.actionsCount, this.actionsSlots);
+        //TODO: update nations count. Test GOT. Test WDO
+        //TODO: Test GOT with packages on turn 1. check the action count /15 or /30.
+        continuaTestes();
     }
 }

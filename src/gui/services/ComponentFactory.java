@@ -791,7 +791,7 @@ public class ComponentFactory implements Serializable {
         return hexViewDialog;
     }
 
-    public JLabel getLabelGradient() {
+    public JLabelGradient getLabelGradient() {
 
         JLabel testLabel = new JLabel(labels.getString("STATUS.MESSAGES")) {
             @Override
@@ -839,7 +839,7 @@ public class ComponentFactory implements Serializable {
                 super.paintComponent(g);
             }
         };
-        return new JLabelGradient(labels.getString("STATUS.MESSAGES"));
+        return new JLabelGradient();
 //        return labelGradient2;
     }
 }

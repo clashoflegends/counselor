@@ -9,6 +9,7 @@ import business.ImageManager;
 import business.facades.WorldFacadeCounselor;
 import control.MapaControler;
 import control.WorldControler;
+import gui.components.JLabelGradient;
 import gui.services.ComponentFactory;
 import gui.tabs.TabPersonagensGui;
 import java.awt.Color;
@@ -20,7 +21,6 @@ import java.io.Serializable;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,7 +38,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final WorldControler wc = new WorldControler(this);
     private TabPersonagensGui tabPersonagem;
-    private JLabel labelStatusBar;
+    private JLabelGradient jlActionCounter;
 
     /**
      * Creates new form MainResultWindowGui
@@ -96,7 +96,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jlRight = new javax.swing.JLabel();
         statusBar = new javax.swing.JPanel();
         statusLabel = new javax.swing.JLabel();
-        jlActionCount = new javax.swing.JLabel();
+        jlActionCountPlaceholder = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(1024, 768));
 
@@ -278,22 +278,23 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         statusLabel.setText(labels.getString("STATUS.MESSAGES")); // NOI18N
 
-        jlActionCount.setText("jLabel1");
+        jlActionCountPlaceholder.setBackground(new java.awt.Color(204, 204, 255));
+        jlActionCountPlaceholder.setText(String.format("%s: 0 / 0 ", labels.getString("ACOES")));
 
         javax.swing.GroupLayout statusBarLayout = new javax.swing.GroupLayout(statusBar);
         statusBar.setLayout(statusBarLayout);
         statusBarLayout.setHorizontalGroup(
             statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(statusBarLayout.createSequentialGroup()
-                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 946, Short.MAX_VALUE)
+                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 952, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jlActionCount, javax.swing.GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE))
+                .addComponent(jlActionCountPlaceholder))
         );
         statusBarLayout.setVerticalGroup(
             statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                 .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jlActionCount, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jlActionCountPlaceholder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -301,10 +302,8 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(infoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
             .addComponent(splitMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1166, Short.MAX_VALUE)
+            .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -331,7 +330,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JButton jbSave;
     private javax.swing.JButton jbSaveWorld;
     private javax.swing.JButton jbSend;
-    private javax.swing.JLabel jlActionCount;
+    private javax.swing.JLabel jlActionCountPlaceholder;
     private javax.swing.JLabel jlLeft;
     private javax.swing.JLabel jlRight;
     private javax.swing.JLabel labelCenario;
@@ -456,7 +455,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     }
 
     public void setStatusMsg(String txt) {
-        labelStatusBar.setText(txt);
+        statusLabel.setText(txt);
     }
 
     public void setLabelMoney(String txt) {
@@ -477,16 +476,21 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         this.jlRight.setIcon(teaser);
     }
 
-    public void setActionsCount(String txt) {
-        jlActionCount.setText(txt);
+    public void setActionsCount(float actionCount, float slotCount) {
+        jlActionCounter.setPercent(actionCount, slotCount);
+        jlActionCounter.setText(String.format("%s: %s / %s ", labels.getString("ACOES"), (int) actionCount, (int) slotCount));
     }
 
     private void doConfigStatusBar() {
-        labelStatusBar = statusLabel;
         final ComponentFactory cf = new ComponentFactory();
-        labelStatusBar = cf.getLabelGradient();
+        jlActionCounter = cf.getLabelGradient();
+        jlActionCounter.setBackground(jlActionCountPlaceholder.getBackground());
+        jlActionCounter.setForeground(jlActionCountPlaceholder.getForeground());
+        jlActionCounter.setMinBarSize(SettingsManager.getInstance().getConfigAsInt("LookAndFeelFontSize", "12"));
+        jlActionCounter.setText(String.format("%s: 0 / 0 ", labels.getString("ACOES")));
+        jlActionCounter.setPercent(0, 0);
         //replace component in UI
         GroupLayout parLayout = (GroupLayout) statusBar.getLayout();
-        parLayout.replace(statusLabel, labelStatusBar);
+        parLayout.replace(jlActionCountPlaceholder, jlActionCounter);
     }
 }
