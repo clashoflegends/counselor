@@ -1154,6 +1154,5 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         getGui().setActionsCount(this.actionsCount, this.actionsSlots);
         //TODO: update nations count. Test GOT. Test WDO
         //TODO: Test GOT with packages on turn 1. check the action count /15 or /30.
-        continuaTestes();
     }
 }
