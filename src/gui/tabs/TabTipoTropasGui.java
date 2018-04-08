@@ -18,9 +18,9 @@ import javax.swing.table.TableModel;
 import model.TipoTropa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
-import persistence.local.WorldManager;
 
 /**
  *
@@ -49,12 +49,13 @@ public class TabTipoTropasGui extends TabBase {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         comboFiltro = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         qtTropas = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
         jTabbedPane1 = new javax.swing.JTabbedPane();
@@ -87,7 +88,7 @@ public class TabTipoTropasGui extends TabBase {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(qtTropas)
@@ -104,6 +105,13 @@ public class TabTipoTropasGui extends TabBase {
                     .addComponent(qtTropas))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        jSplitPane1.setBorder(null);
+        jSplitPane1.setDividerLocation(200);
+        jSplitPane1.setDividerSize(3);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setResizeWeight(0.5);
+        jSplitPane1.setAutoscrolls(true);
 
         jScrollPane3.setBorder(null);
 
@@ -136,6 +144,8 @@ public class TabTipoTropasGui extends TabBase {
         });
         jtMainLista.setName(""); // NOI18N
         jScrollPane3.setViewportView(jtMainLista);
+
+        jSplitPane1.setLeftComponent(jScrollPane3);
 
         jsHabilidade.setBorder(null);
 
@@ -229,11 +239,11 @@ public class TabTipoTropasGui extends TabBase {
         jReplace.setLayout(jReplaceLayout);
         jReplaceLayout.setHorizontalGroup(
             jReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 230, Short.MAX_VALUE)
+            .addGap(0, 451, Short.MAX_VALUE)
         );
         jReplaceLayout.setVerticalGroup(
             jReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 173, Short.MAX_VALUE)
+            .addGap(0, 341, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -251,35 +261,33 @@ public class TabTipoTropasGui extends TabBase {
 
         jTabbedPane1.addTab(labels.getString("TROOP.ABILITY.TITLE"), new javax.swing.ImageIcon(getClass().getResource("/images/book.gif")), jsTroopHab, labels.getString("TROOP.ABILITY.HINT")); // NOI18N
 
+        jSplitPane1.setRightComponent(jTabbedPane1);
+        jTabbedPane1.getAccessibleContext().setAccessibleName("");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
         );
-
-        jTabbedPane1.getAccessibleContext().setAccessibleName("");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -291,6 +299,7 @@ public class TabTipoTropasGui extends TabBase {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jReplace;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JScrollPane jsAtaque;
     private javax.swing.JScrollPane jsDefesa;

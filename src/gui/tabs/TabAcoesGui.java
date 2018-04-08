@@ -50,12 +50,13 @@ public final class TabAcoesGui extends TabBase {
 
         jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jtMainLista = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
         comboFiltro = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         qtAcoes = new javax.swing.JLabel();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jtMainLista = new javax.swing.JTable();
         jpResult = new javax.swing.JPanel();
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -68,6 +69,21 @@ public final class TabAcoesGui extends TabBase {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 100, Short.MAX_VALUE)
         );
+
+        jLabel3.setText(labels.getString("LISTAR:")); // NOI18N
+
+        comboFiltro.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Todos" }));
+
+        jLabel2.setText(labels.getString("TOTAL:")); // NOI18N
+
+        qtAcoes.setText(labels.getString("QTD")); // NOI18N
+
+        jSplitPane1.setBorder(null);
+        jSplitPane1.setDividerLocation(200);
+        jSplitPane1.setDividerSize(3);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setResizeWeight(0.5);
+        jSplitPane1.setAutoscrolls(true);
 
         jScrollPane3.setBorder(null);
 
@@ -103,13 +119,7 @@ public final class TabAcoesGui extends TabBase {
         });
         jScrollPane3.setViewportView(jtMainLista);
 
-        jLabel3.setText(labels.getString("LISTAR:")); // NOI18N
-
-        comboFiltro.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Todos" }));
-
-        jLabel2.setText(labels.getString("TOTAL:")); // NOI18N
-
-        qtAcoes.setText(labels.getString("QTD")); // NOI18N
+        jSplitPane1.setLeftComponent(jScrollPane3);
 
         javax.swing.GroupLayout jpResultLayout = new javax.swing.GroupLayout(jpResult);
         jpResult.setLayout(jpResultLayout);
@@ -119,8 +129,10 @@ public final class TabAcoesGui extends TabBase {
         );
         jpResultLayout.setVerticalGroup(
             jpResultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 120, Short.MAX_VALUE)
+            .addGap(0, 209, Short.MAX_VALUE)
         );
+
+        jSplitPane1.setBottomComponent(jpResult);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -132,8 +144,7 @@ public final class TabAcoesGui extends TabBase {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(qtAcoes)
                 .addContainerGap())
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
-            .addComponent(jpResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
@@ -149,10 +160,8 @@ public final class TabAcoesGui extends TabBase {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(qtAcoes)
                     .addComponent(jLabel2))
-                .addGap(14, 14, 14)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jpResult, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
@@ -180,6 +189,7 @@ public final class TabAcoesGui extends TabBase {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JPanel jpResult;
     private javax.swing.JTable jtMainLista;
     private javax.swing.JLabel qtAcoes;
@@ -223,7 +233,8 @@ public final class TabAcoesGui extends TabBase {
         acaoControl = new AcaoControler(this);
         TableModel model = acaoControl.getMainTableModel((String) comboFiltro.getSelectedItem());
         this.setMainModel(model);
-        stResults.replace(jpResult);
+        jSplitPane1.setBottomComponent(stResults);
+        //stResults.replace(jpResult);
 
         //adiciona listeners
         comboFiltro.setModel(acaoControl.getTipoPersonagemComboModel());

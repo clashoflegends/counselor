@@ -73,46 +73,15 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jtMainLista = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         comboFiltro = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         qtNacoes = new javax.swing.JLabel();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jtMainLista = new javax.swing.JTable();
         detalhesNacao = new javax.swing.JTabbedPane();
-
-        jScrollPane3.setBorder(null);
-
-        jtMainLista.setAutoCreateRowSorter(true);
-        jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
-            },
-            new String [] {
-                "Nome", "Tamanho", "Nação", "Local", "Title 5"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, true
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jtMainLista.setName(""); // NOI18N
-        jScrollPane3.setViewportView(jtMainLista);
 
         jLabel2.setText(labels.getString("TOTAL:")); // NOI18N
 
@@ -149,22 +118,61 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jSplitPane1.setBorder(null);
+        jSplitPane1.setDividerLocation(200);
+        jSplitPane1.setDividerSize(3);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setResizeWeight(0.5);
+        jSplitPane1.setAutoscrolls(true);
+
+        jScrollPane3.setBorder(null);
+
+        jtMainLista.setAutoCreateRowSorter(true);
+        jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "Nome", "Tamanho", "Nação", "Local", "Title 5"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, true
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jtMainLista.setName(""); // NOI18N
+        jScrollPane3.setViewportView(jtMainLista);
+
+        jSplitPane1.setLeftComponent(jScrollPane3);
+        jSplitPane1.setBottomComponent(detalhesNacao);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
-            .addComponent(detalhesNacao)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(detalhesNacao, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE))
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -186,6 +194,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTable jtMainLista;
     private javax.swing.JLabel qtNacoes;
     // End of variables declaration//GEN-END:variables

@@ -42,6 +42,7 @@ public class DispatchManager implements Serializable {
     public static final int ACTIONS_AUTOSAVE = 11;
     public static final int SWITCH_PORTRAIT_PANEL = 12;
     public static final int ACTIONS_MAP_REDRAW = 13;
+    public static final int ACTIONS_COUNT = 14;
 
     private DispatchManager() {
     }

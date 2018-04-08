@@ -190,7 +190,7 @@ public class TabOrdensGui extends TabBase implements Serializable {
         return jtMainLista;
     }
 
-    public void setMainModel(TableModel model) {
+    public final void setMainModel(TableModel model) {
         this.setHelp("");
         this.jtMainLista.setModel(model);
         this.qtOrdens.setText(getMainLista().getRowCount() + "");
