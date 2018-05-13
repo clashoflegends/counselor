@@ -897,11 +897,11 @@ public class MainSettingsGui extends JPanel {
     public JTextField getAutoLoadTextField() {
         return autoLoadTextField;
     }
-
+    
     public JTextField getPortraitsFolderTextField() {
         return portraitsFolderTextField;
     }
-
+    
     public JButton getAutoLoadActionButton() {
         return autoLoadActionButton;
     }
@@ -909,7 +909,7 @@ public class MainSettingsGui extends JPanel {
     public JButton getAutoLoadButton() {
         return autoLoadButton;
     }
-
+    
     public void checkDisplayPortraitCheckBox() {
         boolean isEnable = isShowPortraitCheckEnabled();
         displayPortraitCheckBox.setEnabled(isEnable);
