@@ -195,7 +195,9 @@ public class TabExercitosGui extends TabBase implements Serializable {
 
         jScrollPane1.setBorder(null);
 
+        listaDetalhes.setEditable(false);
         listaDetalhes.setBorder(null);
+        listaDetalhes.setFocusable(false);
         jScrollPane1.setViewportView(listaDetalhes);
 
         jSplitPane1.setRightComponent(jScrollPane1);
