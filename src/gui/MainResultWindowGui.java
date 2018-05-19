@@ -199,6 +199,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph.setText(labels.getString("PONTOS.VITORIA")); // NOI18N
         jbScoreGraph.setToolTipText(labels.getString("MENU.PNTOS.VITORIA.TOOLTIP")); // NOI18N
         jbScoreGraph.setActionCommand("jbScoreGraph");
+        jbScoreGraph.setEnabled(false);
         jbScoreGraph.setFocusable(false);
         jbScoreGraph.setName("jbScoreGraph"); // NOI18N
         jbScoreGraph.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -209,6 +210,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbHexview.setText(bundle.getString("MENU.HEXVIEW")); // NOI18N
         jbHexview.setToolTipText(bundle.getString("MENU.HEXVIEW.TOOLTIP")); // NOI18N
         jbHexview.setActionCommand("jbHexview");
+        jbHexview.setEnabled(false);
         jbHexview.setFocusable(false);
         jbHexview.setName("jbConfig"); // NOI18N
         jToolBar1.add(jbHexview);
@@ -416,6 +418,8 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             jbSaveWorld.setVisible(false);
         }
         jbMap.setEnabled(true);
+        jbScoreGraph.setEnabled(true);
+        jbHexview.setEnabled(true);
         jbCopy.setEnabled(true);
         jbSend.setEnabled(true);
         jbScoreGraph.setEnabled(true);
