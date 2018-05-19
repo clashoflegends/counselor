@@ -16,6 +16,7 @@ import business.facades.WorldFacadeCounselor;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.MainResultWindowGui;
+import gui.accessories.GraphPopup;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
 import java.awt.Component;
@@ -117,6 +118,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doCopy();
             } else if ("jbSend".equals(jbTemp.getActionCommand())) {
                 doSend(jbTemp);
+            } else if ("jbScoreGraph".equals(jbTemp.getActionCommand())) {
+                doGraphScore();
             } else if ("jbAbout".equals(jbTemp.getActionCommand())) {
                 doAbout();
             } else if ("jbHexview".equals(jbTemp.getActionCommand())) {
@@ -294,7 +297,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         dAbout.setVisible(true);
     }
 
-    private void doHexview() {
+    private void doGraphScore() throws HeadlessException {
+        GraphPopup graph = new GraphPopup();
+        graph.start();
+    }
+
+     private void doHexview() {
         WFC.getMapaControler().doHexViewToggle();
     }
 
