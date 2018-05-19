@@ -57,6 +57,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbCopy.addActionListener(wc);
         jbSend.addActionListener(wc);
         jbAbout.addActionListener(wc);
+        jbScoreGraph.addActionListener(wc);
         jbHexview.addActionListener(wc);
         jbConfigs.addActionListener(wc);
         wc.doAutoLoad(autoLoad);
@@ -87,6 +88,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbSaveWorld = new javax.swing.JButton();
         jbCopy = new javax.swing.JButton();
         jbMap = new javax.swing.JButton();
+        jbScoreGraph = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         jbHexview = new javax.swing.JButton();
         jbConfigs = new javax.swing.JButton();
@@ -192,6 +194,15 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbMap.setFocusable(false);
         jbMap.setName("jbExportMap"); // NOI18N
         jToolBar1.add(jbMap);
+
+        jbScoreGraph.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/about.png"))); // NOI18N
+        jbScoreGraph.setText(labels.getString("PONTOS.VITORIA")); // NOI18N
+        jbScoreGraph.setToolTipText(labels.getString("MENU.PNTOS.VITORIA.TOOLTIP")); // NOI18N
+        jbScoreGraph.setActionCommand("jbScoreGraph");
+        jbScoreGraph.setFocusable(false);
+        jbScoreGraph.setName("jbScoreGraph"); // NOI18N
+        jbScoreGraph.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jbScoreGraph);
         jToolBar1.add(filler1);
 
         jbHexview.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_icon.png"))); // NOI18N
@@ -226,21 +237,21 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
                 .addContainerGap()
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(infoPanelLayout.createSequentialGroup()
-                        .addComponent(labelTurno, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
+                        .addComponent(labelTurno, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(15, 15, 15)
-                        .addComponent(labelDeadline, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))
+                        .addComponent(labelDeadline, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(infoPanelLayout.createSequentialGroup()
                         .addComponent(labelNacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(3, 3, 3)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(labelJogo, javax.swing.GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)
-                    .addComponent(labelCenario, javax.swing.GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE))
+                    .addComponent(labelJogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(labelCenario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(labelMoney, javax.swing.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE)
-                    .addComponent(labelJogador, javax.swing.GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE)))
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 1166, Short.MAX_VALUE)
+                    .addComponent(labelMoney, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(labelJogador, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         infoPanelLayout.setVerticalGroup(
             infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -286,7 +297,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         statusBarLayout.setHorizontalGroup(
             statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(statusBarLayout.createSequentialGroup()
-                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 952, Short.MAX_VALUE)
+                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jlActionCountPlaceholder))
         );
@@ -302,7 +313,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(infoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(splitMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1166, Short.MAX_VALUE)
+            .addComponent(splitMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -329,6 +340,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JButton jbOpen;
     private javax.swing.JButton jbSave;
     private javax.swing.JButton jbSaveWorld;
+    private javax.swing.JButton jbScoreGraph;
     private javax.swing.JButton jbSend;
     private javax.swing.JLabel jlActionCountPlaceholder;
     private javax.swing.JLabel jlLeft;
@@ -406,6 +418,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbMap.setEnabled(true);
         jbCopy.setEnabled(true);
         jbSend.setEnabled(true);
+        jbScoreGraph.setEnabled(true);
         jbAbout.setEnabled(true);
         jbHexview.setEnabled(true);
         jbConfigs.setEnabled(true);

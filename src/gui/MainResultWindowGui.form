@@ -22,7 +22,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="infoPanel" alignment="0" max="32767" attributes="0"/>
-          <Component id="splitMainPanel" alignment="0" pref="1166" max="32767" attributes="0"/>
+          <Component id="splitMainPanel" alignment="0" max="32767" attributes="0"/>
           <Component id="statusBar" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
@@ -53,9 +53,9 @@
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <Component id="labelTurno" pref="74" max="32767" attributes="0"/>
+                          <Component id="labelTurno" max="32767" attributes="0"/>
                           <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
-                          <Component id="labelDeadline" pref="55" max="32767" attributes="0"/>
+                          <Component id="labelDeadline" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <Component id="labelNacao" max="32767" attributes="2"/>
@@ -64,16 +64,16 @@
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="labelJogo" pref="411" max="32767" attributes="2"/>
-                      <Component id="labelCenario" alignment="0" pref="411" max="32767" attributes="2"/>
+                      <Component id="labelJogo" max="32767" attributes="2"/>
+                      <Component id="labelCenario" alignment="0" max="32767" attributes="2"/>
                   </Group>
                   <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="labelMoney" pref="443" max="32767" attributes="2"/>
-                      <Component id="labelJogador" alignment="1" pref="443" max="32767" attributes="2"/>
+                      <Component id="labelMoney" max="32767" attributes="2"/>
+                      <Component id="labelJogador" alignment="1" max="32767" attributes="2"/>
                   </Group>
               </Group>
-              <Component id="jToolBar1" alignment="0" pref="1166" max="32767" attributes="0"/>
+              <Component id="jToolBar1" alignment="0" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -296,6 +296,23 @@
                 <Property name="name" type="java.lang.String" value="jbExportMap" noResource="true"/>
               </Properties>
             </Component>
+            <Component class="javax.swing.JButton" name="jbScoreGraph">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/images/about.png"/>
+                </Property>
+                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                  <ResourceString bundle="labels.properties" key="PONTOS.VITORIA" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+                </Property>
+                <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                  <ResourceString bundle="labels.properties" key="MENU.PNTOS.VITORIA.TOOLTIP" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+                </Property>
+                <Property name="actionCommand" type="java.lang.String" value="jbScoreGraph"/>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="name" type="java.lang.String" value="jbScoreGraph" noResource="true"/>
+                <Property name="verticalTextPosition" type="int" value="3"/>
+              </Properties>
+            </Component>
             <Component class="javax.swing.Box$Filler" name="filler1">
               <Properties>
                 <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -406,7 +423,7 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="statusLabel" pref="952" max="32767" attributes="0"/>
+                  <Component id="statusLabel" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jlActionCountPlaceholder" min="-2" max="-2" attributes="0"/>
               </Group>
