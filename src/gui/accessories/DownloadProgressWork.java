@@ -26,72 +26,70 @@ import org.apache.commons.logging.LogFactory;
  * @author Serguei
  */
 public class DownloadProgressWork extends SwingWorker<Void, Void> {
-    
+
     private static final Log LOG = LogFactory.getLog(DownloadProgressWork.class);
-    
-   
+
     private final DownloadPortraitsService portraitsService;
     private final String portraitsFileName;
     private final String portraitsFolder;
     private File downloadFile = null;
     private int filesCount = 0;
     private final int fileSize;
-    
+
     @Override
-        public Void doInBackground() throws FileNotFoundException {
-            setProgress(0);
-            try {
-                Thread.sleep(1000);
-                downloadFile = new File(new File(portraitsFolder), portraitsFileName);
-                Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            downloadFile = portraitsService.downloadPortraisFile(portraitsFileName, portraitsFolder);
-                            filesCount = doUncompressZip(downloadFile);
-                        } catch (FileNotFoundException ex) {
-                            LOG.error("Qué mal todo. " + ex.getMessage());
-                        } catch (ZipException ex) {
-                            LOG.error("Qué mal todo descomprimiendo. " + ex.getMessage());
-                        }
+    public Void doInBackground() throws FileNotFoundException {
+        setProgress(0);
+        try {
+            Thread.sleep(1000);
+            downloadFile = new File(new File(portraitsFolder), portraitsFileName);
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        downloadFile = portraitsService.downloadPortraisFile(portraitsFileName, portraitsFolder);
+                        filesCount = doUncompressZip(downloadFile);
+                    } catch (FileNotFoundException ex) {
+                        LOG.error("Qué mal todo. " + ex.getMessage());
+                    } catch (ZipException ex) {
+                        LOG.error("Qué mal todo descomprimiendo. " + ex.getMessage());
                     }
-                });
-                t.start();
-                while (t.isAlive()) {
-                    Float progreso = downloadFile.length()/(float)fileSize;
-                    progreso*=100;
-                    int progress = progreso.intValue();
-                    
-                   setProgress(progress);
                 }
-                
-            } catch (InterruptedException ignore) {}
-            return null;
+            });
+            t.start();
+            while (t.isAlive()) {
+                Float progreso = downloadFile.length() / (float) fileSize;
+                progreso *= 100;
+                int progress = progreso.intValue();
+
+                setProgress(progress);
+            }
+
+        } catch (InterruptedException ignore) {
         }
+        return null;
+    }
+
     @Override
-        public void done() {
-           setProgress(100);
-           downloadFile.delete();
-           String successLabel = "Successful download and uncompress process. A total of " + filesCount + " portraits have been obtained.";
-           JOptionPane.showMessageDialog(null, successLabel);
-               
-        }
- 
-    
+    public void done() {
+        setProgress(100);
+        downloadFile.delete();
+        String successLabel = "Successful download and uncompress process. A total of " + filesCount + " portraits have been obtained.";
+        JOptionPane.showMessageDialog(null, successLabel);
+
+    }
 
     public DownloadProgressWork(String portraitsFileName, String portraitsFolder, int fileSize) {
         portraitsService = new DownloadPortraitsHttpServiceImpl();
         this.portraitsFileName = portraitsFileName;
         this.portraitsFolder = portraitsFolder;
         this.fileSize = fileSize;
- 
-    } 
-    
+
+    }
+
     /**
-     * Uncompress all the files contained in the compressed file and its folders
-     * in the same folder where the zip file is placed. Doesn't respects the 
-     * directory tree of the zip file.
-     * This method seems a clear candidate to ZipManager.  
+     * Uncompress all the files contained in the compressed file and its folders in the same folder where the zip file is placed. Doesn't respects the
+     * directory tree of the zip file. This method seems a clear candidate to ZipManager.
+     *
      * @param file Zip file.
      * @return Count of files uncopressed.
      * @throws ZipException Exception.
@@ -101,9 +99,9 @@ public class DownloadProgressWork extends SwingWorker<Void, Void> {
         try {
             byte[] buf = new byte[1024];
             ZipFile zipFile = new ZipFile(file);
-            
+
             Enumeration zipFileEntries = zipFile.entries();
-            
+
             while (zipFileEntries.hasMoreElements()) {
                 ZipEntry zipentry = (ZipEntry) zipFileEntries.nextElement();
                 if (zipentry.isDirectory()) {
@@ -123,8 +121,8 @@ public class DownloadProgressWork extends SwingWorker<Void, Void> {
                 fileCount++;
             }
             zipFile.close();
-           
-        }  catch (IOException ex) {
+
+        } catch (IOException ex) {
             throw new ZipException(ex.getMessage());
         }
 
