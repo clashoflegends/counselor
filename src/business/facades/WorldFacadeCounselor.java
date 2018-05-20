@@ -126,6 +126,10 @@ public class WorldFacadeCounselor implements Serializable {
         return ret;
     }
 
+    public SortedMap<String, Nacao> getNacoes() {
+        return WorldManager.getInstance().getNacoes();
+    }
+
     public boolean isJogadorAtivoEliminado(Jogador jogadorAtivo) {
         boolean ret = true;
         for (Nacao nacao : WorldManager.getInstance().getNacoes().values()) {
