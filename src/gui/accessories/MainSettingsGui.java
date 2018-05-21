@@ -72,8 +72,8 @@ public class MainSettingsGui extends JPanel {
         portraitsFolderButton.addActionListener(settingsControler);
         downloadPortraitsButton.addActionListener(settingsControler);
 
-        //FIXME: Hiding controls until they are tested. Set ShowCharacterPortraitsBeta=1 to test.
-        if (SettingsManager.getInstance().isConfig("ShowCharacterPortraitsBeta", "1", "0")) {
+        //Hiding controls here until they are tested. Set ShowCharacterPortraitsBeta=1 to test.
+        if (SettingsManager.getInstance().isConfig("ShowCharacterPortraitsBeta", "1", "1")) {
             displayPortraitCheckBox.setVisible(true);
             portraitsFolderButton.setVisible(true);
             portraitsFolderLabel.setVisible(true);
