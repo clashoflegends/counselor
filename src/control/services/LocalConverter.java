@@ -6,7 +6,7 @@ package control.services;
 
 import business.converter.ConverterFactory;
 import business.facade.LocalFacade;
-import business.facades.ListFactory;
+import persistence.local.ListFactory;
 import java.io.Serializable;
 import model.Artefato;
 import model.Exercito;

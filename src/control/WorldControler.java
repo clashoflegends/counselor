@@ -12,7 +12,7 @@ import business.facade.CidadeFacade;
 import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
 import business.facade.PersonagemFacade;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.MainResultWindowGui;

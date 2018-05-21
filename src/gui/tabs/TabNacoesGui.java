@@ -10,7 +10,7 @@ import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.JogadorFacade;
 import business.facade.NacaoFacade;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.MapaControler;
 import control.NacaoControler;
 import control.services.FiltroConverter;

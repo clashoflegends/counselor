@@ -2,7 +2,7 @@ package gui.subtabs;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.MapaControler;
 import control.OrdemControler;
 import control.OrdemControlerFloater;

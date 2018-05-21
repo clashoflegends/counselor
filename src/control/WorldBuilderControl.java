@@ -7,7 +7,7 @@ package control;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.IBaseModel;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.tabs.TabWorldBuilderGui;

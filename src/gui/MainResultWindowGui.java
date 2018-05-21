@@ -6,7 +6,7 @@
 package gui;
 
 import business.ImageManager;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.MapaControler;
 import control.WorldControler;
 import gui.components.JLabelGradient;

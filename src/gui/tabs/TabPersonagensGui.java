@@ -8,7 +8,7 @@ package gui.tabs;
 import baseLib.GenericoComboObject;
 import business.facade.JogadorFacade;
 import business.facade.PersonagemFacade;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.MapaControler;
 import control.PersonagemControler;
 import control.PortraitControler;

@@ -7,7 +7,7 @@ package control;
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
 import business.facade.AcaoFacade;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.services.FinancasConverter;
 import control.services.NacaoConverter;
 import control.support.ControlBase;

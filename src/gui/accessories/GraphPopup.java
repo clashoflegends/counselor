@@ -5,7 +5,7 @@
  */
 package gui.accessories;
 
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import business.services.ComparatorFactory;
 import gui.services.SampleTableModel;
 import java.util.ArrayList;

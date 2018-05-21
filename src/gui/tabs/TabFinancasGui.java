@@ -8,7 +8,7 @@ package gui.tabs;
 import baseLib.GenericoComboObject;
 import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.FinancasControler;
 import control.MapaControler;
 import control.services.FiltroConverter;
