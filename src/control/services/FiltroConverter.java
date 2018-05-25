@@ -7,7 +7,7 @@ package control.services;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.IBaseModel;
-import business.facades.ListFactory;
+import persistence.local.ListFactory;
 import business.services.ComparatorBaseDisplayModelSorter;
 import java.io.Serializable;
 import java.util.ArrayList;

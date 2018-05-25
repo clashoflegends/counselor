@@ -9,7 +9,7 @@ import baseLib.GenericoComboObject;
 import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
 import business.facade.JogadorFacade;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.CidadeControler;
 import control.MapaControler;
 import control.services.CidadeConverter;

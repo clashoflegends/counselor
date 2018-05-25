@@ -9,7 +9,7 @@ import baseLib.GenericoComboObject;
 import baseLib.IBaseModel;
 import business.ImageManager;
 import business.facade.BattleSimFacade;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.services.AcaoConverter;
 import control.services.ExercitoConverter;
 import control.support.IBattleSimulator;

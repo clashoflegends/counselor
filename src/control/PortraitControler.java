@@ -5,7 +5,7 @@
 package control;
 
 import business.ImageManager;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import static java.awt.Component.CENTER_ALIGNMENT;

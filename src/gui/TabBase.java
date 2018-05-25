@@ -48,7 +48,7 @@ public class TabBase extends javax.swing.JRootPane implements Serializable {
         this.filtroDefault = vlFiltro;
     }
 
-    public int getFiltroDefault() {
+    public final int getFiltroDefault() {
         return filtroDefault;
     }
 

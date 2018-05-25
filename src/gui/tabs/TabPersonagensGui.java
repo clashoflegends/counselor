@@ -8,7 +8,7 @@ package gui.tabs;
 import baseLib.GenericoComboObject;
 import business.facade.JogadorFacade;
 import business.facade.PersonagemFacade;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.MapaControler;
 import control.PersonagemControler;
 import control.PortraitControler;
@@ -170,7 +170,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         );
         portraitPanelLayout.setVerticalGroup(
             portraitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 244, Short.MAX_VALUE)
+            .addGap(0, 251, Short.MAX_VALUE)
         );
 
         showPortrait = Integer.parseInt(SettingsManager.getInstance().getConfig("ShowCharacterPortraits", "0")) == 1;
