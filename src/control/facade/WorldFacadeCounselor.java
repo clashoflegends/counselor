@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package business.facades;
+package control.facade;
 
 import baseLib.BaseModel;
 import business.BussinessException;
@@ -124,6 +124,10 @@ public class WorldFacadeCounselor implements Serializable {
             }
         }
         return ret;
+    }
+
+    public SortedMap<String, Nacao> getNacoes() {
+        return WorldManager.getInstance().getNacoes();
     }
 
     public boolean isJogadorAtivoEliminado(Jogador jogadorAtivo) {

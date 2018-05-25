@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package business.facades;
+package persistence.local;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -23,7 +23,6 @@ import model.Produto;
 import model.TipoTropa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistenceCommons.PersistenceException;
 import persistence.iDao.IAliancaDao;
 import persistence.iDao.IArtefatoDao;
 import persistence.iDao.ICidadeDao;
@@ -35,8 +34,7 @@ import persistence.iDao.INacaoDao;
 import persistence.iDao.IOrdemDao;
 import persistence.iDao.IPersonagemDao;
 import persistence.iDao.IProdutoDao;
-import persistence.local.PersistFactory;
-import persistence.local.WorldManager;
+import persistenceCommons.PersistenceException;
 
 /**
  *

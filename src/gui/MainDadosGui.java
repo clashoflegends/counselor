@@ -5,7 +5,7 @@
  */
 package gui;
 
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.MapaControler;
 import gui.tabs.TabAcoesGui;
 import gui.tabs.TabArtefatosGui;

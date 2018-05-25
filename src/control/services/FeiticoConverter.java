@@ -8,7 +8,7 @@ import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
 import business.facade.FeiticoFacade;
 import business.facade.PersonagemFacade;
-import business.facades.ListFactory;
+import persistence.local.ListFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;

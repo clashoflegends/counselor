@@ -11,7 +11,7 @@ import business.facade.CidadeFacade;
 import business.facade.ExercitoFacade;
 import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import control.services.ArtefatoConverter;
 import control.services.CenarioConverter;
 import control.services.FeiticoConverter;

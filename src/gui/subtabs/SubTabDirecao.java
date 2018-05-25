@@ -8,7 +8,7 @@ package gui.subtabs;
 import business.MovimentoExercito;
 import business.converter.ConverterFactory;
 import business.facade.LocalFacade;
-import business.facades.ListFactory;
+import persistence.local.ListFactory;
 import control.DirecaoControler;
 import control.MapaControler;
 import control.support.ActorInterface;

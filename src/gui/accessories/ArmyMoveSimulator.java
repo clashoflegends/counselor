@@ -5,7 +5,7 @@
 package gui.accessories;
 
 import business.ImageManager;
-import business.facades.WorldFacadeCounselor;
+import control.facade.WorldFacadeCounselor;
 import gui.subtabs.SubTabDirecaoExercito;
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
