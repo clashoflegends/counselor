@@ -5,6 +5,7 @@
  */
 package control;
 
+import business.BussinessException;
 import business.DownloadPortraitsService;
 import control.services.DownloadPortraitsHttpServiceImpl;
 import control.support.ControlBase;
@@ -260,26 +261,33 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             int selected = (showPortraits.isSelected()) ? 1 : 0;
             SettingsManager.getInstance().setConfig("ShowCharacterPortraits", String.valueOf(selected));
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(selected));
-
-        } else if (actionCommand.equals("fPortraitsAction")) {
-
-            JFileChooser fc = new JFileChooser();
-            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-            int returnVal = fc.showOpenDialog(settingsGui);
-
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = fc.getSelectedFile();
-                SettingsManager.getInstance().setConfig("PortraitsFolder", file.getPath());
-                settingsGui.getPortraitsFolderTextField().setText(file.getPath());
-                settingsGui.checkDisplayPortraitCheckBox();
-            }
+            settingsGui.checkDisplayPortraitCheckBox();
+            
         } else if (actionCommand.equals("downloadPortraits")) {
 
             DownloadPortraitsService downloadService = new DownloadPortraitsHttpServiceImpl();
             try {
                 // First check network connection
                 downloadService.checkNetworkConnection();
+                
+                // Select download folder
+                JFileChooser folderChooser = null;
+                String currentFolder = SettingsManager.getInstance().getConfig("PortraitsFolder", "");
+                if (currentFolder.isEmpty()) {
+                    folderChooser = new JFileChooser();
+                } else {
+                    folderChooser = new JFileChooser(currentFolder);
+                }
+                folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                folderChooser.setDialogTitle("Select a download folder");
+                       
+                int jFileReturn = folderChooser.showOpenDialog(settingsGui);
+                if (jFileReturn == JFileChooser.APPROVE_OPTION) {
+                    File file = folderChooser.getSelectedFile();
+                    SettingsManager.getInstance().setConfig("PortraitsFolder", file.getPath());                
+                } else {
+                    throw new BussinessException();
+                }
 
                 // Read server properties file
                 Properties propServer = downloadService.getServerPropertiesFile();
@@ -314,7 +322,9 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             } catch (IOException ex) {
                 String errorLabel = "Properties file could not be read from server.";
                 JOptionPane.showMessageDialog(settingsGui, errorLabel, "Internal error", JOptionPane.ERROR_MESSAGE);
-            } finally {
+            } catch (BussinessException ex) {
+                // Select folder canceled
+            }finally {
                 settingsGui.checkDisplayPortraitCheckBox();
             }
         }
@@ -335,6 +345,11 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
 
             String message = String.format("Completed %d%%.\n", progress);
             progressMonitor.setNote(message);
+            
+            if (progress == 100) {
+                settingsGui.checkDisplayPortraitCheckBox();
+
+            }
 
         }
     }

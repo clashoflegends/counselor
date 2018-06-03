@@ -68,22 +68,17 @@ public class MainSettingsGui extends JPanel {
         pcPathComboBox.addActionListener(settingsControler);
         autoLoadCheck.addActionListener(settingsControler);
         autoLoadActionCheck.addActionListener(settingsControler);
-        displayPortraitCheckBox.addActionListener(settingsControler);
-        portraitsFolderButton.addActionListener(settingsControler);
+        displayPortraitCheckBox.addActionListener(settingsControler);        
         downloadPortraitsButton.addActionListener(settingsControler);
 
         //Hiding controls here until they are tested. Set ShowCharacterPortraitsBeta=1 to test.
         if (SettingsManager.getInstance().isConfig("ShowCharacterPortraitsBeta", "1", "1")) {
-            displayPortraitCheckBox.setVisible(true);
-            portraitsFolderButton.setVisible(true);
-            portraitsFolderLabel.setVisible(true);
-            portraitsFolderTextField.setVisible(true);
+            displayPortraitCheckBox.setVisible(true);            
+            portraitsFolderLabel.setVisible(true);            
             downloadPortraitsButton.setVisible(true);
         } else {
-            displayPortraitCheckBox.setVisible(false);
-            portraitsFolderButton.setVisible(false);
-            portraitsFolderLabel.setVisible(false);
-            portraitsFolderTextField.setVisible(false);
+            displayPortraitCheckBox.setVisible(false);            
+            portraitsFolderLabel.setVisible(false);           
             downloadPortraitsButton.setVisible(false);
         }
     }
@@ -151,8 +146,6 @@ public class MainSettingsGui extends JPanel {
         sequenceRadioButton = new javax.swing.JRadioButton();
         displayPortraitCheckBox = new javax.swing.JCheckBox();
         portraitsFolderLabel = new javax.swing.JLabel();
-        portraitsFolderTextField = new javax.swing.JTextField();
-        portraitsFolderButton = new javax.swing.JButton();
         downloadPortraitsButton = new javax.swing.JButton();
         mapPanel = new javax.swing.JPanel();
         hexTagStyleLabel = new javax.swing.JLabel();
@@ -539,14 +532,6 @@ public class MainSettingsGui extends JPanel {
         portraitsFolderLabel.setText(bundle.getString("SETTINGS.DISPLAY.PORTRAITSFOLDER")); // NOI18N
         portraitsFolderLabel.setToolTipText(bundle.getString("SETTINGS.DISPLAY.PORTRAITSFOLDER.TOOLTIP")); // NOI18N
 
-        portraitsFolderTextField.setEditable(false);
-        portraitsFolderTextField.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        portraitsFolderTextField.setText(settingsManager.getConfig("PortraitsFolder"));
-        portraitsFolderTextField.setEnabled(isAutoLoadActionFilled());
-
-        portraitsFolderButton.setText("...");
-        portraitsFolderButton.setActionCommand("fPortraitsAction");
-
         downloadPortraitsButton.setText(bundle.getString("SETTINGS.DISPLAY.PORTRAITS.BUTTON.DOWNLOAD")); // NOI18N
         downloadPortraitsButton.setToolTipText(bundle.getString("SETTINGS.DISPLAY.PORTRAITS.BUTTON.DOWNLOAD.TOOLTIP")); // NOI18N
         downloadPortraitsButton.setActionCommand("downloadPortraits");
@@ -580,17 +565,19 @@ public class MainSettingsGui extends JPanel {
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(sortOrdersLabel)
                             .addComponent(splitSizeLabel)
-                            .addComponent(filtroLabel))
+                            .addComponent(filtroLabel)
+                            .addComponent(portraitsFolderLabel))
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(displayPanelLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 144, Short.MAX_VALUE)
                                 .addComponent(splitSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap(157, Short.MAX_VALUE))
                             .addGroup(displayPanelLayout.createSequentialGroup()
                                 .addGap(26, 26, 26)
                                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(alphabeticOrderButton)
-                                    .addComponent(allFiltroRadioButton))
+                                    .addComponent(allFiltroRadioButton)
+                                    .addComponent(downloadPortraitsButton))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(ownFiltroRadioButton)
@@ -598,16 +585,7 @@ public class MainSettingsGui extends JPanel {
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(displayPanelLayout.createSequentialGroup()
                         .addComponent(displayPortraitCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(displayPanelLayout.createSequentialGroup()
-                        .addComponent(portraitsFolderLabel)
-                        .addGap(43, 43, 43)
-                        .addComponent(portraitsFolderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(portraitsFolderButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
-                        .addComponent(downloadPortraitsButton)
-                        .addContainerGap())))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         displayPanelLayout.setVerticalGroup(
             displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -642,14 +620,11 @@ public class MainSettingsGui extends JPanel {
                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(autoMoveCheckBox)
                     .addComponent(fogOfWarCheckBox))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(12, 12, 12)
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(portraitsFolderLabel)
-                    .addComponent(portraitsFolderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(portraitsFolderButton)
-                        .addComponent(downloadPortraitsButton)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(downloadPortraitsButton))
+                .addGap(6, 6, 6)
                 .addComponent(displayPortraitCheckBox)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -687,6 +662,8 @@ public class MainSettingsGui extends JPanel {
         pcPathComboBox.setModel(new javax.swing.DefaultComboBoxModel(getPcPathComboLabels()));
         pcPathComboBox.setSelectedIndex(getPcPathIndexSelected());
         pcPathComboBox.setActionCommand("pcPath");
+        pcPathComboBox.setMinimumSize(new java.awt.Dimension(56, 20));
+        pcPathComboBox.setName(""); // NOI18N
 
         javax.swing.GroupLayout mapPanelLayout = new javax.swing.GroupLayout(mapPanel);
         mapPanel.setLayout(mapPanelLayout);
@@ -704,14 +681,11 @@ public class MainSettingsGui extends JPanel {
                             .addComponent(pcPathLabel))
                         .addGap(18, 18, 18)
                         .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(mapPanelLayout.createSequentialGroup()
-                                .addComponent(pcPathComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(9, 9, 9))
-                            .addComponent(armyPathComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(hexTagStyleComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(mapTilesComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
-                .addGap(237, 237, 237))
+                            .addComponent(pcPathComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(mapTilesComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(hexTagStyleComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(armyPathComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(222, 222, 222))
         );
         mapPanelLayout.setVerticalGroup(
             mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -733,7 +707,7 @@ public class MainSettingsGui extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pcPathLabel)
-                    .addComponent(pcPathComboBox))
+                    .addComponent(pcPathComboBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(164, 164, 164))
         );
 
@@ -859,9 +833,7 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JComboBox pcPathComboBox;
     private javax.swing.JLabel pcPathLabel;
     private javax.swing.JPanel playerPanel;
-    private javax.swing.JButton portraitsFolderButton;
     private javax.swing.JLabel portraitsFolderLabel;
-    private javax.swing.JTextField portraitsFolderTextField;
     private javax.swing.JButton saveDirButton;
     private javax.swing.JLabel saveDirLabel;
     private javax.swing.JTextField saveDirTextField;
@@ -897,11 +869,7 @@ public class MainSettingsGui extends JPanel {
     public JTextField getAutoLoadTextField() {
         return autoLoadTextField;
     }
-
-    public JTextField getPortraitsFolderTextField() {
-        return portraitsFolderTextField;
-    }
-
+        
     public JButton getAutoLoadActionButton() {
         return autoLoadActionButton;
     }
@@ -909,7 +877,7 @@ public class MainSettingsGui extends JPanel {
     public JButton getAutoLoadButton() {
         return autoLoadButton;
     }
-
+    
     public void checkDisplayPortraitCheckBox() {
         boolean isEnable = isShowPortraitCheckEnabled();
         displayPortraitCheckBox.setEnabled(isEnable);
@@ -1091,6 +1059,6 @@ public class MainSettingsGui extends JPanel {
         final File portraitsFolder = new File(folderPath);
         boolean enableCheck = portraitsFolder.exists() && portraitsFolder.list().length > 0;
 
-        return enableCheck;
+        return isShowPortraitChecked() || enableCheck;
     }
 }
