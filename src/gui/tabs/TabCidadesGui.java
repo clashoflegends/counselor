@@ -9,9 +9,9 @@ import baseLib.GenericoComboObject;
 import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
 import business.facade.JogadorFacade;
-import control.facade.WorldFacadeCounselor;
 import control.CidadeControler;
 import control.MapaControler;
+import control.facade.WorldFacadeCounselor;
 import control.services.CidadeConverter;
 import control.services.FiltroConverter;
 import gui.TabBase;
@@ -76,9 +76,10 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         comboFiltro = new javax.swing.JComboBox();
         jLabel5 = new javax.swing.JLabel();
         qtCidades = new javax.swing.JLabel();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        detalhesCidade = new javax.swing.JTabbedPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
-        detalhesCidade = new javax.swing.JTabbedPane();
 
         jLabel3.setText(labels.getString("LISTAR:")); // NOI18N
 
@@ -89,9 +90,12 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
 
         qtCidades.setText("999");
 
+        jSplitPane1.setBorder(null);
+        jSplitPane1.setDividerLocation(200);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setRightComponent(detalhesCidade);
+
         jScrollPane3.setBorder(null);
-        jScrollPane3.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        jScrollPane3.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         jtMainLista.setAutoCreateRowSorter(true);
         jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
@@ -128,6 +132,8 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         jtMainLista.setShowVerticalLines(false);
         jScrollPane3.setViewportView(jtMainLista);
 
+        jSplitPane1.setLeftComponent(jScrollPane3);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -137,12 +143,11 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 227, Short.MAX_VALUE)
                 .addComponent(jLabel5)
                 .addGap(2, 2, 2)
                 .addComponent(qtCidades))
-            .addComponent(detalhesCidade, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -153,10 +158,8 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
                     .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(qtCidades)
                     .addComponent(jLabel5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(detalhesCidade, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -177,6 +180,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTable jtMainLista;
     private javax.swing.JLabel qtCidades;
     // End of variables declaration//GEN-END:variables
