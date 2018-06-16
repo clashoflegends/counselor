@@ -8,9 +8,9 @@ package gui.tabs;
 import baseLib.GenericoComboObject;
 import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
-import control.facade.WorldFacadeCounselor;
 import control.FinancasControler;
 import control.MapaControler;
+import control.facade.WorldFacadeCounselor;
 import control.services.FiltroConverter;
 import gui.TabBase;
 import gui.subtabs.SubTabBaseList;
@@ -29,18 +29,18 @@ import persistenceCommons.SettingsManager;
  *
  * @author gurgel
  */
-public final class TabFinancasGui extends TabBase implements Serializable {
+public class TabFinancesGui extends TabBase implements Serializable {
 
-    private static final Log log = LogFactory.getLog(TabFinancasGui.class);
+    private static final Log log = LogFactory.getLog(TabFinancesGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
+    private final NacaoFacade nacaoFacade = new NacaoFacade();
+    private final CenarioFacade cenarioFacade = new CenarioFacade();
     private FinancasControler financasControl;
     private final SubTabBaseList stForecast = new SubTabBaseList();
     private final SubTabBaseList stBalance = new SubTabBaseList();
     private final SubTabBaseList stResources = new SubTabBaseList();
-    private final NacaoFacade nacaoFacade = new NacaoFacade();
-    private final CenarioFacade cenarioFacade = new CenarioFacade();
 
-    public TabFinancasGui(String titulo, String dica, MapaControler mapaControl) {
+    public TabFinancesGui(String titulo, String dica, MapaControler mapaControl) {
         initComponents();
         //Basico
         setIcone("/images/financas.gif");
@@ -63,9 +63,10 @@ public final class TabFinancasGui extends TabBase implements Serializable {
         comboFiltro = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         qtNacoes = new javax.swing.JLabel();
+        jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
-        detalhesCidade = new javax.swing.JTabbedPane();
+        detalhesNacao = new javax.swing.JTabbedPane();
 
         jLabel2.setText(labels.getString("TOTAL:")); // NOI18N
 
@@ -102,6 +103,13 @@ public final class TabFinancasGui extends TabBase implements Serializable {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jSplitPane1.setBorder(null);
+        jSplitPane1.setDividerLocation(200);
+        jSplitPane1.setDividerSize(3);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setResizeWeight(0.5);
+        jSplitPane1.setAutoscrolls(true);
+
         jScrollPane3.setBorder(null);
 
         jtMainLista.setAutoCreateRowSorter(true);
@@ -113,7 +121,7 @@ public final class TabFinancasGui extends TabBase implements Serializable {
                 {null, null, null, null, null}
             },
             new String [] {
-                "Nação", "Tamanho", "Nação", "Local", "Title 5"
+                "Nome", "Tamanho", "Nação", "Local", "Title 5"
             }
         ) {
             Class[] types = new Class [] {
@@ -134,22 +142,22 @@ public final class TabFinancasGui extends TabBase implements Serializable {
         jtMainLista.setName(""); // NOI18N
         jScrollPane3.setViewportView(jtMainLista);
 
+        jSplitPane1.setLeftComponent(jScrollPane3);
+        jSplitPane1.setBottomComponent(detalhesNacao);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
-            .addComponent(detalhesCidade)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(detalhesCidade, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE))
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -165,12 +173,13 @@ public final class TabFinancasGui extends TabBase implements Serializable {
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox comboFiltro;
-    private javax.swing.JTabbedPane detalhesCidade;
+    private javax.swing.JTabbedPane detalhesNacao;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTable jtMainLista;
     private javax.swing.JLabel qtNacoes;
     // End of variables declaration//GEN-END:variables
@@ -218,14 +227,14 @@ public final class TabFinancasGui extends TabBase implements Serializable {
     }
 
     private void addTabs() {
-        detalhesCidade.addTab(labels.getString("EXTRATO.TURNO"),
+        detalhesNacao.addTab(labels.getString("EXTRATO.TURNO"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/diplomacy.gif")),
                 stBalance, labels.getString("EXTRATO.TURNO"));
-        detalhesCidade.addTab(labels.getString("EXTRATO.PROXIMO.TURNO"),
+        detalhesNacao.addTab(labels.getString("EXTRATO.PROXIMO.TURNO"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/diplomacy.gif")),
                 stForecast, labels.getString("EXTRATO.PROXIMO.TURNO"));
         if (cenarioFacade.hasResourceManagement(WorldFacadeCounselor.getInstance().getCenario())) {
-            detalhesCidade.addTab(labels.getString("MERCADO"),
+            detalhesNacao.addTab(labels.getString("MERCADO"),
                     new javax.swing.ImageIcon(getClass().getResource("/images/diplomacy.gif")),
                     stResources, labels.getString("MERCADO"));
         }

@@ -8,10 +8,10 @@ package gui.tabs;
 import baseLib.GenericoComboObject;
 import business.facade.JogadorFacade;
 import business.facade.PersonagemFacade;
-import control.facade.WorldFacadeCounselor;
 import control.MapaControler;
 import control.PersonagemControler;
 import control.PortraitControler;
+import control.facade.WorldFacadeCounselor;
 import control.services.FiltroConverter;
 import control.services.PersonagemConverter;
 import gui.TabBase;
@@ -78,8 +78,10 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         comboFiltro = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         qtPersonagens = new javax.swing.JLabel();
+        jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
+        jPanel1 = new javax.swing.JPanel();
         detalhesPersonagem = new javax.swing.JTabbedPane();
         portraitPanel = new javax.swing.JPanel();
 
@@ -103,7 +105,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 357, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(qtPersonagens))
@@ -119,6 +121,10 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
                     .addComponent(jLabel3))
                 .addContainerGap(15, Short.MAX_VALUE))
         );
+
+        jSplitPane1.setBorder(null);
+        jSplitPane1.setDividerLocation(200);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         jScrollPane3.setBorder(null);
         jScrollPane3.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -159,6 +165,8 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         jtMainLista.setName(""); // NOI18N
         jScrollPane3.setViewportView(jtMainLista);
 
+        jSplitPane1.setTopComponent(jScrollPane3);
+
         portraitPanel.setFocusable(false);
         portraitPanel.setPreferredSize(new java.awt.Dimension(140, 250));
 
@@ -170,36 +178,47 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         );
         portraitPanelLayout.setVerticalGroup(
             portraitPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 251, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         showPortrait = Integer.parseInt(SettingsManager.getInstance().getConfig("ShowCharacterPortraits", "0")) == 1;
         portraitPanel.setVisible(showPortrait);
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(1, 1, 1)
+                .addComponent(portraitPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(detalhesPersonagem, javax.swing.GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(portraitPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+            .addComponent(detalhesPersonagem, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+        );
+
+        detalhesPersonagem.getAccessibleContext().setAccessibleName("Ações");
+
+        jSplitPane1.setRightComponent(jPanel1);
+
         javax.swing.GroupLayout jpMasterLayout = new javax.swing.GroupLayout(jpMaster);
         jpMaster.setLayout(jpMasterLayout);
         jpMasterLayout.setHorizontalGroup(
             jpMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 630, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpMasterLayout.createSequentialGroup()
-                .addComponent(portraitPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(detalhesPersonagem, javax.swing.GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE))
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         jpMasterLayout.setVerticalGroup(
             jpMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpMasterLayout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 299, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(detalhesPersonagem, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
-                    .addComponent(portraitPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)))
+                .addComponent(jSplitPane1)
+                .addContainerGap())
         );
-
-        detalhesPersonagem.getAccessibleContext().setAccessibleName("Ações");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -217,8 +236,10 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     private javax.swing.JTabbedPane detalhesPersonagem;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JPanel jpMaster;
     private javax.swing.JTable jtMainLista;
     private javax.swing.JPanel portraitPanel;
