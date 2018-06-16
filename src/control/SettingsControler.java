@@ -284,7 +284,8 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 int jFileReturn = folderChooser.showOpenDialog(settingsGui);
                 if (jFileReturn == JFileChooser.APPROVE_OPTION) {
                     File file = folderChooser.getSelectedFile();
-                    SettingsManager.getInstance().setConfig("PortraitsFolder", file.getPath());                
+                    SettingsManager.getInstance().setConfig("PortraitsFolder", file.getPath()); 
+                    this.settingsGui.getPortraitFolderNameTextField().setText(file.getPath());
                 } else {
                     throw new BussinessException();
                 }
@@ -302,7 +303,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
 
                 if (returnVal == JOptionPane.OK_OPTION) {
                     String portraitFolder = SettingsManager.getInstance().getConfig("PortraitsFolder");
-               
+                                   
                     final DownloadProgressWork dpw = new DownloadProgressWork(portraitsFileName, portraitFolder, (int) fileSizeByte);
                     dpw.addPropertyChangeListener(this);             
 
