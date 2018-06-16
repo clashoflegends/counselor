@@ -5,14 +5,14 @@
  */
 package gui;
 
-import control.facade.WorldFacadeCounselor;
 import control.MapaControler;
+import control.facade.WorldFacadeCounselor;
 import gui.tabs.TabAcoesGui;
 import gui.tabs.TabArtefatosGui;
 import gui.tabs.TabCidadesGui;
 import gui.tabs.TabExercitosGui;
 import gui.tabs.TabFeiticosGui;
-import gui.tabs.TabFinancasGui;
+import gui.tabs.TabFinancesGui;
 import gui.tabs.TabNacoesGui;
 import gui.tabs.TabPackagesGui;
 import gui.tabs.TabPartidaGui;
@@ -49,7 +49,7 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
         this.addTabBase(new TabExercitosGui(labels.getString("EXERCITOS"), labels.getString("EXERCITOS.DISPONIVEL"), mapaControl));
         this.addTabBase(new TabArtefatosGui(labels.getString("ARTEFATOS"), labels.getString("ARTEFATOS.DISPONIVEL"), mapaControl));
         this.addTabBase(new TabNacoesGui(labels.getString("NACOES"), labels.getString("NACOES"), mapaControl));
-        this.addTabBase(new TabFinancasGui(labels.getString("FINANCAS"), labels.getString("FINANCAS"), mapaControl));
+        this.addTabBase(new TabFinancesGui(labels.getString("FINANCAS"), labels.getString("FINANCAS"), mapaControl));
         if (WorldFacadeCounselor.getInstance().isStartupPackages() && WorldFacadeCounselor.getInstance().getTurno() == 0) {
             this.addTabBase(new TabPackagesGui(labels.getString("STARTUP"), labels.getString("STARTUP.DISPONIVEL"), mapaControl));
         }

@@ -62,14 +62,27 @@ public final class TabFeiticosGui extends TabBase implements Serializable {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jtMainLista = new javax.swing.JTable();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        listaHelp = new javax.swing.JTextPane();
         jlListar = new javax.swing.JLabel();
         comboFiltro = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         qtFeiticos = new javax.swing.JLabel();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jtMainLista = new javax.swing.JTable();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        listaHelp = new javax.swing.JTextPane();
+
+        jlListar.setText(labels.getString("LISTAR:")); // NOI18N
+
+        comboFiltro.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Todos" }));
+
+        jLabel2.setText(labels.getString("TOTAL:")); // NOI18N
+
+        qtFeiticos.setText(labels.getString("QTD")); // NOI18N
+
+        jSplitPane1.setBorder(null);
+        jSplitPane1.setDividerLocation(200);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         jScrollPane3.setBorder(null);
 
@@ -106,37 +119,32 @@ public final class TabFeiticosGui extends TabBase implements Serializable {
         jtMainLista.setName(""); // NOI18N
         jScrollPane3.setViewportView(jtMainLista);
 
+        jSplitPane1.setLeftComponent(jScrollPane3);
+
         jScrollPane1.setBorder(null);
 
         listaHelp.setBorder(null);
         jScrollPane1.setViewportView(listaHelp);
 
-        jlListar.setText(labels.getString("LISTAR:")); // NOI18N
-
-        comboFiltro.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Todos" }));
-
-        jLabel2.setText(labels.getString("TOTAL:")); // NOI18N
-
-        qtFeiticos.setText(labels.getString("QTD")); // NOI18N
+        jSplitPane1.setRightComponent(jScrollPane1);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(152, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(qtFeiticos))
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jlListar)
+                    .addComponent(jlListar, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(37, Short.MAX_VALUE)))
+                    .addContainerGap(77, Short.MAX_VALUE)))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -145,17 +153,17 @@ public final class TabFeiticosGui extends TabBase implements Serializable {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(qtFeiticos))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jlListar)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGap(6, 6, 6)
+                            .addComponent(jlListar))
                         .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addContainerGap(424, Short.MAX_VALUE)))
+                    .addGap(424, 424, 424)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -175,6 +183,7 @@ public final class TabFeiticosGui extends TabBase implements Serializable {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JLabel jlListar;
     private javax.swing.JTable jtMainLista;
     private javax.swing.JTextPane listaHelp;

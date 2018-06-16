@@ -5,8 +5,8 @@
  */
 package gui.accessories;
 
-import control.facade.WorldFacadeCounselor;
 import business.services.ComparatorFactory;
+import control.facade.WorldFacadeCounselor;
 import gui.services.SampleTableModel;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +70,7 @@ public class GraphPopup {
         window.setMinWidth(500);
 
         Chart chart = createStackedBarChart();
+        chart.setAnimated(true);
         Scene scene = new Scene(chart);
 
         //show and tell
@@ -92,6 +93,7 @@ public class GraphPopup {
         yAxis.setLabel("Units Sold");
 
         final BarChart aChart = new BarChart(xAxis, yAxis, tableModel.getBarChartData());
+        aChart.setAnimated(true);
         tableModel.addTableModelListener(new TableModelListener() {
 
             @Override

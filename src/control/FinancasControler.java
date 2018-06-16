@@ -12,7 +12,7 @@ import control.services.FinancasConverter;
 import control.services.NacaoConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
-import gui.tabs.TabFinancasGui;
+import gui.tabs.TabFinancesGui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -39,13 +39,13 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
     private static final Log log = LogFactory.getLog(FinancasControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
-    private final TabFinancasGui tabGui;
+    private final TabFinancesGui tabGui;
     private List<Nacao> listaExibida;
     private final AcaoFacade acaoFacade = new AcaoFacade();
     private static final WorldFacadeCounselor WFC = WorldFacadeCounselor.getInstance();
     private final FinancasConverter finConv = new FinancasConverter();
 
-    public FinancasControler(TabFinancasGui tabGui) {
+    public FinancasControler(TabFinancesGui tabGui) {
         this.tabGui = tabGui;
         registerDispatchManager();
         registerDispatchManagerForMsg(DispatchManager.CLEAR_FINANCES_FORECAST);
@@ -70,7 +70,7 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
         return finConv.getProjecaoTableModel(nation, listPo);
     }
 
-    private TabFinancasGui getTabGui() {
+    private TabFinancesGui getTabGui() {
         return tabGui;
     }
 
