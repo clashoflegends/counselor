@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -41,14 +40,23 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
     public void checkNetworkConnection() throws ConnectException {
         boolean networkAvalaible = false;
         int timeout = 2000;
+        
+        
+        
         try {
+            final URL url = new URL(PROTOCOL_HOST + CLASH_HOST);
+            final URLConnection conn = url.openConnection();
+            conn.connect();
+            networkAvalaible = true;
+           
+            /*
             InetAddress[] addresses = InetAddress.getAllByName(CLASH_HOST);
             for (InetAddress address : addresses) {
                 if (address.isReachable(timeout)) {
                     networkAvalaible = true;
                 }
             }
-
+*/
         } catch (UnknownHostException e1) {
             LOG.error(e1);
             networkAvalaible = false;

@@ -317,7 +317,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 JOptionPane.showMessageDialog(settingsGui, errorLabel, "Internal error", JOptionPane.ERROR_MESSAGE);
 
             } catch (ConnectException ex) {
-                String errorLabel = "Netowrk connection is no avalaible or web site is unreachable.";
+                String errorLabel = "Network connection is no avalaible or web site is unreachable.";
                 JOptionPane.showMessageDialog(settingsGui, errorLabel, actionCommand, JOptionPane.ERROR_MESSAGE);
 
             } catch (IOException ex) {
