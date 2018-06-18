@@ -248,7 +248,7 @@
             <Component class="javax.swing.JButton" name="jbSaveWorld">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/images/disk icon.jpg"/>
+                  <Image iconType="3" name="/images/disk icon.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                   <ResourceString bundle="labels.properties" key="SALVAR.WORLD" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
