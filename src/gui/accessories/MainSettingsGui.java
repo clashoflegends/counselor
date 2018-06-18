@@ -147,6 +147,7 @@ public class MainSettingsGui extends JPanel {
         displayPortraitCheckBox = new javax.swing.JCheckBox();
         portraitsFolderLabel = new javax.swing.JLabel();
         downloadPortraitsButton = new javax.swing.JButton();
+        portraitFolderNameTextField = new javax.swing.JTextField();
         mapPanel = new javax.swing.JPanel();
         hexTagStyleLabel = new javax.swing.JLabel();
         armyPathLabel = new javax.swing.JLabel();
@@ -541,6 +542,14 @@ public class MainSettingsGui extends JPanel {
             }
         });
 
+        portraitFolderNameTextField.setEditable(false);
+        portraitFolderNameTextField.setText(settingsManager.getConfig("PortraitsFolder"));
+        portraitFolderNameTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                portraitFolderNameTextFieldActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout displayPanelLayout = new javax.swing.GroupLayout(displayPanel);
         displayPanel.setLayout(displayPanelLayout);
         displayPanelLayout.setHorizontalGroup(
@@ -554,13 +563,13 @@ public class MainSettingsGui extends JPanel {
                             .addComponent(tableColumnCheckBox)
                             .addComponent(copyOrdersCheckBox)
                             .addComponent(autoMoveCheckBox))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 56, Short.MAX_VALUE)
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(minimizeWindowCheckBox)
                             .addComponent(copyActionsPopUpCheckBox)
                             .addComponent(keepPopUpCheckBox)
                             .addComponent(fogOfWarCheckBox))
-                        .addGap(91, 91, 91))
+                        .addGap(167, 167, 167))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, displayPanelLayout.createSequentialGroup()
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(sortOrdersLabel)
@@ -581,7 +590,8 @@ public class MainSettingsGui extends JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(ownFiltroRadioButton)
-                                    .addComponent(sequenceRadioButton))
+                                    .addComponent(sequenceRadioButton)
+                                    .addComponent(portraitFolderNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(displayPanelLayout.createSequentialGroup()
                         .addComponent(displayPortraitCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -623,7 +633,8 @@ public class MainSettingsGui extends JPanel {
                 .addGap(12, 12, 12)
                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(portraitsFolderLabel)
-                    .addComponent(downloadPortraitsButton))
+                    .addComponent(downloadPortraitsButton)
+                    .addComponent(portraitFolderNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(6, 6, 6)
                 .addComponent(displayPortraitCheckBox)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -784,6 +795,10 @@ public class MainSettingsGui extends JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_downloadPortraitsButtonActionPerformed
 
+    private void portraitFolderNameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portraitFolderNameTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_portraitFolderNameTextFieldActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton allFiltroRadioButton;
@@ -833,6 +848,7 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JComboBox pcPathComboBox;
     private javax.swing.JLabel pcPathLabel;
     private javax.swing.JPanel playerPanel;
+    private javax.swing.JTextField portraitFolderNameTextField;
     private javax.swing.JLabel portraitsFolderLabel;
     private javax.swing.JButton saveDirButton;
     private javax.swing.JLabel saveDirLabel;
@@ -1061,4 +1077,8 @@ public class MainSettingsGui extends JPanel {
 
         return isShowPortraitChecked() || enableCheck;
     }
+    
+     public JTextField getPortraitFolderNameTextField() {
+         return this.portraitFolderNameTextField;       
+     }
 }
