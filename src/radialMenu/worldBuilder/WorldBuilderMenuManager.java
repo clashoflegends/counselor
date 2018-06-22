@@ -65,14 +65,15 @@ public class WorldBuilderMenuManager implements Serializable {
             //add terrain
             menu = doConfigOption(WorldBuilderRadialActions.MAIN_TERRAIN);
             doCreateTerrainSubMenu(menu);
-            //add city
-            menu = doConfigOption(WorldBuilderRadialActions.MAIN_CITY);
-            doCreateNacaoSubMenu(menu);
 
             //add decorations
             for (WorldBuilderRadialActions rra : WorldBuilderRadialActions.WorldBuilderMainMenu) {
                 doConfigOption(rra);
             }
+
+            //add city
+            menu = doConfigOption(WorldBuilderRadialActions.MAIN_CITY);
+            doCreateNacaoSubMenu(menu);
         }
         return rmWorldBuilder;
     }

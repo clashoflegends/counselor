@@ -81,7 +81,8 @@ public class RadialMenu extends javax.swing.JPanel {
     }
 
     private void updateButtons(Point position) {
-
+        //remember that Rads 0 degrees = 3oclock. 12 oclock = 90 degrees. 
+        //when clock = 12,3,6,9 then rad = 90, 0, 270, 180
         //TODO: falta tratamento quando menu eh direcao (nao colocar os invalidos)
         final int startAngle;
         final int totalArc;
@@ -122,9 +123,16 @@ public class RadialMenu extends javax.swing.JPanel {
             totalArc = 360;
             startAngle = 120;
         }
-        final double angularSpacing = (double) totalArc / (double) (getRootMenu().size() - 1);
+        final double angularSpacing;
+        if (totalArc >= 360) {
+            angularSpacing = (double) totalArc / (double) (getRootMenu().size());
+        } else if (totalArc >= 180) {
+            angularSpacing = (double) totalArc / (double) (getRootMenu().size() - 1);
+        } else {
+            angularSpacing = (double) totalArc / (double) (getRootMenu().size() + 1);
+        }
         setInitAngle(startAngle);
-        //set each's menu position
+        //set each's menu position clockwise
         for (RadialButton menu : getRootMenu()) {
             // Get current angles (in radians)
             double currentXAngle = Math.cos(Math.toRadians(getInitAngle()));

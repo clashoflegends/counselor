@@ -105,24 +105,35 @@ public class RadialButton extends JButton {
     }
 
     public void updateButtons() {
-        log.warn("\n" + getLocal().getCoordenadas() + " - " + position);
+        //remember that Rads 0 degrees = 3oclock. 12 oclock = 90 degrees. 
+        //when clock = 12,3,6,9 then rad = 90, 0, 270, 180
 
-        log.warn("x = " + position.x);
-        log.warn("Width = " + this.mapSize.x);
-        log.warn("Width - hexsize = " + (this.mapSize.x - ImageManager.HEX_SIZE));
-        log.warn(position.x >= this.mapSize.x - ImageManager.HEX_SIZE);
-        log.warn(this.mapSize.x - ImageManager.HEX_SIZE - position.x);
-
-        log.warn("y = " + position.y);
-        log.warn("Height = " + this.mapSize.y);
-        log.warn("Height - hexsize = " + (this.mapSize.y - ImageManager.HEX_SIZE));
-        log.warn(position.y >= this.mapSize.y - ImageManager.HEX_SIZE);
-        log.warn(this.mapSize.y - ImageManager.HEX_SIZE - position.y);
-
+//        log.warn("\n" + getLocal().getCoordenadas() + " - " + position);
+//
+//        log.warn("x = " + position.x);
+//        log.warn("Width = " + this.mapSize.x);
+//        log.warn("Width - hexsize = " + (this.mapSize.x - ImageManager.HEX_SIZE));
+//        log.warn(position.x >= this.mapSize.x - ImageManager.HEX_SIZE);
+//        log.warn(this.mapSize.x - ImageManager.HEX_SIZE - position.x);
+//
+//        log.warn("y = " + position.y);
+//        log.warn("Height = " + this.mapSize.y);
+//        log.warn("Height - hexsize = " + (this.mapSize.y - ImageManager.HEX_SIZE));
+//        log.warn(position.y >= this.mapSize.y - ImageManager.HEX_SIZE);
+//        log.warn(this.mapSize.y - ImageManager.HEX_SIZE - position.y);
+        double[] posAngle = calcPosicaoAngle();
         //use max, not min(), for a nice spacing for at least 16 items
-        double angularSpacing = (double) 360 / (double) Math.max(16, subMenuItems.size());
-        double count = 0;
-        double baseAngle = getInitAngle();
+        double angularSpacing;
+        if (posAngle[0] >= 360) {
+            angularSpacing = (double) posAngle[0] / (double) Math.max(16, subMenuItems.size());
+        } else if (posAngle[0] >= 180) {
+            angularSpacing = (double) posAngle[0] / (double) Math.max(9, subMenuItems.size() - 1);
+        } else {
+            //less than full circle, then do not space as much
+            angularSpacing = (double) posAngle[0] / (double) Math.max(5, subMenuItems.size() - 1);
+        }
+        double baseAngle = posAngle[1];
+        //set each's menu position clockwise
         for (RadialButton menu : subMenuItems) {
             final double angle = Math.toRadians(baseAngle);
             // Get current angles (in radians)
@@ -138,47 +149,48 @@ public class RadialButton extends JButton {
             menu.setPosition(position);
 //            menu.setInitAngle(angle);
             menu.setVisible(true);
-            baseAngle += angularSpacing;
+            baseAngle -= angularSpacing;
         }
     }
 
     private double[] calcPosicaoAngle() {
-        double startAngle = 0;
+        double startAngle;
         final int totalArc;
         //check for map boundaries
-        if (position.y <= 0) {
-            //upper border
-            totalArc = 180;
-            startAngle = 90;
-        } else if (position.y >= this.mapSize.y - ImageManager.HEX_SIZE * 2) {
-            //lower border
-            totalArc = 180;
-            startAngle = 270;
-        } else if (position.x >= this.mapSize.x - ImageManager.HEX_SIZE * 2) {
-            //right border
-            totalArc = 360;
-            startAngle = 180;
-        } else if (position.x <= ImageManager.HEX_SIZE) {
-            //left border
-            totalArc = 360;
-            startAngle = 0;
-        } else if (position.x <= 0 && position.y <= 0) {
+        if (position.x <= 0 && position.y <= 0) {
             //upper left corner
-            totalArc = 180;
+            totalArc = 90;
             startAngle = 0;
         } else if (position.x >= this.mapSize.x - ImageManager.HEX_SIZE * 2 && position.y <= 0) {
             //upper right corner
-            totalArc = 120;
+            totalArc = 90;
             startAngle = 270;
         } else if (position.x <= 0 && position.y >= this.mapSize.y - ImageManager.HEX_SIZE * 2) {
             //bottom left corner
-            totalArc = 120;
+            totalArc = 90;
             startAngle = 90;
         } else if (position.x >= this.mapSize.x - ImageManager.HEX_SIZE * 2 && position.y >= this.mapSize.y - ImageManager.HEX_SIZE * 2) {
             //bottom right corner
-            totalArc = 120;
+            totalArc = 90;
             startAngle = 180;
+        } else if (position.y <= 0) {
+            //upper border
+            totalArc = 180;
+            startAngle = 0;
+        } else if (position.y >= this.mapSize.y - ImageManager.HEX_SIZE * 2) {
+            //lower border
+            totalArc = 180;
+            startAngle = 180;
+        } else if (position.x >= this.mapSize.x - ImageManager.HEX_SIZE * 2) {
+            //right border
+            totalArc = 360;
+            startAngle = 270;
+        } else if (position.x <= ImageManager.HEX_SIZE) {
+            //left border
+            totalArc = 360;
+            startAngle = 90;
         } else {
+            //not an edge of the map
             totalArc = 360;
             startAngle = getInitAngle();
         }
@@ -210,7 +222,7 @@ public class RadialButton extends JButton {
      * @param initAngle the initAngle to set
      */
     public void setInitAngle(double initAngle) {
-        log.warn("set initAngle = " + initAngle);
+        //log.warn("initAngle from " + this.initAngle + " to " + initAngle);
         this.initAngle = initAngle;
     }
 
