@@ -183,11 +183,11 @@ public class RadialButton extends JButton {
             startAngle = 180;
         } else if (position.x >= this.mapSize.x - ImageManager.HEX_SIZE * 2) {
             //right border
-            totalArc = 360;
+            totalArc = 180;
             startAngle = 270;
         } else if (position.x <= ImageManager.HEX_SIZE) {
             //left border
-            totalArc = 360;
+            totalArc = 180;
             startAngle = 90;
         } else {
             //not an edge of the map
