@@ -6,9 +6,9 @@
 package gui;
 
 import business.ImageManager;
-import control.facade.WorldFacadeCounselor;
 import control.MapaControler;
 import control.WorldControler;
+import control.facade.WorldFacadeCounselor;
 import gui.components.JLabelGradient;
 import gui.services.ComponentFactory;
 import gui.tabs.TabPersonagensGui;
@@ -168,7 +168,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar1.add(jbSend);
         jToolBar1.add(filler2);
 
-        jbSaveWorld.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/disk icon.jpg"))); // NOI18N
+        jbSaveWorld.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/disk icon.png"))); // NOI18N
         jbSaveWorld.setText(labels.getString("SALVAR.WORLD")); // NOI18N
         jbSaveWorld.setToolTipText(labels.getString("SALVAR.WORLD.TOOLTIP")); // NOI18N
         jbSaveWorld.setActionCommand("jbSaveWorld");

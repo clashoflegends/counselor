@@ -11,9 +11,9 @@ import model.Cidade;
 import model.Partida;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistenceCommons.PersistenceException;
 import persistence.iDao.ICidadeDao;
 import persistence.local.WorldManager;
+import persistenceCommons.PersistenceException;
 
 /**
  *
@@ -39,7 +39,7 @@ public class ClientCidadeDao implements ICidadeDao, Serializable {
     }
 
     @Override
-    public void update(Cidade cidade) {
+    public void update(Cidade cidade, Partida partida) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

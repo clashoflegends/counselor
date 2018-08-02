@@ -65,14 +65,15 @@ public class WorldBuilderMenuManager implements Serializable {
             //add terrain
             menu = doConfigOption(WorldBuilderRadialActions.MAIN_TERRAIN);
             doCreateTerrainSubMenu(menu);
-            //add city
-            menu = doConfigOption(WorldBuilderRadialActions.MAIN_CITY);
-            doCreateNacaoSubMenu(menu);
 
             //add decorations
             for (WorldBuilderRadialActions rra : WorldBuilderRadialActions.WorldBuilderMainMenu) {
                 doConfigOption(rra);
             }
+
+            //add city
+            menu = doConfigOption(WorldBuilderRadialActions.MAIN_CITY);
+            doCreateNacaoSubMenu(menu);
         }
         return rmWorldBuilder;
     }
@@ -85,7 +86,7 @@ public class WorldBuilderMenuManager implements Serializable {
             rmDirectionsCentre.setOptionListener(getListener());
             int opt = -1;
             for (RadialActionsDirections ra : RadialActionsDirections.DirectionsMenu) {
-                RadialButton menu = new RadialButton(getListener().getCurrentAction());
+                RadialButton menu = new RadialButton(getListener().getCurrentAction(), getCanvasSize());
                 menu.setText(labels.getString(ra.getLabel()));
                 menu.setIcon(ImageManager.getInstance().getArrow(initAngle + 180 + 60 * opt));
                 menu.setRolloverIcon(ImageManager.getInstance().getYellowBall());
@@ -137,7 +138,7 @@ public class WorldBuilderMenuManager implements Serializable {
     private void doCreateTerrainSubMenu(RadialButton menu) {
         //create terrain submenu
         for (Terreno terreno : terrenos.values()) {
-            RadialButton subMenu = new RadialButton(WorldBuilderRadialActions.CHANGE_TERRAIN);
+            RadialButton subMenu = new RadialButton(WorldBuilderRadialActions.CHANGE_TERRAIN, getCanvasSize());
             subMenu.setText(terreno.getNome());
             subMenu.setIcon(ImageManager.getInstance().getBlueBall());
             subMenu.setRolloverIcon(ImageManager.getInstance().getYellowBall());
@@ -154,7 +155,7 @@ public class WorldBuilderMenuManager implements Serializable {
     private void doCreateNacaoSubMenu(RadialButton menu) {
         //create terrain submenu
         for (Nacao terreno : nacoes.values()) {
-            RadialButton subMenu = new RadialButton(WorldBuilderRadialActions.CHANGE_CITY_NATION);
+            RadialButton subMenu = new RadialButton(WorldBuilderRadialActions.CHANGE_CITY_NATION, getCanvasSize());
             subMenu.setText(terreno.getNome());
             subMenu.setIcon(ImageManager.getInstance().getBlueBall());
             subMenu.setRolloverIcon(ImageManager.getInstance().getYellowBall());
@@ -169,7 +170,7 @@ public class WorldBuilderMenuManager implements Serializable {
     }
 
     private RadialButton doConfigOption(WorldBuilderRadialActions ra) {
-        RadialButton menu = new RadialButton(ra);
+        RadialButton menu = new RadialButton(ra, getCanvasSize());
         menu.setText(labels.getString(ra.getLabel()));
         menu.setIcon(ImageManager.getInstance().getBlueBall());
         menu.setRolloverIcon(ImageManager.getInstance().getYellowBall());
