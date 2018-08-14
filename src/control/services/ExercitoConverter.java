@@ -10,9 +10,8 @@ import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
 import business.facade.ExercitoFacade;
 import business.facade.LocalFacade;
-import persistence.local.ListFactory;
-import control.facade.WorldFacadeCounselor;
 import business.interfaces.IExercito;
+import control.facade.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +33,7 @@ import msgs.BaseMsgs;
 import msgs.TitleFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.ListFactory;
 import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
@@ -408,7 +408,8 @@ public class ExercitoConverter implements Serializable {
                 } catch (NullPointerException ex) {
                     //no garrison at the scene.
                     list = new ArrayList<Pelotao>();
-                }   break;
+                }
+                break;
             case 2:
                 list = listTropasTipoTransfer(exercito);
                 break;
@@ -456,7 +457,7 @@ public class ExercitoConverter implements Serializable {
          */
         ret.addTab(TitleFactory.displayExercitotitulo(exercito));
         for (Pelotao platoon : exercito.getPelotoes().values()) {
-            ret.addTabTab(String.format("%s %s",platoon.getQtd(), platoon.getTipoTropa().getNome()));
+            ret.addTabTab(String.format("%s %s", platoon.getQtd(), platoon.getTipoTropa().getNome()));
         }
         return ret.getList();
     }
@@ -499,28 +500,6 @@ public class ExercitoConverter implements Serializable {
 
     }
 
-    public static GenericoTableModel getBattleModel(List<ExercitoSim> lista) {
-        GenericoTableModel exercitoModel
-                = new GenericoTableModel(getBattleColNames(), getBattleAsArray(lista),
-                        new Class[]{
-                            java.lang.String.class,
-                            java.lang.Integer.class, java.lang.Integer.class,
-                            java.lang.Integer.class, java.lang.Integer.class,
-                            java.lang.String.class
-                        });
-        return exercitoModel;
-    }
-
-    private static String[] getBattleColNames() {
-        String[] colNames = {
-            labels.getString("COMANDANTE"),
-            labels.getString("TROPA.ATAQUE.NAVAL"), labels.getString("TROPA.DEFESA.NAVAL"),
-            labels.getString("TROPA.ATAQUE.TERRA"), labels.getString("TROPA.DEFESA.TERRA"),
-            labels.getString("NACAO")
-        };
-        return (colNames);
-    }
-
     private static Object[][] getBattleAsArray(List<ExercitoSim> listaExibir) {
         if (listaExibir.isEmpty()) {
             Object[][] ret = {{"", "", "", "", "", ""}};
@@ -535,6 +514,36 @@ public class ExercitoConverter implements Serializable {
         }
     }
 
+    public static GenericoTableModel getBattleModel(List<ExercitoSim> lista) {
+        GenericoTableModel exercitoModel
+                = new GenericoTableModel(getBattleColNames(), getBattleAsArray(lista),
+                        new Class[]{
+                            java.lang.String.class,
+                            java.lang.Integer.class, java.lang.Integer.class,
+                            java.lang.Integer.class, java.lang.Integer.class,
+                            java.lang.String.class,
+                            java.lang.Integer.class, java.lang.Integer.class,
+                            java.lang.String.class,
+                            java.lang.Integer.class, java.lang.Integer.class
+                        });
+        return exercitoModel;
+    }
+
+    private static String[] getBattleColNames() {
+        String[] colNames = {
+            labels.getString("COMANDANTE"),
+            labels.getString("TROPA.ATAQUE.NAVAL"), labels.getString("TROPA.DEFESA.NAVAL"),
+            labels.getString("TROPA.ATAQUE.TERRA"), labels.getString("TROPA.DEFESA.TERRA"),
+            labels.getString("TATICA"),
+            labels.getString("TROPA.ATAQUE.BONUS"),
+            labels.getString("TROPA.DEFESA.BONUS"),
+            labels.getString("NACAO"),
+            labels.getString("COMANDANTE"),
+            labels.getString("MORAL")
+        };
+        return (colNames);
+    }
+
     private static Object[] battleToArray(ExercitoSim exercito) {
         int ii = 0;
         Object[] cArray = new Object[getBattleColNames().length];
@@ -543,7 +552,12 @@ public class ExercitoConverter implements Serializable {
         cArray[ii++] = exercitoFacade.getDefesaExercito(exercito, true);
         cArray[ii++] = exercitoFacade.getAtaqueExercito(exercito, false);
         cArray[ii++] = exercitoFacade.getDefesaExercito(exercito, false);
+        cArray[ii++] = exercitoFacade.getTacticNameSelected(exercito);
+        cArray[ii++] = exercitoFacade.getAtaqueBonusExercito(exercito);
+        cArray[ii++] = exercitoFacade.getDefesaBonusExercito(exercito);
         cArray[ii++] = exercitoFacade.getNacaoNome(exercito);
+        cArray[ii++] = exercitoFacade.getPericiaComandante(exercito);
+        cArray[ii++] = exercitoFacade.getMoral(exercito);
         return cArray;
     }
 }

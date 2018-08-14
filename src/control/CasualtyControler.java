@@ -5,6 +5,7 @@
 package control;
 
 import baseLib.GenericoComboBoxModel;
+import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
 import business.converter.ConverterFactory;
 import business.services.ComparatorFactory;
@@ -127,6 +128,10 @@ public class CasualtyControler implements Serializable, ActionListener {
         }
     }
 
+    public void setFiltroTactic(GenericoComboObject tactic) {
+        getTabGui().setFiltroTactic(tactic);
+    }
+
     public ExercitoSim getExercito() {
         return exercito;
     }
@@ -139,5 +144,4 @@ public class CasualtyControler implements Serializable, ActionListener {
     public void setExercito(ExercitoSim exercito) {
         this.exercito = exercito;
     }
-
 }

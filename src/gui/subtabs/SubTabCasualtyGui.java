@@ -5,6 +5,7 @@
  */
 package gui.subtabs;
 
+import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import control.CasualtyControler;
 import gui.TabBase;
@@ -197,6 +198,16 @@ public final class SubTabCasualtyGui extends TabBase {
     public String getFiltroTactic() {
         GenericoComboObject elem = (GenericoComboObject) comboFiltroTactic.getSelectedItem();
         return elem.getComboId();
+    }
+
+    public void setFiltroTactic(GenericoComboObject cdTactic) {
+        GenericoComboBoxModel model = (GenericoComboBoxModel) comboFiltroTactic.getModel();
+        comboFiltroTactic.setSelectedIndex(model.getIndexByDisplay(cdTactic.getComboDisplay()));
+        //comboFiltroTactic.setSelectedItem(cdTactic.getComboDisplay());
+    }
+
+    public void doHideTacticCombo() {
+        comboFiltroTactic.setVisible(false);
     }
 
     private void updateGui() {

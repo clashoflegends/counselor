@@ -8,9 +8,11 @@ import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.IBaseModel;
 import business.ImageManager;
+import business.converter.ConverterFactory;
 import business.facade.BattleSimFacade;
 import control.facade.WorldFacadeCounselor;
 import control.services.AcaoConverter;
+import control.services.CenarioConverter;
 import control.services.ExercitoConverter;
 import control.support.IBattleSimulator;
 import java.awt.event.ActionEvent;
@@ -19,6 +21,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JSlider;
@@ -87,8 +90,20 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
         this.casualtyControler.updateArmy(exercito, terreno);
     }
 
+    private void updateArmyCasualtyControler(ExercitoSim exercito, Terreno terreno, GenericoComboObject tactic) {
+        if (this.casualtyControler == null) {
+            return;
+        }
+        this.casualtyControler.setFiltroTactic(tactic);
+        updateArmyCasualtyControler(exercito, terreno);
+    }
+
     public void setCasualtyControler(CasualtyControler casualtyControler) {
         this.casualtyControler = casualtyControler;
+    }
+
+    public ComboBoxModel listFiltroTactic() {
+        return CenarioConverter.getInstance().getTaticaComboModel();
     }
 
     @Override
@@ -109,6 +124,10 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
                     exercito.setComandante((Integer) source.getValue());
                 } else if ("jsMorale".equals(source.getName())) {
                     exercito.setMoral((Integer) source.getValue());
+                } else if ("jsAbonus".equals(source.getName())) {
+                    exercito.setBonusAttack((Integer) source.getValue());
+                } else if ("jsDbonus".equals(source.getName())) {
+                    exercito.setBonusDefense((Integer) source.getValue());
                 }
                 this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
             } catch (NullPointerException e) {
@@ -153,10 +172,10 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
     }
 
     private void actionOnTabGui(ActionEvent event) {
-        JComboBox jcbTerrain = (JComboBox) event.getSource();
-        if ("jcbTerrain".equals(jcbTerrain.getActionCommand())) {
+        JComboBox jcbActive = (JComboBox) event.getSource();
+        if ("jcbTerrain".equals(jcbActive.getActionCommand())) {
             try {
-                final GenericoComboObject obj = (GenericoComboObject) jcbTerrain.getModel().getSelectedItem();
+                final GenericoComboObject obj = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
                 final Terreno terrain = (Terreno) obj.getObject();
                 for (ExercitoSim army : listaExibida) {
                     army.setTerreno(terrain);
@@ -168,6 +187,15 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
                 updateArmyCasualtyControler(exercito, getTerreno());
             } catch (NullPointerException ex) {
             }
+        } else if ("cbTactic".equals(jcbActive.getActionCommand())) {
+            final GenericoComboObject tactic = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
+            if (exercito != null) {
+                exercito.setTatica(ConverterFactory.taticaToInt(tactic.getComboId()));
+            }
+            this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
+            updateArmyCasualtyControler(exercito, getTerreno(), tactic);
+        } else {
+            log.info(String.format("actionOnTabGui %s %s", jcbActive.getActionCommand(), jcbActive.getName()));
         }
     }
 

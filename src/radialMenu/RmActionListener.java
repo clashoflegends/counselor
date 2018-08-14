@@ -4,13 +4,12 @@
  */
 package radialMenu;
 
-import control.facade.WorldFacadeCounselor;
 import control.services.LocalConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.accessories.ArmyMoveSimulator;
 import gui.accessories.BattleCasualtySimulator;
-import gui.accessories.BattleSimulator;
+import gui.accessories.BattleCasualtySimulatorNew;
 import gui.accessories.TroopsCasualtiesList;
 import gui.components.DialogTextArea;
 import gui.services.ComponentFactory;
@@ -235,11 +234,19 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
     }
 
     private void createBattleSim(RadialButton rb) {
-        final boolean oldBattleSim = SettingsManager.getInstance().getConfig("BatleSimOld", "0").equalsIgnoreCase("1") || !WorldFacadeCounselor.getInstance().hasCombatCasualtiesTactics();
-        if (oldBattleSim) {
-            BattleSimulator battleSim = new BattleSimulator(rb.getLocal());
+        final boolean newBattleSim = SettingsManager.getInstance().getConfig("BatleSimNew", "0").equalsIgnoreCase("1");
+        if (newBattleSim) {
+            BattleCasualtySimulatorNew battleSim = new BattleCasualtySimulatorNew(rb.getLocal());
             battleSim.setLocationRelativeTo(rb);
             battleSim.setVisible(true);
+            /*
+            BattleSimFx battleSim = new BattleSimFx();
+            battleSim.start();
+            create a blank new FX window.
+            start over Counselor (setLocationRelativeTo)?
+            list armies.
+            go from there.
+             */
         } else {
             BattleCasualtySimulator battleSim = new BattleCasualtySimulator(rb.getLocal());
             battleSim.setLocationRelativeTo(rb);
