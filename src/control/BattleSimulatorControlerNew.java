@@ -14,7 +14,8 @@ import control.facade.WorldFacadeCounselor;
 import control.services.AcaoConverter;
 import control.services.CenarioConverter;
 import control.services.ExercitoConverter;
-import control.support.IBattleSimulator;
+import control.services.FiltroConverter;
+import gui.accessories.BattleCasualtySimulatorNew;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -46,19 +47,19 @@ import persistenceCommons.SettingsManager;
  *
  * @author gurgel
  */
-public class BattleSimulatorControler implements Serializable, ChangeListener, ListSelectionListener, ActionListener {
+public class BattleSimulatorControlerNew implements Serializable, ChangeListener, ListSelectionListener, ActionListener {
 
-    private static final Log log = LogFactory.getLog(BattleSimulatorControler.class);
+    private static final Log log = LogFactory.getLog(BattleSimulatorControlerNew.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private final IBattleSimulator tabGui;
+    private final BattleCasualtySimulatorNew tabGui;
     private final List<ExercitoSim> listaExibida = new ArrayList<ExercitoSim>();
     private ExercitoSim exercito;
     private final BattleSimFacade combSim = new BattleSimFacade();
     private Terreno terreno;
     private int rowIndex = 0;
-    private CasualtyControler casualtyControler;
+    private BattleSimPlatoonCasualtyControlerNew casualtyControler;
 
-    public BattleSimulatorControler(IBattleSimulator tabGui) {
+    public BattleSimulatorControlerNew(BattleCasualtySimulatorNew tabGui) {
         this.tabGui = tabGui;
     }
 
@@ -66,7 +67,7 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
         return AcaoConverter.getAjuda(ordem);
     }
 
-    public IBattleSimulator getTabGui() {
+    public BattleCasualtySimulatorNew getTabGui() {
         return tabGui;
     }
 
@@ -94,11 +95,11 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
         if (this.casualtyControler == null) {
             return;
         }
-        this.casualtyControler.setFiltroTactic(tactic);
+        getTabGui().setFiltroTactic(tactic);
         updateArmyCasualtyControler(exercito, terreno);
     }
 
-    public void setCasualtyControler(CasualtyControler casualtyControler) {
+    public void setCasualtyControler(BattleSimPlatoonCasualtyControlerNew casualtyControler) {
         this.casualtyControler = casualtyControler;
     }
 
@@ -247,4 +248,9 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
         rowIndex = listaExibida.size() - 1;
         this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
     }
+
+    public ComboBoxModel listFiltroTypes() {
+        return new GenericoComboBoxModel(FiltroConverter.listFiltroLW());
+    }
+
 }
