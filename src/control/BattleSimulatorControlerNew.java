@@ -36,6 +36,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
 import model.Exercito;
 import model.ExercitoSim;
+import model.Nacao;
 import model.Ordem;
 import model.Terreno;
 import org.apache.commons.logging.Log;
@@ -75,35 +76,73 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
         return terreno;
     }
 
-    public void doChangeTerrain(Terreno terrain) {
-        setTerreno(terrain);
-        this.getTabGui().setIconImage(ImageManager.getInstance().getTerrainImages(terrain.getCodigo()));
-    }
-
     private void setTerreno(Terreno terreno) {
         this.terreno = terreno;
-    }
-
-    private void updateArmyCasualtyControler(ExercitoSim exercito, Terreno terreno) {
-        if (this.casualtyControler == null) {
-            return;
-        }
-        this.casualtyControler.updateArmy(exercito, terreno);
-    }
-
-    private void updateArmyCasualtyControler(ExercitoSim exercito, Terreno terreno, GenericoComboObject tactic) {
-        if (this.casualtyControler == null) {
-            return;
-        }
-        updateArmyCasualtyControler(exercito, terreno);
     }
 
     public void setCasualtyControler(BattleSimPlatoonCasualtyControlerNew casualtyControler) {
         this.casualtyControler = casualtyControler;
     }
 
+    public void doChangeTerrain(Terreno terrain) {
+        setTerreno(terrain);
+        this.getTabGui().setIconImage(ImageManager.getInstance().getTerrainImages(terrain.getCodigo()));
+    }
+
+    private void updateArmyCasualtyControler(ExercitoSim exercito, Terreno terreno) {
+        if (this.casualtyControler == null) {
+            //safe to ignore if not initialized
+            return;
+        }
+        this.casualtyControler.updateArmy(exercito, terreno);
+    }
+
     public ComboBoxModel listFiltroTactic() {
         return CenarioConverter.getInstance().getTaticaComboModel();
+    }
+
+    public GenericoComboBoxModel getNacaoComboModel() {
+        List<IBaseModel> lista = new ArrayList<IBaseModel>(WorldFacadeCounselor.getInstance().getNacoes().values());
+        return new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]));
+    }
+
+    public TableModel getArmyListTableModel(Collection<Exercito> armies) {
+        for (Exercito army : armies) {
+            listaExibida.add(combSim.clone(army));
+        }
+        return ExercitoConverter.getBattleModel(listaExibida);
+    }
+
+    public GenericoComboBoxModel getTerrenoComboModel() {
+        List<IBaseModel> lista = new ArrayList<IBaseModel>(WorldFacadeCounselor.getInstance().getCenario().getTerrenos().values());
+        return new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]));
+    }
+
+    private void doRemoveArmy(ExercitoSim army) {
+        listaExibida.remove(army);
+        rowIndex--;
+        doRefreshArmy();
+    }
+
+    private void doCloneArmy(ExercitoSim army) {
+        listaExibida.add(combSim.clone(army));
+        rowIndex = listaExibida.size() - 1;
+        doRefreshArmy();
+    }
+
+    private void doNewArmy() {
+        //FIXME: needs to receive Local for the Battle to be resolved. Deal with this later. Local could be stored in GUi or Control.
+        listaExibida.add(new ExercitoSim("Blank", getTerrain()));
+        rowIndex = listaExibida.size() - 1;
+        doRefreshArmy();
+    }
+
+    public void doRefreshArmy() {
+        this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
+    }
+
+    public ComboBoxModel listFiltroTypes() {
+        return new GenericoComboBoxModel(FiltroConverter.listFiltroLW());
     }
 
     @Override
@@ -208,61 +247,18 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
                 exercito.setTatica(ConverterFactory.taticaToInt(tactic.getComboId()));
             }
             doRefreshArmy();
-            updateArmyCasualtyControler(exercito, getTerrain(), tactic);
+            updateArmyCasualtyControler(exercito, getTerrain());
+        } else if ("cbNation".equals(jcbActive.getActionCommand())) {
+            final GenericoComboObject nation = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
+            if (exercito != null) {
+                exercito.setNacao((Nacao) nation.getObject());
+            }
+            doRefreshArmy();
+            updateArmyCasualtyControler(exercito, getTerrain());
         } else if ("comboFiltro".equals(jcbActive.getActionCommand())) {
-            getTabGui().setPlatoonModel(
-                    casualtyControler.getPlatoonTableModel(
-                            getTabGui().getFiltroTypes(),
-                            getTabGui().getFiltroTactic().getComboId(),
-                            getTerrain()),
-                    0
-            );
+            updateArmyCasualtyControler(exercito, getTerrain());
         } else {
             log.info(String.format("actionOnTabGui %s %s", jcbActive.getActionCommand(), jcbActive.getName()));
         }
     }
-
-    public TableModel getArmyListTableModel(Collection<Exercito> armies) {
-        for (Exercito army : armies) {
-            listaExibida.add(combSim.clone(army));
-        }
-        return ExercitoConverter.getBattleModel(listaExibida);
-    }
-
-    public GenericoComboBoxModel getTerrenoComboModel() {
-        List<IBaseModel> lista = new ArrayList<IBaseModel>();
-        for (IBaseModel elem : WorldFacadeCounselor.getInstance().getCenario().getTerrenos().values()) {
-            lista.add(elem);
-        }
-        GenericoComboBoxModel model = new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]));
-        return model;
-    }
-
-    private void doRemoveArmy(ExercitoSim army) {
-        listaExibida.remove(army);
-        rowIndex--;
-        doRefreshArmy();
-    }
-
-    private void doCloneArmy(ExercitoSim army) {
-        listaExibida.add(combSim.clone(army));
-        rowIndex = listaExibida.size() - 1;
-        doRefreshArmy();
-    }
-
-    private void doNewArmy() {
-        //FIXME: needs to receive Local for the Battle to be resolved. Deal with this later. Local could be stored in GUi or Control.
-        listaExibida.add(new ExercitoSim("Blank", getTerrain()));
-        rowIndex = listaExibida.size() - 1;
-        doRefreshArmy();
-    }
-
-    public void doRefreshArmy() {
-        this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
-    }
-
-    public ComboBoxModel listFiltroTypes() {
-        return new GenericoComboBoxModel(FiltroConverter.listFiltroLW());
-    }
-
 }

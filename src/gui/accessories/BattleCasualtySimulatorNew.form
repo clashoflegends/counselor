@@ -26,9 +26,9 @@
           <Group type="102" alignment="0" attributes="0">
               <Group type="103" groupAlignment="1" max="-2" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="jpArmies" min="-2" max="-2" attributes="0"/>
+                      <Component id="jpArmyList" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jpPlatoons" max="32767" attributes="0"/>
+                      <Component id="jpPlatoonList" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
                       <Component id="jpCity" min="-2" max="-2" attributes="0"/>
@@ -48,12 +48,12 @@
               <Group type="103" groupAlignment="1" max="-2" attributes="0">
                   <Component id="jpPlatoonEdit" alignment="0" max="32767" attributes="0"/>
                   <Component id="jpArmyEdit" alignment="0" max="32767" attributes="0"/>
-                  <Component id="jpCity" pref="0" max="32767" attributes="0"/>
+                  <Component id="jpCity" pref="227" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jpArmies" max="32767" attributes="0"/>
-                  <Component id="jpPlatoons" max="32767" attributes="0"/>
+                  <Component id="jpArmyList" max="32767" attributes="0"/>
+                  <Component id="jpPlatoonList" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
           </Group>
@@ -75,9 +75,9 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jsFortification" pref="309" max="32767" attributes="0"/>
-              <Component id="jsSize" alignment="1" max="32767" attributes="0"/>
-              <Component id="jsLoyalty" alignment="1" max="32767" attributes="0"/>
+              <Component id="jsCityFortification" pref="309" max="32767" attributes="0"/>
+              <Component id="jsCitySize" alignment="1" max="32767" attributes="0"/>
+              <Component id="jsCityLoyalty" alignment="1" max="32767" attributes="0"/>
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -96,15 +96,15 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jlLoyalty" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jsLoyalty" min="-2" max="-2" attributes="0"/>
+                  <Component id="jsCityLoyalty" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="jlSize" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jsSize" min="-2" max="-2" attributes="0"/>
+                  <Component id="jsCitySize" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="jlFortification" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jsFortification" min="-2" max="-2" attributes="0"/>
+                  <Component id="jsCityFortification" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -141,17 +141,17 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JSlider" name="jsLoyalty">
+        <Component class="javax.swing.JSlider" name="jsCityLoyalty">
           <Properties>
             <Property name="majorTickSpacing" type="int" value="10"/>
             <Property name="minimum" type="int" value="1"/>
             <Property name="minorTickSpacing" type="int" value="5"/>
             <Property name="paintTicks" type="boolean" value="true"/>
             <Property name="value" type="int" value="1"/>
-            <Property name="name" type="java.lang.String" value="jsLoyalty" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="jsCityLoyalty" noResource="true"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JSlider" name="jsSize">
+        <Component class="javax.swing.JSlider" name="jsCitySize">
           <Properties>
             <Property name="majorTickSpacing" type="int" value="1"/>
             <Property name="maximum" type="int" value="5"/>
@@ -159,10 +159,10 @@
             <Property name="paintTicks" type="boolean" value="true"/>
             <Property name="snapToTicks" type="boolean" value="true"/>
             <Property name="value" type="int" value="0"/>
-            <Property name="name" type="java.lang.String" value="jsSize" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="jsCitySize" noResource="true"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JSlider" name="jsFortification">
+        <Component class="javax.swing.JSlider" name="jsCityFortification">
           <Properties>
             <Property name="majorTickSpacing" type="int" value="1"/>
             <Property name="maximum" type="int" value="5"/>
@@ -170,12 +170,12 @@
             <Property name="paintTicks" type="boolean" value="true"/>
             <Property name="snapToTicks" type="boolean" value="true"/>
             <Property name="value" type="int" value="0"/>
-            <Property name="name" type="java.lang.String" value="jsFortification" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="jsCityFortification" noResource="true"/>
           </Properties>
         </Component>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="jpArmies">
+    <Container class="javax.swing.JPanel" name="jpArmyList">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
@@ -244,40 +244,30 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jbNewArmy" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
+                  <Component id="jbCloneArmy" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jbRemArmy" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
+              </Group>
+              <Group type="102" attributes="0">
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Component id="jLabel5" max="32767" attributes="0"/>
+                      <Component id="jLabel12" max="32767" attributes="0"/>
+                      <Component id="jLabel1" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jLabel2" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jLabel3" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jLabel4" alignment="0" max="32767" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jcbTerrain" alignment="0" max="32767" attributes="0"/>
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jLabel1" max="32767" attributes="0"/>
-                                      <Component id="jLabel2" max="32767" attributes="0"/>
-                                      <Component id="jLabel3" max="32767" attributes="0"/>
-                                      <Component id="jLabel4" max="32767" attributes="0"/>
-                                      <Component id="jLabel5" max="32767" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jbNewArmy" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="jbCloneArmy" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="jbRemArmy" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              </Group>
-                              <Component id="jsMorale" max="32767" attributes="0"/>
-                              <Component id="jsCommander" max="32767" attributes="0"/>
-                              <Component id="jsAbonus" max="32767" attributes="0"/>
-                              <Component id="jsDbonus" max="32767" attributes="0"/>
-                              <Component id="cbTactic" alignment="0" max="32767" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="cbArmyTactic" alignment="1" max="32767" attributes="0"/>
+                      <Component id="jsArmyMorale" max="32767" attributes="0"/>
+                      <Component id="jsArmyCommander" max="32767" attributes="0"/>
+                      <Component id="jsArmyAbonus" max="32767" attributes="0"/>
+                      <Component id="jsArmyDbonus" max="32767" attributes="0"/>
+                      <Component id="cbArmyNation" max="32767" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -285,33 +275,36 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="jcbTerrain" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jsCommander" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jsArmyCommander" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jsMorale" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jsArmyMorale" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jsAbonus" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jsArmyAbonus" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jsDbonus" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jsArmyDbonus" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel12" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cbArmyNation" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="cbTactic" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cbArmyTactic" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jbCloneArmy" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jbRemArmy" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -322,18 +315,6 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JComboBox" name="jcbTerrain">
-          <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="4">
-                <StringItem index="0" value="Item 1"/>
-                <StringItem index="1" value="Item 2"/>
-                <StringItem index="2" value="Item 3"/>
-                <StringItem index="3" value="Item 4"/>
-              </StringArray>
-            </Property>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
@@ -341,12 +322,12 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JSpinner" name="jsCommander">
+        <Component class="javax.swing.JSpinner" name="jsArmyCommander">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
               <SpinnerModel initial="0" maximum="1000" minimum="0" numberType="java.lang.Integer" stepSize="5" type="number"/>
             </Property>
-            <Property name="name" type="java.lang.String" value="jsCommander" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="jsArmyCommander" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
@@ -356,12 +337,12 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JSpinner" name="jsMorale">
+        <Component class="javax.swing.JSpinner" name="jsArmyMorale">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
               <SpinnerModel initial="0" maximum="1000" minimum="0" numberType="java.lang.Integer" stepSize="10" type="number"/>
             </Property>
-            <Property name="name" type="java.lang.String" value="jsMorale" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="jsArmyMorale" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">
@@ -371,12 +352,12 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JSpinner" name="jsAbonus">
+        <Component class="javax.swing.JSpinner" name="jsArmyAbonus">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
               <SpinnerModel initial="0" maximum="1000000" minimum="0" numberType="java.lang.Integer" stepSize="1000" type="number"/>
             </Property>
-            <Property name="name" type="java.lang.String" value="jsAbonus" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="jsArmyAbonus" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel4">
@@ -386,12 +367,12 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JSpinner" name="jsDbonus">
+        <Component class="javax.swing.JSpinner" name="jsArmyDbonus">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
               <SpinnerModel initial="0" maximum="1000000" minimum="0" numberType="java.lang.Integer" stepSize="1000" type="number"/>
             </Property>
-            <Property name="name" type="java.lang.String" value="jsDbonus" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="jsArmyDbonus" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel5">
@@ -401,7 +382,7 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JComboBox" name="cbTactic">
+        <Component class="javax.swing.JComboBox" name="cbArmyTactic">
         </Component>
         <Component class="javax.swing.JButton" name="jbNewArmy">
           <Properties>
@@ -439,9 +420,22 @@
             <Property name="name" type="java.lang.String" value="jbCloneArmy" noResource="true"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JLabel" name="jLabel12">
+          <Properties>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="NACAO" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="cbArmyNation">
+          <Properties>
+            <Property name="actionCommand" type="java.lang.String" value="cbNacao"/>
+            <Property name="name" type="java.lang.String" value="cbArmyNation" noResource="true"/>
+          </Properties>
+        </Component>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="jpPlatoons">
+    <Container class="javax.swing.JPanel" name="jpPlatoonList">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
@@ -462,9 +456,9 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
+                  <Component id="jScrollPane3" pref="90" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane3" pref="73" max="32767" attributes="0"/>
+                  <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -479,8 +473,9 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="comboFiltroTypes" min="-2" pref="56" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="cbTypeCategory" min="-2" pref="56" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="jcbTerrain" min="-2" pref="198" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -489,8 +484,9 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="comboFiltroTypes" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="cbTypeCategory" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel11" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="jcbTerrain" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="32767" attributes="0"/>
                   </Group>
@@ -498,12 +494,24 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JComboBox" name="comboFiltroTypes">
+            <Component class="javax.swing.JComboBox" name="cbTypeCategory">
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel11">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                   <ResourceString bundle="gui/accessories/Bundle.properties" key="LISTAR:" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+                </Property>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JComboBox" name="jcbTerrain">
+              <Properties>
+                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                  <StringArray count="4">
+                    <StringItem index="0" value="Item 1"/>
+                    <StringItem index="1" value="Item 2"/>
+                    <StringItem index="2" value="Item 3"/>
+                    <StringItem index="3" value="Item 4"/>
+                  </StringArray>
                 </Property>
               </Properties>
             </Component>
@@ -575,17 +583,17 @@
                       </Group>
                   </Group>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="cbTroopType" max="32767" attributes="0"/>
-                      <Component id="jsQty" max="32767" attributes="0"/>
+                      <Component id="cbPlatoonTroopType" max="32767" attributes="0"/>
+                      <Component id="jsPlatoonQty" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jbClonePlatoon" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jbRemPlatoon" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
-                      <Component id="jsTraining" alignment="0" max="32767" attributes="0"/>
-                      <Component id="jsWeapon" alignment="0" max="32767" attributes="0"/>
-                      <Component id="jsArmor" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jsPlatoonTraining" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jsPlatoonWeapon" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jsPlatoonArmor" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -596,27 +604,27 @@
               <Group type="102" alignment="0" attributes="0">
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="cbTroopType" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cbPlatoonTroopType" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jsQty" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jsPlatoonQty" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jsTraining" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jsPlatoonTraining" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jsWeapon" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jsPlatoonWeapon" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jsArmor" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jsPlatoonArmor" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -636,12 +644,12 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JSpinner" name="jsQty">
+        <Component class="javax.swing.JSpinner" name="jsPlatoonQty">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
               <SpinnerModel initial="1000" maximum="1000000" minimum="0" numberType="java.lang.Integer" stepSize="100" type="number"/>
             </Property>
-            <Property name="name" type="java.lang.String" value="jsQty" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="jsPlatoonQty" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel7">
@@ -651,12 +659,12 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JSpinner" name="jsTraining">
+        <Component class="javax.swing.JSpinner" name="jsPlatoonTraining">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
               <SpinnerModel initial="10" maximum="100" minimum="0" numberType="java.lang.Integer" stepSize="10" type="number"/>
             </Property>
-            <Property name="name" type="java.lang.String" value="jsTraining" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="jsPlatoonTraining" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel8">
@@ -666,12 +674,12 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JSpinner" name="jsWeapon">
+        <Component class="javax.swing.JSpinner" name="jsPlatoonWeapon">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
               <SpinnerModel initial="10" maximum="100" minimum="0" numberType="java.lang.Integer" stepSize="10" type="number"/>
             </Property>
-            <Property name="name" type="java.lang.String" value="jsWeapon" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="jsPlatoonWeapon" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel9">
@@ -681,12 +689,12 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JSpinner" name="jsArmor">
+        <Component class="javax.swing.JSpinner" name="jsPlatoonArmor">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
               <SpinnerModel initial="10" maximum="100" minimum="0" numberType="java.lang.Integer" stepSize="10" type="number"/>
             </Property>
-            <Property name="name" type="java.lang.String" value="jsArmor" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="jsPlatoonArmor" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel10">
@@ -696,7 +704,7 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JComboBox" name="cbTroopType">
+        <Component class="javax.swing.JComboBox" name="cbPlatoonTroopType">
         </Component>
         <Component class="javax.swing.JButton" name="jbNewPlatoon">
           <Properties>

@@ -55,12 +55,11 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         setLocal(local);
         configUI(local);
         /*
-        add/edit plattons; add platoon when no army. find platoon by troopType, not rowIndex.
-        How to add nation? add to army panel?
-        rename components to identify platoon's vs army's easier
         relayout: Move terrain to city box; rename city box to local, adjust title;
+        better messages https://stackoverflow.com/questions/3240415/how-to-create-a-notification-in-swing  https://stackoverflow.com/questions/23841518/how-to-pop-up-a-text-boxor-tooltip-via-script-in-java
         test edge cases, no armies, no city, sea, etc
-        run simulation (spit out round by round results)
+        FIXME: fix all fixmes
+        run simulation (split out round by round results)
         add troops/nation/army powers to combar (i.e. first strike)
         add diplomatic relationship to BattleSim
          */
@@ -79,44 +78,46 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jlSize = new javax.swing.JLabel();
         jlFortification = new javax.swing.JLabel();
         jlDefense = new javax.swing.JLabel();
-        jsLoyalty = new javax.swing.JSlider();
-        jsSize = new javax.swing.JSlider();
-        jsFortification = new javax.swing.JSlider();
-        jpArmies = new javax.swing.JPanel();
+        jsCityLoyalty = new javax.swing.JSlider();
+        jsCitySize = new javax.swing.JSlider();
+        jsCityFortification = new javax.swing.JSlider();
+        jpArmyList = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtArmyList = new javax.swing.JTable();
         jpArmyEdit = new javax.swing.JPanel();
-        jcbTerrain = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
-        jsCommander = new javax.swing.JSpinner();
+        jsArmyCommander = new javax.swing.JSpinner();
         jLabel2 = new javax.swing.JLabel();
-        jsMorale = new javax.swing.JSpinner();
+        jsArmyMorale = new javax.swing.JSpinner();
         jLabel3 = new javax.swing.JLabel();
-        jsAbonus = new javax.swing.JSpinner();
+        jsArmyAbonus = new javax.swing.JSpinner();
         jLabel4 = new javax.swing.JLabel();
-        jsDbonus = new javax.swing.JSpinner();
+        jsArmyDbonus = new javax.swing.JSpinner();
         jLabel5 = new javax.swing.JLabel();
-        cbTactic = new javax.swing.JComboBox();
+        cbArmyTactic = new javax.swing.JComboBox();
         jbNewArmy = new javax.swing.JButton();
         jbRemArmy = new javax.swing.JButton();
         jbCloneArmy = new javax.swing.JButton();
-        jpPlatoons = new javax.swing.JPanel();
+        jLabel12 = new javax.swing.JLabel();
+        cbArmyNation = new javax.swing.JComboBox();
+        jpPlatoonList = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        comboFiltroTypes = new javax.swing.JComboBox();
+        cbTypeCategory = new javax.swing.JComboBox();
         jLabel11 = new javax.swing.JLabel();
+        jcbTerrain = new javax.swing.JComboBox();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtPlatoonList = new javax.swing.JTable();
         jpPlatoonEdit = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
-        jsQty = new javax.swing.JSpinner();
+        jsPlatoonQty = new javax.swing.JSpinner();
         jLabel7 = new javax.swing.JLabel();
-        jsTraining = new javax.swing.JSpinner();
+        jsPlatoonTraining = new javax.swing.JSpinner();
         jLabel8 = new javax.swing.JLabel();
-        jsWeapon = new javax.swing.JSpinner();
+        jsPlatoonWeapon = new javax.swing.JSpinner();
         jLabel9 = new javax.swing.JLabel();
-        jsArmor = new javax.swing.JSpinner();
+        jsPlatoonArmor = new javax.swing.JSpinner();
         jLabel10 = new javax.swing.JLabel();
-        cbTroopType = new javax.swing.JComboBox();
+        cbPlatoonTroopType = new javax.swing.JComboBox();
         jbNewPlatoon = new javax.swing.JButton();
         jbRemPlatoon = new javax.swing.JButton();
         jbClonePlatoon = new javax.swing.JButton();
@@ -134,36 +135,36 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jlDefense.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jlDefense.setText(labels.getString("CIDADE.DEFESA")); // NOI18N
 
-        jsLoyalty.setMajorTickSpacing(10);
-        jsLoyalty.setMinimum(1);
-        jsLoyalty.setMinorTickSpacing(5);
-        jsLoyalty.setPaintTicks(true);
-        jsLoyalty.setValue(1);
-        jsLoyalty.setName("jsLoyalty"); // NOI18N
+        jsCityLoyalty.setMajorTickSpacing(10);
+        jsCityLoyalty.setMinimum(1);
+        jsCityLoyalty.setMinorTickSpacing(5);
+        jsCityLoyalty.setPaintTicks(true);
+        jsCityLoyalty.setValue(1);
+        jsCityLoyalty.setName("jsCityLoyalty"); // NOI18N
 
-        jsSize.setMajorTickSpacing(1);
-        jsSize.setMaximum(5);
-        jsSize.setPaintLabels(true);
-        jsSize.setPaintTicks(true);
-        jsSize.setSnapToTicks(true);
-        jsSize.setValue(0);
-        jsSize.setName("jsSize"); // NOI18N
+        jsCitySize.setMajorTickSpacing(1);
+        jsCitySize.setMaximum(5);
+        jsCitySize.setPaintLabels(true);
+        jsCitySize.setPaintTicks(true);
+        jsCitySize.setSnapToTicks(true);
+        jsCitySize.setValue(0);
+        jsCitySize.setName("jsCitySize"); // NOI18N
 
-        jsFortification.setMajorTickSpacing(1);
-        jsFortification.setMaximum(5);
-        jsFortification.setPaintLabels(true);
-        jsFortification.setPaintTicks(true);
-        jsFortification.setSnapToTicks(true);
-        jsFortification.setValue(0);
-        jsFortification.setName("jsFortification"); // NOI18N
+        jsCityFortification.setMajorTickSpacing(1);
+        jsCityFortification.setMaximum(5);
+        jsCityFortification.setPaintLabels(true);
+        jsCityFortification.setPaintTicks(true);
+        jsCityFortification.setSnapToTicks(true);
+        jsCityFortification.setValue(0);
+        jsCityFortification.setName("jsCityFortification"); // NOI18N
 
         javax.swing.GroupLayout jpCityLayout = new javax.swing.GroupLayout(jpCity);
         jpCity.setLayout(jpCityLayout);
         jpCityLayout.setHorizontalGroup(
             jpCityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jsFortification, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
-            .addComponent(jsSize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jsLoyalty, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jsCityFortification, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
+            .addComponent(jsCitySize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jsCityLoyalty, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jpCityLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jpCityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -179,18 +180,18 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jlLoyalty)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jsLoyalty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jsCityLoyalty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jlSize)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jsSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jsCitySize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jlFortification)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jsFortification, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jsCityFortification, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        jpArmies.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("BATTLESIM.ARMIES.TITLE"))); // NOI18N
+        jpArmyList.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("BATTLESIM.ARMIES.TITLE"))); // NOI18N
 
         jScrollPane1.setBorder(null);
 
@@ -208,42 +209,40 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jtArmyList.setName("jtArmyList"); // NOI18N
         jScrollPane1.setViewportView(jtArmyList);
 
-        javax.swing.GroupLayout jpArmiesLayout = new javax.swing.GroupLayout(jpArmies);
-        jpArmies.setLayout(jpArmiesLayout);
-        jpArmiesLayout.setHorizontalGroup(
-            jpArmiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jpArmyListLayout = new javax.swing.GroupLayout(jpArmyList);
+        jpArmyList.setLayout(jpArmyListLayout);
+        jpArmyListLayout.setHorizontalGroup(
+            jpArmyListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
         );
-        jpArmiesLayout.setVerticalGroup(
-            jpArmiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpArmiesLayout.createSequentialGroup()
+        jpArmyListLayout.setVerticalGroup(
+            jpArmyListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpArmyListLayout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addGap(0, 0, 0))
         );
 
         jpArmyEdit.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("BATTLESIM.ARMY.TITLE"))); // NOI18N
 
-        jcbTerrain.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         jLabel1.setText(labels.getString("COMANDANTE")); // NOI18N
 
-        jsCommander.setModel(new javax.swing.SpinnerNumberModel(0, 0, 1000, 5));
-        jsCommander.setName("jsCommander"); // NOI18N
+        jsArmyCommander.setModel(new javax.swing.SpinnerNumberModel(0, 0, 1000, 5));
+        jsArmyCommander.setName("jsArmyCommander"); // NOI18N
 
         jLabel2.setText(labels.getString("MORAL")); // NOI18N
 
-        jsMorale.setModel(new javax.swing.SpinnerNumberModel(0, 0, 1000, 10));
-        jsMorale.setName("jsMorale"); // NOI18N
+        jsArmyMorale.setModel(new javax.swing.SpinnerNumberModel(0, 0, 1000, 10));
+        jsArmyMorale.setName("jsArmyMorale"); // NOI18N
 
         jLabel3.setText(labels.getString("TROPA.ATAQUE.BONUS")); // NOI18N
 
-        jsAbonus.setModel(new javax.swing.SpinnerNumberModel(0, 0, 1000000, 1000));
-        jsAbonus.setName("jsAbonus"); // NOI18N
+        jsArmyAbonus.setModel(new javax.swing.SpinnerNumberModel(0, 0, 1000000, 1000));
+        jsArmyAbonus.setName("jsArmyAbonus"); // NOI18N
 
         jLabel4.setText(labels.getString("TROPA.DEFESA.BONUS")); // NOI18N
 
-        jsDbonus.setModel(new javax.swing.SpinnerNumberModel(0, 0, 1000000, 1000));
-        jsDbonus.setName("jsDbonus"); // NOI18N
+        jsArmyDbonus.setModel(new javax.swing.SpinnerNumberModel(0, 0, 1000000, 1000));
+        jsArmyDbonus.setName("jsArmyDbonus"); // NOI18N
 
         jLabel5.setText(labels.getString("TATICA")); // NOI18N
 
@@ -263,74 +262,78 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jbCloneArmy.setActionCommand("jbCloneArmy");
         jbCloneArmy.setName("jbCloneArmy"); // NOI18N
 
+        jLabel12.setText(labels.getString("NACAO")); // NOI18N
+
+        cbArmyNation.setActionCommand("cbNacao");
+        cbArmyNation.setName("cbArmyNation"); // NOI18N
+
         javax.swing.GroupLayout jpArmyEditLayout = new javax.swing.GroupLayout(jpArmyEdit);
         jpArmyEdit.setLayout(jpArmyEditLayout);
         jpArmyEditLayout.setHorizontalGroup(
             jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpArmyEditLayout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jbNewArmy)
+                .addGap(29, 29, 29)
+                .addComponent(jbCloneArmy)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jbRemArmy)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(jpArmyEditLayout.createSequentialGroup()
+                .addGroup(jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jcbTerrain, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jpArmyEditLayout.createSequentialGroup()
-                        .addGroup(jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jpArmyEditLayout.createSequentialGroup()
-                                .addGroup(jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
-                            .addGroup(jpArmyEditLayout.createSequentialGroup()
-                                .addComponent(jbNewArmy)
-                                .addGap(29, 29, 29)))
-                        .addGroup(jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jpArmyEditLayout.createSequentialGroup()
-                                .addComponent(jbCloneArmy)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jbRemArmy)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(jsMorale)
-                            .addComponent(jsCommander)
-                            .addComponent(jsAbonus)
-                            .addComponent(jsDbonus)
-                            .addComponent(cbTactic, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap())))
+                    .addComponent(cbArmyTactic, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jsArmyMorale)
+                    .addComponent(jsArmyCommander)
+                    .addComponent(jsArmyAbonus)
+                    .addComponent(jsArmyDbonus)
+                    .addComponent(cbArmyNation, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         jpArmyEditLayout.setVerticalGroup(
             jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpArmyEditLayout.createSequentialGroup()
-                .addComponent(jcbTerrain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jsCommander, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jsArmyCommander, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jsMorale, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jsArmyMorale, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jsAbonus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jsArmyAbonus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jsDbonus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jsArmyDbonus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel12)
+                    .addComponent(cbArmyNation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(cbTactic, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cbArmyTactic, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpArmyEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jbCloneArmy)
                     .addComponent(jbRemArmy)
                     .addComponent(jbNewArmy)))
         );
 
-        jpPlatoons.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("TROOPCASUALTIES.BORDER.TITLE"))); // NOI18N
+        jpPlatoonList.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("TROOPCASUALTIES.BORDER.TITLE"))); // NOI18N
 
         jLabel11.setText(labels.getString("LISTAR:")); // NOI18N
+
+        jcbTerrain.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -340,16 +343,18 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
                 .addContainerGap()
                 .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(comboFiltroTypes, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(cbTypeCategory, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jcbTerrain, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(comboFiltroTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11))
+                    .addComponent(cbTypeCategory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel11)
+                    .addComponent(jcbTerrain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -385,42 +390,42 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jtPlatoonList.setName("jtPlatoonList"); // NOI18N
         jScrollPane3.setViewportView(jtPlatoonList);
 
-        javax.swing.GroupLayout jpPlatoonsLayout = new javax.swing.GroupLayout(jpPlatoons);
-        jpPlatoons.setLayout(jpPlatoonsLayout);
-        jpPlatoonsLayout.setHorizontalGroup(
-            jpPlatoonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jpPlatoonListLayout = new javax.swing.GroupLayout(jpPlatoonList);
+        jpPlatoonList.setLayout(jpPlatoonListLayout);
+        jpPlatoonListLayout.setHorizontalGroup(
+            jpPlatoonListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
-        jpPlatoonsLayout.setVerticalGroup(
-            jpPlatoonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpPlatoonsLayout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        jpPlatoonListLayout.setVerticalGroup(
+            jpPlatoonListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpPlatoonListLayout.createSequentialGroup()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jpPlatoonEdit.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("BATTLESIM.PLATOON.TITLE"))); // NOI18N
 
         jLabel6.setText(labels.getString("QTD")); // NOI18N
 
-        jsQty.setModel(new javax.swing.SpinnerNumberModel(1000, 0, 1000000, 100));
-        jsQty.setName("jsQty"); // NOI18N
+        jsPlatoonQty.setModel(new javax.swing.SpinnerNumberModel(1000, 0, 1000000, 100));
+        jsPlatoonQty.setName("jsPlatoonQty"); // NOI18N
 
         jLabel7.setText(labels.getString("TREINO")); // NOI18N
 
-        jsTraining.setModel(new javax.swing.SpinnerNumberModel(10, 0, 100, 10));
-        jsTraining.setName("jsTraining"); // NOI18N
+        jsPlatoonTraining.setModel(new javax.swing.SpinnerNumberModel(10, 0, 100, 10));
+        jsPlatoonTraining.setName("jsPlatoonTraining"); // NOI18N
 
         jLabel8.setText(labels.getString("ARMA")); // NOI18N
 
-        jsWeapon.setModel(new javax.swing.SpinnerNumberModel(10, 0, 100, 10));
-        jsWeapon.setName("jsWeapon"); // NOI18N
+        jsPlatoonWeapon.setModel(new javax.swing.SpinnerNumberModel(10, 0, 100, 10));
+        jsPlatoonWeapon.setName("jsPlatoonWeapon"); // NOI18N
 
         jLabel9.setText(labels.getString("ARMADURA")); // NOI18N
 
-        jsArmor.setModel(new javax.swing.SpinnerNumberModel(10, 0, 100, 10));
-        jsArmor.setName("jsArmor"); // NOI18N
+        jsPlatoonArmor.setModel(new javax.swing.SpinnerNumberModel(10, 0, 100, 10));
+        jsPlatoonArmor.setName("jsPlatoonArmor"); // NOI18N
 
         jLabel10.setText(labels.getString("TIPO")); // NOI18N
 
@@ -459,16 +464,16 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
                             .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE))
                         .addGap(10, 10, 10)))
                 .addGroup(jpPlatoonEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cbTroopType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jsQty)
+                    .addComponent(cbPlatoonTroopType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jsPlatoonQty)
                     .addGroup(jpPlatoonEditLayout.createSequentialGroup()
                         .addComponent(jbClonePlatoon)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jbRemPlatoon)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jsTraining)
-                    .addComponent(jsWeapon)
-                    .addComponent(jsArmor))
+                    .addComponent(jsPlatoonTraining)
+                    .addComponent(jsPlatoonWeapon)
+                    .addComponent(jsPlatoonArmor))
                 .addContainerGap())
         );
         jpPlatoonEditLayout.setVerticalGroup(
@@ -476,23 +481,23 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
             .addGroup(jpPlatoonEditLayout.createSequentialGroup()
                 .addGroup(jpPlatoonEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
-                    .addComponent(cbTroopType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbPlatoonTroopType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jpPlatoonEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(jsQty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jsPlatoonQty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jpPlatoonEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
-                    .addComponent(jsTraining, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jsPlatoonTraining, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jpPlatoonEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
-                    .addComponent(jsWeapon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jsPlatoonWeapon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jpPlatoonEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
-                    .addComponent(jsArmor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jsPlatoonArmor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jpPlatoonEditLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jbClonePlatoon)
@@ -507,9 +512,9 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jpArmies, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jpArmyList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jpPlatoons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jpPlatoonList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jpCity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -524,23 +529,25 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jpPlatoonEdit, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jpArmyEdit, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jpCity, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(jpCity, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jpArmies, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jpPlatoons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jpArmyList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jpPlatoonList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(2, 2, 2))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox cbTactic;
-    private javax.swing.JComboBox cbTroopType;
-    private javax.swing.JComboBox comboFiltroTypes;
+    private javax.swing.JComboBox cbArmyNation;
+    private javax.swing.JComboBox cbArmyTactic;
+    private javax.swing.JComboBox cbPlatoonTroopType;
+    private javax.swing.JComboBox cbTypeCategory;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -563,22 +570,22 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
     private javax.swing.JLabel jlFortification;
     private javax.swing.JLabel jlLoyalty;
     private javax.swing.JLabel jlSize;
-    private javax.swing.JPanel jpArmies;
     private javax.swing.JPanel jpArmyEdit;
+    private javax.swing.JPanel jpArmyList;
     private javax.swing.JPanel jpCity;
     private javax.swing.JPanel jpPlatoonEdit;
-    private javax.swing.JPanel jpPlatoons;
-    private javax.swing.JSpinner jsAbonus;
-    private javax.swing.JSpinner jsArmor;
-    private javax.swing.JSpinner jsCommander;
-    private javax.swing.JSpinner jsDbonus;
-    private javax.swing.JSlider jsFortification;
-    private javax.swing.JSlider jsLoyalty;
-    private javax.swing.JSpinner jsMorale;
-    private javax.swing.JSpinner jsQty;
-    private javax.swing.JSlider jsSize;
-    private javax.swing.JSpinner jsTraining;
-    private javax.swing.JSpinner jsWeapon;
+    private javax.swing.JPanel jpPlatoonList;
+    private javax.swing.JSpinner jsArmyAbonus;
+    private javax.swing.JSpinner jsArmyCommander;
+    private javax.swing.JSpinner jsArmyDbonus;
+    private javax.swing.JSpinner jsArmyMorale;
+    private javax.swing.JSlider jsCityFortification;
+    private javax.swing.JSlider jsCityLoyalty;
+    private javax.swing.JSlider jsCitySize;
+    private javax.swing.JSpinner jsPlatoonArmor;
+    private javax.swing.JSpinner jsPlatoonQty;
+    private javax.swing.JSpinner jsPlatoonTraining;
+    private javax.swing.JSpinner jsPlatoonWeapon;
     private javax.swing.JTable jtArmyList;
     private javax.swing.JTable jtPlatoonList;
     // End of variables declaration//GEN-END:variables
@@ -600,9 +607,9 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
             return;
         }
         final Cidade city = localFacade.getCidade(local);
-        jsLoyalty.setValue(cidadeFacade.getLealdade(city));
-        jsSize.setValue(cidadeFacade.getTamanho(city));
-        jsFortification.setValue(cidadeFacade.getFortificacao(city));
+        jsCityLoyalty.setValue(cidadeFacade.getLealdade(city));
+        jsCitySize.setValue(cidadeFacade.getTamanho(city));
+        jsCityFortification.setValue(cidadeFacade.getFortificacao(city));
 
         jpCity.setBorder(javax.swing.BorderFactory.createTitledBorder(
                 String.format("%s: %s", labels.getString("BATTLESIM.CITY.TITLE"),
@@ -614,35 +621,35 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
     public void updateCityLabels() {
         jlLoyalty.setText(String.format("%s: %s",
                 labels.getString("LEALDADE"),
-                jsLoyalty.getValue()));
+                jsCityLoyalty.getValue()));
 
-        jlSize.setText(String.format("%s: %s", labels.getString("TAMANHO"), cidadeFacade.getTamanhoNome(jsSize.getValue())));
+        jlSize.setText(String.format("%s: %s", labels.getString("TAMANHO"), cidadeFacade.getTamanhoNome(jsCitySize.getValue())));
 
         jlFortification.setText(String.format("%s: %s", labels.getString("FORTIFICACOES"),
-                cidadeFacade.getFortificacaoNome(jsFortification.getValue())));
+                cidadeFacade.getFortificacaoNome(jsCityFortification.getValue())));
 
         jlDefense.setText(String.format("%s: %s", labels.getString("CIDADE.DEFESA"),
-                cidadeFacade.getDefesa(jsSize.getValue(), jsFortification.getValue(), jsLoyalty.getValue())));
+                cidadeFacade.getDefesa(jsCitySize.getValue(), jsCityFortification.getValue(), jsCityLoyalty.getValue())));
     }
 
     private void configCitySliders() {
-        jsLoyalty.addChangeListener(battleSimControler);
-        jsSize.addChangeListener(battleSimControler);
-        jsFortification.addChangeListener(battleSimControler);
+        jsCityLoyalty.addChangeListener(battleSimControler);
+        jsCitySize.addChangeListener(battleSimControler);
+        jsCityFortification.addChangeListener(battleSimControler);
 
         Hashtable sizeLabels = new Hashtable();
-        for (int ii = jsSize.getMinimum(); ii < jsSize.getMaximum(); ii++) {
+        for (int ii = jsCitySize.getMinimum(); ii < jsCitySize.getMaximum(); ii++) {
             sizeLabels.put(ii, new JLabel(cidadeFacade.getTamanhoNome(ii)));
         }
-        jsSize.setLabelTable(sizeLabels);
-        jsSize.setPaintLabels(true);
+        jsCitySize.setLabelTable(sizeLabels);
+        jsCitySize.setPaintLabels(true);
 
         Hashtable fortLabels = new Hashtable();
-        for (int ii = jsFortification.getMinimum(); ii < jsFortification.getMaximum(); ii++) {
+        for (int ii = jsCityFortification.getMinimum(); ii < jsCityFortification.getMaximum(); ii++) {
             fortLabels.put(ii, new JLabel(cidadeFacade.getFortificacaoNome(ii)));
         }
-        jsFortification.setLabelTable(fortLabels);
-        jsFortification.setPaintLabels(true);
+        jsCityFortification.setLabelTable(fortLabels);
+        jsCityFortification.setPaintLabels(true);
     }
 
     private void setArmy(Local local) {
@@ -655,24 +662,27 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
 
     private void configUI(Local local) {
 
-        comboFiltroTypes.setActionCommand("comboFiltro");
-        comboFiltroTypes.setModel(battleSimControler.listFiltroTypes());
+        cbTypeCategory.setActionCommand("comboFiltro");
+        cbTypeCategory.setModel(battleSimControler.listFiltroTypes());
 
         //adiciona listeners
-        comboFiltroTypes.addActionListener(battleSimControler);
+        cbTypeCategory.addActionListener(battleSimControler);
 
         configCitySliders();
-        cbTactic.setActionCommand("cbTactic");
-        cbTactic.setModel(battleSimControler.listFiltroTactic());
-        cbTactic.addActionListener(battleSimControler);
-        cbTroopType.setActionCommand("cbTroopType");
-        cbTroopType.setModel(platoonControler.listTipoTropas());
-        cbTroopType.addActionListener(platoonControler);
+        cbArmyTactic.setActionCommand("cbTactic");
+        cbArmyTactic.setModel(battleSimControler.listFiltroTactic());
+        cbArmyTactic.addActionListener(battleSimControler);
+        cbArmyNation.setActionCommand("cbNation");
+        cbArmyNation.setModel(battleSimControler.getNacaoComboModel());
+        cbArmyNation.addActionListener(battleSimControler);
+        cbPlatoonTroopType.setActionCommand("cbTroopType");
+        cbPlatoonTroopType.setModel(platoonControler.listTipoTropas());
+        cbPlatoonTroopType.addActionListener(platoonControler);
 
-        jsCommander.addChangeListener(battleSimControler);
-        jsMorale.addChangeListener(battleSimControler);
-        jsAbonus.addChangeListener(battleSimControler);
-        jsDbonus.addChangeListener(battleSimControler);
+        jsArmyCommander.addChangeListener(battleSimControler);
+        jsArmyMorale.addChangeListener(battleSimControler);
+        jsArmyAbonus.addChangeListener(battleSimControler);
+        jsArmyDbonus.addChangeListener(battleSimControler);
         jcbTerrain.setActionCommand("jcbTerrain");
         jbNewArmy.addActionListener(battleSimControler);
         jbCloneArmy.addActionListener(battleSimControler);
@@ -706,11 +716,12 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         //config border
         final String title;
         if (exercito != null) {
-            title = String.format(labels.getString("TROOPCASUALTIES.COMMANDER.TACTIC"), exercito.getNome(), terrain.getNome(), getFiltroTactic().getComboDisplay());
+            GenericoComboObject tactic = (GenericoComboObject) cbArmyTactic.getSelectedItem();
+            title = String.format(labels.getString("TROOPCASUALTIES.COMMANDER.TACTIC"), exercito.getNome(), terrain.getNome(), tactic.getComboDisplay());
         } else {
             title = labels.getString("TROOPCASUALTIES.BORDER.TITLE");
         }
-        jpPlatoons.setBorder(javax.swing.BorderFactory.createTitledBorder(title));
+        jpPlatoonList.setBorder(javax.swing.BorderFactory.createTitledBorder(title));
     }
 
     @Override
@@ -728,16 +739,20 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
     public final void setPlatoonModel(TableModel model, int selected) {
         this.jtPlatoonList.setModel(model);
         doAdjustCols(jtPlatoonList);
-//        this.jtPlatoonList.getSelectionModel().setSelectionInterval(0, 0);
         try {
-            this.jtPlatoonList.setRowSelectionInterval(selected, selected);
+            this.jtPlatoonList.getSelectionModel().setSelectionInterval(selected, selected);
         } catch (IllegalArgumentException ex) {
-            this.jtPlatoonList.setRowSelectionInterval(0, 0);
+            this.jtPlatoonList.getSelectionModel().setSelectionInterval(0, 0);
         }
+//        try {
+//            this.jtPlatoonList.setRowSelectionInterval(selected, selected);
+//        } catch (IllegalArgumentException ex) {
+//            this.jtPlatoonList.setRowSelectionInterval(0, 0);
+//        }
     }
 
     public final String getFiltroTypes() {
-        GenericoComboObject elem = (GenericoComboObject) comboFiltroTypes.getSelectedItem();
+        GenericoComboObject elem = (GenericoComboObject) cbTypeCategory.getSelectedItem();
         return elem.getComboId();
     }
 
@@ -755,12 +770,8 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         return jtPlatoonList;
     }
 
-    public GenericoComboObject getFiltroTactic() {
-        return (GenericoComboObject) cbTactic.getSelectedItem();
-    }
-
     public GenericoComboObject getTipoTropaPlatoon() {
-        return (GenericoComboObject) cbTroopType.getSelectedItem();
+        return (GenericoComboObject) cbPlatoonTroopType.getSelectedItem();
     }
 
     public void doRefreshArmy() {
@@ -769,48 +780,53 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
 
     @Override
     public void updateArmy(ExercitoSim exercito) {
-        jsCommander.removeChangeListener(battleSimControler);
-        jsCommander.setValue(exercito.getPericiaComandante());
-        jsCommander.addChangeListener(battleSimControler);
+        jsArmyCommander.removeChangeListener(battleSimControler);
+        jsArmyCommander.setValue(exercito.getPericiaComandante());
+        jsArmyCommander.addChangeListener(battleSimControler);
 
-        jsMorale.removeChangeListener(battleSimControler);
-        jsMorale.setValue(exercito.getMoral());
-        jsMorale.addChangeListener(battleSimControler);
+        jsArmyMorale.removeChangeListener(battleSimControler);
+        jsArmyMorale.setValue(exercito.getMoral());
+        jsArmyMorale.addChangeListener(battleSimControler);
 
-        jsAbonus.removeChangeListener(battleSimControler);
-        jsAbonus.setValue(exercito.getBonusAttack());
-        jsAbonus.addChangeListener(battleSimControler);
+        jsArmyAbonus.removeChangeListener(battleSimControler);
+        jsArmyAbonus.setValue(exercito.getBonusAttack());
+        jsArmyAbonus.addChangeListener(battleSimControler);
 
-        jsDbonus.removeChangeListener(battleSimControler);
-        jsDbonus.setValue(exercito.getBonusDefense());
-        jsDbonus.addChangeListener(battleSimControler);
+        jsArmyDbonus.removeChangeListener(battleSimControler);
+        jsArmyDbonus.setValue(exercito.getBonusDefense());
+        jsArmyDbonus.addChangeListener(battleSimControler);
 
-        cbTactic.removeActionListener(battleSimControler);
-        final GenericoComboBoxModel model = (GenericoComboBoxModel) cbTactic.getModel();
-        cbTactic.setSelectedIndex(model.getIndexById(ConverterFactory.taticaToCodigo(exercito.getTatica())));
-        cbTactic.addActionListener(battleSimControler);
+        cbArmyTactic.removeActionListener(battleSimControler);
+        final GenericoComboBoxModel modelTactic = (GenericoComboBoxModel) cbArmyTactic.getModel();
+        cbArmyTactic.setSelectedIndex(modelTactic.getIndexById(ConverterFactory.taticaToCodigo(exercito.getTatica())));
+        cbArmyTactic.addActionListener(battleSimControler);
+
+        cbArmyNation.removeActionListener(battleSimControler);
+        final GenericoComboBoxModel modelNation = (GenericoComboBoxModel) cbArmyNation.getModel();
+        cbArmyNation.setSelectedIndex(modelNation.getIndexById(exercito.getNacao().getComboId()));
+        cbArmyNation.addActionListener(battleSimControler);
     }
 
     public void updatePlatoonPanel(Pelotao platoon) {
-        jsQty.removeChangeListener(platoonControler);
-        jsQty.setValue(platoon.getQtd());
-        jsQty.addChangeListener(platoonControler);
+        jsPlatoonQty.removeChangeListener(platoonControler);
+        jsPlatoonQty.setValue(platoon.getQtd());
+        jsPlatoonQty.addChangeListener(platoonControler);
 
-        jsTraining.removeChangeListener(platoonControler);
-        jsTraining.setValue(platoon.getTreino());
-        jsTraining.addChangeListener(platoonControler);
+        jsPlatoonTraining.removeChangeListener(platoonControler);
+        jsPlatoonTraining.setValue(platoon.getTreino());
+        jsPlatoonTraining.addChangeListener(platoonControler);
 
-        jsWeapon.removeChangeListener(platoonControler);
-        jsWeapon.setValue(platoon.getModAtaque());
-        jsWeapon.addChangeListener(platoonControler);
+        jsPlatoonWeapon.removeChangeListener(platoonControler);
+        jsPlatoonWeapon.setValue(platoon.getModAtaque());
+        jsPlatoonWeapon.addChangeListener(platoonControler);
 
-        jsArmor.removeChangeListener(platoonControler);
-        jsArmor.setValue(platoon.getModDefesa());
-        jsArmor.addChangeListener(platoonControler);
+        jsPlatoonArmor.removeChangeListener(platoonControler);
+        jsPlatoonArmor.setValue(platoon.getModDefesa());
+        jsPlatoonArmor.addChangeListener(platoonControler);
 
-        cbTroopType.removeActionListener(platoonControler);
-        final GenericoComboBoxModel model = (GenericoComboBoxModel) cbTroopType.getModel();
-        cbTroopType.setSelectedIndex(model.getIndexById(platoon.getTipoTropa().getComboId()));
-        cbTroopType.addActionListener(platoonControler);
+        cbPlatoonTroopType.removeActionListener(platoonControler);
+        final GenericoComboBoxModel model = (GenericoComboBoxModel) cbPlatoonTroopType.getModel();
+        cbPlatoonTroopType.setSelectedIndex(model.getIndexById(platoon.getTipoTropa().getComboId()));
+        cbPlatoonTroopType.addActionListener(platoonControler);
     }
 }

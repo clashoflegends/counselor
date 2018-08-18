@@ -7,7 +7,6 @@ package control;
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
 import business.BussinessException;
-import business.converter.ConverterFactory;
 import business.facade.BattleSimFacade;
 import business.services.ComparatorFactory;
 import control.services.CenarioConverter;
@@ -49,26 +48,15 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
 
     private static final Log log = LogFactory.getLog(BattleSimPlatoonCasualtyControlerNew.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private GenericoTableModel platoonTableModel;
     private BattleCasualtySimulatorNew tabGui;
-    private Terreno terrain;
     private ExercitoSim exercito;
     private Pelotao platoon;
-    private int rowIndex = 0;
     private List<Pelotao> listaExibida = new ArrayList<Pelotao>();
     private final BattleSimFacade combSim = new BattleSimFacade();
+    private int indexOfPlatoon = 0;
 
     public BattleSimPlatoonCasualtyControlerNew(BattleCasualtySimulatorNew tabGui, Local local) {
         setTabGui(tabGui);
-        setTerrain(local.getTerreno());
-    }
-
-    private Terreno getTerrain() {
-        return terrain;
-    }
-
-    private void setTerrain(Terreno terrain) {
-        this.terrain = terrain;
     }
 
     private ExercitoSim getExercito() {
@@ -101,12 +89,11 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
 
     public void updateArmy(ExercitoSim exercito, Terreno terrain) {
         setExercito(exercito);
-        setTerrain(terrain);
-        getTabGui().setPlatoonModel(getPlatoonTableModel(getTabGui().getFiltroTypes(), getTabGui().getFiltroTactic().getComboId(), terrain), rowIndex);
+        getTabGui().setPlatoonModel(getPlatoonTableModel(getTabGui().getFiltroTypes(), terrain), indexOfPlatoon);
     }
 
-    public GenericoTableModel getPlatoonTableModel(String filtro, String tactic, Terreno terrain) {
-        if (tactic.equalsIgnoreCase("pa")) {
+    public GenericoTableModel getPlatoonTableModel(String filtro, Terreno terrain) {
+        if (getExercito().getTatica() == 2) {
             listaExibida = new ArrayList<Pelotao>();
         } else if (getExercito() == null) {
             listaExibida = new ArrayList<Pelotao>();
@@ -114,24 +101,36 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
             listaExibida = FiltroConverter.listaByFiltroCasualty(filtro, getExercito().getPelotoes().values());
         }
         //sort array
-        ComparatorFactory.getComparatorCasualtiesPelotaoSorter(listaExibida, ConverterFactory.taticaToInt(tactic), terrain, WorldManager.getInstance().getPartida().getId());
-        this.platoonTableModel = ExercitoConverter.getPelotaoModel(listaExibida, getExercito());
-        return this.platoonTableModel;
+//        ComparatorFactory.getComparatorCasualtiesPelotaoSorter(listaExibida, ConverterFactory.taticaToInt(tactic), terrain, WorldManager.getInstance().getPartida().getId());
+        ComparatorFactory.getComparatorCasualtiesPelotaoSorter(listaExibida, getExercito().getTatica(), terrain, WorldManager.getInstance().getPartida().getId());
+        //find new platoon position so that the selected element doesn't change all the time
+        if (getPlatoon() != null) {
+            indexOfPlatoon = listaExibida.indexOf(getPlatoon());
+        } else {
+            indexOfPlatoon = Math.min(indexOfPlatoon, listaExibida.size() - 1);
+        }
+        //create model
+        return ExercitoConverter.getPelotaoModel(listaExibida, getExercito());
     }
 
     private void doRemovePlatoon() {
-        rowIndex--;
+        if (getPlatoon() == null) {
+            return;
+        }
         getExercito().getPelotoes().remove(getPlatoon().getCodigo());
-        this.platoonTableModel = ExercitoConverter.getPelotaoModel(listaExibida, getExercito());
+        setPlatoon(null);
         this.getTabGui().doRefreshArmy();
     }
 
     private void doClonePlatoon() {
+        if (getPlatoon() == null) {
+            return;
+        }
         try {
             final Pelotao platoonClone = combSim.clone(getPlatoon());
             changeTipoTropaToAvailable(platoonClone);
             getExercito().getPelotoes().put(platoonClone.getCodigo(), platoonClone);
-            rowIndex = listaExibida.size() - 1;
+            setPlatoon(platoonClone);
             this.getTabGui().doRefreshArmy();
         } catch (BussinessException be) {
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.STATUS_BAR_MSG, labels.getString("PLATOON.NEW.CANCELED"));
@@ -140,14 +139,23 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
 
     private void doNewPlatoon() {
         try {
-            final Pelotao pelotaoNew = new Pelotao();
-            changeTipoTropaToAvailable(pelotaoNew);
-            getExercito().getPelotoes().put(pelotaoNew.getCodigo(), pelotaoNew);
-            rowIndex = listaExibida.size() - 1;
+            final Pelotao platoonNew = new Pelotao();
+            changeTipoTropaToAvailable(platoonNew);
+            getExercito().getPelotoes().put(platoonNew.getCodigo(), platoonNew);
+            setPlatoon(platoonNew);
             this.getTabGui().doRefreshArmy();
         } catch (BussinessException be) {
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.STATUS_BAR_MSG, labels.getString("PLATOON.NEW.CANCELED"));
         }
+    }
+
+    protected boolean doNoArmySelectedMsg() {
+        if (getExercito() == null) {
+            //no army is selected, can't have new
+            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.STATUS_BAR_MSG, labels.getString("PLATOON.NEW.CANCELED"));
+            return true;
+        }
+        return false;
     }
 
     private void changeTipoTropaToAvailable(Pelotao aPlatoon) throws BussinessException {
@@ -165,6 +173,9 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
     protected void doActionButton(ActionEvent event) {
         JButton jbTemp = (JButton) event.getSource();
         //monta csv com as ordens
+        if (doNoArmySelectedMsg()) {
+            return;
+        }
         if ("jbNewPlatoon".equals(jbTemp.getActionCommand())) {
             doNewPlatoon();
         } else if ("jbClonePlatoon".equals(jbTemp.getActionCommand())) {
@@ -199,8 +210,8 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
                 return;
             }
             JTable table = this.getTabGui().getListaPlatoon();
-            rowIndex = lsm.getAnchorSelectionIndex();
-            int modelIndex = table.convertRowIndexToModel(rowIndex);
+            int indexRow = lsm.getAnchorSelectionIndex();
+            int modelIndex = table.convertRowIndexToModel(indexRow);
             setPlatoon((Pelotao) listaExibida.get(modelIndex));
             //set short casualties list
             getTabGui().updatePlatoonPanel(getPlatoon());

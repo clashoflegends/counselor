@@ -42,7 +42,7 @@ public final class SubTabCasualtyGuiNew extends TabBase {
 
         //adiciona listeners
 
-        TableModel model = casualtyControler.getPlatoonTableModel(getFiltro(), getFiltroTactic(), local.getTerreno());
+        TableModel model = casualtyControler.getPlatoonTableModel(getFiltro(), local.getTerreno());
         this.setMainModel(model);
     }
 

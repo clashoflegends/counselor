@@ -57,14 +57,12 @@ public class CenarioConverter implements Serializable {
      */
     public GenericoComboBoxModel getProdutoComboModel(int tipo) {
         Produto[] items = cenarioFacade.listProdutos(cenario, tipo);
-        GenericoComboBoxModel model = new GenericoComboBoxModel(items);
-        return model;
+        return new GenericoComboBoxModel(items);
     }
 
     public GenericoComboBoxModel getTaticaComboModel() {
         String[][] items = cenarioFacade.listTaticas(cenario);
-        GenericoComboBoxModel model = new GenericoComboBoxModel(items);
-        return model;
+        return new GenericoComboBoxModel(items);
     }
 
     public GenericoTableModel getTaticaTableModel() {
