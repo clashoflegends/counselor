@@ -9,7 +9,6 @@ import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import control.BattleSimPlatoonCasualtyControlerNew;
 import gui.TabBase;
-import gui.tabs.TabTipoTropasGui;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
@@ -25,10 +24,9 @@ import persistenceCommons.SettingsManager;
  */
 public final class SubTabCasualtyGuiNew extends TabBase {
 
-    private static final Log log = LogFactory.getLog(TabTipoTropasGui.class);
+    private static final Log log = LogFactory.getLog(SubTabCasualtyGuiNew.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final BattleSimPlatoonCasualtyControlerNew controler;
-
 
     public SubTabCasualtyGuiNew(Local local, BattleSimPlatoonCasualtyControlerNew casualtyControler) {
         initComponents();
@@ -43,10 +41,8 @@ public final class SubTabCasualtyGuiNew extends TabBase {
         comboFiltro.setActionCommand("comboFiltro");
 
         //adiciona listeners
-        comboFiltro.addActionListener(casualtyControler);
-        comboFiltroTactic.addActionListener(casualtyControler);
 
-        TableModel model = casualtyControler.getMainTableModel(getFiltro(), getFiltroTactic(), local.getTerreno());
+        TableModel model = casualtyControler.getPlatoonTableModel(getFiltro(), getFiltroTactic(), local.getTerreno());
         this.setMainModel(model);
     }
 
@@ -182,6 +178,5 @@ public final class SubTabCasualtyGuiNew extends TabBase {
     public void setFiltroTactic(GenericoComboObject cdTactic) {
         GenericoComboBoxModel model = (GenericoComboBoxModel) comboFiltroTactic.getModel();
         comboFiltroTactic.setSelectedIndex(model.getIndexByDisplay(cdTactic.getComboDisplay()));
-        //comboFiltroTactic.setSelectedItem(cdTactic.getComboDisplay());
     }
 }
