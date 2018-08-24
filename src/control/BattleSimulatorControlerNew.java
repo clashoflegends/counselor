@@ -159,13 +159,13 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
         } else if (event.getSource() instanceof JSpinner) {
             try {
                 JSpinner source = (JSpinner) event.getSource();
-                if ("jsCommander".equals(source.getName())) {
+                if ("jsArmyCommander".equals(source.getName())) {
                     exercito.setComandante((Integer) source.getValue());
-                } else if ("jsMorale".equals(source.getName())) {
+                } else if ("jsArmyMorale".equals(source.getName())) {
                     exercito.setMoral((Integer) source.getValue());
-                } else if ("jsAbonus".equals(source.getName())) {
+                } else if ("jsArmyAbonus".equals(source.getName())) {
                     exercito.setBonusAttack((Integer) source.getValue());
-                } else if ("jsDbonus".equals(source.getName())) {
+                } else if ("jsArmyDbonus".equals(source.getName())) {
                     exercito.setBonusDefense((Integer) source.getValue());
                 }
                 doRefreshArmy();

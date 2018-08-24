@@ -226,13 +226,13 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
             try {
                 JSpinner source = (JSpinner) event.getSource();
                 final Integer value = (Integer) source.getValue();
-                if ("jsQty".equals(source.getName())) {
+                if ("jsPlatoonQty".equals(source.getName())) {
                     platoon.setQtd(value);
-                } else if ("jsTraining".equals(source.getName())) {
+                } else if ("jsPlatoonTraining".equals(source.getName())) {
                     platoon.setTreino(value);
-                } else if ("jsWeapon".equals(source.getName())) {
+                } else if ("jsPlatoonWeapon".equals(source.getName())) {
                     platoon.setModAtaque(value);
-                } else if ("jsArmor".equals(source.getName())) {
+                } else if ("jsPlatoonArmor".equals(source.getName())) {
                     platoon.setModDefesa(value);
                 }
                 this.getTabGui().doRefreshArmy();
