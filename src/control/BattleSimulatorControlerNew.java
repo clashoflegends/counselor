@@ -150,7 +150,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
         if (event.getSource() instanceof JSlider) {
             JSlider source = (JSlider) event.getSource();
             if (!source.getValueIsAdjusting()) {
-                if ("jsLoyalty".equals(source.getName()) || "jsSize".equals(source.getName()) || "jsFortification".equals(source.getName())) {
+                if ("jsCityLoyalty".equals(source.getName()) || "jsCitySize".equals(source.getName()) || "jsCityFortification".equals(source.getName())) {
                     this.getTabGui().updateCityLabels();
                 } else {
                     log.info(source.getName());
