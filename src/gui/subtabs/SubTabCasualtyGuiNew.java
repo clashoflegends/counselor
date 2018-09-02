@@ -7,9 +7,8 @@ package gui.subtabs;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
-import control.CasualtyControler;
+import control.BattleSimPlatoonCasualtyControlerNew;
 import gui.TabBase;
-import gui.tabs.TabTipoTropasGui;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
@@ -23,36 +22,27 @@ import persistenceCommons.SettingsManager;
  *
  * @author gurgel
  */
-public final class SubTabCasualtyGui extends TabBase {
+public final class SubTabCasualtyGuiNew extends TabBase {
 
-    private static final Log log = LogFactory.getLog(TabTipoTropasGui.class);
+    private static final Log log = LogFactory.getLog(SubTabCasualtyGuiNew.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private final CasualtyControler controler;
+    private final BattleSimPlatoonCasualtyControlerNew controler;
 
-    public SubTabCasualtyGui(Local local) {
-        this(local, new CasualtyControler(local));
-    }
-
-    public SubTabCasualtyGui(Local local, CasualtyControler casualtyControler) {
+    public SubTabCasualtyGuiNew(Local local, BattleSimPlatoonCasualtyControlerNew casualtyControler) {
         initComponents();
         //Cria o Controle da lista 
         this.controler = casualtyControler;
-        this.controler.setTabGui(this);
+//        this.controler.setTabGui(this);
         //configura grid
         jtMainLista.setAutoCreateColumnsFromModel(true);
         jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jtMainLista.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jtMainLista.setAutoCreateRowSorter(true);
         comboFiltro.setActionCommand("comboFiltro");
-        comboFiltro.setModel(casualtyControler.listFiltro());
-        comboFiltroTactic.setActionCommand("comboFiltro");
-        comboFiltroTactic.setModel(casualtyControler.listFiltroTactic());
 
         //adiciona listeners
-        comboFiltro.addActionListener(casualtyControler);
-        comboFiltroTactic.addActionListener(casualtyControler);
 
-        TableModel model = casualtyControler.getMainTableModel(getFiltro(), getFiltroTactic(), local.getTerreno());
+        TableModel model = casualtyControler.getPlatoonTableModel(getFiltro(), local.getTerreno());
         this.setMainModel(model);
     }
 
@@ -65,19 +55,13 @@ public final class SubTabCasualtyGui extends TabBase {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
         comboFiltro = new javax.swing.JComboBox();
         comboFiltroTactic = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
-        qtTropas = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
 
-        jLabel2.setText(labels.getString("TOTAL:")); // NOI18N
-
         jLabel1.setText(labels.getString("LISTAR:")); // NOI18N
-
-        qtTropas.setText("66666"); // NOI18N
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -90,11 +74,7 @@ public final class SubTabCasualtyGui extends TabBase {
                 .addComponent(comboFiltroTactic, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 313, Short.MAX_VALUE)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(qtTropas)
-                .addContainerGap())
+                .addContainerGap(411, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -103,8 +83,6 @@ public final class SubTabCasualtyGui extends TabBase {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(qtTropas)
                     .addComponent(comboFiltroTactic, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -171,12 +149,10 @@ public final class SubTabCasualtyGui extends TabBase {
     private javax.swing.JComboBox comboFiltro;
     private javax.swing.JComboBox comboFiltroTactic;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jtMainLista;
-    private javax.swing.JLabel qtTropas;
     // End of variables declaration//GEN-END:variables
 
     public JTable getMainLista() {
@@ -186,7 +162,6 @@ public final class SubTabCasualtyGui extends TabBase {
     public final void setMainModel(TableModel model) {
         this.jtMainLista.setModel(model);
         this.doConfigTableColumns(jtMainLista);
-        this.updateGui();
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);
     }
 
@@ -203,14 +178,5 @@ public final class SubTabCasualtyGui extends TabBase {
     public void setFiltroTactic(GenericoComboObject cdTactic) {
         GenericoComboBoxModel model = (GenericoComboBoxModel) comboFiltroTactic.getModel();
         comboFiltroTactic.setSelectedIndex(model.getIndexByDisplay(cdTactic.getComboDisplay()));
-        //comboFiltroTactic.setSelectedItem(cdTactic.getComboDisplay());
-    }
-
-    public void doHideTacticCombo() {
-        comboFiltroTactic.setVisible(false);
-    }
-
-    private void updateGui() {
-        this.qtTropas.setText(getMainLista().getRowCount() + "");
     }
 }

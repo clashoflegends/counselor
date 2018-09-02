@@ -23,9 +23,9 @@ import model.Raca;
 import model.TipoTropa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
-import persistence.local.WorldManager;
 
 /**
  *
@@ -57,14 +57,12 @@ public class CenarioConverter implements Serializable {
      */
     public GenericoComboBoxModel getProdutoComboModel(int tipo) {
         Produto[] items = cenarioFacade.listProdutos(cenario, tipo);
-        GenericoComboBoxModel model = new GenericoComboBoxModel(items);
-        return model;
+        return new GenericoComboBoxModel(items);
     }
 
     public GenericoComboBoxModel getTaticaComboModel() {
         String[][] items = cenarioFacade.listTaticas(cenario);
-        GenericoComboBoxModel model = new GenericoComboBoxModel(items);
-        return model;
+        return new GenericoComboBoxModel(items);
     }
 
     public GenericoTableModel getTaticaTableModel() {
@@ -131,6 +129,12 @@ public class CenarioConverter implements Serializable {
         lista.addAll(cenarioFacade.getTipoTropas(cenario));
         GenericoComboBoxModel model = new GenericoComboBoxModel(lista.toArray(new TipoTropa[0]));
         return model;
+    }
+
+    public List<TipoTropa> getTropaTipo() {
+        List<TipoTropa> lista = new ArrayList<TipoTropa>();
+        lista.addAll(cenarioFacade.getTipoTropas(cenario));
+        return lista;
     }
 
     public boolean hasCidadeOrdens() {

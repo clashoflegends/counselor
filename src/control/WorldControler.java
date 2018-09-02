@@ -99,6 +99,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         registerDispatchManagerForMsg(DispatchManager.SAVE_WORLDBUILDER_FILE);
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_AUTOSAVE);
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_COUNT);
+        registerDispatchManagerForMsg(DispatchManager.STATUS_BAR_MSG);
     }
 
     @Override
@@ -302,7 +303,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         graph.start();
     }
 
-     private void doHexview() {
+    private void doHexview() {
         WFC.getMapaControler().doHexViewToggle();
     }
 
@@ -884,12 +885,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     @Override
-    public void receiveDispatch(int msgName, String idNacao) {
+    public void receiveDispatch(int msgName, String msg) {
         if (msgName == DispatchManager.SET_LABEL_MONEY) {
-            final Nacao nacao = WFC.getNacao(idNacao);
+            final Nacao nacao = WFC.getNacao(msg);
             int actionCost = WFC.getNacaoOrderCost(nacao);
             final String labelActionsCost = String.format(labels.getString("MENU.ACTION.COST"), nacaoFacade.getNome(nacao), actionCost);
             getGui().setLabelMoney(labelActionsCost);
+        } else if (msgName == DispatchManager.STATUS_BAR_MSG) {
+            getGui().setStatusMsg(msg);
         }
     }
 

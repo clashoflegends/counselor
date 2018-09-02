@@ -89,7 +89,7 @@ public class ListFactory implements Serializable {
             return nacaoDao.list(null);
         } catch (PersistenceException ex) {
             log.fatal("Problemas na persistencia...", ex);
-            throw new UnsupportedOperationException("Not yet implemented");
+            throw new UnsupportedOperationException("Not yet implemented...");
         }
     }
 
