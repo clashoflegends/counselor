@@ -7,6 +7,7 @@ package control;
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
 import business.BussinessException;
+import business.combat.ArmySim;
 import business.facade.BattleSimFacade;
 import business.services.ComparatorFactory;
 import control.services.CenarioConverter;
@@ -29,14 +30,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import model.ExercitoSim;
 import model.Local;
 import model.Pelotao;
 import model.Terreno;
 import model.TipoTropa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 
@@ -49,7 +48,7 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
     private static final Log log = LogFactory.getLog(BattleSimPlatoonCasualtyControlerNew.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private BattleCasualtySimulatorNew tabGui;
-    private ExercitoSim exercito;
+    private ArmySim exercito;
     private Pelotao platoon;
     private List<Pelotao> listaExibida = new ArrayList<Pelotao>();
     private final BattleSimFacade combSim = new BattleSimFacade();
@@ -59,11 +58,11 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
         setTabGui(tabGui);
     }
 
-    private ExercitoSim getExercito() {
+    private ArmySim getExercito() {
         return exercito;
     }
 
-    private void setExercito(ExercitoSim exercito) {
+    private void setExercito(ArmySim exercito) {
         this.exercito = exercito;
     }
 
@@ -87,7 +86,7 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
         return CenarioConverter.getInstance().getTropaTipoComboModel();
     }
 
-    public void updateArmy(ExercitoSim exercito, Terreno terrain) {
+    public void updateArmy(ArmySim exercito, Terreno terrain) {
         setExercito(exercito);
         getTabGui().setPlatoonModel(getPlatoonTableModel(getTabGui().getFiltroTypes(), terrain), indexOfPlatoon);
     }
@@ -102,7 +101,7 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
         }
         //sort array
 //        ComparatorFactory.getComparatorCasualtiesPelotaoSorter(listaExibida, ConverterFactory.taticaToInt(tactic), terrain, WorldManager.getInstance().getPartida().getId());
-        ComparatorFactory.getComparatorCasualtiesPelotaoSorter(listaExibida, getExercito().getTatica(), terrain, WorldManager.getInstance().getPartida().getId());
+        ComparatorFactory.getComparatorCasualtiesPelotaoSorter(listaExibida, getExercito().getTatica(), terrain);
         //find new platoon position so that the selected element doesn't change all the time
         if (getPlatoon() != null) {
             indexOfPlatoon = listaExibida.indexOf(getPlatoon());

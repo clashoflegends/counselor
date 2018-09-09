@@ -34,7 +34,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
 import model.Exercito;
-import model.ExercitoSim;
+import business.combat.ArmySim;
 import model.Ordem;
 import model.Terreno;
 import org.apache.commons.logging.Log;
@@ -51,8 +51,8 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
     private static final Log log = LogFactory.getLog(BattleSimulatorControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final IBattleSimulator tabGui;
-    private final List<ExercitoSim> listaExibida = new ArrayList<ExercitoSim>();
-    private ExercitoSim exercito;
+    private final List<ArmySim> listaExibida = new ArrayList<ArmySim>();
+    private ArmySim exercito;
     private final BattleSimFacade combSim = new BattleSimFacade();
     private Terreno terreno;
     private int rowIndex = 0;
@@ -83,14 +83,14 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
         this.terreno = terreno;
     }
 
-    private void updateArmyCasualtyControler(ExercitoSim exercito, Terreno terreno) {
+    private void updateArmyCasualtyControler(ArmySim exercito, Terreno terreno) {
         if (this.casualtyControler == null) {
             return;
         }
         this.casualtyControler.updateArmy(exercito, terreno);
     }
 
-    private void updateArmyCasualtyControler(ExercitoSim exercito, Terreno terreno, GenericoComboObject tactic) {
+    private void updateArmyCasualtyControler(ArmySim exercito, Terreno terreno, GenericoComboObject tactic) {
         if (this.casualtyControler == null) {
             return;
         }
@@ -147,7 +147,7 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
             if (!lsm.isSelectionEmpty()) {
                 rowIndex = lsm.getAnchorSelectionIndex();
                 int modelIndex = table.convertRowIndexToModel(rowIndex);
-                exercito = (ExercitoSim) listaExibida.get(modelIndex);
+                exercito = (ArmySim) listaExibida.get(modelIndex);
                 getTabGui().updateArmy(exercito);
                 //set short casualties list
                 getTabGui().setCasualtyBorder(exercito, getTerreno());
@@ -191,7 +191,7 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
             try {
                 final GenericoComboObject obj = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
                 final Terreno terrain = (Terreno) obj.getObject();
-                for (ExercitoSim army : listaExibida) {
+                for (ArmySim army : listaExibida) {
                     army.setTerreno(terrain);
                 }
                 this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
@@ -229,21 +229,21 @@ public class BattleSimulatorControler implements Serializable, ChangeListener, L
         return model;
     }
 
-    private void doRemoveArmy(ExercitoSim army) {
+    private void doRemoveArmy(ArmySim army) {
         listaExibida.remove(army);
         rowIndex--;
         this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
     }
 
-    private void doCloneArmy(ExercitoSim army) {
+    private void doCloneArmy(ArmySim army) {
         listaExibida.add(combSim.clone(army));
         rowIndex = listaExibida.size() - 1;
         this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
     }
 
-    private void doNewArmy(ExercitoSim army) {
+    private void doNewArmy(ArmySim army) {
         //FIXME: needs to receive Local for the Battle to be resolved. Deal with this later. Local could be stored in GUi or Control.
-        listaExibida.add(new ExercitoSim("Blank", getTerreno()));
+        listaExibida.add(new ArmySim("Blank", getTerreno()));
         rowIndex = listaExibida.size() - 1;
         this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
     }

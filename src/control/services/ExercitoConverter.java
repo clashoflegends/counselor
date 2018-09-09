@@ -22,7 +22,7 @@ import java.util.TreeMap;
 import model.Cenario;
 import model.Cidade;
 import model.Exercito;
-import model.ExercitoSim;
+import business.combat.ArmySim;
 import model.Jogador;
 import model.Local;
 import model.Nacao;
@@ -139,8 +139,8 @@ public class ExercitoConverter implements Serializable {
         cArray[ii++] = exercitoFacade.getNacaoNome(exercito);
         Local local = exercitoFacade.getLocal(exercito);
         cArray[ii++] = localFacade.getCoordenadas(local);
-        cArray[ii++] = exercitoFacade.getTropasCavalaria(exercito);
-        cArray[ii++] = exercitoFacade.getTropasInfantaria(exercito);
+        cArray[ii++] = exercitoFacade.getQtTropasCavalaria(exercito);
+        cArray[ii++] = exercitoFacade.getQtTropasInfantaria(exercito);
         cArray[ii++] = exercitoFacade.getEsquadra(exercito);
         cArray[ii++] = exercitoFacade.getComida(exercito);
         cArray[ii++] = exercitoFacade.getUpkeepFood(exercito);
@@ -455,7 +455,7 @@ public class ExercitoConverter implements Serializable {
         /**
          * Um pequeno exército portando o estandarte do Rei-Fogo sob o comando do(a) Comandante Tertis está Aqui.
          */
-        ret.addTab(TitleFactory.displayExercitotitulo(exercito));
+        ret.addTab(TitleFactory.displayExercitoTitle(exercito));
         for (Pelotao platoon : exercito.getPelotoes().values()) {
             ret.addTabTab(String.format("%s %s", platoon.getQtd(), platoon.getTipoTropa().getNome()));
         }
@@ -500,21 +500,21 @@ public class ExercitoConverter implements Serializable {
 
     }
 
-    private static Object[][] getBattleAsArray(List<ExercitoSim> listaExibir) {
+    private static Object[][] getBattleAsArray(List<ArmySim> listaExibir) {
         if (listaExibir.isEmpty()) {
             Object[][] ret = {{"", "", "", "", "", ""}};
             return (ret);
         } else {
             int ii = 0;
             Object[][] ret = new Object[listaExibir.size()][getBattleColNames().length];
-            for (ExercitoSim exercito : listaExibir) {
+            for (ArmySim exercito : listaExibir) {
                 ret[ii++] = ExercitoConverter.battleToArray(exercito);
             }
             return (ret);
         }
     }
 
-    public static GenericoTableModel getBattleModel(List<ExercitoSim> lista) {
+    public static GenericoTableModel getBattleModel(List<ArmySim> lista) {
         GenericoTableModel exercitoModel
                 = new GenericoTableModel(getBattleColNames(), getBattleAsArray(lista),
                         new Class[]{
@@ -544,7 +544,7 @@ public class ExercitoConverter implements Serializable {
         return (colNames);
     }
 
-    private static Object[] battleToArray(ExercitoSim exercito) {
+    private static Object[] battleToArray(ArmySim exercito) {
         int ii = 0;
         Object[] cArray = new Object[getBattleColNames().length];
         cArray[ii++] = exercitoFacade.getComandanteTitulo(exercito, WorldFacadeCounselor.getInstance().getCenario());
