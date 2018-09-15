@@ -3,7 +3,7 @@ package control.support;
 import java.awt.Image;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
-import model.ExercitoSim;
+import business.combat.ArmySim;
 import model.Terreno;
 
 /*
@@ -22,9 +22,9 @@ public interface IBattleSimulator {
 
     public JTable getListaExercitos();
 
-    public void updateArmy(ExercitoSim exercito);
+    public void updateArmy(ArmySim exercito);
 
-    public void setCasualtyBorder(ExercitoSim exercito, Terreno terrain);
+    public void setCasualtyBorder(ArmySim exercito, Terreno terrain);
 
     public void setIconImage(Image image);
 }

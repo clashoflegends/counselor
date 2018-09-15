@@ -6,6 +6,7 @@ package gui.accessories;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
+import business.combat.ArmySim;
 import business.converter.ConverterFactory;
 import business.facade.CidadeFacade;
 import business.facade.LocalFacade;
@@ -20,7 +21,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import model.Cidade;
-import model.ExercitoSim;
 import model.Local;
 import model.Pelotao;
 import model.Terreno;
@@ -696,7 +696,7 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
     }
 
     @Override
-    public void setCasualtyBorder(ExercitoSim exercito, Terreno terrain) {
+    public void setCasualtyBorder(ArmySim exercito, Terreno terrain) {
         //config border
         final String title;
         if (exercito != null) {
@@ -763,9 +763,9 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
     }
 
     @Override
-    public void updateArmy(ExercitoSim exercito) {
+    public void updateArmy(ArmySim exercito) {
         jsArmyCommander.removeChangeListener(battleSimControler);
-        jsArmyCommander.setValue(exercito.getPericiaComandante());
+        jsArmyCommander.setValue(exercito.getComandantePericia());
         jsArmyCommander.addChangeListener(battleSimControler);
 
         jsArmyMorale.removeChangeListener(battleSimControler);
@@ -773,11 +773,11 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jsArmyMorale.addChangeListener(battleSimControler);
 
         jsArmyAbonus.removeChangeListener(battleSimControler);
-        jsArmyAbonus.setValue(exercito.getBonusAttack());
+        jsArmyAbonus.setValue(exercito.getAttackBonus());
         jsArmyAbonus.addChangeListener(battleSimControler);
 
         jsArmyDbonus.removeChangeListener(battleSimControler);
-        jsArmyDbonus.setValue(exercito.getBonusDefense());
+        jsArmyDbonus.setValue(exercito.getArmyDefenseBonus());
         jsArmyDbonus.addChangeListener(battleSimControler);
 
         cbArmyTactic.removeActionListener(battleSimControler);

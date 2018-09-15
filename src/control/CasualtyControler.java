@@ -7,6 +7,7 @@ package control;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
+import business.combat.ArmySim;
 import business.converter.ConverterFactory;
 import business.services.ComparatorFactory;
 import control.services.CenarioConverter;
@@ -22,7 +23,6 @@ import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
-import model.ExercitoSim;
 import model.Local;
 import model.Pelotao;
 import model.Terreno;
@@ -44,7 +44,7 @@ public class CasualtyControler implements Serializable, ActionListener {
     private GenericoTableModel mainTableModel;
     private SubTabCasualtyGui tabGui;
     private final Local local;
-    private ExercitoSim exercito;
+    private ArmySim exercito;
 
     public CasualtyControler(SubTabCasualtyGui tabGui, Local local) {
         this.tabGui = tabGui;
@@ -103,7 +103,7 @@ public class CasualtyControler implements Serializable, ActionListener {
             listaExibida = FiltroConverter.listaByFiltroCasualty(filtro, exercito.getPelotoes().values());
         }
         //sort array
-        ComparatorFactory.getComparatorCasualtiesPelotaoSorter(listaExibida, ConverterFactory.taticaToInt(tactic), terrain, WorldManager.getInstance().getPartida().getId());
+        ComparatorFactory.getComparatorCasualtiesPelotaoSorter(listaExibida, ConverterFactory.taticaToInt(tactic), terrain);
         this.mainTableModel = ExercitoConverter.getPelotaoModel(listaExibida, getExercito());
         return this.mainTableModel;
     }
@@ -132,16 +132,16 @@ public class CasualtyControler implements Serializable, ActionListener {
         getTabGui().setFiltroTactic(tactic);
     }
 
-    public ExercitoSim getExercito() {
+    public ArmySim getExercito() {
         return exercito;
     }
 
-    public void updateArmy(ExercitoSim exercito, Terreno terrain) {
+    public void updateArmy(ArmySim exercito, Terreno terrain) {
         this.setExercito(exercito);
         getTabGui().setMainModel(getMainTableModel(getTabGui().getFiltro(), getTabGui().getFiltroTactic(), terrain));
     }
 
-    public void setExercito(ExercitoSim exercito) {
+    public void setExercito(ArmySim exercito) {
         this.exercito = exercito;
     }
 }

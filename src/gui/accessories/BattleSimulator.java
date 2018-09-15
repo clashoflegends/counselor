@@ -17,7 +17,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import model.Cidade;
-import model.ExercitoSim;
+import business.combat.ArmySim;
 import model.Local;
 import model.Terreno;
 import persistenceCommons.BundleManager;
@@ -362,16 +362,16 @@ public class BattleSimulator extends JFrame implements IBattleSimulator {
     }
 
     @Override
-    public void updateArmy(ExercitoSim exercito) {
+    public void updateArmy(ArmySim exercito) {
         jsMorale.removeChangeListener(battleSimControler);
         jsCommander.removeChangeListener(battleSimControler);
         jsMorale.setValue(exercito.getMoral());
-        jsCommander.setValue(exercito.getPericiaComandante());
+        jsCommander.setValue(exercito.getComandantePericia());
         jsMorale.addChangeListener(battleSimControler);
         jsCommander.addChangeListener(battleSimControler);
     }
 
     @Override
-    public void setCasualtyBorder(ExercitoSim exercito, Terreno terrain) {
+    public void setCasualtyBorder(ArmySim exercito, Terreno terrain) {
     }
 }
