@@ -21,6 +21,7 @@ import java.io.Serializable;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JToggleButton;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,15 +40,21 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private final WorldControler wc = new WorldControler(this);
     private TabPersonagensGui tabPersonagem;
     private JLabelGradient jlActionCounter;
+    
+    private final SettingsManager settingsManager;
 
     /**
      * Creates new form MainResultWindowGui
      */
     public MainResultWindowGui(String autoLoad) {
+        this.settingsManager = SettingsManager.getInstance();
         initComponents();
         doConfigStatusBar();
         //load teaser
-        doLoadTeaser();
+        doLoadTeaser();        
+        
+     //   SettingsControler settingsControler = new SettingsControler(this);
+        
         //adiciona listeners
         jbOpen.addActionListener(wc);
         jbLoad.addActionListener(wc);
@@ -60,6 +67,11 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph.addActionListener(wc);
         jbHexview.addActionListener(wc);
         jbConfigs.addActionListener(wc);
+        togglePathPj.addActionListener(wc);
+        togglePathPjFuture.addActionListener(wc);
+        toggleFogWar.addActionListener(wc);
+        togglePathArmy.addActionListener(wc);
+        toggleDisplayPortrait.addActionListener(wc);
         wc.doAutoLoad(autoLoad);
     }
 
@@ -90,6 +102,13 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbMap = new javax.swing.JButton();
         jbScoreGraph = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        jToolBar2 = new javax.swing.JToolBar();
+        togglePathPj = new javax.swing.JToggleButton();
+        togglePathPjFuture = new javax.swing.JToggleButton();
+        togglePathArmy = new javax.swing.JToggleButton();
+        toggleFogWar = new javax.swing.JToggleButton();
+        toggleDisplayPortrait = new javax.swing.JToggleButton();
+        filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         jbHexview = new javax.swing.JButton();
         jbConfigs = new javax.swing.JButton();
         jbAbout = new javax.swing.JButton();
@@ -205,6 +224,61 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbScoreGraph);
         jToolBar1.add(filler1);
+
+        jToolBar2.setRollover(true);
+
+        togglePathPj.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_path_pj.png"))); // NOI18N
+        togglePathPj.setSelected(isPcPathSelected());
+        togglePathPj.setToolTipText(bundle.getString("SETTINGS.MAP.PCPATH")); // NOI18N
+        togglePathPj.setActionCommand("pcPathDraw");
+        togglePathPj.setEnabled(false);
+        togglePathPj.setFocusable(false);
+        togglePathPj.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        togglePathPj.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar2.add(togglePathPj);
+
+        togglePathPjFuture.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_path_pj_2.png"))); // NOI18N
+        togglePathPjFuture.setSelected(isPcPathFutureSelected());
+        togglePathPjFuture.setToolTipText(bundle.getString("SETTINGS.MAP.PCPATH.FUTURE")); // NOI18N
+        togglePathPjFuture.setActionCommand("pcPathDraw");
+        togglePathPjFuture.setEnabled(false);
+        togglePathPjFuture.setFocusable(false);
+        togglePathPjFuture.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        togglePathPjFuture.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar2.add(togglePathPjFuture);
+
+        togglePathArmy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_path_army.png"))); // NOI18N
+        togglePathArmy.setSelected(true);
+        togglePathArmy.setToolTipText(bundle.getString("SETTINGS.MAP.ARMYPATH.ARMY")); // NOI18N
+        togglePathArmy.setActionCommand("drawPathArmy");
+        togglePathArmy.setEnabled(false);
+        togglePathArmy.setFocusable(false);
+        togglePathArmy.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        togglePathArmy.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar2.add(togglePathArmy);
+
+        toggleFogWar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_fog.png"))); // NOI18N
+        toggleFogWar.setSelected(isFogOfWarSelected());
+        toggleFogWar.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.FOGOFWAR")); // NOI18N
+        toggleFogWar.setActionCommand("drawFogWar");
+        toggleFogWar.setEnabled(false);
+        toggleFogWar.setFocusable(false);
+        toggleFogWar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        toggleFogWar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar2.add(toggleFogWar);
+
+        toggleDisplayPortrait.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/display_portrait.png"))); // NOI18N
+        toggleDisplayPortrait.setSelected(isDisplayPortraitsSelected());
+        toggleDisplayPortrait.setToolTipText(bundle.getString("SETTINGS.DISPLAY.SHOWPORTRAITS")); // NOI18N
+        toggleDisplayPortrait.setActionCommand("drawDisplayPortraits");
+        toggleDisplayPortrait.setEnabled(false);
+        toggleDisplayPortrait.setFocusable(false);
+        toggleDisplayPortrait.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        toggleDisplayPortrait.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar2.add(toggleDisplayPortrait);
+
+        jToolBar1.add(jToolBar2);
+        jToolBar1.add(filler3);
 
         jbHexview.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_icon.png"))); // NOI18N
         jbHexview.setText(bundle.getString("MENU.HEXVIEW")); // NOI18N
@@ -323,7 +397,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             .addGroup(layout.createSequentialGroup()
                 .addComponent(infoPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(splitMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 666, Short.MAX_VALUE)
+                .addComponent(splitMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -331,8 +405,10 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
+    private javax.swing.Box.Filler filler3;
     private javax.swing.JPanel infoPanel;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JToolBar jToolBar2;
     private javax.swing.JButton jbAbout;
     private javax.swing.JButton jbConfigs;
     private javax.swing.JButton jbCopy;
@@ -357,6 +433,11 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JSplitPane splitMainPanel;
     private javax.swing.JPanel statusBar;
     private javax.swing.JLabel statusLabel;
+    private javax.swing.JToggleButton toggleDisplayPortrait;
+    private javax.swing.JToggleButton toggleFogWar;
+    private javax.swing.JToggleButton togglePathArmy;
+    private javax.swing.JToggleButton togglePathPj;
+    private javax.swing.JToggleButton togglePathPjFuture;
     // End of variables declaration//GEN-END:variables
 
     public void iniciaConfig() {
@@ -426,6 +507,13 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbAbout.setEnabled(true);
         jbHexview.setEnabled(true);
         jbConfigs.setEnabled(true);
+        
+        togglePathPj.setEnabled(true);
+        togglePathPjFuture.setEnabled(true);
+        togglePathArmy.setEnabled(true);
+        toggleFogWar.setEnabled(true);
+        toggleDisplayPortrait.setEnabled(true);
+                
         // Joga a janela toda para a esquerda = 0
         // divide a janela ao meio = -1
         //        this.splitMainPanel.setDividerLocation(55555);
@@ -510,4 +598,45 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         GroupLayout parLayout = (GroupLayout) statusBar.getLayout();
         parLayout.replace(jlActionCountPlaceholder, jlActionCounter);
     }
+    
+    public boolean isPcPathSelected() {
+        boolean isSelected = false;
+        int drawPcPath = settingsManager.getConfigAsInt("drawPcPath", "1");
+        isSelected = drawPcPath == 1 || drawPcPath == 2;
+        return isSelected;
+    }
+    
+    public JToggleButton getPcPath() {
+        return this.togglePathPj;
+    }
+    
+    public boolean isPcPathFutureSelected() {
+        boolean isSelected = false;
+        int drawPcPath = settingsManager.getConfigAsInt("drawPcPath", "1");
+        isSelected = drawPcPath == 1 || drawPcPath == 3;
+        return isSelected;
+    }
+    
+    public JToggleButton getPcPathFuture() {
+        return this.togglePathPjFuture;
+    }
+    
+    public boolean isFogOfWarSelected() {
+        return settingsManager.getConfig("FogOfWarType", "1").equals("1");
+    }
+    
+    public JToggleButton getFogOfWar() {
+        return this.toggleFogWar;
+    }
+    
+    public boolean isDisplayPortraitsSelected() {
+        return settingsManager.getConfig("ShowCharacterPortraits", "1").equals("1");
+    }
+    
+    public JToggleButton getDisplayPortraits() {
+        return this.toggleDisplayPortrait;
+    }
+    
+    
 }
+

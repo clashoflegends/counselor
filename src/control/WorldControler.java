@@ -15,6 +15,7 @@ import business.facade.PersonagemFacade;
 import control.facade.WorldFacadeCounselor;
 import control.support.ControlBase;
 import control.support.DispatchManager;
+import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
 import gui.accessories.GraphPopup;
 import gui.accessories.MainAboutBox;
@@ -25,6 +26,8 @@ import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -43,6 +46,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JToggleButton;
+import javax.swing.ProgressMonitor;
 import model.Cidade;
 import model.Comando;
 import model.ComandoDetail;
@@ -73,7 +78,7 @@ import persistenceLocal.PathFactory;
  *
  * @author gurgel
  */
-public class WorldControler extends ControlBase implements Serializable, ActionListener {
+public class WorldControler extends ControlBase implements Serializable, ActionListener, PropertyChangeListener {
 
     private static final Log log = LogFactory.getLog(WorldControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
@@ -91,6 +96,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private final CenarioFacade cenarioFacade = new CenarioFacade();
     private final PersonagemFacade personagemFacade = new PersonagemFacade();
     private static final WorldFacadeCounselor WFC = WorldFacadeCounselor.getInstance();
+    
+    private ProgressMonitor progressMonitor;
 
     public WorldControler(MainResultWindowGui aGui) {
         setGui(aGui);
@@ -100,6 +107,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_AUTOSAVE);
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_COUNT);
         registerDispatchManagerForMsg(DispatchManager.STATUS_BAR_MSG);
+        registerDispatchManagerForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+        registerDispatchManagerForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL);
     }
 
     @Override
@@ -132,6 +141,34 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             } else {
                 log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
             }
+        } else if (actionEvent.getSource() instanceof JToggleButton) {
+            JToggleButton jbTemp = (JToggleButton)actionEvent.getSource();
+            if (("pcPathDraw").equals(jbTemp.getActionCommand())) {
+                doDrawPjPaths();
+               
+            } else if("drawPathArmy".equals(jbTemp.getActionCommand())) {
+                //TODO 
+              
+                
+            } else if("drawFogWar".equals(jbTemp.getActionCommand())) {
+                doDrawFogOfWar(jbTemp);
+                
+            } else if("drawDisplayPortraits".equals(jbTemp.getActionCommand())) {
+                
+                DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
+                if (!displayPortraitsManager.isShowPortraitEnableable()) {
+                    progressMonitor = new ProgressMonitor(gui, "Downloading file...", "", 0, 100);
+                    progressMonitor.setProgress(0);
+                    displayPortraitsManager.downloadPortraits(gui, this);
+                }
+                               
+                doDisplayPortraits(jbTemp);          
+                                
+            }else {
+                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+            }
+        
+        
         } else {
             log.info(labels.getString("OPS.GENERAL.EVENT"));
         }
@@ -879,6 +916,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             case DispatchManager.ACTIONS_COUNT:
                 doCountActions();
                 break;
+            case DispatchManager.ACTIONS_MAP_REDRAW:
+                gui.getPcPath().setSelected(gui.isPcPathSelected());
+                gui.getPcPathFuture().setSelected(gui.isPcPathFutureSelected());
+                gui.getFogOfWar().setSelected(gui.isFogOfWarSelected());
+                break;
             default:
                 break;
         }
@@ -893,6 +935,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             getGui().setLabelMoney(labelActionsCost);
         } else if (msgName == DispatchManager.STATUS_BAR_MSG) {
             getGui().setStatusMsg(msg);
+        } else if (msgName == DispatchManager.SWITCH_PORTRAIT_PANEL) {
+            gui.getDisplayPortraits().setSelected(msg.equals("1"));
         }
     }
 
@@ -909,6 +953,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             doSave(cmpnt, false);
         }
     }
+    
+    
 
     public void saveWorldFile(World world) {
         //salva o arquivo
@@ -1163,5 +1209,72 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private void doUpdateGuiActionCount() {
         getGui().setActionsCount(this.actionsCount, this.actionsSlots);
+    }
+    
+    private void doDrawPjPaths() {        
+        int pcPathValue = gui.getPcPath().isSelected() ? 1 : 0;
+        int pcPathFutureValue = gui.getPcPathFuture().isSelected() ? 1 : 0;
+        int settingValue = calculateDrawPcPathValue(pcPathValue, pcPathFutureValue);
+        SettingsManager.getInstance().setConfig("drawPcPath", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("drawPcPath");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+        
+    }
+    
+    private void doDrawFogOfWar(JToggleButton button) {         
+        int settingValue = button.isSelected() ? 1 : 0;
+        SettingsManager.getInstance().setConfig("FogOfWarType", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("FogOfWarType");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+        
+    }
+    
+    
+    private int calculateDrawPcPathValue(int pcPath, int pcPathFuture) {
+        int settingValue = 0;
+        String valueBin = String.valueOf(pcPath).concat(String.valueOf(pcPathFuture));
+        int tempValue = Integer.parseInt(valueBin, 2);
+        switch(tempValue){
+            case 0:
+                settingValue = tempValue;
+                break;
+            case 1:
+                settingValue = 3;
+                break;
+            case 2:
+                settingValue = tempValue;
+                break;
+            case 3:
+                settingValue = 1;
+                break;
+        }
+        return settingValue;
+    }
+
+    private void doDisplayPortraits(JToggleButton jbTemp) {
+        int selected = (jbTemp.isSelected()) ? 1 : 0;
+        SettingsManager.getInstance().setConfig("ShowCharacterPortraits", String.valueOf(selected));
+        SettingsManager.getInstance().doConfigSave("ShowCharacterPortraits");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(selected));
+        
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if ("progress".equals(evt.getPropertyName())) {
+            int progress = (Integer) evt.getNewValue();
+            progressMonitor.setProgress(progress);
+
+            String message = String.format("Completed %d%%.\n", progress);
+            progressMonitor.setNote(message);
+            
+            if (progress == 100) {
+          //      settingsGui.checkDisplayPortraitCheckBox();
+
+            }
+
+        }    
     }
 }
