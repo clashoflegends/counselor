@@ -5,12 +5,9 @@
  */
 package control;
 
-import business.BussinessException;
-import business.DownloadPortraitsService;
-import control.services.DownloadPortraitsHttpServiceImpl;
 import control.support.ControlBase;
 import control.support.DispatchManager;
-import gui.accessories.DownloadProgressWork;
+import control.support.DisplayPortraitsManager;
 import gui.accessories.MainSettingsGui;
 import gui.accessories.MainSettingsGui.ComboItem;
 import java.awt.event.ActionEvent;
@@ -18,16 +15,10 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.Serializable;
-import java.net.ConnectException;
-import java.text.DecimalFormat;
-import java.util.Properties;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -264,70 +255,16 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             settingsGui.checkDisplayPortraitCheckBox();
             
         } else if (actionCommand.equals("downloadPortraits")) {
-
-            DownloadPortraitsService downloadService = new DownloadPortraitsHttpServiceImpl();
-            try {
-                // First check network connection
-                downloadService.checkNetworkConnection();
-                
-                // Select download folder
-                JFileChooser folderChooser = null;
-                String currentFolder = SettingsManager.getInstance().getConfig("PortraitsFolder", "");
-                if (currentFolder.isEmpty()) {
-                    folderChooser = new JFileChooser();
-                } else {
-                    folderChooser = new JFileChooser(currentFolder);
-                }
-                folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                folderChooser.setDialogTitle("Select a download folder");
-                       
-                int jFileReturn = folderChooser.showOpenDialog(settingsGui);
-                if (jFileReturn == JFileChooser.APPROVE_OPTION) {
-                    File file = folderChooser.getSelectedFile();
-                    SettingsManager.getInstance().setConfig("PortraitsFolder", file.getPath()); 
-                    this.settingsGui.getPortraitFolderNameTextField().setText(file.getPath());
-                } else {
-                    throw new BussinessException();
-                }
-
-                // Read server properties file
-                Properties propServer = downloadService.getServerPropertiesFile();
-
-                String portraitsFileName = propServer.getProperty("portraistFileNameFull");
-                int fileSizeByte = downloadService.getSize(portraitsFileName);
-                float fileSize = fileSizeByte / (1024f * 1024f);
-                DecimalFormat df = new DecimalFormat("####.##");
-
-                int returnVal = JOptionPane.showConfirmDialog(settingsGui, "A compressed file of " + df.format(fileSize) + " Mb will be downloaded into the file system.",
-                        "Ready to download", JOptionPane.OK_CANCEL_OPTION);
-
-                if (returnVal == JOptionPane.OK_OPTION) {
-                    String portraitFolder = SettingsManager.getInstance().getConfig("PortraitsFolder");
-                                   
-                    final DownloadProgressWork dpw = new DownloadProgressWork(portraitsFileName, portraitFolder, (int) fileSizeByte);
-                    dpw.addPropertyChangeListener(this);             
-
-                    progressMonitor = new ProgressMonitor(settingsGui, "Downloading file...", "", 0, 100);
-                    progressMonitor.setProgress(0);                 
-                    dpw.execute();
-                }
-
-            } catch (FileNotFoundException ex) {
-                String errorLabel = "Zip file could not be downloaded.";
-                JOptionPane.showMessageDialog(settingsGui, errorLabel, "Internal error", JOptionPane.ERROR_MESSAGE);
-
-            } catch (ConnectException ex) {
-                String errorLabel = "Network connection is no avalaible or web site is unreachable.";
-                JOptionPane.showMessageDialog(settingsGui, errorLabel, actionCommand, JOptionPane.ERROR_MESSAGE);
-
-            } catch (IOException ex) {
-                String errorLabel = "Properties file could not be read from server.";
-                JOptionPane.showMessageDialog(settingsGui, errorLabel, "Internal error", JOptionPane.ERROR_MESSAGE);
-            } catch (BussinessException ex) {
-                // Select folder canceled
-            }finally {
-                settingsGui.checkDisplayPortraitCheckBox();
+            
+            DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
+            if (!displayPortraitsManager.isShowPortraitEnableable()) {
+                progressMonitor = new ProgressMonitor(settingsGui, "Downloading file...", "", 0, 100);
+                progressMonitor.setProgress(0);
+                displayPortraitsManager.downloadPortraits(settingsGui, this);
             }
+
+            settingsGui.checkDisplayPortraitCheckBox();
+            
         }
     }
 
