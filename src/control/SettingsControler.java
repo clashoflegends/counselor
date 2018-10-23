@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceLocal.PathFactory;
 
@@ -36,6 +37,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
 
     private final MainSettingsGui settingsGui;
     private ProgressMonitor progressMonitor;
+    private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
     public SettingsControler(MainSettingsGui jpanel) {
         this.settingsGui = jpanel;
@@ -253,18 +255,18 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             SettingsManager.getInstance().setConfig("ShowCharacterPortraits", String.valueOf(selected));
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(selected));
             settingsGui.checkDisplayPortraitCheckBox();
-            
+
         } else if (actionCommand.equals("downloadPortraits")) {
-            
+
             DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
             if (!displayPortraitsManager.isShowPortraitEnableable()) {
-                progressMonitor = new ProgressMonitor(settingsGui, "Downloading file...", "", 0, 100);
+                progressMonitor = new ProgressMonitor(settingsGui, labels.getString("CONFIG.DOWNLOAD.FILE"), "", 0, 100);
                 progressMonitor.setProgress(0);
                 displayPortraitsManager.downloadPortraits(settingsGui, this);
             }
 
             settingsGui.checkDisplayPortraitCheckBox();
-            
+
         }
     }
 
@@ -281,9 +283,9 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             int progress = (Integer) evt.getNewValue();
             progressMonitor.setProgress(progress);
 
-            String message = String.format("Completed %d%%.\n", progress);
+            final String message = String.format(labels.getString("CONFIG.DOWNLOAD.FILE"), progress);
             progressMonitor.setNote(message);
-            
+
             if (progress == 100) {
                 settingsGui.checkDisplayPortraitCheckBox();
 
