@@ -16,7 +16,9 @@ import control.services.AcaoConverter;
 import control.services.CenarioConverter;
 import control.services.ExercitoConverter;
 import control.services.FiltroConverter;
+import control.support.WindowPopupText;
 import gui.accessories.BattleCasualtySimulatorNew;
+import gui.accessories.TroopsCasualtiesList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -230,7 +232,13 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
     protected void doActionButton(ActionEvent event) {
         JButton jbTemp = (JButton) event.getSource();
         //monta csv com as ordens
-        if ("jbNewArmy".equals(jbTemp.getActionCommand())) {
+        if ("jbAbout".equals(jbTemp.getActionCommand())) {
+            doAbout();
+        } else if ("jbTacticHelp".equals(jbTemp.getActionCommand())) {
+            doTacticHelp();
+        } else if ("jbCasualtiesList".equals(jbTemp.getActionCommand())) {
+            doLocalCasualties();
+        } else if ("jbNewArmy".equals(jbTemp.getActionCommand())) {
             doNewArmy();
         } else if ("jbCloneArmy".equals(jbTemp.getActionCommand())) {
             doCloneArmy(exercito);
@@ -276,5 +284,23 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
         } else {
             log.info(String.format("actionOnTabGui %s %s", jcbActive.getActionCommand(), jcbActive.getName()));
         }
+    }
+
+    private void doAbout() {
+        //Launch popup window with BatleSim disclaimer
+        WindowPopupText.showWindowText(labels.getString("BATTLESIM.DISCLAIMER.TEXT"), labels.getString("BATTLESIM.DISCLAIMER.TITLE"), this.getTabGui());
+    }
+
+    private void doTacticHelp() {
+        //launch tactics bonuses in a new window
+        WindowPopupText.showWindowTable(CenarioConverter.getInstance().getTaticaTableModel(), labels.getString("BATTLESIM.TATICA.HINT"), this.getTabGui());
+
+    }
+
+    private void doLocalCasualties() {
+        //TODO: implement this with Terreno, not Local
+        TroopsCasualtiesList casualtiesSim = new TroopsCasualtiesList(getTerrain());
+        casualtiesSim.setLocationRelativeTo(this.getTabGui());
+        casualtiesSim.setVisible(true);
     }
 }
