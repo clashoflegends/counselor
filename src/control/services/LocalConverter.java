@@ -6,7 +6,6 @@ package control.services;
 
 import business.converter.ConverterFactory;
 import business.facade.LocalFacade;
-import persistence.local.ListFactory;
 import java.io.Serializable;
 import model.Artefato;
 import model.Exercito;
@@ -28,7 +27,7 @@ public class LocalConverter implements Serializable {
 
     private static final Log log = LogFactory.getLog(LocalConverter.class);
     private static final LocalFacade localFacade = new LocalFacade();
-    private static final ListFactory listFactory = new ListFactory();
+//    private static final ListFactory listFactory = new ListFactory();
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
     public static String getInfo(Local local) {
