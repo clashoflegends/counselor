@@ -11,6 +11,7 @@ import business.ImageManager;
 import business.combat.ArmySim;
 import business.converter.ConverterFactory;
 import business.facade.BattleSimFacade;
+import business.interfaces.IExercito;
 import control.facade.WorldFacadeCounselor;
 import control.services.AcaoConverter;
 import control.services.CenarioConverter;
@@ -148,21 +149,6 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
         return new GenericoComboBoxModel(FiltroConverter.listFiltroLW());
     }
 
-    private void doCombatCity() {
-        //FIXME: add Cidade to GUI (as opposed to labels) and Controler
-        final Cidade city = new Cidade();
-        city.setTamanho(4);
-        city.setFortificacao(1);
-        city.setLealdade(50);
-//        CombatManagerCity cbm = new CombatManagerCity(city);
-//        for (IExercito army : listaExibida) {
-//            //clone the army so that we can run multiple simulations without changing the BattleSim
-//            cbm.addArmy(new ArmySim((ArmySim) army));
-//        }
-//        cbm.setTerrain(getTerrain());
-//        cbm.doCombat(0);
-    }
-
     @Override
     public void stateChanged(ChangeEvent event) {
         if (event.getSource() instanceof JSlider) {
@@ -238,6 +224,8 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
             doTacticHelp();
         } else if ("jbCasualtiesList".equals(jbTemp.getActionCommand())) {
             doLocalCasualties();
+        } else if ("jbSimulation".equals(jbTemp.getActionCommand())) {
+            doSimulation();
         } else if ("jbNewArmy".equals(jbTemp.getActionCommand())) {
             doNewArmy();
         } else if ("jbCloneArmy".equals(jbTemp.getActionCommand())) {
@@ -302,5 +290,28 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
         TroopsCasualtiesList casualtiesSim = new TroopsCasualtiesList(getTerrain());
         casualtiesSim.setLocationRelativeTo(this.getTabGui());
         casualtiesSim.setVisible(true);
+    }
+
+    private void doSimulation() {
+        //put results in a new window.
+        //clone the army so that we can run multiple simulations without changing the BattleSim
+
+        //FIXME: to start, all armies attack the city.
+        doCombatCity();
+    }
+
+    private void doCombatCity() {
+        //FIXME: add Cidade to GUI (as opposed to labels) and Controler
+        final Cidade city = new Cidade();
+        city.setTamanho(4);
+        city.setFortificacao(1);
+        city.setLealdade(50);
+        CombatManagerCity cbm = new CombatManagerCity(city);
+        for (IExercito army : listaExibida) {
+            //clone the army so that we can run multiple simulations without changing the BattleSim
+            cbm.addArmy(new ArmySim((ArmySim) army));
+        }
+        cbm.setTerrain(getTerrain());
+        cbm.doCombat(0);
     }
 }

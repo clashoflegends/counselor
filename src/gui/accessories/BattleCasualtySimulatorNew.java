@@ -123,6 +123,7 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jcbTerrain = new javax.swing.JComboBox();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        jbSimulation = new javax.swing.JButton();
         jbCasualtiesList = new javax.swing.JButton();
         jbTacticHelp = new javax.swing.JButton();
         jbAbout = new javax.swing.JButton();
@@ -498,6 +499,13 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jToolBar1.add(filler1);
         jToolBar1.add(filler2);
 
+        jbSimulation.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/right.gif"))); // NOI18N
+        jbSimulation.setText(bundle.getString("BATTLESIM.RUN.SIMULATION")); // NOI18N
+        jbSimulation.setActionCommand("jbSimulation");
+        jbSimulation.setFocusable(false);
+        jbSimulation.setName("jbSimulation"); // NOI18N
+        jToolBar1.add(jbSimulation);
+
         jbCasualtiesList.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_exercito.gif"))); // NOI18N
         jbCasualtiesList.setText(bundle.getString("TROOPCASUALTIES.BORDER.TITLE")); // NOI18N
         jbCasualtiesList.setActionCommand("jbCasualtiesList");
@@ -584,6 +592,7 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
     private javax.swing.JButton jbNewPlatoon;
     private javax.swing.JButton jbRemArmy;
     private javax.swing.JButton jbRemPlatoon;
+    private javax.swing.JButton jbSimulation;
     private javax.swing.JButton jbTacticHelp;
     private javax.swing.JComboBox jcbTerrain;
     private javax.swing.JLabel jlDefense;
@@ -704,6 +713,7 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jsArmyAbonus.addChangeListener(battleSimControler);
         jsArmyDbonus.addChangeListener(battleSimControler);
         jcbTerrain.setActionCommand("jcbTerrain");
+        jbSimulation.addActionListener(battleSimControler);
         jbCasualtiesList.addActionListener(battleSimControler);
         jbTacticHelp.addActionListener(battleSimControler);
         jbAbout.addActionListener(battleSimControler);

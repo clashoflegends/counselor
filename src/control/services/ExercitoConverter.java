@@ -30,7 +30,7 @@ import model.Pelotao;
 import model.Personagem;
 import model.TipoTropa;
 import msgs.BaseMsgs;
-import msgs.TitleFactory;
+import business.services.TitleFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.local.ListFactory;
