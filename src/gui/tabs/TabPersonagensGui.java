@@ -364,6 +364,9 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
                 && personagemFacade.isAtivo(personagem)) {
             //can receive orders
             stOrdens.doMudaActor(personagem);
+        } else if (personagemFacade.isAtivo(personagem)) {
+            //should list orders
+            stOrdens.doMudaActor(personagem);
         } else {
             //refem ou morto, nao pode dar ordem
             //forca selecao para vazio, limpando quadro de parametros
