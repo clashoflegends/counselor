@@ -11,10 +11,9 @@ import business.MovimentoExercito;
 import business.converter.ConverterFactory;
 import business.facade.ExercitoFacade;
 import business.facade.LocalFacade;
-import persistence.local.ListFactory;
-import control.facade.WorldFacadeCounselor;
 import control.DirecaoExercitoControler;
 import control.MapaControler;
+import control.facade.WorldFacadeCounselor;
 import control.support.ActorInterface;
 import gui.TabBase;
 import java.io.Serializable;
@@ -25,6 +24,7 @@ import model.Ordem;
 import model.TipoTropa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 
@@ -123,6 +123,10 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
         }
         if (ordem.hasHabilidade(";AM14;")) {
             setLimiteMovimento(14);
+            return;
+        }
+        if (ordem.hasHabilidade(";AM08;")) {
+            setLimiteMovimento(8);
             return;
         }
         //FIXME: clean up after a while (7/5/2016) once it's in the EGF.

@@ -636,6 +636,7 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
             return;
         }
         final Cidade city = localFacade.getCidade(local);
+        battleSimControler.setCity(city.clone());
         jsCityLoyalty.setValue(cidadeFacade.getLealdade(city));
         jsCitySize.setValue(cidadeFacade.getTamanho(city));
         jsCityFortification.setValue(cidadeFacade.getFortificacao(city));
@@ -648,6 +649,11 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
 
     @Override
     public void updateCityLabels() {
+        final Cidade city = battleSimControler.getCity();
+        city.setLealdade(jsCityLoyalty.getValue());
+        city.setTamanho(jsCitySize.getValue());
+        city.setFortificacao(jsCityFortification.getValue());
+
         jlLoyalty.setText(String.format("%s: %s",
                 labels.getString("LEALDADE"),
                 jsCityLoyalty.getValue()));
