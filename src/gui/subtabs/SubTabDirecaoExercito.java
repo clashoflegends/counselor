@@ -18,6 +18,7 @@ import control.support.ActorInterface;
 import gui.TabBase;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import model.Local;
 import model.Ordem;
@@ -577,7 +578,17 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
     }
 
     private GenericoComboBoxModel getTropaModel() {
-        if (isAll() || actor == null || actor.getExercito() == null) {
+        if (isAll() || actor == null) {
+            //assume all troops are available
+            return dirExControl.getTropaTipoComboModel(isAgua());
+        } else if (actor.getExercito() == null) {
+            //LOM has PCs marching as armies, but at a cost of 1 point
+            //If the army has no troops, the cost of each move will default to 1.
+            Collection<TipoTropa> list = new ArrayList<TipoTropa>();
+            GenericoComboBoxModel model = new GenericoComboBoxModel(list.toArray(new TipoTropa[0]));
+            return model;
+        } else if (actor.getExercito() == null) {
+            //assume all troops are available
             return dirExControl.getTropaTipoComboModel(isAgua());
         } else {
             return dirExControl.getTropaTipoComboModel(actor.getExercito(), isAgua());
