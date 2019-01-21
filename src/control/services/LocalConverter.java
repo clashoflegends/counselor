@@ -6,7 +6,10 @@ package control.services;
 
 import business.converter.ConverterFactory;
 import business.facade.LocalFacade;
+import business.services.ComparatorFactory;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import model.Artefato;
 import model.Exercito;
 import model.Habilidade;
@@ -49,8 +52,19 @@ public class LocalConverter implements Serializable {
         //personagens
         if (local.getPersonagens().values().size() > 0) {
             ret.add(labels.getString("PERSONAGENS.LOCAL"));
-            for (Personagem personagem : local.getPersonagens().values()) {
-                ret.add(PersonagemConverter.getInfo(personagem));
+            if (SettingsManager.getInstance().getConfig("HexInfoPcSorting", "N").equals("N")) {
+                //sort by nation
+                final List<Personagem> personagens = new ArrayList<Personagem>(local.getPersonagens().values());
+                ComparatorFactory.getComparatorNationSorter(personagens);
+
+                for (Personagem personagem : personagens) {
+                    ret.add(PersonagemConverter.getInfo(personagem));
+                }
+            } else {
+                //sort alphabetcaly
+                for (Personagem personagem : local.getPersonagens().values()) {
+                    ret.add(PersonagemConverter.getInfo(personagem));
+                }
             }
         }
         //exercitos
