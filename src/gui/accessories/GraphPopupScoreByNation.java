@@ -10,9 +10,14 @@ import control.facade.WorldFacadeCounselor;
 import gui.services.SampleTableModel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -39,6 +44,8 @@ public class GraphPopupScoreByNation {
 
     private static final Log log = LogFactory.getLog(GraphPopupScoreByNation.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
+    private final Set<String> teams = new TreeSet<String>();
+    private final SortedMap<String, Nacao> mapNations = new TreeMap<String, Nacao>();
 
     public void start() {
         //leave it here because we don't know from what thread it's coming from?
@@ -84,19 +91,44 @@ public class GraphPopupScoreByNation {
 
     private List<String> getNames(List<Nacao> model) {
         List<String> ret = new ArrayList<String>();
-        for (Nacao nacao : model) {
-            ret.add(nacao.getNome());
+        for (Nacao nation : model) {
+            ret.add(nation.getNome());
+
         }
         return ret;
     }
-    final static String[] teams = {"-", "RED", "BLUE", "GREEN", "YELLOW"};
+
+    private List<Nacao> doPrepNations() {
+        List<Nacao> nations = new ArrayList<Nacao>(WorldFacadeCounselor.getInstance().getNacoes().values());
+        //sort by points
+        ComparatorFactory.getComparatorNationVictoryPointsSorter(nations);
+        for (Nacao nation : nations) {
+            //collect information
+            teams.add(nation.getTeamFlag());
+            mapNations.put(nation.getNome(), nation);
+        }
+        return nations;
+    }
+
+    private void styleNew(StackedBarChart<Number, String> chart) {
+        for (final XYChart.Series< Number, String> series : chart.getData()) {
+            for (final XYChart.Data<Number, String> data : series.getData()) {
+                StringBuilder style = new StringBuilder();
+                if (series.getName().equals("-")) {
+                    style.append(String.format("-fx-background-color: %s; ", "GREY"));
+                } else {
+                    style.append(String.format("-fx-background-color: %s; ", series.getName()));
+                }
+                data.getNode().setStyle(style.toString());
+            }
+        }
+    }
 
     private StackedBarChart createStackedBarChart() {
         final CategoryAxis xAxis = new CategoryAxis();
         final NumberAxis yAxis = new NumberAxis();
 
-        List<Nacao> nations = new ArrayList<Nacao>(WorldFacadeCounselor.getInstance().getNacoes().values());
-        ComparatorFactory.getComparatorNationVictoryPointsSorter(nations);
+        List<Nacao> nations = doPrepNations();
         xAxis.setCategories(FXCollections.<String>observableList(getNames(nations)));
 
         //format axis
@@ -111,7 +143,7 @@ public class GraphPopupScoreByNation {
             final XYChart.Series<Number, String> series = new XYChart.Series();
             series.setName(teamName);
 
-            for (Nacao nation : WorldFacadeCounselor.getInstance().getNacoes().values()) {
+            for (Nacao nation : nations) {
                 if (!teamName.equals(nation.getTeamFlag())) {
                     continue;
                 }
@@ -124,7 +156,7 @@ public class GraphPopupScoreByNation {
 //        stackedBarChart.setTitle(labels.getString("PONTOS.VITORIA"));
         stackedBarChart.getData().addAll(seriesList);
         stackedBarChart.setLegendVisible(false);
-//        stackedBarChart.setCategoryGap(0.2);
+        styleNew(stackedBarChart);
 
         return stackedBarChart;
     }
@@ -230,5 +262,22 @@ public class GraphPopupScoreByNation {
 //        stackedBarChart.setCategoryGap(0.2);
 
         return stackedBarChart;
+    }
+
+    private void styleOld(StackedBarChart chart) {
+        int nSeries = 0;
+        Set<Node> nodes = chart.lookupAll(".series" + nSeries);
+        for (Node n : nodes) {
+            StringBuilder style = new StringBuilder();
+            if (true) {
+                style.append("-fx-background-color: red; ");
+            } else {
+                style.append("-fx-background-color: white, blue; ");
+            }
+
+            n.setStyle(style.toString());
+        }
+        nSeries++;
+
     }
 }
