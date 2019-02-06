@@ -65,6 +65,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbSend.addActionListener(wc);
         jbAbout.addActionListener(wc);
         jbScoreGraph.addActionListener(wc);
+        jbScoreGraph1.addActionListener(wc);
         jbHexview.addActionListener(wc);
         jbConfigs.addActionListener(wc);
         togglePathPj.addActionListener(wc);
@@ -101,6 +102,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbCopy = new javax.swing.JButton();
         jbMap = new javax.swing.JButton();
         jbScoreGraph = new javax.swing.JButton();
+        jbScoreGraph1 = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         jToolBar2 = new javax.swing.JToolBar();
         togglePathPj = new javax.swing.JToggleButton();
@@ -214,7 +216,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbMap.setName("jbExportMap"); // NOI18N
         jToolBar1.add(jbMap);
 
-        jbScoreGraph.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/about.png"))); // NOI18N
+        jbScoreGraph.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/bargraph icon.png"))); // NOI18N
         jbScoreGraph.setText(labels.getString("PONTOS.VITORIA")); // NOI18N
         jbScoreGraph.setToolTipText(labels.getString("MENU.PNTOS.VITORIA.TOOLTIP")); // NOI18N
         jbScoreGraph.setActionCommand("jbScoreGraph");
@@ -223,6 +225,16 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph.setName("jbScoreGraph"); // NOI18N
         jbScoreGraph.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbScoreGraph);
+
+        jbScoreGraph1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/bargraph icon.png"))); // NOI18N
+        jbScoreGraph1.setText(labels.getString("PONTOS.VITORIA.TEAM")); // NOI18N
+        jbScoreGraph1.setToolTipText(labels.getString("MENU.PNTOS.VITORIA.TOOLTIP")); // NOI18N
+        jbScoreGraph1.setActionCommand("jbGraphSingleTurn");
+        jbScoreGraph1.setEnabled(false);
+        jbScoreGraph1.setFocusable(false);
+        jbScoreGraph1.setName("jbGraphSingleTurn"); // NOI18N
+        jbScoreGraph1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jbScoreGraph1);
         jToolBar1.add(filler1);
 
         jToolBar2.setRollover(true);
@@ -397,7 +409,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             .addGroup(layout.createSequentialGroup()
                 .addComponent(infoPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(splitMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
+                .addComponent(splitMainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 648, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -419,6 +431,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JButton jbSave;
     private javax.swing.JButton jbSaveWorld;
     private javax.swing.JButton jbScoreGraph;
+    private javax.swing.JButton jbScoreGraph1;
     private javax.swing.JButton jbSend;
     private javax.swing.JLabel jlActionCountPlaceholder;
     private javax.swing.JLabel jlLeft;
@@ -503,7 +516,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbHexview.setEnabled(true);
         jbCopy.setEnabled(true);
         jbSend.setEnabled(true);
-        jbScoreGraph.setEnabled(true);
+        jbScoreGraph1.setEnabled(true);
         jbAbout.setEnabled(true);
         jbHexview.setEnabled(true);
         jbConfigs.setEnabled(true);

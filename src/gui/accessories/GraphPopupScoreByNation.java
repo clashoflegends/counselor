@@ -10,11 +10,9 @@ import control.facade.WorldFacadeCounselor;
 import gui.services.SampleTableModel;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.embed.swing.JFXPanel;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -37,9 +35,9 @@ import persistenceCommons.SettingsManager;
  *
  * @author jmoura
  */
-public class GraphPopup {
+public class GraphPopupScoreByNation {
 
-    private static final Log log = LogFactory.getLog(GraphPopup.class);
+    private static final Log log = LogFactory.getLog(GraphPopupScoreByNation.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
     public void start() {
@@ -91,23 +89,7 @@ public class GraphPopup {
         }
         return ret;
     }
-
-    private void style(StackedBarChart chart) {
-        int nSeries = 0;
-        Set<Node> nodes = chart.lookupAll(".series" + nSeries);
-        for (Node n : nodes) {
-            StringBuilder style = new StringBuilder();
-            if (true) {
-                style.append("-fx-background-color: red; ");
-            } else {
-                style.append("-fx-background-color: white, blue; ");
-            }
-
-            n.setStyle(style.toString());
-        }
-        nSeries++;
-
-    }
+    final static String[] teams = {"-", "RED", "BLUE", "GREEN", "YELLOW"};
 
     private StackedBarChart createStackedBarChart() {
         final CategoryAxis xAxis = new CategoryAxis();
@@ -122,23 +104,28 @@ public class GraphPopup {
         yAxis.setLabel(labels.getString("PONTOS.VITORIA"));
         //xAxis.setLabel(labels.getString("NACAO"));
         xAxis.setTickMarkVisible(false);
+        List<XYChart.Series<Number, String>> seriesList = new ArrayList<XYChart.Series<Number, String>>();
+        for (String teamName : teams) {
 
-        //Series 1
-        XYChart.Series<Number, String> series = new XYChart.Series();
-        //series1.setName("XYChart.Series 1");
+            //Series 1
+            final XYChart.Series<Number, String> series = new XYChart.Series();
+            series.setName(teamName);
 
-        for (Nacao nation : WorldFacadeCounselor.getInstance().getNacoes().values()) {
-            final XYChart.Data data = new XYChart.Data(nation.getPontosVitoria(), nation.getNome());
-            series.getData().add(data);
+            for (Nacao nation : WorldFacadeCounselor.getInstance().getNacoes().values()) {
+                if (!teamName.equals(nation.getTeamFlag())) {
+                    continue;
+                }
+                series.getData().add(new XYChart.Data(nation.getPontosVitoria(), nation.getNome()));
+            }
+            seriesList.add(series);
         }
 
         final StackedBarChart<Number, String> stackedBarChart = new StackedBarChart<Number, String>(yAxis, xAxis);
 //        stackedBarChart.setTitle(labels.getString("PONTOS.VITORIA"));
-        stackedBarChart.getData().addAll(series);
+        stackedBarChart.getData().addAll(seriesList);
         stackedBarChart.setLegendVisible(false);
 //        stackedBarChart.setCategoryGap(0.2);
 
-        style(stackedBarChart);
         return stackedBarChart;
     }
 
