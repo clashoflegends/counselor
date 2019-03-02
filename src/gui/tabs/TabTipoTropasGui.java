@@ -231,7 +231,7 @@ public class TabTipoTropasGui extends TabBase {
         ));
         jsTatica.setViewportView(jtTatica);
 
-        jTabbedPane1.addTab(bundle.getString("TATICA"), new javax.swing.ImageIcon(getClass().getResource("/images/combat.png")), jsTatica, "Defense values for all troops"); // NOI18N
+        jTabbedPane1.addTab(bundle.getString("TATICA"), new javax.swing.ImageIcon(getClass().getResource("/images/combat.png")), jsTatica, bundle.getString("BATTLESIM.TATICA.HINT")); // NOI18N
 
         jsTroopHab.setBorder(null);
 

@@ -9,6 +9,7 @@ import gui.subtabs.SubTabCasualtyGui;
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import model.Local;
+import model.Terreno;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -22,11 +23,15 @@ public class TroopsCasualtiesList extends JFrame {
 
     private static final Log log = LogFactory.getLog(TroopsCasualtiesList.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private Local local;
+    private Terreno terrain;
 
     public TroopsCasualtiesList(Local local) {
+        this(local.getTerreno());
+    }
+
+    public TroopsCasualtiesList(Terreno aTerrain) {
         initComponents();
-        setLocal(local);
+        setTerrain(aTerrain);
         configUi();
     }
 
@@ -89,20 +94,20 @@ public class TroopsCasualtiesList extends JFrame {
 
     private void configUi() {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        final String title = String.format(labels.getString("TROOPCASUALTIES.TITLE"), getLocal().getTerreno().getNome());
+        final String title = String.format(labels.getString("TROOPCASUALTIES.TITLE"), getTerrain().getNome());
         setTitle(title);
-        this.setIconImage(ImageManager.getInstance().getTerrainImages(getLocal().getTerreno().getCodigo()));
+        this.setIconImage(ImageManager.getInstance().getTerrainImages(getTerrain().getCodigo()));
         jpQuadro.setBorder(javax.swing.BorderFactory.createTitledBorder(title));
-        SubTabCasualtyGui jtabMain = new SubTabCasualtyGui(local);
+        SubTabCasualtyGui jtabMain = new SubTabCasualtyGui(getTerrain());
         GroupLayout parLayout = (GroupLayout) jpQuadro.getLayout();
         parLayout.replace(jPanel1, jtabMain);
     }
 
-    private Local getLocal() {
-        return local;
+    private Terreno getTerrain() {
+        return terrain;
     }
 
-    private void setLocal(Local local) {
-        this.local = local;
+    private void setTerrain(Terreno terrain) {
+        this.terrain = terrain;
     }
 }

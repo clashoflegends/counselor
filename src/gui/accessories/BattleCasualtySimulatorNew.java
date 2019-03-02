@@ -81,7 +81,6 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jsCityLoyalty = new javax.swing.JSlider();
         jsCitySize = new javax.swing.JSlider();
         jsCityFortification = new javax.swing.JSlider();
-        jcbTerrain = new javax.swing.JComboBox();
         jpArmyList = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtArmyList = new javax.swing.JTable();
@@ -120,6 +119,14 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jbClonePlatoon = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
         cbTypeCategory = new javax.swing.JComboBox();
+        jToolBar1 = new javax.swing.JToolBar();
+        jcbTerrain = new javax.swing.JComboBox();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
+        jbSimulation = new javax.swing.JButton();
+        jbCasualtiesList = new javax.swing.JButton();
+        jbTacticHelp = new javax.swing.JButton();
+        jbAbout = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -161,23 +168,19 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jsCityFortification.setName("jsCityFortification"); // NOI18N
         jsCityFortification.setPreferredSize(new java.awt.Dimension(50, 200));
 
-        jcbTerrain.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         javax.swing.GroupLayout jpCityLayout = new javax.swing.GroupLayout(jpCity);
         jpCity.setLayout(jpCityLayout);
         jpCityLayout.setHorizontalGroup(
             jpCityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpCityLayout.createSequentialGroup()
-                .addGroup(jpCityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jcbTerrain, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlDefense, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jlDefense, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(33, 33, 33))
             .addGroup(jpCityLayout.createSequentialGroup()
-                .addComponent(jlLoyalty, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jlLoyalty, javax.swing.GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jlSize, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jlSize, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jlFortification, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jlFortification, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE))
             .addGroup(jpCityLayout.createSequentialGroup()
                 .addComponent(jsCityLoyalty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -195,13 +198,10 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
                     .addComponent(jlSize)
                     .addComponent(jlFortification))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpCityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpCityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jsCitySize, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jsCityFortification, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jsCityLoyalty, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jcbTerrain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jpCityLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jsCitySize, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jsCityFortification, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jsCityLoyalty, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
         );
 
         jpArmyList.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("BATTLESIM.ARMIES.TITLE"))); // NOI18N
@@ -230,7 +230,7 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         );
         jpArmyListLayout.setVerticalGroup(
             jpArmyListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
         );
 
         jpArmyEdit.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("BATTLESIM.ARMY.TITLE"))); // NOI18N
@@ -491,27 +491,65 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
                     .addComponent(jbRemPlatoon)))
         );
 
+        jToolBar1.setFloatable(false);
+        jToolBar1.setRollover(true);
+
+        jcbTerrain.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jToolBar1.add(jcbTerrain);
+        jToolBar1.add(filler1);
+        jToolBar1.add(filler2);
+
+        jbSimulation.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/right.gif"))); // NOI18N
+        jbSimulation.setText(bundle.getString("BATTLESIM.RUN.SIMULATION")); // NOI18N
+        jbSimulation.setActionCommand("jbSimulation");
+        jbSimulation.setFocusable(false);
+        jbSimulation.setName("jbSimulation"); // NOI18N
+        jToolBar1.add(jbSimulation);
+
+        jbCasualtiesList.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_exercito.gif"))); // NOI18N
+        jbCasualtiesList.setText(bundle.getString("TROOPCASUALTIES.BORDER.TITLE")); // NOI18N
+        jbCasualtiesList.setActionCommand("jbCasualtiesList");
+        jbCasualtiesList.setFocusable(false);
+        jbCasualtiesList.setName("jbCasualtiesList"); // NOI18N
+        jToolBar1.add(jbCasualtiesList);
+
+        jbTacticHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/combat.png"))); // NOI18N
+        jbTacticHelp.setText(bundle.getString("TATICA")); // NOI18N
+        jbTacticHelp.setToolTipText(bundle.getString("BATTLESIM.TATICA.HINT")); // NOI18N
+        jbTacticHelp.setActionCommand("jbTacticHelp");
+        jbTacticHelp.setFocusable(false);
+        jbTacticHelp.setName("jbTacticHelp"); // NOI18N
+        jToolBar1.add(jbTacticHelp);
+
+        jbAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/about.png"))); // NOI18N
+        jbAbout.setText(labels.getString("MENU.ABOUT")); // NOI18N
+        jbAbout.setToolTipText(labels.getString("BATTLESIM.ABOUT.TOOLTIP")); // NOI18N
+        jbAbout.setActionCommand("jbAbout");
+        jbAbout.setFocusable(false);
+        jbAbout.setName("jbAbout"); // NOI18N
+        jToolBar1.add(jbAbout);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jpArmyEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jpCity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jpPlatoonEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jpArmyList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jpPlatoonList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGap(0, 0, 0))
+                .addComponent(jpArmyEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jpCity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jpPlatoonEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jpArmyList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jpPlatoonList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jpArmyList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jpPlatoonList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -529,6 +567,8 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
     private javax.swing.JComboBox cbArmyTactic;
     private javax.swing.JComboBox cbPlatoonTroopType;
     private javax.swing.JComboBox cbTypeCategory;
+    private javax.swing.Box.Filler filler1;
+    private javax.swing.Box.Filler filler2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -543,12 +583,17 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JButton jbAbout;
+    private javax.swing.JButton jbCasualtiesList;
     private javax.swing.JButton jbCloneArmy;
     private javax.swing.JButton jbClonePlatoon;
     private javax.swing.JButton jbNewArmy;
     private javax.swing.JButton jbNewPlatoon;
     private javax.swing.JButton jbRemArmy;
     private javax.swing.JButton jbRemPlatoon;
+    private javax.swing.JButton jbSimulation;
+    private javax.swing.JButton jbTacticHelp;
     private javax.swing.JComboBox jcbTerrain;
     private javax.swing.JLabel jlDefense;
     private javax.swing.JLabel jlFortification;
@@ -591,6 +636,7 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
             return;
         }
         final Cidade city = localFacade.getCidade(local);
+        battleSimControler.setCity(city.clone());
         jsCityLoyalty.setValue(cidadeFacade.getLealdade(city));
         jsCitySize.setValue(cidadeFacade.getTamanho(city));
         jsCityFortification.setValue(cidadeFacade.getFortificacao(city));
@@ -603,6 +649,11 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
 
     @Override
     public void updateCityLabels() {
+        final Cidade city = battleSimControler.getCity();
+        city.setLealdade(jsCityLoyalty.getValue());
+        city.setTamanho(jsCitySize.getValue());
+        city.setFortificacao(jsCityFortification.getValue());
+
         jlLoyalty.setText(String.format("%s: %s",
                 labels.getString("LEALDADE"),
                 jsCityLoyalty.getValue()));
@@ -668,6 +719,10 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jsArmyAbonus.addChangeListener(battleSimControler);
         jsArmyDbonus.addChangeListener(battleSimControler);
         jcbTerrain.setActionCommand("jcbTerrain");
+        jbSimulation.addActionListener(battleSimControler);
+        jbCasualtiesList.addActionListener(battleSimControler);
+        jbTacticHelp.addActionListener(battleSimControler);
+        jbAbout.addActionListener(battleSimControler);
         jbNewArmy.addActionListener(battleSimControler);
         jbCloneArmy.addActionListener(battleSimControler);
         jbRemArmy.addActionListener(battleSimControler);

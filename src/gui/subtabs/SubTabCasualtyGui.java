@@ -14,6 +14,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import model.Local;
+import model.Terreno;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -30,10 +31,18 @@ public final class SubTabCasualtyGui extends TabBase {
     private final CasualtyControler controler;
 
     public SubTabCasualtyGui(Local local) {
-        this(local, new CasualtyControler(local));
+        this(local.getTerreno(), new CasualtyControler(local));
+    }
+
+    public SubTabCasualtyGui(Terreno terrain) {
+        this(terrain, new CasualtyControler(terrain));
     }
 
     public SubTabCasualtyGui(Local local, CasualtyControler casualtyControler) {
+        this(local.getTerreno(), casualtyControler);
+    }
+
+    public SubTabCasualtyGui(Terreno terrain, CasualtyControler casualtyControler) {
         initComponents();
         //Cria o Controle da lista 
         this.controler = casualtyControler;
@@ -52,7 +61,7 @@ public final class SubTabCasualtyGui extends TabBase {
         comboFiltro.addActionListener(casualtyControler);
         comboFiltroTactic.addActionListener(casualtyControler);
 
-        TableModel model = casualtyControler.getMainTableModel(getFiltro(), getFiltroTactic(), local.getTerreno());
+        TableModel model = casualtyControler.getMainTableModel(getFiltro(), getFiltroTactic(), terrain);
         this.setMainModel(model);
     }
 

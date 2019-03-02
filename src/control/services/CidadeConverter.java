@@ -13,7 +13,6 @@ import business.facade.LocalFacade;
 import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
 import business.facade.PersonagemFacade;
-import persistence.local.ListFactory;
 import control.facade.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,6 +31,7 @@ import model.Produto;
 import msgs.BaseMsgs;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
@@ -445,6 +445,7 @@ public class CidadeConverter implements Serializable {
         } else {
             ret.addTab(String.format("%s: %s", labels.getString("LEALDADE"), "?"));
         }
+        ret.addTab(String.format("%s: %s", labels.getString("RACA"), cidadeFacade.getRacaNome(cidade)));
         ret.addTab(String.format("%s: %s", labels.getString("CIDADE.DOCAS"), BaseMsgs.cidadeDocas[cidade.getDocas()]));
         ret.addTab(String.format("%s: %s", labels.getString("OCULTO"), cidadeFacade.getOculto(cidade)));
         ret.addTab(String.format("%s: %s", labels.getString("SITIADO"), cidadeFacade.getSitiado(cidade)));

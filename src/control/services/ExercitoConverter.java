@@ -6,6 +6,7 @@ package control.services;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
+import business.combat.ArmySim;
 import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
 import business.facade.ExercitoFacade;
@@ -22,7 +23,6 @@ import java.util.TreeMap;
 import model.Cenario;
 import model.Cidade;
 import model.Exercito;
-import business.combat.ArmySim;
 import model.Jogador;
 import model.Local;
 import model.Nacao;
@@ -30,7 +30,7 @@ import model.Pelotao;
 import model.Personagem;
 import model.TipoTropa;
 import msgs.BaseMsgs;
-import msgs.TitleFactory;
+import business.services.TitleFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.local.ListFactory;
@@ -532,8 +532,8 @@ public class ExercitoConverter implements Serializable {
     private static String[] getBattleColNames() {
         String[] colNames = {
             labels.getString("COMANDANTE"),
-            labels.getString("TROPA.ATAQUE.NAVAL"), labels.getString("TROPA.DEFESA.NAVAL"),
             labels.getString("TROPA.ATAQUE.TERRA"), labels.getString("TROPA.DEFESA.TERRA"),
+            labels.getString("TROPA.ATAQUE.NAVAL"), labels.getString("TROPA.DEFESA.NAVAL"),
             labels.getString("TATICA"),
             labels.getString("TROPA.ATAQUE.BONUS"),
             labels.getString("TROPA.DEFESA.BONUS"),
@@ -548,10 +548,10 @@ public class ExercitoConverter implements Serializable {
         int ii = 0;
         Object[] cArray = new Object[getBattleColNames().length];
         cArray[ii++] = exercitoFacade.getComandanteTitulo(exercito, WorldFacadeCounselor.getInstance().getCenario());
-        cArray[ii++] = exercitoFacade.getAtaqueExercito(exercito, true);
-        cArray[ii++] = exercitoFacade.getDefesaExercito(exercito, true);
         cArray[ii++] = exercitoFacade.getAtaqueExercito(exercito, false);
         cArray[ii++] = exercitoFacade.getDefesaExercito(exercito, false);
+        cArray[ii++] = exercitoFacade.getAtaqueExercito(exercito, true);
+        cArray[ii++] = exercitoFacade.getDefesaExercito(exercito, true);
         cArray[ii++] = exercitoFacade.getTacticNameSelected(exercito);
         cArray[ii++] = exercitoFacade.getAtaqueBonusExercito(exercito);
         cArray[ii++] = exercitoFacade.getDefesaBonusExercito(exercito);
