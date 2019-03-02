@@ -8,9 +8,8 @@ import model.Cenario;
 import model.Partida;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-//
-import persistenceCommons.PersistenceException;
 import persistence.iDao.ICenarioDao;
+import persistenceCommons.PersistenceException;
 
 /**
  *
@@ -20,15 +19,13 @@ public class ClientCenarioDao implements ICenarioDao {
 
     private static final Log log = LogFactory.getLog(ClientCenarioDao.class);
 
+    @Override
     public Cenario get(Partida partida) throws PersistenceException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void clear() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public Cenario get(int idPartida) throws PersistenceException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

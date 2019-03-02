@@ -23,28 +23,26 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Component id="jpArmyEdit" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="jpCity" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
-                      <Component id="jpPlatoonEdit" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="jpArmyList" max="32767" attributes="0"/>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Component id="jpPlatoonList" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-              <EmptySpace min="-2" pref="0" max="-2" attributes="0"/>
+          <Group type="102" attributes="0">
+              <Component id="jpArmyEdit" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="jpCity" max="32767" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="jpPlatoonEdit" min="-2" max="-2" attributes="0"/>
           </Group>
+          <Group type="102" attributes="0">
+              <Component id="jpArmyList" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="jpPlatoonList" max="32767" attributes="0"/>
+          </Group>
+          <Component id="jToolBar1" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
+              <Component id="jToolBar1" min="-2" pref="25" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jpArmyList" max="32767" attributes="0"/>
                   <Component id="jpPlatoonList" max="32767" attributes="0"/>
@@ -75,18 +73,15 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="jcbTerrain" alignment="0" min="-2" pref="233" max="-2" attributes="0"/>
-                      <Component id="jlDefense" alignment="0" max="32767" attributes="0"/>
-                  </Group>
+                  <Component id="jlDefense" max="32767" attributes="0"/>
                   <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
               </Group>
               <Group type="102" attributes="0">
-                  <Component id="jlLoyalty" max="32767" attributes="0"/>
+                  <Component id="jlLoyalty" pref="88" max="32767" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="jlSize" max="32767" attributes="0"/>
+                  <Component id="jlSize" pref="72" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jlFortification" max="32767" attributes="0"/>
+                  <Component id="jlFortification" pref="115" max="32767" attributes="0"/>
               </Group>
               <Group type="102" alignment="0" attributes="0">
                   <Component id="jsCityLoyalty" min="-2" max="-2" attributes="0"/>
@@ -107,16 +102,12 @@
                       <Component id="jlSize" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jlFortification" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Group type="103" alignment="0" groupAlignment="3" attributes="0">
-                          <Component id="jsCitySize" alignment="3" min="-2" pref="143" max="-2" attributes="0"/>
-                          <Component id="jsCityFortification" alignment="3" min="-2" pref="143" max="-2" attributes="0"/>
-                      </Group>
-                      <Component id="jsCityLoyalty" alignment="0" min="-2" pref="143" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="jsCitySize" pref="0" max="32767" attributes="0"/>
+                      <Component id="jsCityFortification" alignment="0" pref="0" max="32767" attributes="0"/>
+                      <Component id="jsCityLoyalty" alignment="0" pref="0" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="jcbTerrain" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -195,18 +186,6 @@
             </Property>
           </Properties>
         </Component>
-        <Component class="javax.swing.JComboBox" name="jcbTerrain">
-          <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="4">
-                <StringItem index="0" value="Item 1"/>
-                <StringItem index="1" value="Item 2"/>
-                <StringItem index="2" value="Item 3"/>
-                <StringItem index="3" value="Item 4"/>
-              </StringArray>
-            </Property>
-          </Properties>
-        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="jpArmyList">
@@ -228,7 +207,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jScrollPane1" alignment="0" pref="127" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" alignment="0" pref="178" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -727,6 +706,106 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JComboBox" name="cbTypeCategory">
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JToolBar" name="jToolBar1">
+      <Properties>
+        <Property name="floatable" type="boolean" value="false"/>
+        <Property name="rollover" type="boolean" value="true"/>
+      </Properties>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JComboBox" name="jcbTerrain">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="4">
+                <StringItem index="0" value="Item 1"/>
+                <StringItem index="1" value="Item 2"/>
+                <StringItem index="2" value="Item 3"/>
+                <StringItem index="3" value="Item 4"/>
+              </StringArray>
+            </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.Box$Filler" name="filler1">
+          <Properties>
+            <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[32767, 0]"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="classDetails" type="java.lang.String" value="Box.Filler.HorizontalGlue"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.Box$Filler" name="filler2">
+          <Properties>
+            <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[32767, 0]"/>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="classDetails" type="java.lang.String" value="Box.Filler.HorizontalGlue"/>
+          </AuxValues>
+        </Component>
+        <Component class="javax.swing.JButton" name="jbSimulation">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/images/right.gif"/>
+            </Property>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="BATTLESIM.RUN.SIMULATION" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="jbSimulation"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="name" type="java.lang.String" value="jbSimulation" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jbCasualtiesList">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/images/hex_exercito.gif"/>
+            </Property>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="TROOPCASUALTIES.BORDER.TITLE" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="jbCasualtiesList"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="name" type="java.lang.String" value="jbCasualtiesList" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jbTacticHelp">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/images/combat.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="TATICA" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="BATTLESIM.TATICA.HINT" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="jbTacticHelp"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="name" type="java.lang.String" value="jbTacticHelp" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jbAbout">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/images/about.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="gui/accessories/Bundle.properties" key="MENU.ABOUT" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="BATTLESIM.ABOUT.TOOLTIP" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="jbAbout"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="name" type="java.lang.String" value="jbAbout" noResource="true"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>

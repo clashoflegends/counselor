@@ -17,7 +17,8 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
-import gui.accessories.GraphPopup;
+import gui.accessories.GraphPopupScoreByNation;
+import gui.accessories.GraphPopupVpPerTeam;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
 import java.awt.Component;
@@ -96,7 +97,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private final CenarioFacade cenarioFacade = new CenarioFacade();
     private final PersonagemFacade personagemFacade = new PersonagemFacade();
     private static final WorldFacadeCounselor WFC = WorldFacadeCounselor.getInstance();
-    
+
     private ProgressMonitor progressMonitor;
 
     public WorldControler(MainResultWindowGui aGui) {
@@ -130,6 +131,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doSend(jbTemp);
             } else if ("jbScoreGraph".equals(jbTemp.getActionCommand())) {
                 doGraphScore();
+            } else if ("jbGraphSingleTurn".equals(jbTemp.getActionCommand())) {
+                doGraphSingleTurn();
             } else if ("jbAbout".equals(jbTemp.getActionCommand())) {
                 doAbout();
             } else if ("jbHexview".equals(jbTemp.getActionCommand())) {
@@ -142,33 +145,31 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
             }
         } else if (actionEvent.getSource() instanceof JToggleButton) {
-            JToggleButton jbTemp = (JToggleButton)actionEvent.getSource();
+            JToggleButton jbTemp = (JToggleButton) actionEvent.getSource();
             if (("pcPathDraw").equals(jbTemp.getActionCommand())) {
                 doDrawPjPaths();
-               
-            } else if("drawPathArmy".equals(jbTemp.getActionCommand())) {
+
+            } else if ("drawPathArmy".equals(jbTemp.getActionCommand())) {
                 //TODO 
-              
-                
-            } else if("drawFogWar".equals(jbTemp.getActionCommand())) {
+
+            } else if ("drawFogWar".equals(jbTemp.getActionCommand())) {
                 doDrawFogOfWar(jbTemp);
-                
-            } else if("drawDisplayPortraits".equals(jbTemp.getActionCommand())) {
-                
+
+            } else if ("drawDisplayPortraits".equals(jbTemp.getActionCommand())) {
+
                 DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
                 if (!displayPortraitsManager.isShowPortraitEnableable()) {
                     progressMonitor = new ProgressMonitor(gui, "Downloading file...", "", 0, 100);
                     progressMonitor.setProgress(0);
                     displayPortraitsManager.downloadPortraits(gui, this);
                 }
-                               
-                doDisplayPortraits(jbTemp);          
-                                
-            }else {
+
+                doDisplayPortraits(jbTemp);
+
+            } else {
                 log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
             }
-        
-        
+
         } else {
             log.info(labels.getString("OPS.GENERAL.EVENT"));
         }
@@ -336,7 +337,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private void doGraphScore() throws HeadlessException {
-        GraphPopup graph = new GraphPopup();
+        GraphPopupScoreByNation graph = new GraphPopupScoreByNation();
+        graph.start();
+    }
+
+    private void doGraphSingleTurn() throws HeadlessException {
+        GraphPopupVpPerTeam graph = new GraphPopupVpPerTeam();
         graph.start();
     }
 
@@ -953,8 +959,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             doSave(cmpnt, false);
         }
     }
-    
-    
 
     public void saveWorldFile(World world) {
         //salva o arquivo
@@ -1210,8 +1214,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private void doUpdateGuiActionCount() {
         getGui().setActionsCount(this.actionsCount, this.actionsSlots);
     }
-    
-    private void doDrawPjPaths() {        
+
+    private void doDrawPjPaths() {
         int pcPathValue = gui.getPcPath().isSelected() ? 1 : 0;
         int pcPathFutureValue = gui.getPcPathFuture().isSelected() ? 1 : 0;
         int settingValue = calculateDrawPcPathValue(pcPathValue, pcPathFutureValue);
@@ -1219,24 +1223,23 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         SettingsManager.getInstance().doConfigSave("drawPcPath");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
-        
+
     }
-    
-    private void doDrawFogOfWar(JToggleButton button) {         
+
+    private void doDrawFogOfWar(JToggleButton button) {
         int settingValue = button.isSelected() ? 1 : 0;
         SettingsManager.getInstance().setConfig("FogOfWarType", String.valueOf(settingValue));
         SettingsManager.getInstance().doConfigSave("FogOfWarType");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
-        
+
     }
-    
-    
+
     private int calculateDrawPcPathValue(int pcPath, int pcPathFuture) {
         int settingValue = 0;
         String valueBin = String.valueOf(pcPath).concat(String.valueOf(pcPathFuture));
         int tempValue = Integer.parseInt(valueBin, 2);
-        switch(tempValue){
+        switch (tempValue) {
             case 0:
                 settingValue = tempValue;
                 break;
@@ -1258,7 +1261,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         SettingsManager.getInstance().setConfig("ShowCharacterPortraits", String.valueOf(selected));
         SettingsManager.getInstance().doConfigSave("ShowCharacterPortraits");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(selected));
-        
+
     }
 
     @Override
@@ -1269,12 +1272,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
             String message = String.format("Completed %d%%.\n", progress);
             progressMonitor.setNote(message);
-            
+
             if (progress == 100) {
-          //      settingsGui.checkDisplayPortraitCheckBox();
+                //      settingsGui.checkDisplayPortraitCheckBox();
 
             }
 
-        }    
+        }
     }
 }

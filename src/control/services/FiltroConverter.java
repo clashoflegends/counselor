@@ -19,7 +19,7 @@ import model.Jogador;
 import model.Nacao;
 import model.Pelotao;
 import model.TipoTropa;
-import msgs.TitleFactory;
+import business.services.TitleFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;

@@ -13,7 +13,6 @@ import business.facade.FeiticoFacade;
 import business.facade.LocalFacade;
 import business.facade.OrdemFacade;
 import business.facade.PersonagemFacade;
-import persistence.local.ListFactory;
 import control.facade.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,6 +31,7 @@ import model.Personagem;
 import model.PersonagemFeitico;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
@@ -592,7 +592,11 @@ public class PersonagemConverter implements Serializable {
         if (personagemFacade.isMorto(personagem)) {
             //do nothing, just skip.
         } else {
-            ret.addTab(String.format(labels.getString("S.DE.S"), personagemFacade.getNome(personagem), personagemFacade.getNacaoNome(personagem)));
+            ret.addTab(String.format(labels.getString("S.AT.S.S"),
+                    personagemFacade.getNome(personagem),
+                    personagemFacade.getNacaoNome(personagem),
+                    personagemFacade.getInfoShort(personagem) + " ")
+            );
         }
         return ret.getList();
     }

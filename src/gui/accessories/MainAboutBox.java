@@ -11,7 +11,6 @@
 package gui.accessories;
 
 import gui.TabBase;
-import persistenceCommons.SysApoio;
 import gui.components.ButtonLink;
 import java.io.Serializable;
 import javax.swing.GroupLayout;
@@ -19,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 
 /**
  *

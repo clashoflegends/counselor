@@ -11,10 +11,9 @@ import business.MovimentoExercito;
 import business.converter.ConverterFactory;
 import business.facade.ExercitoFacade;
 import business.facade.LocalFacade;
-import persistence.local.ListFactory;
-import control.facade.WorldFacadeCounselor;
 import control.DirecaoExercitoControler;
 import control.MapaControler;
+import control.facade.WorldFacadeCounselor;
 import control.support.ActorInterface;
 import gui.TabBase;
 import java.io.Serializable;
@@ -25,6 +24,7 @@ import model.Ordem;
 import model.TipoTropa;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 
@@ -45,7 +45,8 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
     private Ordem ordem;
     private ActorInterface actor;
     private final ListFactory listFactory = new ListFactory();
-    private boolean agua = false, all = false;
+    private int moveType = 0;
+    private boolean all = false;
     private int limiteMovimento = 0;
 
     /**
@@ -113,41 +114,6 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
         //set initial tag
         this.doMovementTagsPaint(vlInicial);
         setListeners();
-    }
-
-    private void setDefaultValues() {
-        setAgua(ordem.hasHabilidade(";AMW;"));
-        if (ordem.hasHabilidade(";AM12;")) {
-            setLimiteMovimento(12);
-            return;
-        }
-        if (ordem.hasHabilidade(";AM14;")) {
-            setLimiteMovimento(14);
-            return;
-        }
-        //FIXME: clean up after a while (7/5/2016) once it's in the EGF.
-        if (ordem.getCodigo().equals("850") && WorldFacadeCounselor.getInstance().hasResourceManagement()) {
-            setLimiteMovimento(12);
-            setAgua(false);
-        } else if (ordem.getCodigo().equals("850") && !WorldFacadeCounselor.getInstance().hasResourceManagement()) {
-            setLimiteMovimento(14);
-            setAgua(false);
-        } else if (ordem.getCodigo().equals("851")) {
-            setLimiteMovimento(14);
-            setAgua(false);
-        } else if (ordem.getCodigo().equals("852")) {
-            setLimiteMovimento(14);
-            setAgua(false);
-        } else if (ordem.getCodigo().equals("860")) {
-            setLimiteMovimento(14);
-            setAgua(false);
-        } else if (ordem.getCodigo().equals("830")) {
-            setLimiteMovimento(14);
-            setAgua(true);
-        } else {
-            setLimiteMovimento(0);
-            setAgua(false);
-        }
     }
 
     /**
@@ -444,7 +410,7 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
                     }
                 }
                 movEx.setLimiteMovimento(this.getLimiteMovimento());
-                movEx.setPorAgua(isAgua());
+                movEx.setMoveType(this.getMoveType());
                 //salva o destino
                 this.destino = proximoDestino;
                 //desenha a tag
@@ -501,15 +467,29 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
     /**
      * @return the agua
      */
-    public final boolean isAgua() {
-        return agua;
+    private boolean isAgua() {
+        return getMoveType() == MovimentoExercito.BY_WATER;
+    }
+
+    private int getMoveType() {
+        return moveType;
+    }
+
+    private void setMoveType(int moveType) {
+        this.moveType = moveType;
     }
 
     /**
-     * @param agua the agua to set
+     * @param water the agua to set
      */
-    private void setAgua(boolean agua) {
-        this.agua = agua;
+    private void setAgua(boolean water) {
+        if (water) {
+            //variable costs per terrain on water
+            setMoveType(MovimentoExercito.BY_WATER);
+        } else {
+            //else, variable costs per terrain on land
+            setMoveType(MovimentoExercito.BY_LAND);
+        }
     }
 
     /**
@@ -573,10 +553,68 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
     }
 
     private GenericoComboBoxModel getTropaModel() {
-        if (isAll() || actor == null || actor.getExercito() == null) {
+        if (isAll() || actor == null) {
+            //assume all troops are available
+            return dirExControl.getTropaTipoComboModel(isAgua());
+//        } else if (actor.getExercito() == null) {
+//            //LOM has PCs marching as armies, but at a cost of 1 point
+//            //If the army has no troops, the cost of each move will default to 1.
+//            Collection<TipoTropa> list = new ArrayList<TipoTropa>();
+//            GenericoComboBoxModel model = new GenericoComboBoxModel(list.toArray(new TipoTropa[0]));
+//            return model;
+        } else if (actor.getExercito() == null) {
+            //assume all troops are available
             return dirExControl.getTropaTipoComboModel(isAgua());
         } else {
             return dirExControl.getTropaTipoComboModel(actor.getExercito(), isAgua());
+        }
+    }
+
+    private void setDefaultValues() {
+        if (ordem.hasHabilidade(";AMF;")) {
+            //if fixed cost of 1
+            setMoveType(MovimentoExercito.BY_FIXED);
+        } else if (ordem.hasHabilidade(";AMW;")) {
+            //else, variable costs per terrain on water
+            setMoveType(MovimentoExercito.BY_WATER);
+        } else {
+            //else, variable costs per terrain on land
+            setMoveType(MovimentoExercito.BY_LAND);
+        }
+        if (ordem.hasHabilidade(";AM12;")) {
+            setLimiteMovimento(12);
+            return;
+        }
+        if (ordem.hasHabilidade(";AM14;")) {
+            setLimiteMovimento(14);
+            return;
+        }
+        if (ordem.hasHabilidade(";AM08;")) {
+            setLimiteMovimento(8);
+            return;
+        }
+        //FIXME: clean up after a while (7/5/2016) once it's in the EGF.
+        if (ordem.getCodigo().equals("850") && WorldFacadeCounselor.getInstance().hasResourceManagement()) {
+            setLimiteMovimento(12);
+            setMoveType(MovimentoExercito.BY_LAND);
+        } else if (ordem.getCodigo().equals("850") && !WorldFacadeCounselor.getInstance().hasResourceManagement()) {
+            setLimiteMovimento(14);
+            setMoveType(MovimentoExercito.BY_LAND);
+        } else if (ordem.getCodigo().equals("851")) {
+            setLimiteMovimento(14);
+            setMoveType(MovimentoExercito.BY_LAND);
+        } else if (ordem.getCodigo().equals("852")) {
+            setLimiteMovimento(14);
+            setMoveType(MovimentoExercito.BY_LAND);
+        } else if (ordem.getCodigo().equals("860")) {
+            setLimiteMovimento(14);
+            setMoveType(MovimentoExercito.BY_LAND);
+        } else if (ordem.getCodigo().equals("830")) {
+            setLimiteMovimento(14);
+            setMoveType(MovimentoExercito.BY_WATER);
+        } else {
+            setLimiteMovimento(0);
+            setMoveType(MovimentoExercito.BY_LAND);
         }
     }
 }

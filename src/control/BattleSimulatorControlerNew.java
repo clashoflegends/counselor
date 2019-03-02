@@ -11,12 +11,17 @@ import business.ImageManager;
 import business.combat.ArmySim;
 import business.converter.ConverterFactory;
 import business.facade.BattleSimFacade;
+import business.facade.CidadeFacade;
+import business.facade.ExercitoFacade;
+import business.facade.NacaoFacade;
 import control.facade.WorldFacadeCounselor;
 import control.services.AcaoConverter;
 import control.services.CenarioConverter;
 import control.services.ExercitoConverter;
 import control.services.FiltroConverter;
+import control.support.WindowPopupText;
 import gui.accessories.BattleCasualtySimulatorNew;
+import gui.accessories.TroopsCasualtiesList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -54,12 +59,16 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
     private static final Log log = LogFactory.getLog(BattleSimulatorControlerNew.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final BattleCasualtySimulatorNew tabGui;
-    private final List<ArmySim> listaExibida = new ArrayList<ArmySim>();
+    private final List<ArmySim> armiesList = new ArrayList<ArmySim>();
     private ArmySim exercito;
-    private final BattleSimFacade combSim = new BattleSimFacade();
     private Terreno terreno;
+    private Cidade cityClone;
     private int rowIndex = 0;
     private BattleSimPlatoonCasualtyControlerNew casualtyControler;
+    private final BattleSimFacade bsf = new BattleSimFacade();
+    private final NacaoFacade nacaoFacade = new NacaoFacade();
+    private final CidadeFacade cidadeFacade = new CidadeFacade();
+    private final ExercitoFacade exercitoFacade = new ExercitoFacade();
 
     public BattleSimulatorControlerNew(BattleCasualtySimulatorNew tabGui) {
         this.tabGui = tabGui;
@@ -79,6 +88,14 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
 
     private void setTerreno(Terreno terreno) {
         this.terreno = terreno;
+    }
+
+    public void setCity(Cidade city) {
+        cityClone = city;
+    }
+
+    public Cidade getCity() {
+        return cityClone;
     }
 
     public void setCasualtyControler(BattleSimPlatoonCasualtyControlerNew casualtyControler) {
@@ -109,9 +126,9 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
 
     public TableModel getArmyListTableModel(Collection<Exercito> armies) {
         for (Exercito army : armies) {
-            listaExibida.add(combSim.clone(army));
+            armiesList.add(bsf.clone(army));
         }
-        return ExercitoConverter.getBattleModel(listaExibida);
+        return ExercitoConverter.getBattleModel(armiesList);
     }
 
     public GenericoComboBoxModel getTerrenoComboModel() {
@@ -120,45 +137,30 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
     }
 
     private void doRemoveArmy(ArmySim army) {
-        listaExibida.remove(army);
+        armiesList.remove(army);
         rowIndex--;
         doRefreshArmy();
     }
 
     private void doCloneArmy(ArmySim army) {
-        listaExibida.add(combSim.clone(army));
-        rowIndex = listaExibida.size() - 1;
+        armiesList.add(bsf.clone(army));
+        rowIndex = armiesList.size() - 1;
         doRefreshArmy();
     }
 
     private void doNewArmy() {
         //FIXME: needs to receive Local for the Battle to be resolved. Deal with this later. Local could be stored in GUi or Control.
-        listaExibida.add(new ArmySim("Blank", getTerrain()));
-        rowIndex = listaExibida.size() - 1;
+        armiesList.add(new ArmySim("Blank", getTerrain()));
+        rowIndex = armiesList.size() - 1;
         doRefreshArmy();
     }
 
     public void doRefreshArmy() {
-        this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(listaExibida), rowIndex);
+        this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(armiesList), rowIndex);
     }
 
     public ComboBoxModel listFiltroTypes() {
         return new GenericoComboBoxModel(FiltroConverter.listFiltroLW());
-    }
-
-    private void doCombatCity() {
-        //FIXME: add Cidade to GUI (as opposed to labels) and Controler
-        final Cidade city = new Cidade();
-        city.setTamanho(4);
-        city.setFortificacao(1);
-        city.setLealdade(50);
-//        CombatManagerCity cbm = new CombatManagerCity(city);
-//        for (IExercito army : listaExibida) {
-//            //clone the army so that we can run multiple simulations without changing the BattleSim
-//            cbm.addArmy(new ArmySim((ArmySim) army));
-//        }
-//        cbm.setTerrain(getTerrain());
-//        cbm.doCombat(0);
     }
 
     @Override
@@ -204,7 +206,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
             JTable table = this.getTabGui().getListaExercitos();
             rowIndex = lsm.getAnchorSelectionIndex();
             int modelIndex = table.convertRowIndexToModel(rowIndex);
-            exercito = (ArmySim) listaExibida.get(modelIndex);
+            exercito = (ArmySim) armiesList.get(modelIndex);
             getTabGui().updateArmy(exercito);
             //set short casualties list
             getTabGui().setCasualtyBorder(exercito, getTerrain());
@@ -230,7 +232,15 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
     protected void doActionButton(ActionEvent event) {
         JButton jbTemp = (JButton) event.getSource();
         //monta csv com as ordens
-        if ("jbNewArmy".equals(jbTemp.getActionCommand())) {
+        if ("jbAbout".equals(jbTemp.getActionCommand())) {
+            doAbout();
+        } else if ("jbTacticHelp".equals(jbTemp.getActionCommand())) {
+            doTacticHelp();
+        } else if ("jbCasualtiesList".equals(jbTemp.getActionCommand())) {
+            doLocalCasualties();
+        } else if ("jbSimulation".equals(jbTemp.getActionCommand())) {
+            doSimulation();
+        } else if ("jbNewArmy".equals(jbTemp.getActionCommand())) {
             doNewArmy();
         } else if ("jbCloneArmy".equals(jbTemp.getActionCommand())) {
             doCloneArmy(exercito);
@@ -247,7 +257,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
             try {
                 final GenericoComboObject obj = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
                 final Terreno terrain = (Terreno) obj.getObject();
-                for (ArmySim army : listaExibida) {
+                for (ArmySim army : armiesList) {
                     army.setTerreno(terrain);
                 }
                 doRefreshArmy();
@@ -277,4 +287,89 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
             log.info(String.format("actionOnTabGui %s %s", jcbActive.getActionCommand(), jcbActive.getName()));
         }
     }
+
+    private void doAbout() {
+        //Launch popup window with BatleSim disclaimer
+        WindowPopupText.showWindowText(labels.getString("BATTLESIM.DISCLAIMER.TEXT"), labels.getString("BATTLESIM.DISCLAIMER.TITLE"), this.getTabGui());
+    }
+
+    private void doTacticHelp() {
+        //launch tactics bonuses in a new window
+        WindowPopupText.showWindowTable(CenarioConverter.getInstance().getTaticaTableModel(), labels.getString("BATTLESIM.TATICA.HINT"), this.getTabGui());
+
+    }
+
+    private void doLocalCasualties() {
+        //TODO: implement this with Terreno, not Local
+        TroopsCasualtiesList casualtiesSim = new TroopsCasualtiesList(getTerrain());
+        casualtiesSim.setLocationRelativeTo(this.getTabGui());
+        casualtiesSim.setVisible(true);
+    }
+
+    private void doSimulation() {
+        //put results in a new window.
+        //clone the army so that we can run multiple simulations without changing the BattleSim
+
+        //FIXME: to start, all armies attack the city.
+        doCombatCity();
+    }
+
+    private void doCombatCity() {
+        //FIXME: add Cidade from GUI (as opposed to labels) and Controler
+
+        final Cidade city = getCity();
+        //calc defense
+        long defesa = cidadeFacade.getDefesa(getCity());
+        //calcula forca e constituicao das tropas, sem tatica
+        int ataqueTotal = 0;
+        long qtTrops = 0;
+        for (ArmySim army : armiesList) {
+            //add the total amount of troops to be used later
+            qtTrops += exercitoFacade.getQtTropasTotal(army);
+            //calcula os fatores da media ponderada.
+            int forcaBasica = bsf.getArmyAttackBaseLand(army, army.getLocal());
+            int forcaPlus = 0;
+            int modRelacionamento = 100 - nacaoFacade.getBonusRelacionamento(city.getNacao(), army.getNacao());
+            //aqui entram os bonus da nacao por terreno/tropa
+            final int dano = forcaPlus + (forcaBasica * modRelacionamento / 100);
+            ataqueTotal += dano;
+            //City round %s: %s inflicted %s of damage to %s with a defense of %s.
+//            final String msgDano = SysMsgs.CombateFezDanoCidadeAtaque + SysMsgs.Separador + rounds + SysMsgs.Separador
+//                    + army.displayComandante() + SysMsgs.Separador + dano + SysMsgs.Separador
+//                    + city.displayNomeHex() + SysMsgs.Separador + defesa;
+        }
+        //apply damage
+
+        //distribui a defesa do cp como dano aos atacantes
+        for (ArmySim army : armiesList) {
+            long danoPer = defesa * exercitoFacade.getQtTropasTotal(army) / qtTrops;
+
+            //City round %s: %s with an attack of %s inflicted %s of damage to %s with a defense of %s.
+            //how to apply damage from PbmCommons?
+//            army.sumCombateDano(danoPer);
+//            List<String> msgDanoT = army.doCombateDano();
+            List<String> msgDanoT = new ArrayList<String>();
+            try {
+                boolean first = true;
+                for (String item : msgDanoT) {
+                    if (first) {
+//                        msg += "\t\t" + SysMsgs.CombateCasualitiesLabel + SysMsgs.Separador + rounds + "\n";
+                        first = false;
+                    }
+//                    msg += "\t\t" + item + "\n";
+                }
+            } catch (NullPointerException ex) {
+                //just skip, no messages
+            }
+        }
+        System.out.println(defesa + "/" + ataqueTotal);
+
+        //check results
+        if (ataqueTotal <= defesa) {
+            //ataque falhou.
+        } else {
+            //capturou
+        }
+    }
+
 }

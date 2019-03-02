@@ -43,12 +43,13 @@ public class CasualtyControler implements Serializable, ActionListener {
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
     private SubTabCasualtyGui tabGui;
-    private final Local local;
+//    private final Local local;
+    private final Terreno terrain;
     private ArmySim exercito;
 
     public CasualtyControler(SubTabCasualtyGui tabGui, Local local) {
         this.tabGui = tabGui;
-        this.local = local;
+        this.terrain = local.getTerreno();
     }
 
     /**
@@ -57,7 +58,11 @@ public class CasualtyControler implements Serializable, ActionListener {
      * @param local
      */
     public CasualtyControler(Local local) {
-        this.local = local;
+        this.terrain = local.getTerreno();
+    }
+
+    public CasualtyControler(Terreno aTerrain) {
+        this.terrain = aTerrain;
     }
 
     private SubTabCasualtyGui getTabGui() {
@@ -69,7 +74,7 @@ public class CasualtyControler implements Serializable, ActionListener {
     }
 
     public GenericoTableModel getMainTableModel(String filtro, String tactic) {
-        return getMainTableModel(filtro, tactic, local.getTerreno());
+        return getMainTableModel(filtro, tactic, terrain);
     }
 
     public GenericoTableModel getMainTableModel(String filtro, String tactic, Terreno terrain) {

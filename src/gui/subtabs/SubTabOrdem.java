@@ -2,10 +2,12 @@ package gui.subtabs;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
-import control.facade.WorldFacadeCounselor;
+import business.facade.JogadorFacade;
+import business.facade.PersonagemFacade;
 import control.MapaControler;
 import control.OrdemControler;
 import control.OrdemControlerFloater;
+import control.facade.WorldFacadeCounselor;
 import control.support.ActorInterface;
 import control.support.ActorInterfaceFactory;
 import gui.TabBase;
@@ -33,7 +35,7 @@ import model.Ordem;
 import model.Personagem;
 import model.PersonagemFeitico;
 import model.PersonagemOrdem;
-import msgs.TitleFactory;
+import business.services.TitleFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -57,6 +59,8 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     private final JDialog dOrdem = new JDialog(new JFrame(), false);
     private final SubTabTextArea stAjuda = new SubTabTextArea();
     private final IAcaoGui parentTab;
+    private final JogadorFacade jogadorFacade = new JogadorFacade();
+    private final PersonagemFacade personagemFacade = new PersonagemFacade();
 
     public SubTabOrdem(IAcaoGui parentTab, MapaControler mapaControl) {
         initComponents();
@@ -717,6 +721,14 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         } else if (WorldFacadeCounselor.getInstance().isGameOver()
                 || WorldFacadeCounselor.getInstance().isJogadorAtivoEliminado(WorldFacadeCounselor.getInstance().getJogadorAtivo())) {
             allowOrders = false;
+        } else if (!jogadorFacade.isMine(getActor().getNacao(), WorldFacadeCounselor.getInstance().getJogadorAtivo())) {
+            //Show list, but do not allow orders
+            //clear first
+            doOrdemClear();
+            //show list
+            setOrdensModel(getActor().getOrdemTableModel());
+            //quit
+            return;
         }
 
         if (allowOrders) {
