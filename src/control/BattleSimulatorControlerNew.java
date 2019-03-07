@@ -126,6 +126,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
 
     public TableModel getArmyListTableModel(Collection<Exercito> armies) {
         for (Exercito army : armies) {
+            //FIXME: Needs deep clone for pelotao
             armiesList.add(bsf.clone(army));
         }
         return ExercitoConverter.getBattleModel(armiesList);
