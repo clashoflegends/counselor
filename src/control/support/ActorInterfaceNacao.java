@@ -75,13 +75,22 @@ public class ActorInterfaceNacao extends ActorInterface {
 
     @Override
     public ComboBoxModel getTropaTipoComboModel(int tipo) {
-        //tipo=0 then ALL; =1 then by city=char race
-        if (tipo == 0) {
-            return CenarioConverter.getInstance().getTropaTipoComboModel();
-        } else {
-            Raca racaNacao = nacaoFacade.getRaca(getNacao());
-            Raca racaCidade = cidadeFacade.getRaca(nacaoFacade.getCapital(getNacao()));
-            return CenarioConverter.getInstance().getTropaTipoComboModel(racaCidade, racaNacao);
+        //tipo=0 then ALL; =1 then by city=char race; =2 then basic troops that can be recruited at capital
+        switch (tipo) {
+            case 0:
+                return CenarioConverter.getInstance().getTropaTipoComboModel();
+            case 1:
+            {
+                Raca racaNacao = nacaoFacade.getRaca(getNacao());
+                Raca racaCidade = cidadeFacade.getRaca(nacaoFacade.getCapital(getNacao()));
+                return CenarioConverter.getInstance().getTropaTipoComboModel(racaCidade, racaNacao);
+            }
+            default:
+            {
+                Raca racaNacao = nacaoFacade.getRaca(getNacao());
+                Raca racaCidade = cidadeFacade.getRaca(nacaoFacade.getCapital(getNacao()));
+                return CenarioConverter.getInstance().getTropaTipoComboBasicModel(racaCidade, racaNacao);
+            }
         }
     }
 
