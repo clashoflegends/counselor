@@ -124,6 +124,18 @@ public class CenarioConverter implements Serializable {
         return model;
     }
 
+    public ComboBoxModel getTropaTipoComboBasicModel(Raca racaCidade, Raca racaNacao) {
+        List<TipoTropa> lista = new ArrayList<TipoTropa>();
+        for (TipoTropa troop : cenarioFacade.getTipoTropas(cenario, racaCidade, racaNacao)) {
+            if (!troop.isBasicType()) {
+                continue;
+            }
+            lista.add(troop);
+        }
+        GenericoComboBoxModel model = new GenericoComboBoxModel(lista.toArray(new TipoTropa[0]));
+        return model;
+    }
+
     public ComboBoxModel getTropaTipoComboModel() {
         List<TipoTropa> lista = new ArrayList<TipoTropa>();
         lista.addAll(cenarioFacade.getTipoTropas(cenario));
