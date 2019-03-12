@@ -12,6 +12,7 @@ import business.facade.CidadeFacade;
 import business.facade.ExercitoFacade;
 import business.facade.LocalFacade;
 import business.interfaces.IExercito;
+import business.services.TitleFactory;
 import control.facade.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,7 +31,6 @@ import model.Pelotao;
 import model.Personagem;
 import model.TipoTropa;
 import msgs.BaseMsgs;
-import business.services.TitleFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.local.ListFactory;
@@ -139,12 +139,12 @@ public class ExercitoConverter implements Serializable {
         cArray[ii++] = exercitoFacade.getNacaoNome(exercito);
         Local local = exercitoFacade.getLocal(exercito);
         cArray[ii++] = localFacade.getCoordenadas(local);
+        cArray[ii++] = exercitoFacade.getMoral(exercito);
         cArray[ii++] = exercitoFacade.getQtTropasCavalaria(exercito);
         cArray[ii++] = exercitoFacade.getQtTropasInfantaria(exercito);
         cArray[ii++] = exercitoFacade.getEsquadra(exercito);
         cArray[ii++] = exercitoFacade.getComida(exercito);
         cArray[ii++] = exercitoFacade.getUpkeepFood(exercito);
-        cArray[ii++] = exercitoFacade.getMoral(exercito);
         cArray[ii++] = exercitoFacade.getDescricaoTamanho(exercito);
         cArray[ii++] = exercitoFacade.getTacticNameSelected(exercito);
         cArray[ii++] = exercitoFacade.getUpkeepCost(exercito);
@@ -189,9 +189,9 @@ public class ExercitoConverter implements Serializable {
 
     private static String[] getExercitoColNames() {
         String[] colNames = {
-            labels.getString("COMANDANTE"), labels.getString("NACAO"), labels.getString("LOCAL"),
+            labels.getString("COMANDANTE"), labels.getString("NACAO"), labels.getString("LOCAL"), labels.getString("MORAL"),
             labels.getString("CAVALARIAS"), labels.getString("INFANTARIAS"), labels.getString("NAVIOS"),
-            labels.getString("COMIDA"), labels.getString("COMIDA.CONSUMO"), labels.getString("MORAL"),
+            labels.getString("COMIDA"), labels.getString("COMIDA.CONSUMO"),
             labels.getString("TAMANHO"),
             labels.getString("TATICA"),
             labels.getString("CUSTO.MANUTENCAO"), labels.getString("MAQUINAS.GUERRA"),
