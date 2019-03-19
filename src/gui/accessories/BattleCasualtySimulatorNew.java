@@ -632,11 +632,15 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
      * @param local
      */
     private void setCidade(Local local) {
-        if (!localFacade.isCidade(local)) {
-            return;
+        final Cidade city;
+        if (localFacade.isCidade(local)) {
+            //clone city not to have original values changed
+            city = localFacade.getCidade(local).clone();
+        } else {
+            //create dummy city for controls to work
+            city = new Cidade();
         }
-        final Cidade city = localFacade.getCidade(local);
-        battleSimControler.setCity(city.clone());
+        battleSimControler.setCity(city);
         jsCityLoyalty.setValue(cidadeFacade.getLealdade(city));
         jsCitySize.setValue(cidadeFacade.getTamanho(city));
         jsCityFortification.setValue(cidadeFacade.getFortificacao(city));
