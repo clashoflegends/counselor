@@ -29,6 +29,7 @@ import model.Nacao;
 import model.Ordem;
 import model.Personagem;
 import model.PersonagemFeitico;
+import utils.OpenSlotCounter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.local.ListFactory;
@@ -43,7 +44,7 @@ import utils.StringRet;
  */
 public class PersonagemConverter implements Serializable {
 
-    public static final int ORDEM_COL_INDEX_START = 1;
+    public static final int ORDEM_COL_INDEX_START = 2;
 //    private static final int FILTRO_PROPRIOS = 1;
 //    private static final int FILTRO_TODOS = 0;
     private static final Log log = LogFactory.getLog(PersonagemConverter.class);
@@ -69,6 +70,8 @@ public class PersonagemConverter implements Serializable {
         List<String> colNames = new ArrayList<String>(30);
         colNames.add(labels.getString("NOME"));
         classes.add(java.lang.String.class);
+        colNames.add(labels.getString("OPEN.SLOTS"));
+        classes.add(OpenSlotCounter.class);
         for (int nn = 1; nn <= qtOrdens; nn++) {
             colNames.add(String.format("%s %s", labels.getString("ACAO"), nn));
 //            classes.add(String.class);
@@ -117,10 +120,8 @@ public class PersonagemConverter implements Serializable {
     private static Object[] personagemToArray(Personagem personagem) {
         int qtOrdens = WorldFacadeCounselor.getInstance().getOrdensQtMax();
         int ii = 0;
-        String[] temp;
         Object[] cArray = new Object[getPersonagemColNames(new ArrayList<Class>(30)).length];
         Local local = personagemFacade.getLocal(personagem);
-        Local localOrigem = personagemFacade.getLocalOrigem(personagem);
         //inicia array
         cArray[ii++] = personagemFacade.getNome(personagem);
 //        for (int nn = 0; nn < qtOrdens; nn++) {
@@ -128,6 +129,7 @@ public class PersonagemConverter implements Serializable {
 //            cArray[ORDEM_COL_INDEX_START + nn] = temp[0] + temp[1];
 //            ii++;
 //        }
+        cArray[ii++] = new OpenSlotCounter(ordemFacade.getOrdensOpenSlots(personagem));
         final int orderMax = ordemFacade.getOrdemMax(personagem, WorldFacadeCounselor.getInstance().getCenario());
         for (int nn = 0; nn < qtOrdens; nn++) {
             cArray[ORDEM_COL_INDEX_START + nn] = ordemFacade.getActorAction(personagem, nn, orderMax, WorldFacadeCounselor.getInstance().getJogadorAtivo());

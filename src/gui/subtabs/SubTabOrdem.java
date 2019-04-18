@@ -3,7 +3,8 @@ package gui.subtabs;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import business.facade.JogadorFacade;
-import business.facade.PersonagemFacade;
+import business.facade.OrdemFacade;
+import business.services.TitleFactory;
 import control.MapaControler;
 import control.OrdemControler;
 import control.OrdemControlerFloater;
@@ -35,7 +36,6 @@ import model.Ordem;
 import model.Personagem;
 import model.PersonagemFeitico;
 import model.PersonagemOrdem;
-import business.services.TitleFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -60,7 +60,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     private final SubTabTextArea stAjuda = new SubTabTextArea();
     private final IAcaoGui parentTab;
     private final JogadorFacade jogadorFacade = new JogadorFacade();
-    private final PersonagemFacade personagemFacade = new PersonagemFacade();
+    private final OrdemFacade ordemFacade = new OrdemFacade();
 
     public SubTabOrdem(IAcaoGui parentTab, MapaControler mapaControl) {
         initComponents();
@@ -684,7 +684,8 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         this.jtListaOrdens.getModel().setValueAt(action.getOrdemParameters(), ordIndex, 1);
         this.jtListaOrdens.getModel().setValueAt(TitleFactory.getTipoOrdem(action.getOrdem()), ordIndex, 2);
         //update main table. PersonagemTab is the only one that contains orders.
-        parentTab.setValueAt(action, ordIndex);
+        final int ordensOpenSlots = this.getActor().getOrdensOpenSlots();
+        parentTab.setValueAt(action, ordIndex, ordensOpenSlots);
     }
 
     public void doOrdemClear() {

@@ -295,10 +295,14 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     }
 
     @Override
-    public void setValueAt(ActorAction actorAction, int ordIndex) {
+    public void setValueAt(ActorAction actorAction, int ordIndex, int openSlotsQt) {
         this.jtMainLista.getModel().setValueAt(actorAction,
                 personagemControl.getModelRowIndex(),
                 PersonagemConverter.ORDEM_COL_INDEX_START + ordIndex);
+        //set Col=1 at front, before skills so that it doesn't have to calculate where is the column.
+        this.jtMainLista.getModel().setValueAt(openSlotsQt,
+                personagemControl.getModelRowIndex(),
+                1);
     }
 
     public void doLoadChars() {

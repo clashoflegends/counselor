@@ -38,29 +38,16 @@ public class LocalTableCellRenderer extends DefaultTableCellRenderer implements 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-        //Load collor on first time, so we can UN paint them...
-//        if (isSelected && colorBgSelected == null) {
-//            colorBgSelected = c.getBackground();
-//            colorFgSelected = c.getForeground();
-//            fontSelected = c.getFont();
-//        } else if (!isSelected && colorBgNotSelected == null) {
-//            colorBgNotSelected = c.getBackground();
-//            colorFgNotSelected = c.getForeground();
-//            fontNotSelected = c.getFont();
-//        } else
         if (isSelected) {
             c.setBackground(colorBgSelected);
             c.setForeground(colorFgSelected);
-//            c.setFont(fontSelected);
         } else {
             c.setBackground(colorBgNotSelected);
             c.setForeground(colorFgNotSelected);
-//            c.setFont(fontNotSelected);
         }
         final boolean highlight = mapaControler.getLocal() == value || localFacade.getCoordenadas(mapaControler.getLocal()).equals(value);
         if (highlight) {
             c.setBackground(new Color(128, 128, 255));
-//            c.setBackground(new Color(255, 255, 128));
             c.setForeground(Color.WHITE);
             Font font = c.getFont();
             font = new Font(font.getName(), font.getStyle() | Font.BOLD, font.getSize());

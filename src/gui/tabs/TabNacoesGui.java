@@ -10,9 +10,9 @@ import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.JogadorFacade;
 import business.facade.NacaoFacade;
-import control.facade.WorldFacadeCounselor;
 import control.MapaControler;
 import control.NacaoControler;
+import control.facade.WorldFacadeCounselor;
 import control.services.FiltroConverter;
 import control.services.NacaoConverter;
 import gui.TabBase;
@@ -280,7 +280,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     }
 
     @Override
-    public void setValueAt(ActorAction actorAction, int ordIndex) {
+    public void setValueAt(ActorAction actorAction, int ordIndex, int openSlotsQt) {
         //set how many points were selected
         final int points = acaoFacade.getPointsSetup(stOrdens.getActor().getNacao());
         this.jtMainLista.getModel().setValueAt(points,

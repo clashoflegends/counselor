@@ -35,6 +35,7 @@ import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
+import utils.OpenSlotCounter;
 import utils.StringRet;
 
 /**
@@ -59,20 +60,6 @@ public class CidadeConverter implements Serializable {
                 getCidadeColNames(classes),
                 getCidadesAsArray(lista),
                 classes.toArray(new Class[0]));
-//        GenericoTableModel cidadeModel = new GenericoTableModel(
-//                getCidadeColNames(), getCidadesAsArray(lista),
-//                new Class[]{
-//            java.lang.String.class, java.lang.String.class,
-//            Local.class, java.lang.Integer.class,
-//            java.lang.Integer.class,
-//            java.lang.Integer.class, java.lang.Integer.class,
-//            java.lang.Integer.class,
-//            java.lang.String.class, java.lang.String.class,
-//            java.lang.String.class, java.lang.Integer.class,
-//            java.lang.String.class, java.lang.String.class,
-//            java.lang.String.class, java.lang.String.class,
-//            java.lang.String.class, java.lang.String.class
-//        });
         return cidadeModel;
     }
 
@@ -80,6 +67,8 @@ public class CidadeConverter implements Serializable {
         List<String> colNames = new ArrayList<String>(30);
         colNames.add(labels.getString("NOME"));
         classes.add(java.lang.String.class);
+        colNames.add(labels.getString("OPEN.SLOTS"));
+        classes.add(OpenSlotCounter.class);
         colNames.add(labels.getString("TAMANHO"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("LOCAL"));
@@ -148,6 +137,8 @@ public class CidadeConverter implements Serializable {
         int ii = 0;
         Object[] cArray = new Object[getCidadeColNames(new ArrayList<Class>(30)).length];
         cArray[ii++] = cidadeFacade.getNome(cidade);
+//        cArray[ii++] = ordemFacade.getOrdensOpenSlots(cidade);
+        cArray[ii++] = new OpenSlotCounter(ordemFacade.getOrdensOpenSlots(cidade));
         cArray[ii++] = cidadeFacade.getTamanhoNome(cidade);
         cArray[ii++] = cidadeFacade.getLocal(cidade);
 
@@ -155,7 +146,7 @@ public class CidadeConverter implements Serializable {
         cArray[ii++] = cidadeFacade.getProducao(cidade, WorldFacadeCounselor.getInstance().getCenario().getMoney(), WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getTurno());
         cArray[ii++] = cidadeFacade.getUpkeepMoney(cidade);
         cArray[ii++] = cidadeFacade.getLealdade(cidade);
-        cArray[ii++] = cidadeFacade.getLealdadeDelta(cidade);
+        cArray[ii++] = cidadeFacade.getLealdade(cidade);
         cArray[ii++] = localFacade.getPersonagens(cidadeFacade.getLocal(cidade)).size();
         cArray[ii++] = cidadeFacade.getRacaNome(cidade);
         cArray[ii++] = cidadeFacade.getDocasNome(cidade);
