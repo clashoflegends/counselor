@@ -22,6 +22,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import model.Cidade;
 import model.Local;
+import model.Nacao;
 import model.Pelotao;
 import model.Terreno;
 import org.apache.commons.logging.Log;
@@ -774,6 +775,9 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
 //        this.jtArmyList.getSelectionModel().setSelectionInterval(0, 0);
         try {
             this.jtArmyList.setRowSelectionInterval(selected, selected);
+//        } catch (NullPointerException e) {
+//            log.fatal("Crash on BattleSimulator. Investigate.");
+//            this.jtArmyList.setRowSelectionInterval(0, 0);
         } catch (IllegalArgumentException ex) {
             this.jtArmyList.setRowSelectionInterval(0, 0);
         }
@@ -813,12 +817,17 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         return jtPlatoonList;
     }
 
+    public Nacao getNation() {
+        final GenericoComboObject nation = (GenericoComboObject) cbArmyNation.getSelectedItem();
+        return (Nacao) nation.getObject();
+    }
+
     public GenericoComboObject getTipoTropaPlatoon() {
         return (GenericoComboObject) cbPlatoonTroopType.getSelectedItem();
     }
 
     public void doRefreshArmy() {
-        battleSimControler.doRefreshArmy();
+        battleSimControler.doRefreshArmies();
     }
 
     @Override

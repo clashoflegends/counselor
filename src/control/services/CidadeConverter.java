@@ -454,6 +454,10 @@ public class CidadeConverter implements Serializable {
     }
 
     private static void getInfoResources(StringRet ret, Cidade cidade) {
+        if (!WorldFacadeCounselor.getInstance().hasResourceManagement()) {
+            //no resources
+            return;
+        }
         ret.add(String.format("%s %s %s %s %s", (Object[]) getProdutoColNames()));
         Object[][] resources = getProdutosAsArray(cidade);
         int qtRes = 0;
