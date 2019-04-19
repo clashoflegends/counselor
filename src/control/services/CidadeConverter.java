@@ -436,6 +436,15 @@ public class CidadeConverter implements Serializable {
         } else {
             ret.addTab(String.format("%s: %s", labels.getString("LEALDADE"), "?"));
         }
+        final String cityDefense;
+        if (cidade.getLealdade() > 0) {
+            cityDefense = SysApoio.getMyFormatter().format(cidadeFacade.getDefesa(cidade));
+        } else {
+            String cityDefenseLow = SysApoio.getMyFormatter().format(cidadeFacade.getDefesa(cidade.getTamanho(), cidade.getFortificacao(), 1));
+            String cityDefenseHigh = SysApoio.getMyFormatter().format(cidadeFacade.getDefesa(cidade.getTamanho(), cidade.getFortificacao(), 100));
+            cityDefense = String.format("%s - %s", cityDefenseLow, cityDefenseHigh);
+        }
+        ret.addTab(String.format("%s: %s", labels.getString("CIDADE.DEFESA"), cityDefense));
         ret.addTab(String.format("%s: %s", labels.getString("RACA"), cidadeFacade.getRacaNome(cidade)));
         ret.addTab(String.format("%s: %s", labels.getString("CIDADE.DOCAS"), BaseMsgs.cidadeDocas[cidade.getDocas()]));
         ret.addTab(String.format("%s: %s", labels.getString("OCULTO"), cidadeFacade.getOculto(cidade)));
