@@ -44,7 +44,7 @@ import utils.StringRet;
  */
 public class PersonagemConverter implements Serializable {
 
-    public static final int ORDEM_COL_INDEX_START = 2;
+    public static final int ORDEM_COL_INDEX_START = 1;
 //    private static final int FILTRO_PROPRIOS = 1;
 //    private static final int FILTRO_TODOS = 0;
     private static final Log log = LogFactory.getLog(PersonagemConverter.class);
@@ -70,8 +70,10 @@ public class PersonagemConverter implements Serializable {
         List<String> colNames = new ArrayList<String>(30);
         colNames.add(labels.getString("NOME"));
         classes.add(java.lang.String.class);
-        colNames.add(labels.getString("OPEN.SLOTS"));
-        classes.add(OpenSlotCounter.class);
+        if (SettingsManager.getInstance().isConfig("CharOpenSlotColumn", "1", "0")) {
+            colNames.add(labels.getString("OPEN.SLOTS"));
+            classes.add(OpenSlotCounter.class);
+        }
         for (int nn = 1; nn <= qtOrdens; nn++) {
             colNames.add(String.format("%s %s", labels.getString("ACAO"), nn));
 //            classes.add(String.class);
@@ -124,9 +126,10 @@ public class PersonagemConverter implements Serializable {
         Local local = personagemFacade.getLocal(personagem);
         //inicia array
         cArray[ii++] = personagemFacade.getNome(personagem);
-
         final OpenSlotCounter openSlot = new OpenSlotCounter(ordemFacade.getOrdensOpenSlots(personagem));
-        cArray[ii++] = openSlot;
+        if (SettingsManager.getInstance().isConfig("CharOpenSlotColumn", "1", "0")) {
+            cArray[ii++] = openSlot;
+        }
         final int orderMax = ordemFacade.getOrdemMax(personagem, WorldFacadeCounselor.getInstance().getCenario());
         for (int nn = 0; nn < qtOrdens; nn++) {
             final ActorAction actorAction = ordemFacade.getActorAction(personagem, nn, orderMax, WorldFacadeCounselor.getInstance().getJogadorAtivo());
