@@ -9,6 +9,7 @@ import baseLib.GenericoTableModel;
 import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
 import business.facade.ExercitoFacade;
+import business.facade.JogadorFacade;
 import business.facade.LocalFacade;
 import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
@@ -20,6 +21,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.ComboBoxModel;
+import model.ActorAction;
 import model.Cidade;
 import model.Exercito;
 import model.Jogador;
@@ -51,6 +53,8 @@ public class CidadeConverter implements Serializable {
     private static final OrdemFacade ordemFacade = new OrdemFacade();
     private static final NacaoFacade nacaoFacade = new NacaoFacade();
     private static final PersonagemFacade personagemFacade = new PersonagemFacade();
+    private static final CenarioFacade cenarioFacade = new CenarioFacade();
+    private static final JogadorFacade jogadorFacade = new JogadorFacade();
     private static final ListFactory listFactory = new ListFactory();
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
@@ -137,8 +141,24 @@ public class CidadeConverter implements Serializable {
         int ii = 0;
         Object[] cArray = new Object[getCidadeColNames(new ArrayList<Class>(30)).length];
         cArray[ii++] = cidadeFacade.getNome(cidade);
-//        cArray[ii++] = ordemFacade.getOrdensOpenSlots(cidade);
-        cArray[ii++] = new OpenSlotCounter(ordemFacade.getOrdensOpenSlots(cidade));
+        final OpenSlotCounter openSlot;
+        //default to can't receive orders
+        openSlot = new OpenSlotCounter(0);
+        openSlot.setStatus(ActorAction.STATUS_DISABLED);
+        if (cenarioFacade.hasOrdensCidade(WorldFacadeCounselor.getInstance().getCenario())
+                && jogadorFacade.isMine(cidade, WorldFacadeCounselor.getInstance().getJogadorAtivo())
+                && cidadeFacade.isAtivo(cidade)) {
+            //can receive orders
+            openSlot.setOpenSlotQt(ordemFacade.getOrdensOpenSlots(cidade));
+            openSlot.setStatus(ActorAction.STATUS_BLANK);
+        } else if (cenarioFacade.hasOrdensCidade(WorldFacadeCounselor.getInstance().getCenario())) {
+            //can receive orders, but not from active player (enemy/team mate)
+            openSlot.setOpenSlotQt(ordemFacade.getOrdensOpenSlots(cidade));
+            openSlot.setStatus(ActorAction.STATUS_READONLY);
+        }
+
+        cArray[ii++] = openSlot;
+
         cArray[ii++] = cidadeFacade.getTamanhoNome(cidade);
         cArray[ii++] = cidadeFacade.getLocal(cidade);
 
@@ -481,7 +501,6 @@ public class CidadeConverter implements Serializable {
     }
 
     public static String getResultados(Cidade cidade) {
-        final CenarioFacade cenarioFacade = new CenarioFacade();
         final String info = LocalConverter.getInfo(cidadeFacade.getLocal(cidade));
         if (!cenarioFacade.hasOrdensCidade(WorldFacadeCounselor.getInstance().getCenario())) {
             return info;

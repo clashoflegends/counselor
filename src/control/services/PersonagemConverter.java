@@ -29,13 +29,13 @@ import model.Nacao;
 import model.Ordem;
 import model.Personagem;
 import model.PersonagemFeitico;
-import utils.OpenSlotCounter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
+import utils.OpenSlotCounter;
 import utils.StringRet;
 
 /**
@@ -124,16 +124,18 @@ public class PersonagemConverter implements Serializable {
         Local local = personagemFacade.getLocal(personagem);
         //inicia array
         cArray[ii++] = personagemFacade.getNome(personagem);
-//        for (int nn = 0; nn < qtOrdens; nn++) {
-//            temp = ordemFacade.getOrdemDisplay(personagem, nn, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-//            cArray[ORDEM_COL_INDEX_START + nn] = temp[0] + temp[1];
-//            ii++;
-//        }
-        cArray[ii++] = new OpenSlotCounter(ordemFacade.getOrdensOpenSlots(personagem));
+
+        final OpenSlotCounter openSlot = new OpenSlotCounter(ordemFacade.getOrdensOpenSlots(personagem));
+        cArray[ii++] = openSlot;
         final int orderMax = ordemFacade.getOrdemMax(personagem, WorldFacadeCounselor.getInstance().getCenario());
         for (int nn = 0; nn < qtOrdens; nn++) {
-            cArray[ORDEM_COL_INDEX_START + nn] = ordemFacade.getActorAction(personagem, nn, orderMax, WorldFacadeCounselor.getInstance().getJogadorAtivo());
+            final ActorAction actorAction = ordemFacade.getActorAction(personagem, nn, orderMax, WorldFacadeCounselor.getInstance().getJogadorAtivo());
+            cArray[ORDEM_COL_INDEX_START + nn] = actorAction;
             ii++;
+            if (nn == 0 || actorAction.isBlank()) {
+                //Sync the status of the first order, or if blank,  to OpenSlots column
+                openSlot.setStatus(actorAction.getStatus());
+            }
         }
         cArray[ii++] = local;
         cArray[ii++] = personagem.getPericiaComandante();

@@ -149,10 +149,6 @@ public class CenarioConverter implements Serializable {
         return lista;
     }
 
-    public boolean hasCidadeOrdens() {
-        return !CenarioFacade.isSw(cenario);
-    }
-
     public static String[][] listFiltro() {
         String[][] ret = new String[1][2];
         ret[0][0] = labels.getString("FILTRO.TODOS"); //Display

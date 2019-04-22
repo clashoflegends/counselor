@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import utils.OpenSlotCounter;
 
 /**
  *
@@ -211,11 +212,9 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     @Override
     public void setValueAt(ActorAction actorAction, int ordIndex, int openSlotsQt) {
         //set Col=1 at front, before skills so that it doesn't have to calculate where is the column.
-        this.jtMainLista.getModel().setValueAt(openSlotsQt,
-                cidadeControl.getModelRowIndex(),
-                1);
-//        OpenSlotCounter valueAt = (OpenSlotCounter) this.jtMainLista.getModel().getValueAt(cidadeControl.getModelRowIndex(), 1);
-//        valueAt.setOpenSlotQt(openSlotsQt);
+        OpenSlotCounter openSlotCounter = (OpenSlotCounter) this.jtMainLista.getModel().getValueAt(cidadeControl.getModelRowIndex(), 1);
+        openSlotCounter.setOpenSlotQt(openSlotsQt);
+        this.jtMainLista.getModel().setValueAt(openSlotCounter, cidadeControl.getModelRowIndex(), 1);
     }
 
     public JTable getMainLista() {

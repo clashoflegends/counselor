@@ -42,10 +42,10 @@ public class OpenSlotTableCellRenderer extends DefaultTableCellRenderer implemen
             c.setForeground(colorFgNotSelected);
             try {
                 OpenSlotCounter counter = (OpenSlotCounter) value;
-                if (counter.intValue() > 0) {
+                if (counter.isEditable()) {
                     c.setBackground(colorBgMissing);
                 }
-                if (counter.intValue() < 0) {
+                if (counter.isDisabled()) {
                     c.setForeground(colorFgDisable);
                 }
             } catch (NullPointerException ex) {

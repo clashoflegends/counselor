@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import utils.OpenSlotCounter;
 
 /**
  *
@@ -300,7 +301,9 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
                 personagemControl.getModelRowIndex(),
                 PersonagemConverter.ORDEM_COL_INDEX_START + ordIndex);
         //set Col=1 at front, before skills so that it doesn't have to calculate where is the column.
-        this.jtMainLista.getModel().setValueAt(openSlotsQt,
+        OpenSlotCounter openSlotCounter = (OpenSlotCounter) this.jtMainLista.getModel().getValueAt(personagemControl.getModelRowIndex(), 1);
+        openSlotCounter.setOpenSlotQt(openSlotsQt);
+        this.jtMainLista.getModel().setValueAt(openSlotCounter,
                 personagemControl.getModelRowIndex(),
                 1);
     }
