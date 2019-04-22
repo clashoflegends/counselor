@@ -258,6 +258,10 @@ public class WorldFacadeCounselor implements Serializable {
         return cf.hasResourceManagement(getCenario());
     }
 
+    public boolean hasOrdensCidade() {
+        return cf.hasOrdensCidade(getCenario());
+    }
+
     public boolean hasCapitals() {
         return getCenario().hasHabilidade(";SNC;");
     }

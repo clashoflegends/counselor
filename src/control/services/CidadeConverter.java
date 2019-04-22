@@ -71,8 +71,10 @@ public class CidadeConverter implements Serializable {
         List<String> colNames = new ArrayList<String>(30);
         colNames.add(labels.getString("NOME"));
         classes.add(java.lang.String.class);
-        colNames.add(labels.getString("OPEN.SLOTS"));
-        classes.add(OpenSlotCounter.class);
+        if (WorldFacadeCounselor.getInstance().hasOrdensCidade()) {
+            colNames.add(labels.getString("OPEN.SLOTS"));
+            classes.add(OpenSlotCounter.class);
+        }
         colNames.add(labels.getString("TAMANHO"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("LOCAL"));
@@ -141,24 +143,20 @@ public class CidadeConverter implements Serializable {
         int ii = 0;
         Object[] cArray = new Object[getCidadeColNames(new ArrayList<Class>(30)).length];
         cArray[ii++] = cidadeFacade.getNome(cidade);
-        final OpenSlotCounter openSlot;
-        //default to can't receive orders
-        openSlot = new OpenSlotCounter(0);
-        openSlot.setStatus(ActorAction.STATUS_DISABLED);
-        if (cenarioFacade.hasOrdensCidade(WorldFacadeCounselor.getInstance().getCenario())
-                && jogadorFacade.isMine(cidade, WorldFacadeCounselor.getInstance().getJogadorAtivo())
-                && cidadeFacade.isAtivo(cidade)) {
-            //can receive orders
-            openSlot.setOpenSlotQt(ordemFacade.getOrdensOpenSlots(cidade));
-            openSlot.setStatus(ActorAction.STATUS_BLANK);
-        } else if (cenarioFacade.hasOrdensCidade(WorldFacadeCounselor.getInstance().getCenario())) {
-            //can receive orders, but not from active player (enemy/team mate)
-            openSlot.setOpenSlotQt(ordemFacade.getOrdensOpenSlots(cidade));
-            openSlot.setStatus(ActorAction.STATUS_READONLY);
+        if (WorldFacadeCounselor.getInstance().hasOrdensCidade()) {
+            //default to can receive orders
+            final OpenSlotCounter openSlot = new OpenSlotCounter(ordemFacade.getOrdensOpenSlots(cidade));
+            if (jogadorFacade.isMine(cidade, WorldFacadeCounselor.getInstance().getJogadorAtivo())
+                    && cidadeFacade.isAtivo(cidade)) {
+                //can receive orders
+                openSlot.setStatus(ActorAction.STATUS_BLANK);
+            } else {
+                //can receive orders, but not from active player (enemy/team mate)
+                openSlot.setStatus(ActorAction.STATUS_READONLY);
+            }
+
+            cArray[ii++] = openSlot;
         }
-
-        cArray[ii++] = openSlot;
-
         cArray[ii++] = cidadeFacade.getTamanhoNome(cidade);
         cArray[ii++] = cidadeFacade.getLocal(cidade);
 
@@ -502,7 +500,7 @@ public class CidadeConverter implements Serializable {
 
     public static String getResultados(Cidade cidade) {
         final String info = LocalConverter.getInfo(cidadeFacade.getLocal(cidade));
-        if (!cenarioFacade.hasOrdensCidade(WorldFacadeCounselor.getInstance().getCenario())) {
+        if (!WorldFacadeCounselor.getInstance().hasOrdensCidade()) {
             return info;
         } else {
             return ordemFacade.getResultado(cidade) + "\n" + info;

@@ -561,7 +561,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         if (cenarioFacade.hasOrdensNacao(WFC.getPartida())) {
             ret += listaOrdensByNation() + "\n\n";
         }
-        if (cenarioFacade.hasOrdensCidade(WFC.getCenario())) {
+        if (WFC.hasOrdensCidade()) {
             ret += listaOrdensByCity() + "\n\n";
         }
         if (SettingsManager.getInstance().getConfig("CopyActionsOrder", "1").equals("1")) {
