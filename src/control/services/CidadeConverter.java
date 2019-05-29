@@ -164,7 +164,7 @@ public class CidadeConverter implements Serializable {
         cArray[ii++] = cidadeFacade.getProducao(cidade, WorldFacadeCounselor.getInstance().getCenario().getMoney(), WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getTurno());
         cArray[ii++] = cidadeFacade.getUpkeepMoney(cidade);
         cArray[ii++] = cidadeFacade.getLealdade(cidade);
-        cArray[ii++] = cidadeFacade.getLealdade(cidade);
+        cArray[ii++] = cidadeFacade.getLealdadeDelta(cidade);
         cArray[ii++] = localFacade.getPersonagens(cidadeFacade.getLocal(cidade)).size();
         cArray[ii++] = cidadeFacade.getRacaNome(cidade);
         cArray[ii++] = cidadeFacade.getDocasNome(cidade);
