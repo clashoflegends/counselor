@@ -111,17 +111,18 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
     public void receiveDispatch(Nacao nation, PersonagemOrdem before, PersonagemOrdem after) {
         boolean refresh = false;
         //retira "antes" da lista
-        if (acaoFacade.getCusto(before) > 0 && WFC.remNacaoPersonagemOrdens(nation, before)) {
+        if (WFC.getOrderCost(before, nation) > 0 && WFC.remNacaoPersonagemOrdens(nation, before)) {
             refresh = true;
         }
 
         //receive msg to add to finances forecast
-        if (acaoFacade.getCusto(after) > 0 && WFC.addNacaoPersonagemOrdens(nation, after)) {
+        if (WFC.getOrderCost(after, nation) > 0 && WFC.addNacaoPersonagemOrdens(nation, after)) {
             refresh = true;
         }
 
+        //if cost changed, then recalculate
         if (refresh) {
-            //FIXMEURGENT: How to refresh the Cost of Orders in the main table?
+            //FIXME: How to refresh the Cost of Orders in the main table?
             tabGui.setProjecaoModel(getProjecaoTableModel(nation));
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SET_LABEL_MONEY, nation.getId() + "");
         }

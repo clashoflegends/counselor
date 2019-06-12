@@ -905,14 +905,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     String.format("%s: %s [$%s]",
                             after.getNome(),
                             after.getOrdem().getDescricao(),
-                            acaoFacade.getCusto(after)));
+                            WFC.getOrderCost(after, nation)));
         } else if (before != null) {
             //Clear before
             this.getGui().setStatusMsg(
                     String.format("%s: %s [$%s]",
                             before.getNome(),
                             before.getOrdem().getDescricao(),
-                            acaoFacade.getCusto(before)));
+                            WFC.getOrderCost(before, nation)));
         }
     }
 
