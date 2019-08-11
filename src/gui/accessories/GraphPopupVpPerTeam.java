@@ -142,9 +142,32 @@ public class GraphPopupVpPerTeam {
         return nations;
     }
 
-    private String getNationColor(String nmNation) {
+    private String getNationColorFill(String nmNation) {
         try {
-            return SysApoio.colorToHexa(mapNations.get(nmNation).getFillColor());
+            final String color = SysApoio.colorToHexa(mapNations.get(nmNation).getFillColor());
+            log.info(String.format("%s %s", nmNation, color));
+            if (color.equals("#030303")) {
+                //invert colors, too much black. Particularly important for WDO where all orcs are black.
+                return SysApoio.colorToHexa(mapNations.get(nmNation).getBorderColor());
+            } else {
+                //use ok color
+                return color;
+            }
+        } catch (NullPointerException e) {
+            return "GREY";
+        }
+    }
+
+    private String getNationColorBorder(String nmNation) {
+        try {
+            final String color = SysApoio.colorToHexa(mapNations.get(nmNation).getFillColor());
+            if (color.equals("#030303")) {
+                //invert colors, too much black. Particularly important for WDO where all orcs are black.
+                return color;
+            } else {
+                //use ok color
+                return SysApoio.colorToHexa(mapNations.get(nmNation).getBorderColor());
+            }
         } catch (NullPointerException e) {
             return "GREY";
         }
@@ -154,7 +177,8 @@ public class GraphPopupVpPerTeam {
         for (final XYChart.Series< Number, String> series : chart.getData()) {
             for (final XYChart.Data<Number, String> data : series.getData()) {
                 StringBuilder style = new StringBuilder();
-                style.append(String.format("-fx-background-color: %s; ", getNationColor(series.getName())));
+                style.append(String.format("-fx-background-color: %s; ", getNationColorFill(series.getName())));
+                style.append(String.format("-fx-border-color: %s; ", getNationColorBorder(series.getName())));
                 data.getNode().setStyle(style.toString());
             }
         }

@@ -561,7 +561,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         if (cenarioFacade.hasOrdensNacao(WFC.getPartida())) {
             ret += listaOrdensByNation() + "\n\n";
         }
-        if (cenarioFacade.hasOrdensCidade(WFC.getCenario())) {
+        if (WFC.hasOrdensCidade()) {
             ret += listaOrdensByCity() + "\n\n";
         }
         if (SettingsManager.getInstance().getConfig("CopyActionsOrder", "1").equals("1")) {
@@ -905,14 +905,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     String.format("%s: %s [$%s]",
                             after.getNome(),
                             after.getOrdem().getDescricao(),
-                            acaoFacade.getCusto(after)));
+                            WFC.getOrderCost(after, nation)));
         } else if (before != null) {
             //Clear before
             this.getGui().setStatusMsg(
                     String.format("%s: %s [$%s]",
                             before.getNome(),
                             before.getOrdem().getDescricao(),
-                            acaoFacade.getCusto(before)));
+                            WFC.getOrderCost(before, nation)));
         }
     }
 

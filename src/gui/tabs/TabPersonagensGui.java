@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import utils.OpenSlotCounter;
 
 /**
  *
@@ -295,10 +296,22 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     }
 
     @Override
-    public void setValueAt(ActorAction actorAction, int ordIndex) {
+    public void setValueAt(ActorAction actorAction, int ordIndex, int openSlotsQt) {
+        final int columnIndex;
+        if (SettingsManager.getInstance().isConfig("CharOpenSlotColumn", "1", "0")) {
+            //wants the column displayed
+            //set Col=1 at front, before skills so that it doesn't have to calculate where is the column.
+            OpenSlotCounter openSlotCounter = (OpenSlotCounter) this.jtMainLista.getModel().getValueAt(personagemControl.getModelRowIndex(), 1);
+            openSlotCounter.setOpenSlotQt(openSlotsQt);
+            this.jtMainLista.getModel().setValueAt(openSlotCounter,
+                    personagemControl.getModelRowIndex(),
+                    1);
+            columnIndex = PersonagemConverter.ORDEM_COL_INDEX_START + ordIndex + 1;
+        } else {
+            columnIndex = PersonagemConverter.ORDEM_COL_INDEX_START + ordIndex;
+        }
         this.jtMainLista.getModel().setValueAt(actorAction,
-                personagemControl.getModelRowIndex(),
-                PersonagemConverter.ORDEM_COL_INDEX_START + ordIndex);
+                personagemControl.getModelRowIndex(), columnIndex);
     }
 
     public void doLoadChars() {

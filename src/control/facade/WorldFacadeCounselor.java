@@ -258,6 +258,10 @@ public class WorldFacadeCounselor implements Serializable {
         return cf.hasResourceManagement(getCenario());
     }
 
+    public boolean hasOrdensCidade() {
+        return cf.hasOrdensCidade(getCenario());
+    }
+
     public boolean hasCapitals() {
         return getCenario().hasHabilidade(";SNC;");
     }
@@ -304,9 +308,13 @@ public class WorldFacadeCounselor implements Serializable {
     public int getNacaoOrderCost(Nacao nacao) {
         int cost = 0;
         for (PersonagemOrdem po : getMapPersonagemOrdens(nacao)) {
-            cost += acaoFacade.getCusto(po);
+            cost += getOrderCost(po, nacao);
         }
         return cost;
+    }
+
+    public int getOrderCost(PersonagemOrdem po, Nacao nacao) {
+        return acaoFacade.getCusto(po, nacao, this.getCenario());
     }
 
     public Nacao getNacao(String idNacao) {

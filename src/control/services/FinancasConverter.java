@@ -8,7 +8,6 @@ import baseLib.GenericoTableModel;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
-import persistence.local.ListFactory;
 import control.facade.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.Iterator;
@@ -17,11 +16,11 @@ import model.Cenario;
 import model.ExtratoDetail;
 import model.Mercado;
 import model.Nacao;
-import model.Ordem;
 import model.PersonagemOrdem;
 import model.Produto;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 
@@ -36,8 +35,9 @@ public class FinancasConverter implements Serializable {
     private static final Log log = LogFactory.getLog(FinancasConverter.class);
     private static final NacaoFacade nacaoFacade = new NacaoFacade();
     private static final CenarioFacade cenarioFacade = new CenarioFacade();
-    private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
+    private static final WorldFacadeCounselor WFC = WorldFacadeCounselor.getInstance();
     private static final AcaoFacade acaoFacade = new AcaoFacade();
+    private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     public static final int SIZE = 14;
 
     public static GenericoTableModel getExtratoTableModel(Nacao nacao) {
@@ -88,7 +88,7 @@ public class FinancasConverter implements Serializable {
         if (nacao == null) {
             throw new UnsupportedOperationException(labels.getString("NOT.IMPLEMENTED"));
         } else {
-            final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
+            final Cenario cenario = WFC.getCenario();
             ListFactory lf = new ListFactory();
             int ii = 0;
             int valorAcoes = 0;
@@ -97,7 +97,7 @@ public class FinancasConverter implements Serializable {
             int cidadesUpkeep = nacaoFacade.getCustoCidades(nacao, cenario) * -1;
             int personagens = nacaoFacade.getCustoPersonagens(nacao, cenario) * -1;
             int arrecadacao = nacaoFacade.getArrecadacao(nacao);
-            int ouroProd = nacaoFacade.getProducao(nacao, cenario.getMoney(), cenario, WorldFacadeCounselor.getInstance().getTurno());
+            int ouroProd = nacaoFacade.getProducao(nacao, cenario.getMoney(), cenario, WFC.getTurno());
             final int custos = exercitos + cidadesUpkeep + personagens + exeBonus;
             if (exeBonus != 0) {
                 dados[ii][0] = labels.getString("FINANCAS.CURRENT.DISCOUNT.ARMIES");
@@ -135,10 +135,11 @@ public class FinancasConverter implements Serializable {
                 dados[ii++][1] = null;
 
                 for (PersonagemOrdem po : listPo) {
-                    final Ordem ordem = po.getOrdem();
-                    dados[ii][0] = String.format("%s - %s", po.getNome(), ordem.getDescricao());
-                    dados[ii++][1] = acaoFacade.getCusto(ordem) * -1;
-                    valorAcoes -= acaoFacade.getCusto(ordem);
+                    dados[ii][0] = String.format("%s - %s", po.getNome(), po.getOrdem().getDescricao());
+                    dados[ii++][1] = WFC.getOrderCost(po, nacao) * -1;
+                    valorAcoes -= WFC.getOrderCost(po, nacao);
+                    //dados[ii++][1] = acaoFacade.getCusto(po, nacao) * -1;
+                    //valorAcoes -= acaoFacade.getCusto(po, nacao);
                 }
                 dados[ii][0] = labels.getString("FINANCAS.COST.ACTIONS");
                 dados[ii++][1] = valorAcoes;
@@ -176,13 +177,13 @@ public class FinancasConverter implements Serializable {
             return (ret);
         } else {
             try {
-                final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
+                final Cenario cenario = WFC.getCenario();
                 Produto[] produtos = cenarioFacade.listProdutos(cenario, 1);
                 int ii = 0, nn = 0;
-                Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
+                Mercado mercado = WFC.getMercado();
                 Object[][] ret = new Object[produtos.length][getMercadoColNames().length];
                 for (Produto produto : produtos) {
-                    int prod = nacaoFacade.getProducao(nacao, produto, cenario, WorldFacadeCounselor.getInstance().getTurno());
+                    int prod = nacaoFacade.getProducao(nacao, produto, cenario, WFC.getTurno());
                     int est = nacaoFacade.getEstoque(nacao, produto);
                     int unit = mercado.getProdutoVlVenda(produto);
                     ret[ii][nn++] = produto.getNome();

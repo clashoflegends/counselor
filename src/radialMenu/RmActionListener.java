@@ -8,7 +8,6 @@ import control.services.LocalConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.accessories.ArmyMoveSimulator;
-import gui.accessories.BattleCasualtySimulator;
 import gui.accessories.BattleCasualtySimulatorNew;
 import gui.accessories.TroopsCasualtiesList;
 import gui.components.DialogTextArea;
@@ -234,24 +233,17 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
     }
 
     private void createBattleSim(RadialButton rb) {
-        final boolean newBattleSim = SettingsManager.getInstance().getConfig("BatleSimNew", "1").equalsIgnoreCase("1");
-        if (newBattleSim) {
-            BattleCasualtySimulatorNew battleSim = new BattleCasualtySimulatorNew(rb.getLocal());
-            battleSim.setLocationRelativeTo(rb);
-            battleSim.setVisible(true);
-            /*
+        BattleCasualtySimulatorNew battleSim = new BattleCasualtySimulatorNew(rb.getLocal());
+        battleSim.setLocationRelativeTo(rb);
+        battleSim.setVisible(true);
+        /*
             BattleSimFx battleSim = new BattleSimFx();
             battleSim.start();
             create a blank new FX window.
             start over Counselor (setLocationRelativeTo)?
             list armies.
             go from there.
-             */
-        } else {
-            BattleCasualtySimulator battleSim = new BattleCasualtySimulator(rb.getLocal());
-            battleSim.setLocationRelativeTo(rb);
-            battleSim.setVisible(true);
-        }
+         */
     }
 
     private void createArmyMovSim(RadialButton rb, boolean water) {

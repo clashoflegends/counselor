@@ -6,7 +6,6 @@ package control;
 
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
-import persistenceCommons.SysApoio;
 import control.services.CidadeConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
@@ -27,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 
 /**
  *
@@ -39,6 +39,7 @@ public class CidadeControler extends ControlBase implements Serializable, Action
     private GenericoTableModel mainTableModel;
     private final TabCidadesGui tabCidadesGui;
     private List<Cidade> listaExibida;
+    private int modelRowIndex = 0;
 
     public CidadeControler(TabCidadesGui tabGui) {
         this.tabCidadesGui = tabGui;
@@ -47,9 +48,8 @@ public class CidadeControler extends ControlBase implements Serializable, Action
     }
 
     public GenericoTableModel getMainTableModel(GenericoComboObject filtro) {
-        Nacao nacao = null;
         try {
-            nacao = (Nacao) filtro.getObject();
+            Nacao nacao = (Nacao) filtro.getObject();
             listaExibida = CidadeConverter.listaByNacao(nacao);
         } catch (ClassCastException e) {
             listaExibida = CidadeConverter.listaByFiltro(filtro.getComboId());
@@ -64,6 +64,10 @@ public class CidadeControler extends ControlBase implements Serializable, Action
 
     public String getResultados(Cidade cidade) {
         return CidadeConverter.getResultados(cidade);
+    }
+
+    public int getModelRowIndex() {
+        return this.modelRowIndex;
     }
 
     @Override
@@ -106,8 +110,9 @@ public class CidadeControler extends ControlBase implements Serializable, Action
             } else {
                 //testes
                 int rowIndex = lsm.getAnchorSelectionIndex();
-                int modelIndex = table.convertRowIndexToModel(rowIndex);
-                Cidade cidade = (Cidade) listaExibida.get(modelIndex);
+                modelRowIndex = table.convertRowIndexToModel(rowIndex);
+                Cidade cidade = (Cidade) listaExibida.get(modelRowIndex);
+
                 getTabGui().doMudaCidade(cidade);
             }
         } catch (IndexOutOfBoundsException ex) {

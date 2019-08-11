@@ -9,6 +9,7 @@ import control.MapaControler;
 import gui.services.ActorActionTableCellRenderer;
 import gui.services.ColumnWidthsAdjuster;
 import gui.services.LocalTableCellRenderer;
+import gui.services.OpenSlotTableCellRenderer;
 import java.io.Serializable;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -20,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
+import utils.OpenSlotCounter;
 
 /**
  *
@@ -94,8 +96,10 @@ public class TabBase extends javax.swing.JRootPane implements Serializable {
     protected void doConfigTableColumns(JTable table) {
         //set renders for Action columns
         table.setDefaultRenderer(ActorAction.class, new ActorActionTableCellRenderer(table));
+        //set renders for Open Slot columns
+        table.setDefaultRenderer(OpenSlotCounter.class, new OpenSlotTableCellRenderer(table));
+        //set render for Local/Hex
         if (this.mapaControler != null) {
-            //set render for Local/Hex
             table.setDefaultRenderer(Local.class, new LocalTableCellRenderer(this.mapaControler, table));
         }
         //Adjust all columns to fit.

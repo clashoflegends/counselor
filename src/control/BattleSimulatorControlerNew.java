@@ -60,7 +60,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final BattleCasualtySimulatorNew tabGui;
     private final List<ArmySim> armiesList = new ArrayList<ArmySim>();
-    private ArmySim exercito;
+    private ArmySim armySelected;
     private Terreno terreno;
     private Cidade cityClone;
     private int rowIndex = 0;
@@ -126,6 +126,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
 
     public TableModel getArmyListTableModel(Collection<Exercito> armies) {
         for (Exercito army : armies) {
+            //FIXME: Needs deep clone for pelotao
             armiesList.add(bsf.clone(army));
         }
         return ExercitoConverter.getBattleModel(armiesList);
@@ -139,23 +140,23 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
     private void doRemoveArmy(ArmySim army) {
         armiesList.remove(army);
         rowIndex--;
-        doRefreshArmy();
+        doRefreshArmies();
     }
 
     private void doCloneArmy(ArmySim army) {
         armiesList.add(bsf.clone(army));
         rowIndex = armiesList.size() - 1;
-        doRefreshArmy();
+        doRefreshArmies();
     }
 
     private void doNewArmy() {
         //FIXME: needs to receive Local for the Battle to be resolved. Deal with this later. Local could be stored in GUi or Control.
-        armiesList.add(new ArmySim("Blank", getTerrain()));
+        armiesList.add(new ArmySim("Blank", getTerrain(), getTabGui().getNation()));
         rowIndex = armiesList.size() - 1;
-        doRefreshArmy();
+        doRefreshArmies();
     }
 
-    public void doRefreshArmy() {
+    public void doRefreshArmies() {
         this.getTabGui().setArmyModel(ExercitoConverter.getBattleModel(armiesList), rowIndex);
     }
 
@@ -178,15 +179,15 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
             try {
                 JSpinner source = (JSpinner) event.getSource();
                 if ("jsArmyCommander".equals(source.getName())) {
-                    exercito.setComandante((Integer) source.getValue());
+                    armySelected.setComandante((Integer) source.getValue());
                 } else if ("jsArmyMorale".equals(source.getName())) {
-                    exercito.setMoral((Integer) source.getValue());
+                    armySelected.setMoral((Integer) source.getValue());
                 } else if ("jsArmyAbonus".equals(source.getName())) {
-                    exercito.setBonusAttack((Integer) source.getValue());
+                    armySelected.setBonusAttack((Integer) source.getValue());
                 } else if ("jsArmyDbonus".equals(source.getName())) {
-                    exercito.setBonusDefense((Integer) source.getValue());
+                    armySelected.setBonusDefense((Integer) source.getValue());
                 }
-                doRefreshArmy();
+                doRefreshArmies();
             } catch (NullPointerException e) {
                 //hex with no army
             }
@@ -206,11 +207,11 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
             JTable table = this.getTabGui().getListaExercitos();
             rowIndex = lsm.getAnchorSelectionIndex();
             int modelIndex = table.convertRowIndexToModel(rowIndex);
-            exercito = (ArmySim) armiesList.get(modelIndex);
-            getTabGui().updateArmy(exercito);
+            armySelected = (ArmySim) armiesList.get(modelIndex);
+            getTabGui().updateArmy(armySelected);
             //set short casualties list
-            getTabGui().setCasualtyBorder(exercito, getTerrain());
-            updateArmyCasualtyControler(exercito, getTerrain());
+            getTabGui().setCasualtyBorder(armySelected, getTerrain());
+            updateArmyCasualtyControler(armySelected, getTerrain());
         } catch (IndexOutOfBoundsException ex) {
             //lista vazia?
         }
@@ -243,9 +244,9 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
         } else if ("jbNewArmy".equals(jbTemp.getActionCommand())) {
             doNewArmy();
         } else if ("jbCloneArmy".equals(jbTemp.getActionCommand())) {
-            doCloneArmy(exercito);
+            doCloneArmy(armySelected);
         } else if ("jbRemArmy".equals(jbTemp.getActionCommand())) {
-            doRemoveArmy(exercito);
+            doRemoveArmy(armySelected);
         } else {
             log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
         }
@@ -260,29 +261,29 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
                 for (ArmySim army : armiesList) {
                     army.setTerreno(terrain);
                 }
-                doRefreshArmy();
+                doRefreshArmies();
                 this.doChangeTerrain(terrain);
-                getTabGui().setCasualtyBorder(exercito, terrain);
+                getTabGui().setCasualtyBorder(armySelected, terrain);
                 //set short casualties list
-                updateArmyCasualtyControler(exercito, getTerrain());
+                updateArmyCasualtyControler(armySelected, getTerrain());
             } catch (NullPointerException ex) {
             }
         } else if ("cbTactic".equals(jcbActive.getActionCommand())) {
             final GenericoComboObject tactic = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
-            if (exercito != null) {
-                exercito.setTatica(ConverterFactory.taticaToInt(tactic.getComboId()));
+            if (armySelected != null) {
+                armySelected.setTatica(ConverterFactory.taticaToInt(tactic.getComboId()));
             }
-            doRefreshArmy();
-            updateArmyCasualtyControler(exercito, getTerrain());
+            doRefreshArmies();
+            updateArmyCasualtyControler(armySelected, getTerrain());
         } else if ("cbNation".equals(jcbActive.getActionCommand())) {
             final GenericoComboObject nation = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
-            if (exercito != null) {
-                exercito.setNacao((Nacao) nation.getObject());
+            if (armySelected != null) {
+                armySelected.setNacao((Nacao) nation.getObject());
             }
-            doRefreshArmy();
-            updateArmyCasualtyControler(exercito, getTerrain());
+            doRefreshArmies();
+            updateArmyCasualtyControler(armySelected, getTerrain());
         } else if ("comboFiltro".equals(jcbActive.getActionCommand())) {
-            updateArmyCasualtyControler(exercito, getTerrain());
+            updateArmyCasualtyControler(armySelected, getTerrain());
         } else {
             log.info(String.format("actionOnTabGui %s %s", jcbActive.getActionCommand(), jcbActive.getName()));
         }

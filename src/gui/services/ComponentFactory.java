@@ -126,6 +126,7 @@ public class ComponentFactory implements Serializable {
     private static final String TERRENO = "Terreno";
     private static final String TEXTO_20 = "Texto_20";
     private static final String TROPA_TIPO = "Tropa_Tipo";
+    private static final String TROPA_TIPO_BASIC = "Tropa_Tipo_Basic";
     private static final String TROPA_TABLE = "Tropa_Table";
     private static final String TROPA_TABLE_TR = "Tropa_Table_Tr";
     private static final String TROPA_TABLE_GARRISON = "Tropa_Table_Garrison";
@@ -612,6 +613,15 @@ public class ComponentFactory implements Serializable {
                 cbTemp = new JComboBox(getActor().getTropaTipoComboModel(0));
             } else {
                 cbTemp = new JComboBox(getActor().getTropaTipoComboModel(1));
+            }
+            cNovo = cbTemp;
+        } else if (controle.equals(TROPA_TIPO_BASIC)) {//Tropa-Tipo-vanilla
+            //é um combo com o model com os tipos de tropa BASICOS que a nacao pode recrutar
+            JComboBox cbTemp;
+            if (isAllSelected()) {
+                cbTemp = new JComboBox(getActor().getTropaTipoComboModel(0));
+            } else {
+                cbTemp = new JComboBox(getActor().getTropaTipoComboModel(2));
             }
             cNovo = cbTemp;
         } else if (controle.equals(TROPA_TABLE)) {//Tropa-Table

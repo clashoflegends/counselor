@@ -35,6 +35,7 @@ import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
+import utils.OpenSlotCounter;
 import utils.StringRet;
 
 /**
@@ -69,6 +70,10 @@ public class PersonagemConverter implements Serializable {
         List<String> colNames = new ArrayList<String>(30);
         colNames.add(labels.getString("NOME"));
         classes.add(java.lang.String.class);
+        if (SettingsManager.getInstance().isConfig("CharOpenSlotColumn", "1", "0")) {
+            colNames.add(labels.getString("OPEN.SLOTS"));
+            classes.add(OpenSlotCounter.class);
+        }
         for (int nn = 1; nn <= qtOrdens; nn++) {
             colNames.add(String.format("%s %s", labels.getString("ACAO"), nn));
 //            classes.add(String.class);
@@ -117,21 +122,23 @@ public class PersonagemConverter implements Serializable {
     private static Object[] personagemToArray(Personagem personagem) {
         int qtOrdens = WorldFacadeCounselor.getInstance().getOrdensQtMax();
         int ii = 0;
-        String[] temp;
         Object[] cArray = new Object[getPersonagemColNames(new ArrayList<Class>(30)).length];
         Local local = personagemFacade.getLocal(personagem);
-        Local localOrigem = personagemFacade.getLocalOrigem(personagem);
         //inicia array
         cArray[ii++] = personagemFacade.getNome(personagem);
-//        for (int nn = 0; nn < qtOrdens; nn++) {
-//            temp = ordemFacade.getOrdemDisplay(personagem, nn, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-//            cArray[ORDEM_COL_INDEX_START + nn] = temp[0] + temp[1];
-//            ii++;
-//        }
+        final OpenSlotCounter openSlot = new OpenSlotCounter(ordemFacade.getOrdensOpenSlots(personagem));
+        if (SettingsManager.getInstance().isConfig("CharOpenSlotColumn", "1", "0")) {
+            cArray[ii++] = openSlot;
+        }
         final int orderMax = ordemFacade.getOrdemMax(personagem, WorldFacadeCounselor.getInstance().getCenario());
         for (int nn = 0; nn < qtOrdens; nn++) {
-            cArray[ORDEM_COL_INDEX_START + nn] = ordemFacade.getActorAction(personagem, nn, orderMax, WorldFacadeCounselor.getInstance().getJogadorAtivo());
+            final ActorAction actorAction = ordemFacade.getActorAction(personagem, nn, orderMax, WorldFacadeCounselor.getInstance().getJogadorAtivo());
+            cArray[ORDEM_COL_INDEX_START + nn] = actorAction;
             ii++;
+            if (nn == 0 || actorAction.isBlank()) {
+                //Sync the status of the first order, or if blank,  to OpenSlots column
+                openSlot.setStatus(actorAction.getStatus());
+            }
         }
         cArray[ii++] = local;
         cArray[ii++] = personagem.getPericiaComandante();
