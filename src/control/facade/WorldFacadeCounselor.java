@@ -314,7 +314,7 @@ public class WorldFacadeCounselor implements Serializable {
     }
 
     public int getOrderCost(PersonagemOrdem po, Nacao nacao) {
-        return acaoFacade.getCusto(po, nacao, this.getCenario());
+        return acaoFacade.getCusto(po, nacao, this.getCenario(), this.getMercado());
     }
 
     public Nacao getNacao(String idNacao) {
