@@ -508,7 +508,7 @@ public class PersonagemConverter implements Serializable {
         String mask1 = "   %s %d(%d)\n";
         String mask2 = "   %s %d\n";
         Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
-        String ret = "";
+        String ret = "\n" + String.format(labels.getString("PERSONAGEM.HAS.SKILLS"), personagem.getNome()) + "\n";
         if (personagem.getPericiaAgenteNatural() > 0) {
             if (personagem.getPericiaAgente() != personagem.getPericiaAgenteNatural()) {
                 ret += String.format(mask1,

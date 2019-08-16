@@ -576,31 +576,29 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         //lista todos os personagens
         for (Iterator<Personagem> iter = WFC.getPersonagens(); iter.hasNext();) {
             Personagem personagem = iter.next();
-            if (jogadorAtivo.isNacao(personagem.getNacao())) {
-                //ret += personagemFacade.getNome(personagem);
-                //ret += "\t@" + personagemFacade.getCoordenadas(personagem) + "\n";
-                ret += personagemFacade.getResultadoLocal(personagem);
-                List<String[]> pericias = personagemFacade.getPericias(personagem, WFC.getCenario());
-                int aTipo = 0, aTitulo = 1, aNatural = 2, aFinal = 3;
-                for (String[] sPericias : pericias) {
-                    if (sPericias[aTitulo].equals("") && sPericias[aNatural].equals(sPericias[aFinal])) {
-                        ret += String.format("\t. %s: %s \n", sPericias[aTipo], sPericias[aNatural]);
-                    } else if (sPericias[aTitulo].equals("") && !sPericias[aNatural].equals(sPericias[aFinal])) {
-                        ret += String.format("\t. %s: %s (%s)\n", sPericias[aTipo], sPericias[aNatural], sPericias[aFinal]);
-                    } else if (sPericias[aNatural].equals(sPericias[aFinal])) {
-                        ret += String.format("\t. %s: %s - %s\n", sPericias[aTipo], sPericias[aNatural], sPericias[aTitulo]);
-                    } else {
-                        ret += String.format("\t. %s: %s (%s) - %s\n", sPericias[aTipo], sPericias[aNatural], sPericias[aFinal], sPericias[aTitulo]);
-                    }
-                }
-
-                //Hero
-                if (personagemFacade.hasExtraOrdem(personagem)) {
-                    ret += String.format("\t. %s: %s \n", labels.getString("EPIC.HERO"), labels.getString("EPIC.HERO.DESCRIPTION"));
-                }
-                ret += getActorOrdersString(personagem);
-                ret += "\n";
+            if (!jogadorAtivo.isNacao(personagem.getNacao())) {
+                continue;
             }
+            ret += personagemFacade.getResultadoLocal(personagem);
+            ret += "\n\t" + String.format(labels.getString("PERSONAGEM.HAS.SKILLS"), personagem.getNome()) + "\n";
+            List<String[]> pericias = personagemFacade.getPericias(personagem, WFC.getCenario());
+            int aTipo = 0, aTitulo = 1, aNatural = 2, aFinal = 3;
+            for (String[] sPericias : pericias) {
+                if (sPericias[aTitulo].equals("") && sPericias[aNatural].equals(sPericias[aFinal])) {
+                    ret += String.format("\t. %s: %s \n", sPericias[aTipo], sPericias[aNatural]);
+                } else if (sPericias[aTitulo].equals("") && !sPericias[aNatural].equals(sPericias[aFinal])) {
+                    ret += String.format("\t. %s: %s (%s)\n", sPericias[aTipo], sPericias[aNatural], sPericias[aFinal]);
+                } else if (sPericias[aNatural].equals(sPericias[aFinal])) {
+                    ret += String.format("\t. %s: %s - %s\n", sPericias[aTipo], sPericias[aNatural], sPericias[aTitulo]);
+                } else {
+                    ret += String.format("\t. %s: %s (%s) - %s\n", sPericias[aTipo], sPericias[aNatural], sPericias[aFinal], sPericias[aTitulo]);
+                }
+            }
+            if (personagemFacade.hasExtraOrdem(personagem)) {
+                ret += String.format("\t. %s: %s \n", labels.getString("EPIC.HERO"), labels.getString("EPIC.HERO.DESCRIPTION"));
+            }
+            ret += getActorOrdersString(personagem);
+            ret += "\n";
         }
         return ret;
     }
