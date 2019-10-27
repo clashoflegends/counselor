@@ -824,6 +824,6 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     @Override
     public String getGuiConfig() {
         //not supported, sending a non valid property name to be checked.
-        return "Not supported yet.";
+        return "GuiNoneResultsDetachedStatus";
     }
 }

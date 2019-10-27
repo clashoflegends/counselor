@@ -26,6 +26,8 @@ public class OrdemControlerFloater extends ControlBase implements Serializable, 
 
     private static final Log log = LogFactory.getLog(OrdemControlerFloater.class);
     private IPopupTabGui tabGui;
+    public static final String POPUP_FLOAT_DETACHED = "detached";
+    public static final String POPUP_FLOAT_ATTACHED = "attached";
 
     public OrdemControlerFloater(IPopupTabGui tabOrdens) {
         setTabGui(tabOrdens);
@@ -98,7 +100,7 @@ public class OrdemControlerFloater extends ControlBase implements Serializable, 
 
     private void doConfigPopup() {
         //check status of popups
-        if (SettingsManager.getInstance().isConfig(getTabGui().getGuiConfig(), "detached", "attached")) {
+        if (SettingsManager.getInstance().isConfig(getTabGui().getGuiConfig(), POPUP_FLOAT_DETACHED, POPUP_FLOAT_ATTACHED)) {
             getTabGui().doDetachPopup();
         }
     }

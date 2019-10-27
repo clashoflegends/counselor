@@ -131,8 +131,7 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, Serializable {
         if (jbDetach.isSelected()) {
             doDetachPopup();
         } else {
-            dPopup.setVisible(false);
-            jMaster.setViewportView(stContent);
+            doAttachPopup();
         }
     }
 
@@ -144,13 +143,16 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, Serializable {
         dPopup.setLocationRelativeTo(jMaster);
         dPopup.setVisible(true);
         jMaster.repaint();
+        SettingsManager.getInstance().setConfigAndSaveToFile(getGuiConfig(), OrdemControlerFloater.POPUP_FLOAT_DETACHED);
     }
 
     @Override
     public void doAttachPopup() {
         //closing dialog, forced to redraw and detach
+        dPopup.setVisible(false);
         jbDetach.setSelected(false);
         jMaster.setViewportView(stContent);
+        SettingsManager.getInstance().setConfigAndSaveToFile(getGuiConfig(), OrdemControlerFloater.POPUP_FLOAT_ATTACHED);
     }
 
     public void setGuiConfig(String guiConfig) {
