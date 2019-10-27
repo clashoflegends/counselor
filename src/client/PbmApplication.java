@@ -7,6 +7,7 @@ package client;
 import baseLib.Application;
 import baseLib.JgFrame;
 import business.ImageManager;
+import control.support.DispatchManager;
 import gui.MainResultWindowGui;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
@@ -74,6 +75,7 @@ public class PbmApplication extends Application {
             frame.setExtendedState(Frame.NORMAL);
         }
         //centerWindow(frame);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.GUI_STATUS_PERSIST);
         frame.setVisible(true);
         log.info("Interface carregada and exibida.");
     }

@@ -10,7 +10,11 @@ package gui.services;
  */
 public interface IPopupTabGui {
 
+    public void doDetachTogglePopup();
+
     public void doDetachPopup();
 
     public void doAttachPopup();
+
+    public String getGuiConfig();
 }

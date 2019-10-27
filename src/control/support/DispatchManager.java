@@ -44,6 +44,7 @@ public class DispatchManager implements Serializable {
     public static final int ACTIONS_MAP_REDRAW = 13;
     public static final int ACTIONS_COUNT = 14;
     public static final int STATUS_BAR_MSG = 15;
+    public static final int GUI_STATUS_PERSIST = 16;
 
     private DispatchManager() {
     }
