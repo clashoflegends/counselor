@@ -143,7 +143,7 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, Serializable {
         dPopup.setLocationRelativeTo(jMaster);
         dPopup.setVisible(true);
         jMaster.repaint();
-        SettingsManager.getInstance().setConfigAndSaveToFile(getGuiConfig(), OrdemControlerFloater.POPUP_FLOAT_DETACHED);
+        SettingsManager.getInstance().setConfigAndSaveToFile(getGuiConfig(), IPopupTabGui.POPUP_FLOATING);
     }
 
     @Override
@@ -152,7 +152,7 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, Serializable {
         dPopup.setVisible(false);
         jbDetach.setSelected(false);
         jMaster.setViewportView(stContent);
-        SettingsManager.getInstance().setConfigAndSaveToFile(getGuiConfig(), OrdemControlerFloater.POPUP_FLOAT_ATTACHED);
+        SettingsManager.getInstance().setConfigAndSaveToFile(getGuiConfig(), IPopupTabGui.POPUP_DOCKED);
     }
 
     public void setGuiConfig(String guiConfig) {

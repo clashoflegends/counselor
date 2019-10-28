@@ -20,6 +20,7 @@ import gui.MainMapaGui;
 import gui.accessories.DialogHexView;
 import gui.components.DialogTextArea;
 import gui.services.ComponentFactory;
+import gui.services.IPopupTabGui;
 import java.awt.Point;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -80,6 +81,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_REDRAW);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_RANGE_CLICK);
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+        registerDispatchManagerForMsg(DispatchManager.GUI_STATUS_PERSIST);
         //inicialize locais
         WorldBuilderMenuManager.getInstance().doCanvasReset(mapaManager.getMapMaxSize(listFactory.listLocais().values()));
         WorldBuilderMenuManager.getInstance().setLocais(listFactory.listLocais());
@@ -324,6 +326,9 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
             case DispatchManager.LOCAL_MAP_REDRAW_TAG:
                 tabGui.setTag();
                 break;
+            case DispatchManager.GUI_STATUS_PERSIST:
+                doConfigHexView();
+                break;
             default:
                 break;
         }
@@ -364,13 +369,32 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         showActiveRadialMenu(local);
     }
 
-    public void doHexViewToggle() {
-        if (hexView != null) {
-            hexView.setVisible(!hexView.isVisible());
-        } else {
-            hexView = ComponentFactory.showDialogHexView(this.getTabGui());
-            doHexViewUpdate();
+    private void doConfigHexView() {
+        //check status of popups
+        if (SettingsManager.getInstance().isConfig("GuiHexViewDetachedStatus", IPopupTabGui.POPUP_FLOATING, IPopupTabGui.POPUP_HIDDEN)) {
+            doCreateHexView();
         }
+    }
+
+    public void doHexViewToggle() {
+        if (hexView == null) {
+            doCreateHexView();
+            SettingsManager.getInstance().setConfigAndSaveToFile("GuiHexViewDetachedStatus", IPopupTabGui.POPUP_FLOATING);
+        } else if (hexView.isVisible()) {
+            //hide
+            hexView.setVisible(!hexView.isVisible());
+            SettingsManager.getInstance().setConfigAndSaveToFile("GuiHexViewDetachedStatus", IPopupTabGui.POPUP_HIDDEN);
+        } else {
+            //display
+            hexView.setVisible(!hexView.isVisible());
+            SettingsManager.getInstance().setConfigAndSaveToFile("GuiHexViewDetachedStatus", IPopupTabGui.POPUP_FLOATING);
+        }
+    }
+
+    private void doCreateHexView() {
+        //create on first time
+        hexView = ComponentFactory.showDialogHexView(this.getTabGui());
+        doHexViewUpdate();
     }
 
     private void doHexViewUpdate() {

@@ -4,12 +4,15 @@
  */
 package gui.accessories;
 
+import gui.services.IPopupTabGui;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
 import java.io.Serializable;
 import javax.swing.JFrame;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistenceCommons.SettingsManager;
 
 /**
  *
@@ -17,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DialogHexView extends javax.swing.JDialog implements Serializable {
 //make this follow hex selection
+
     private static final Log log = LogFactory.getLog(DialogHexView.class);
     // Variables declaration - do not modify
     private javax.swing.JScrollPane detContent;
@@ -27,7 +31,6 @@ public class DialogHexView extends javax.swing.JDialog implements Serializable {
     public DialogHexView(boolean modal) {
         super(new JFrame(), modal);
         this.setAlwaysOnTop(true);
-        this.setPreferredSize(new Dimension(500, 400));
         initComponents();
     }
 
@@ -61,5 +64,9 @@ public class DialogHexView extends javax.swing.JDialog implements Serializable {
 
     public void setTextBackground(Color color) {
         this.jtaTextArea.setBackground(color);
+    }
+
+    public void windowClosing(WindowEvent e) {
+        SettingsManager.getInstance().setConfigAndSaveToFile("GuiHexViewDetachedStatus", IPopupTabGui.POPUP_HIDDEN);
     }
 }

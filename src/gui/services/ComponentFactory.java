@@ -20,6 +20,7 @@ import gui.subtabs.SubTabRelacionamento;
 import gui.subtabs.SubTabTropas;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
@@ -796,6 +797,7 @@ public class ComponentFactory implements Serializable {
         if (relativeTo != null) {
             hexViewDialog.setLocationRelativeTo(relativeTo);
         }
+        hexViewDialog.setPreferredSize(new Dimension(500, 400));
         hexViewDialog.pack();
         hexViewDialog.setVisible(true);
         return hexViewDialog;
