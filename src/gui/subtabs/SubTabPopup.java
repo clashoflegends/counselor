@@ -11,7 +11,9 @@
 package gui.subtabs;
 
 import control.OrdemControlerFloater;
+import control.support.DispatchManager;
 import gui.TabBase;
+import gui.services.IDispatchReceiver;
 import gui.services.IPopupTabGui;
 import java.awt.Color;
 import java.awt.Component;
@@ -21,6 +23,9 @@ import java.io.Serializable;
 import javax.swing.GroupLayout;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import model.Local;
+import model.Nacao;
+import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -30,7 +35,7 @@ import persistenceCommons.SettingsManager;
  *
  * @author jmoura
  */
-public class SubTabPopup extends TabBase implements IPopupTabGui, Serializable {
+public class SubTabPopup extends TabBase implements IPopupTabGui, IDispatchReceiver, Serializable {
 
     private static final Log log = LogFactory.getLog(SubTabPopup.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
@@ -94,12 +99,12 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, Serializable {
         final OrdemControlerFloater ordemControlFloater = new OrdemControlerFloater(this);
         dPopup.setTitle(labels.getString("INFORMATION.TITLE"));
         dPopup.setAlwaysOnTop(true);
-        dPopup.setPreferredSize(new Dimension(400, 500));
         dPopup.addComponentListener(ordemControlFloater);
         dPopup.setName("dPopup");
         jbDetach.setActionCommand("jbDetach");
         jbDetach.addItemListener(ordemControlFloater);
         jMaster.setViewportView(stContent);
+        DispatchManager.getInstance().registerForMsg(DispatchManager.WINDOWS_CLOSING, this);
     }
 
     public void setText(String title, String text) {
@@ -122,7 +127,6 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, Serializable {
     public void replace(Component oldComponent) {
         GroupLayout parLayout = (GroupLayout) oldComponent.getParent().getLayout();
         parLayout.replace(oldComponent, this);
-
     }
 
     @Override
@@ -139,11 +143,22 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, Serializable {
     public void doDetachPopup() {
         //monta a floating window para ordens
         dPopup.add(stContent);
+        //load configs
+        int width = SettingsManager.getInstance().getConfigAsInt(getGuiConfig() + "SizeWidth", "500");
+        int height = SettingsManager.getInstance().getConfigAsInt(getGuiConfig() + "SizeHeight", "400");
+        int posX = SettingsManager.getInstance().getConfigAsInt(getGuiConfig() + "PositionX", "1");
+        int posY = SettingsManager.getInstance().getConfigAsInt(getGuiConfig() + "PositionY", "1");
+        //configura jDialog
+        if (!SettingsManager.getInstance().isKeyExist(getGuiConfig() + "PositionY")) {
+            dPopup.setLocationRelativeTo(jMaster);
+        } else {
+            dPopup.setLocation(posX, posY);
+        }
+        dPopup.setPreferredSize(new Dimension(width, height));
         dPopup.pack();
-        dPopup.setLocationRelativeTo(jMaster);
         dPopup.setVisible(true);
         jMaster.repaint();
-        SettingsManager.getInstance().setConfigAndSaveToFile(getGuiConfig(), IPopupTabGui.POPUP_FLOATING);
+        SettingsManager.getInstance().setConfigAndSaveToFile(getGuiConfigDetachedStatus(), IPopupTabGui.POPUP_FLOATING);
     }
 
     @Override
@@ -152,7 +167,7 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, Serializable {
         dPopup.setVisible(false);
         jbDetach.setSelected(false);
         jMaster.setViewportView(stContent);
-        SettingsManager.getInstance().setConfigAndSaveToFile(getGuiConfig(), IPopupTabGui.POPUP_DOCKED);
+        SettingsManager.getInstance().setConfigAndSaveToFile(getGuiConfigDetachedStatus(), IPopupTabGui.POPUP_DOCKED);
     }
 
     public void setGuiConfig(String guiConfig) {
@@ -162,5 +177,39 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, Serializable {
     @Override
     public String getGuiConfig() {
         return this.guiConfig;
+    }
+
+    @Override
+    public String getGuiConfigDetachedStatus() {
+        return this.guiConfig + "DetachedStatus";
+    }
+
+    @Override
+    public void receiveDispatch(int msgName) {
+        log.info(String.format("SubTabPopup: %s; size (%s); coord: (%s);", getGuiConfig(), dPopup.getSize().toString(), dPopup.getLocation().toString()));
+        SettingsManager.getInstance().setConfig(getGuiConfig() + "SizeWidth", dPopup.getSize().width + "");
+        SettingsManager.getInstance().setConfig(getGuiConfig() + "SizeHeight", dPopup.getSize().height + "");
+        SettingsManager.getInstance().setConfig(getGuiConfig() + "PositionX", dPopup.getLocation().x + "");
+        SettingsManager.getInstance().setConfigAndSaveToFile(getGuiConfig() + "PositionY", dPopup.getLocation().y + "");
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, String txt) {
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, Local local) {
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, Local local, int range) {
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, Component cmpnt) {
+    }
+
+    @Override
+    public void receiveDispatch(Nacao nation, PersonagemOrdem before, PersonagemOrdem after) {
     }
 }

@@ -271,7 +271,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
                     new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png")),
                     stResults, labels.getString("RESULTADOS.TOOLTIP"));
         }
-        stResults.setGuiConfig("GuiCityResultsDetachedStatus");
+        stResults.setGuiConfig("GuiCityResults");
     }
 
     public void doMudaCidadeClear() {

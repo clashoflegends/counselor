@@ -355,7 +355,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     private void doAddTabs() {
         //config tabs
         stResults.setFontText(detalhesPersonagem.getFont());
-        stResults.setGuiConfig("GuiPcResultsDetachedStatus");
+        stResults.setGuiConfig("GuiPcResults");
         detalhesPersonagem.addTab(labels.getString("ACAO"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/hex_personagem.gif")),
                 stOrdens, labels.getString("ORDERNS.TOOLTIP"));

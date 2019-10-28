@@ -155,6 +155,12 @@ public class SubTabPopupPortrait extends TabBase implements IPopupTabGui, Serial
     @Override
     public String getGuiConfig() {
         //not supported, sending a non valid property name to be checked.
-        return "GuiPortraitResultsDetachedStatus";
+        return "GuiPortraitResults";
+    }
+
+    @Override
+    public String getGuiConfigDetachedStatus() {
+        //not supported, sending a non valid property name to be checked.
+        return "GuiPortraitResults";
     }
 }

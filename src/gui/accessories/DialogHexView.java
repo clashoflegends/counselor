@@ -80,7 +80,10 @@ public class DialogHexView extends javax.swing.JDialog implements IDispatchRecei
 
     @Override
     public void receiveDispatch(int msgName) {
-        log.info(String.format("size (%s); coord: (%s);", this.getSize().toString(), this.getLocation().toString()));
+        SettingsManager.getInstance().setConfig("GuiHexViewSizeWidth", this.getSize().width + "");
+        SettingsManager.getInstance().setConfig("GuiHexViewSizeHeight", this.getSize().height + "");
+        SettingsManager.getInstance().setConfig("GuiHexViewPositionX", this.getLocation().x + "");
+        SettingsManager.getInstance().setConfigAndSaveToFile("GuiHexViewPositionY", this.getLocation().y + "");
     }
 
     @Override

@@ -21,4 +21,6 @@ public interface IPopupTabGui {
     public void doAttachPopup();
 
     public String getGuiConfig();
+
+    public String getGuiConfigDetachedStatus();
 }

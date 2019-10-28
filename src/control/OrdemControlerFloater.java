@@ -99,7 +99,7 @@ public class OrdemControlerFloater extends ControlBase implements Serializable, 
 
     private void doConfigPopup() {
         //check status of popups
-        if (SettingsManager.getInstance().isConfig(getTabGui().getGuiConfig(), IPopupTabGui.POPUP_FLOATING, IPopupTabGui.POPUP_DOCKED)) {
+        if (SettingsManager.getInstance().isConfig(getTabGui().getGuiConfigDetachedStatus(), IPopupTabGui.POPUP_FLOATING, IPopupTabGui.POPUP_DOCKED)) {
             getTabGui().doDetachPopup();
         }
     }
