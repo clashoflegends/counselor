@@ -6,7 +6,6 @@ package gui.accessories;
 
 import gui.services.IPopupTabGui;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 import java.io.Serializable;
 import javax.swing.JFrame;
