@@ -4,6 +4,7 @@
  */
 package control.support;
 
+import gui.services.IDispatchReceiver;
 import java.awt.Component;
 import java.io.Serializable;
 import model.Local;
@@ -16,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jmoura
  */
-public abstract class ControlBase implements Serializable {
+public abstract class ControlBase implements IDispatchReceiver, Serializable {
 
     private static final Log log = LogFactory.getLog(ControlBase.class);
 

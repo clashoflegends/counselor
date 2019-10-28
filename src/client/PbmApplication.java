@@ -22,40 +22,41 @@ import persistenceCommons.SettingsManager;
  * @author gurgel
  */
 public class PbmApplication extends Application {
-
+    
     private static final Log log = LogFactory.getLog(PbmApplication.class);
     String autoStart;
-
+    
     public PbmApplication() {
         super();
         this.autoStart = null;
     }
-
+    
     public PbmApplication(String autoStart) {
         super();
         this.autoStart = autoStart;
     }
-
+    
     @Override
     public String getName() {
         return "Counselor";
     }
-
+    
     @Override
     protected void init() {
         this.createAndShowGUI();
     }
-
+    
     private void createAndShowGUI() {
         JgFrame frame = new JgFrame(getName());
         frame.addWindowListener(new WindowAdapter() {
-
+            
             @Override
             public void windowClosing(WindowEvent e) {
+                DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.WINDOWS_CLOSING);
                 exit();
             }
         });
-
+        
         try {
             //Create and set up the main content pane.
             //contentMainPane.setOpaque(true); //content panes must be opaque

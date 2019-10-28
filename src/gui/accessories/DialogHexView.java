@@ -4,11 +4,16 @@
  */
 package gui.accessories;
 
+import control.support.DispatchManager;
+import gui.services.IDispatchReceiver;
 import gui.services.IPopupTabGui;
 import java.awt.Color;
-import java.awt.event.WindowEvent;
+import java.awt.Component;
 import java.io.Serializable;
 import javax.swing.JFrame;
+import model.Local;
+import model.Nacao;
+import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.SettingsManager;
@@ -17,7 +22,7 @@ import persistenceCommons.SettingsManager;
  *
  * @author jmoura
  */
-public class DialogHexView extends javax.swing.JDialog implements Serializable {
+public class DialogHexView extends javax.swing.JDialog implements IDispatchReceiver, Serializable {
 //make this follow hex selection
 
     private static final Log log = LogFactory.getLog(DialogHexView.class);
@@ -54,6 +59,14 @@ public class DialogHexView extends javax.swing.JDialog implements Serializable {
 
         detContent.setViewportView(jpContent);
         this.add(detContent);
+        //events
+        DispatchManager.getInstance().registerForMsg(DispatchManager.WINDOWS_CLOSING, this);
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                SettingsManager.getInstance().setConfigAndSaveToFile("GuiHexViewDetachedStatus", IPopupTabGui.POPUP_HIDDEN);
+            }
+        });
     }
 
     public void setText(String text) {
@@ -65,7 +78,28 @@ public class DialogHexView extends javax.swing.JDialog implements Serializable {
         this.jtaTextArea.setBackground(color);
     }
 
-    public void windowClosing(WindowEvent e) {
-        SettingsManager.getInstance().setConfigAndSaveToFile("GuiHexViewDetachedStatus", IPopupTabGui.POPUP_HIDDEN);
+    @Override
+    public void receiveDispatch(int msgName) {
+        log.info(String.format("size (%s); coord: (%s);", this.getSize().toString(), this.getLocation().toString()));
+    }
+
+    @Override
+    public void receiveDispatch(Nacao nation, PersonagemOrdem before, PersonagemOrdem after) {
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, String txt) {
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, Local local) {
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, Local local, int range) {
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, Component cmpnt) {
     }
 }
