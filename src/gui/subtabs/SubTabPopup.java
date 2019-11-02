@@ -186,7 +186,12 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, IDispatchRecei
 
     @Override
     public void receiveDispatch(int msgName) {
-        log.info(String.format("SubTabPopup: %s; size (%s); coord: (%s);", getGuiConfig(), dPopup.getSize().toString(), dPopup.getLocation().toString()));
+        //save windows config
+        //log.info(String.format("SubTabPopup: %s; size (%s); coord: (%s);", getGuiConfig(), dPopup.getSize().toString(), dPopup.getLocation().toString()));
+        if (dPopup.getSize().width == 0) {
+            //do not save if window does not exist
+            return;
+        }
         SettingsManager.getInstance().setConfig(getGuiConfig() + "SizeWidth", dPopup.getSize().width + "");
         SettingsManager.getInstance().setConfig(getGuiConfig() + "SizeHeight", dPopup.getSize().height + "");
         SettingsManager.getInstance().setConfig(getGuiConfig() + "PositionX", dPopup.getLocation().x + "");

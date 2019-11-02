@@ -47,6 +47,8 @@ public class DispatchManager implements Serializable {
     public static final int STATUS_BAR_MSG = 15;
     public static final int GUI_STATUS_PERSIST = 16;
     public static final int WINDOWS_CLOSING = 17;
+    public static final int WINDOWS_MAXIMIZING = 18;
+    public static final int WINDOWS_MINIMIZING = 19;
 
     private DispatchManager() {
     }
