@@ -29,6 +29,7 @@ public class PbmApplication extends Application implements Serializable {
     private final String autoStart;
     private final JgFrame frame = new JgFrame(getName());
     private final String configName = "MainWindow";
+    private boolean isMaximized = false;
 
     public PbmApplication() {
         super();
@@ -76,10 +77,11 @@ public class PbmApplication extends Application implements Serializable {
         //default
         frame.pack();
         if (SettingsManager.getInstance().getConfig("maximizeWindowOnStart", "0").equals("1")) {
+            isMaximized = true;
             frame.setExtendedState(Frame.MAXIMIZED_BOTH);
         } else {
+            isMaximized = false;
             frame.setExtendedState(Frame.NORMAL);
-
         }
         //send event to load GUI configs in other windows. 
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.GUI_STATUS_PERSIST);
@@ -89,18 +91,19 @@ public class PbmApplication extends Application implements Serializable {
         log.info("Interface carregada and exibida.");
     }
 
-    private void saveFrameConfigs(int msgName) {
-        if (DispatchManager.WINDOWS_MAXIMIZING == msgName) {
-            //save windows config
+    private void saveFrameConfigs() {
+        if (isMaximized) {
+            //save maximize windows config
             SettingsManager.getInstance().setConfig("maximizeWindowOnStart", "1");
-        } else if (DispatchManager.WINDOWS_MINIMIZING == msgName) {
-            //save windows config
+        } else {
+            //save minimized windows config
+            SettingsManager.getInstance().setConfig(configName + "SizeWidth", frame.getSize().width + "");
+            SettingsManager.getInstance().setConfig(configName + "SizeHeight", frame.getSize().height + "");
+            SettingsManager.getInstance().setConfig(configName + "PositionX", frame.getLocation().x + "");
+            SettingsManager.getInstance().setConfig(configName + "PositionY", frame.getLocation().y + "");
             SettingsManager.getInstance().setConfig("maximizeWindowOnStart", "0");
         }
-        SettingsManager.getInstance().setConfig(configName + "SizeWidth", frame.getSize().width + "");
-        SettingsManager.getInstance().setConfig(configName + "SizeHeight", frame.getSize().height + "");
-        SettingsManager.getInstance().setConfig(configName + "PositionX", frame.getLocation().x + "");
-        SettingsManager.getInstance().setConfigAndSaveToFile(configName + "PositionY", frame.getLocation().y + "");
+        SettingsManager.getInstance().saveToFile();
     }
 
     private void setListeners(JgFrame frame) {
@@ -109,7 +112,7 @@ public class PbmApplication extends Application implements Serializable {
             @Override
             public void windowClosing(WindowEvent e) {
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.WINDOWS_CLOSING);
-                saveFrameConfigs(DispatchManager.WINDOWS_CLOSING);
+                saveFrameConfigs();
                 exit();
             }
 
@@ -129,10 +132,12 @@ public class PbmApplication extends Application implements Serializable {
 
                 if ((oldState & Frame.MAXIMIZED_BOTH) == 0 && (newState & Frame.MAXIMIZED_BOTH) != 0) {
                     //Frame was maximized
-                    saveFrameConfigs(DispatchManager.WINDOWS_MAXIMIZING);
+                    isMaximized = true;
+                    saveFrameConfigs();
                 } else if ((oldState & Frame.MAXIMIZED_BOTH) != 0 && (newState & Frame.MAXIMIZED_BOTH) == 0) {
                     //Frame was de-maximized
-                    saveFrameConfigs(DispatchManager.WINDOWS_MINIMIZING);
+                    isMaximized = false;
+                    saveFrameConfigs();
                 }
             }
         });
