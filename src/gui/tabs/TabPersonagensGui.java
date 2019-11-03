@@ -14,7 +14,6 @@ import control.PortraitControler;
 import control.facade.WorldFacadeCounselor;
 import control.services.FiltroConverter;
 import control.services.PersonagemConverter;
-import control.support.DispatchManager;
 import gui.TabBase;
 import gui.services.IAcaoGui;
 import gui.subtabs.SubTabBaseList;
@@ -63,6 +62,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         setIcone("/images/hex_personagem.gif");
         setTitle(titulo);
         setDica(dica);
+        this.setKeyFilterProperty("GuiFilterChars");
 
         iniciaConfig();
     }
@@ -387,5 +387,10 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
             //forca selecao para vazio, limpando quadro de parametros
             stOrdens.doOrdemClear();
         }
+    }
+
+    @Override
+    protected int getComboFiltroSize() {
+        return this.comboFiltro.getModel().getSize();
     }
 }

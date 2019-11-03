@@ -109,6 +109,7 @@ public class PersonagemControler extends ControlBase implements Serializable, Ac
         } else if (actionEvent.getSource() instanceof JComboBox) {
             JComboBox cb = (JComboBox) actionEvent.getSource();
             if ("comboFiltro".equals(cb.getName())) {
+                SettingsManager.getInstance().setConfigAndSaveToFile(getTabGui().getKeyFilterProperty(), cb.getSelectedIndex() + "");
                 //refaz o modelo com a nova lista.
                 getTabGui().setMainModel(getMainTableModel((GenericoComboObject) cb.getSelectedItem()));
             }

@@ -89,6 +89,7 @@ public class NacaoControler extends ControlBase implements Serializable, ActionL
         } else if (event.getSource() instanceof JComboBox) {
             JComboBox cb = (JComboBox) event.getSource();
             if ("comboFiltro".equals(cb.getName())) {
+                SettingsManager.getInstance().setConfigAndSaveToFile(getTabGui().getKeyFilterProperty(), cb.getSelectedIndex() + "");
                 final GenericoComboObject elem = (GenericoComboObject) cb.getSelectedItem();
                 getTabGui().setMainModel(getMainTableModel(elem));
             }

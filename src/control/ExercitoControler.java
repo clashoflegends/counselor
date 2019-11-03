@@ -67,6 +67,7 @@ public class ExercitoControler implements Serializable, ActionListener, ListSele
         } else if (e.getSource() instanceof JComboBox) {
             JComboBox cb = (JComboBox) e.getSource();
             if ("comboFiltro".equals(cb.getName())) {
+                SettingsManager.getInstance().setConfigAndSaveToFile(getTabGui().getKeyFilterProperty(), cb.getSelectedIndex() + "");
                 getTabGui().setMainModel(getMainTableModel((GenericoComboObject) cb.getSelectedItem()));
             }
         }

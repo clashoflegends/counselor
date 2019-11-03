@@ -62,6 +62,8 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         setTitle(titulo);
         setDica(dica);
         this.setMapaControler(mapaControl);
+        this.setKeyFilterProperty("GuiFilterCity");
+
         initConfig();
     }
 
@@ -297,5 +299,10 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
             //forca selecao para vazio, limpando quadro de parametros
             stOrdens.doOrdemClear();
         }
+    }
+
+    @Override
+    protected int getComboFiltroSize() {
+        return this.comboFiltro.getModel().getSize();
     }
 }

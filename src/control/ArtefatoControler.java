@@ -41,9 +41,8 @@ public class ArtefatoControler implements Serializable, ActionListener, ListSele
     }
 
     public GenericoTableModel getMainTableModel(GenericoComboObject filtro) {
-        Nacao nacao = null;
         try {
-            nacao = (Nacao) filtro.getObject();
+            final Nacao nacao = (Nacao) filtro.getObject();
             listaExibida = ArtefatoConverter.listaByNacao(nacao);
         } catch (ClassCastException e) {
             listaExibida = ArtefatoConverter.listaByFiltro(filtro.getComboId());
@@ -63,6 +62,7 @@ public class ArtefatoControler implements Serializable, ActionListener, ListSele
         } else if (event.getSource() instanceof JComboBox) {
             JComboBox cb = (JComboBox) event.getSource();
             if ("comboFiltro".equals(cb.getName())) {
+                SettingsManager.getInstance().setConfigAndSaveToFile(getTabGui().getKeyFilterProperty(), cb.getSelectedIndex() + "");
                 getTabGui().setMainModel(getMainTableModel((GenericoComboObject) cb.getSelectedItem()));
             }
         }
