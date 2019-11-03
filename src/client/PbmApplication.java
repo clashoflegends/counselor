@@ -28,7 +28,7 @@ public class PbmApplication extends Application implements Serializable {
     private static final Log log = LogFactory.getLog(PbmApplication.class);
     private final String autoStart;
     private final JgFrame frame = new JgFrame(getName());
-    private final String configName = "MainWindow";
+    private final String configName = "GuiMainWindow";
     private boolean isMaximized = false;
 
     public PbmApplication() {
