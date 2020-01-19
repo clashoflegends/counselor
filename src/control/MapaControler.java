@@ -393,7 +393,9 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
 
     private void doCreateHexView() {
         //create on first time
-        hexView = ComponentFactory.showDialogHexView(this.getTabGui());
+        if (hexView == null) {
+            hexView = ComponentFactory.showDialogHexView(this.getTabGui());
+        }
         doHexViewUpdate();
     }
 

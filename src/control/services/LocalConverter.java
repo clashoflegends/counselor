@@ -42,12 +42,20 @@ public class LocalConverter implements Serializable {
         ret.add(String.format(labels.getString("TERRENO.CLIMA"),
                 local.getTerreno().getNome(),
                 BaseMsgs.localClima[local.getClima()]));
-        //personagens
-        if (localFacade.isTerrainLandmark(local)) {
-            ret.add(labels.getString("LANDMARK.LOCAL") + ";");
-            for (Habilidade feature : localFacade.getTerrainLandmark(local)) {
-                ret.addTab(ConverterFactory.getLandmarkName(feature.getCodigo()));
+        //old landmark print
+//        if (localFacade.isTerrainLandmark(local)) {
+//            ret.add(labels.getString("LANDMARK.LOCAL") + ";");
+//            for (Habilidade feature : localFacade.getTerrainLandmark(local)) {
+//                ret.addTab(ConverterFactory.getLandmarkName(feature.getCodigo()));
+//            }
+//        }
+        //landmarks and others
+        for (Habilidade hab : local.getHabilidades().values()) {
+            if (hab.getCodigo().equals(";-;")) {
+                continue;
             }
+            //ret.add(labels.getString("LANDMARK.LOCAL") + " " + ConverterFactory.getLandmarkName(hab.getCodigo()));
+            ret.add(hab.getNome());
         }
         //personagens
         if (local.getPersonagens().values().size() > 0) {
