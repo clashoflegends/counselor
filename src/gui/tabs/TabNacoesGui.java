@@ -51,6 +51,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     private final SubTabTextArea stResults = new SubTabTextArea();
     private final SubTabTextArea stCombats = new SubTabTextArea();
     private final SubTabBaseList stDiplomacy = new SubTabBaseList();
+    private final SubTabBaseList stDiplomacyAll = new SubTabBaseList();
     private final SubTabBaseList stTroops = new SubTabBaseList();
     private SubTabOrdem stOrdens;
     private LimitTableCellRenderer ltcr;
@@ -210,6 +211,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         stResults.setText("");
         stCombats.setText("");
         stDiplomacy.setListModelClear();
+        stDiplomacyAll.setListModelClear();
         stTroops.setListModelClear();
         //set model
         this.jtMainLista.setModel(model);
@@ -276,6 +278,9 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         detalhesNacao.addTab(labels.getString("DIPLOMACY"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/diplomacy.gif")),
                 stDiplomacy, labels.getString("DIPLOMACY.TOOLTIP"));
+        detalhesNacao.addTab(labels.getString("DIPLOMACY.ALL"),
+                new javax.swing.ImageIcon(getClass().getResource("/images/diplomacy.gif")),
+                stDiplomacyAll, labels.getString("DIPLOMACY.ALL.TOOLTIP"));
         detalhesNacao.addTab(labels.getString("TROPAS"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/hex_exercito.gif")),
                 stTroops, labels.getString("TROPAS.DISPONIVEL"));
@@ -336,6 +341,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
             this.doTagHide();
         }
         stDiplomacy.setListModel(nacaoControl.getRelacionamentoTableModel(nacao));
+        stDiplomacyAll.setListModel(nacaoControl.getRelacionamentoAllTableModel());
         stTroops.setListModel(nacaoControl.getTropaTableModel(nacao));
         setResults(nacao);
         setCombats(nacao);

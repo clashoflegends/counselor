@@ -58,6 +58,11 @@ public class NacaoControler extends ControlBase implements Serializable, ActionL
         }
     }
 
+    public GenericoTableModel getRelacionamentoAllTableModel() {
+        final GenericoTableModel nacaoModel = NacaoConverter.getRelacionamentoAllModel();
+        return (nacaoModel);
+    }
+
     public GenericoTableModel getTropaTableModel(Nacao nacao) {
         if (nacao == null) {
             return (null);

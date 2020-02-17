@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import model.Cenario;
 import model.Exercito;
@@ -38,7 +39,6 @@ public class NacaoConverter implements Serializable {
     public static final int ORDEM_COL_INDEX_START = 4;
     private static final Log log = LogFactory.getLog(NacaoConverter.class);
     private static final NacaoFacade nacaoFacade = new NacaoFacade();
-    private static final FinancasConverter financasConverter = new FinancasConverter();
     private static final AcaoFacade acaoFacade = new AcaoFacade();
     private static final ListFactory listFactory = new ListFactory();
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
@@ -214,6 +214,14 @@ public class NacaoConverter implements Serializable {
         return model;
     }
 
+    public static GenericoTableModel getRelacionamentoAllModel() {
+        final String[] allNationsColNames = getRelacionamentoAllColNames();
+        GenericoTableModel model = new GenericoTableModel(allNationsColNames,
+                getRelacionamentoAllAsArray(allNationsColNames),
+                new Class[]{java.lang.String.class, java.lang.String.class});
+        return model;
+    }
+
     private static String[] getRelacionamentoColNames() {
         String[] colNames = {labels.getString("NACAO"), labels.getString("DIPLOMACY")};
         return (colNames);
@@ -228,15 +236,68 @@ public class NacaoConverter implements Serializable {
             int ii = 0;
             Object[][] ret = new Object[listaExibir.size()][getRelacionamentoColNames().length];
             for (Nacao nacaoAlvo : listaExibir) {
-                if (nacao != nacaoAlvo) {
-                    ret[ii][0] = nacaoAlvo.getNome();
-                    ret[ii][1] = nacaoFacade.getRelacionamento(nacao, nacaoAlvo);
-                    //ret[ii][1] = Msgs.nacaoRelacionamento[nacao.getRelacionamento(nacaoAlvo) + 2];
-                    ii++;
+                if (nacao == nacaoAlvo) {
+                    continue;
                 }
+                ret[ii][0] = nacaoAlvo.getNome();
+                ret[ii][1] = nacaoFacade.getRelacionamento(nacao, nacaoAlvo);
+                ii++;
             }
             return (ret);
         }
+    }
+
+    private static String[] getRelacionamentoAllColNames() {
+        final List<String> nations = new ArrayList<String>();
+        //+1 for header first column
+        nations.add(" ");
+        for (Nacao nation : listFactory.listNacoes().values()) {
+            if (!nacaoFacade.isAtivaPC(nation)) {
+                //exclude inactive nations (in WDO it is a major issue)
+                continue;
+            }
+            nations.add(nation.getNome());
+        }
+        return (nations.toArray(new String[0]));
+    }
+
+    private static Object[][] getRelacionamentoAllAsArray(String[] allNationsColNames) {
+        Collection<Nacao> listaExibir = listFactory.listNacoes().values();
+        if (listaExibir.isEmpty()) {
+            Object[][] ret = {{"", ""}};
+            return (ret);
+        }
+        /*
+            Steps
+                build basic table
+                confirm colunms and rows
+                paint red/green?
+            
+         */
+        int ii = 0;
+        Object[][] ret = new Object[allNationsColNames.length - 1][allNationsColNames.length];
+        for (Nacao nacaoRow : listaExibir) {
+            if (!nacaoFacade.isAtivaPC(nacaoRow)) {
+                //exclude inactive nations (in WDO it is a major issue)
+                continue;
+            }
+            ret[ii][0] = nacaoRow.getNome();
+            int nn = 1;
+            for (Nacao nacaoCol : listaExibir) {
+                if (!nacaoFacade.isAtivaPC(nacaoCol)) {
+                    //exclude inactive nations (in WDO it is a major issue)
+                    continue;
+                }
+                if (nacaoRow == nacaoCol) {
+                    //don't write if the same
+                    ret[ii][nn++] = "";
+                } else {
+                    ret[ii][nn++] = nacaoFacade.getRelacionamento(nacaoRow, nacaoCol);
+                }
+            }
+            ii++;
+        }
+        return (ret);
     }
 
     public static List<Nacao> listaByFiltro(String filtro) {
