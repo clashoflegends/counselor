@@ -35,7 +35,7 @@ import persistenceCommons.SysApoio;
  */
 public class NacaoConverter implements Serializable {
 
-    public static final int ORDEM_COL_INDEX_START = 4;
+    public static final int ORDEM_COL_INDEX_START = 5;
     private static final Log log = LogFactory.getLog(NacaoConverter.class);
     private static final NacaoFacade nacaoFacade = new NacaoFacade();
     private static final AcaoFacade acaoFacade = new AcaoFacade();
@@ -77,6 +77,7 @@ public class NacaoConverter implements Serializable {
         cArray[ii++] = nacaoFacade.getNome(nacao);
         cArray[ii++] = nacaoFacade.getRacaNome(nacao);
         cArray[ii++] = nacaoFacade.getPontosVitoria(nacao);
+        cArray[ii++] = nacaoFacade.getPointsDomination(nacao);
         cArray[ii++] = SysApoio.iif(nacaoFacade.isAtiva(nacao), labels.getString("ATIVA"), labels.getString("INATIVA"));
         if (cenarioFacade.hasOrdensNacao(WFC.getPartida())) {
             cArray[ii++] = acaoFacade.getPointsSetup(nacao);
@@ -117,6 +118,8 @@ public class NacaoConverter implements Serializable {
         colNames.add(labels.getString("RACA"));
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("PONTOS.VITORIA"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("PONTOS.DOMINATION"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("ATIVA"));
         classes.add(java.lang.String.class);
