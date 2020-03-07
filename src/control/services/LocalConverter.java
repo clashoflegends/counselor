@@ -49,6 +49,7 @@ public class LocalConverter implements Serializable {
 //            }
 //        }
         //landmarks and others
+        ret.add("\n");
         for (Habilidade hab : local.getHabilidades().values()) {
             if (hab.getCodigo().equals(";-;")) {
                 continue;
@@ -56,8 +57,18 @@ public class LocalConverter implements Serializable {
             //ret.add(labels.getString("LANDMARK.LOCAL") + " " + ConverterFactory.getLandmarkName(hab.getCodigo()));
             ret.add(hab.getNome());
         }
+        //City 
+        if (localFacade.isCidade(local)) {
+            for (Habilidade hab : local.getCidade().getHabilidades().values()) {
+                if (hab.getCodigo().equals(";-;")) {
+                    continue;
+                }
+                ret.add(hab.getNome());
+            }
+        }
         //personagens
         if (local.getPersonagens().values().size() > 0) {
+            ret.add("\n");
             ret.add(labels.getString("PERSONAGENS.LOCAL"));
             if (SettingsManager.getInstance().getConfig("HexInfoPcSorting", "N").equals("N")) {
                 //sort by nation
@@ -76,6 +87,7 @@ public class LocalConverter implements Serializable {
         }
         //exercitos
         if (local.getExercitos().values().size() > 0) {
+            ret.add("\n");
             ret.add(labels.getString("EXERCITOS"));
             for (Exercito exercito : local.getExercitos().values()) {
                 ret.add(ExercitoConverter.getInfo(exercito));
@@ -83,6 +95,7 @@ public class LocalConverter implements Serializable {
         }
         //artefatos
         if (local.getArtefatos().values().size() > 0) {
+            ret.add("\n");
             ret.add(labels.getString("ARTEFATOS"));
             for (Artefato artefato : local.getArtefatos().values()) {
                 ret.add(ArtefatoConverter.getInfo(artefato));
