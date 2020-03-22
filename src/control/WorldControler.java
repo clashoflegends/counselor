@@ -350,7 +350,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private void doGraphAllTurns() throws HeadlessException {
-        GraphPopupVpPerTurn graph = new GraphPopupVpPerTurn();
+        GraphPopupVpPerTurn graph = new GraphPopupVpPerTurn(WorldFacadeCounselor.getInstance().getNacoes().values());
         graph.start(WFC.getVictoryPoints());
     }
 
