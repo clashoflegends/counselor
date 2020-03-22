@@ -19,6 +19,7 @@ import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
 import gui.accessories.GraphPopupScoreByNation;
 import gui.accessories.GraphPopupVpPerTeam;
+import gui.accessories.GraphPopupVpPerTurn;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
 import java.awt.Component;
@@ -133,6 +134,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doGraphScore();
             } else if ("jbGraphSingleTurn".equals(jbTemp.getActionCommand())) {
                 doGraphSingleTurn();
+            } else if ("jbGraphAllTurns".equals(jbTemp.getActionCommand())) {
+                doGraphAllTurns();
             } else if ("jbAbout".equals(jbTemp.getActionCommand())) {
                 doAbout();
             } else if ("jbHexview".equals(jbTemp.getActionCommand())) {
@@ -344,6 +347,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private void doGraphSingleTurn() throws HeadlessException {
         GraphPopupVpPerTeam graph = new GraphPopupVpPerTeam();
         graph.start();
+    }
+
+    private void doGraphAllTurns() throws HeadlessException {
+        GraphPopupVpPerTurn graph = new GraphPopupVpPerTurn();
+        graph.start(WFC.getVictoryPoints());
     }
 
     private void doHexview() {
@@ -765,8 +773,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     /**
-     * Carrega o arquivo verifica integridade do arquivo verifica se o turno/nacao/jogador eh correto limpa as ordens atuais existentes carrega as
-     * ordens personagem por personagem atualiza GUI indica quantas ordens foram carregadas/descartadas
+     * Carrega o arquivo verifica integridade do arquivo verifica se o turno/nacao/jogador eh correto limpa as ordens atuais existentes carrega as ordens
+     * personagem por personagem atualiza GUI indica quantas ordens foram carregadas/descartadas
      */
     private void setComando(File file) {
         try {
@@ -1277,5 +1285,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             }
 
         }
+    }
+
+    public boolean isVictoryPointsExists() {
+        return !(WFC.getVictoryPoints() == null || WFC.getVictoryPoints().isEmpty());
     }
 }

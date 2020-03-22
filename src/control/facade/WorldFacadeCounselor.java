@@ -33,6 +33,7 @@ import model.Ordem;
 import model.Partida;
 import model.Personagem;
 import model.PersonagemOrdem;
+import model.VictoryPointsGame;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.local.WorldManager;
@@ -319,6 +320,10 @@ public class WorldFacadeCounselor implements Serializable {
 
     public Nacao getNacao(String idNacao) {
         return WorldManager.getInstance().getNacao(idNacao);
+    }
+
+    public VictoryPointsGame getVictoryPoints() {
+        return WorldManager.getInstance().getVictoryPoints();
     }
 
 }
