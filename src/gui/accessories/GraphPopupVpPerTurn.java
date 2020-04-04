@@ -105,7 +105,7 @@ public class GraphPopupVpPerTurn {
         //creating graph itself
         StackedAreaChart<String, Number> areaChart = new StackedAreaChart(xAxis, yAxis);
         areaChart.setTitle(labels.getString("PONTOS.VITORIA.HISTORY"));
-        areaChart.setLegendVisible(true);
+        areaChart.setLegendVisible(false);
         areaChart.setCreateSymbols(false);
 
         //populating graph data
