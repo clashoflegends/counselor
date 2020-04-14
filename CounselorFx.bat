@@ -6,7 +6,7 @@ SET	FX_MODULES=javafx.controls,javafx.swing
 
 for /f tokens^=2-5^ delims^=.-_^" %%j in ('java.exe -fullversion 2^>^&1') do set "jver=%%j%%k%%l%%m"
 echo %jver%
-IF %jver% EQU 8 (
+IF %jver:~0,2% EQU 18 (
 	start javaw -Xmx512M -jar Counselor.jar %1
 ) ELSE (
 
