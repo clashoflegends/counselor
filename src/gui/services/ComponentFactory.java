@@ -20,6 +20,7 @@ import gui.subtabs.SubTabRelacionamento;
 import gui.subtabs.SubTabTropas;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
@@ -792,10 +793,18 @@ public class ComponentFactory implements Serializable {
 
     public static DialogHexView showDialogHexView(Component relativeTo) {
         DialogHexView hexViewDialog = new DialogHexView(false);
+        //load configs
+        int width = SettingsManager.getInstance().getConfigAsInt("GuiHexViewSizeWidth", "500");
+        int height = SettingsManager.getInstance().getConfigAsInt("GuiHexViewSizeHeight", "400");
+        int posX = SettingsManager.getInstance().getConfigAsInt("GuiHexViewPositionX", "1");
+        int posY = SettingsManager.getInstance().getConfigAsInt("GuiHexViewPositionY", "1");
         //configura jDialog
-        if (relativeTo != null) {
+        if (relativeTo != null && !SettingsManager.getInstance().isKeyExist("GuiHexViewPositionY")) {
             hexViewDialog.setLocationRelativeTo(relativeTo);
+        } else {
+            hexViewDialog.setLocation(posX, posY);
         }
+        hexViewDialog.setPreferredSize(new Dimension(width, height));
         hexViewDialog.pack();
         hexViewDialog.setVisible(true);
         return hexViewDialog;

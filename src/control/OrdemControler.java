@@ -95,6 +95,21 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_COUNT);
     }
 
+    private void doRepeatAction() {
+        try {
+            doSalvaAction(indexModelOrdem);
+            //find open slot
+            int nextActionSlot = getTabGui().getNextActionSlot();
+            while (nextActionSlot >= 0) {
+                doSalvaAction(nextActionSlot);
+                //update open slot
+                nextActionSlot = getTabGui().getNextActionSlot();
+            }
+        } catch (NullPointerException ex) {
+            //nao fax nada, ordem nao existe
+        }
+    }
+
     public ComboBoxModel getTaticasComboModel() {
         return CenarioConverter.getInstance().getTaticaComboModel();
     }
@@ -124,6 +139,8 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             JButton button = (JButton) actionEvent.getSource();
             if ("jbOk".equals(button.getActionCommand())) {
                 doSalvaAction();
+            } else if ("jbRepeat".equals(button.getActionCommand())) {
+                doRepeatAction();
             } else if ("jbClear".equals(button.getActionCommand())) {
                 doRemoveAction();
             } else if ("jbHelp".equals(button.getActionCommand())) {
