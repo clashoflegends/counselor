@@ -145,7 +145,7 @@ public class GraphPopupVpPerTeam {
     private String getNationColorFill(String nmNation) {
         try {
             final String color = SysApoio.colorToHexa(mapNations.get(nmNation).getFillColor());
-            log.info(String.format("%s %s", nmNation, color));
+            log.debug(String.format("%s %s", nmNation, color));
             if (color.equals("#030303")) {
                 //invert colors, too much black. Particularly important for WDO where all orcs are black.
                 return SysApoio.colorToHexa(mapNations.get(nmNation).getBorderColor());

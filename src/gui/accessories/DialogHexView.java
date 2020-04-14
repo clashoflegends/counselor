@@ -4,19 +4,27 @@
  */
 package gui.accessories;
 
+import control.support.DispatchManager;
+import gui.services.IDispatchReceiver;
+import gui.services.IPopupTabGui;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Component;
 import java.io.Serializable;
 import javax.swing.JFrame;
+import model.Local;
+import model.Nacao;
+import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistenceCommons.SettingsManager;
 
 /**
  *
  * @author jmoura
  */
-public class DialogHexView extends javax.swing.JDialog implements Serializable {
+public class DialogHexView extends javax.swing.JDialog implements IDispatchReceiver, Serializable {
 //make this follow hex selection
+
     private static final Log log = LogFactory.getLog(DialogHexView.class);
     // Variables declaration - do not modify
     private javax.swing.JScrollPane detContent;
@@ -27,7 +35,6 @@ public class DialogHexView extends javax.swing.JDialog implements Serializable {
     public DialogHexView(boolean modal) {
         super(new JFrame(), modal);
         this.setAlwaysOnTop(true);
-        this.setPreferredSize(new Dimension(500, 400));
         initComponents();
     }
 
@@ -52,6 +59,14 @@ public class DialogHexView extends javax.swing.JDialog implements Serializable {
 
         detContent.setViewportView(jpContent);
         this.add(detContent);
+        //events
+        DispatchManager.getInstance().registerForMsg(DispatchManager.WINDOWS_CLOSING, this);
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                SettingsManager.getInstance().setConfigAndSaveToFile("GuiHexViewDetachedStatus", IPopupTabGui.POPUP_HIDDEN);
+            }
+        });
     }
 
     public void setText(String text) {
@@ -61,5 +76,33 @@ public class DialogHexView extends javax.swing.JDialog implements Serializable {
 
     public void setTextBackground(Color color) {
         this.jtaTextArea.setBackground(color);
+    }
+
+    @Override
+    public void receiveDispatch(int msgName) {
+        SettingsManager.getInstance().setConfig("GuiHexViewSizeWidth", this.getSize().width + "");
+        SettingsManager.getInstance().setConfig("GuiHexViewSizeHeight", this.getSize().height + "");
+        SettingsManager.getInstance().setConfig("GuiHexViewPositionX", this.getLocation().x + "");
+        SettingsManager.getInstance().setConfigAndSaveToFile("GuiHexViewPositionY", this.getLocation().y + "");
+    }
+
+    @Override
+    public void receiveDispatch(Nacao nation, PersonagemOrdem before, PersonagemOrdem after) {
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, String txt) {
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, Local local) {
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, Local local, int range) {
+    }
+
+    @Override
+    public void receiveDispatch(int msgName, Component cmpnt) {
     }
 }

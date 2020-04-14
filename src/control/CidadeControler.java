@@ -92,6 +92,7 @@ public class CidadeControler extends ControlBase implements Serializable, Action
 //        if("comboBoxChanged") {
             JComboBox cb = (JComboBox) e.getSource();
             if ("comboFiltro".equals(cb.getName())) {
+                SettingsManager.getInstance().setConfigAndSaveToFile(getTabGui().getKeyFilterProperty(), cb.getSelectedIndex() + "");
                 getTabGui().setMainModel(getMainTableModel((GenericoComboObject) cb.getSelectedItem()));
             }
         }

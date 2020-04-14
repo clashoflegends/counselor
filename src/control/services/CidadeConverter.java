@@ -6,7 +6,6 @@ package control.services;
 
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
-import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
 import business.facade.ExercitoFacade;
 import business.facade.JogadorFacade;
@@ -53,7 +52,6 @@ public class CidadeConverter implements Serializable {
     private static final OrdemFacade ordemFacade = new OrdemFacade();
     private static final NacaoFacade nacaoFacade = new NacaoFacade();
     private static final PersonagemFacade personagemFacade = new PersonagemFacade();
-    private static final CenarioFacade cenarioFacade = new CenarioFacade();
     private static final JogadorFacade jogadorFacade = new JogadorFacade();
     private static final ListFactory listFactory = new ListFactory();
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
@@ -109,6 +107,8 @@ public class CidadeConverter implements Serializable {
         }
         colNames.add(labels.getString("SITIADO"));
         classes.add(java.lang.String.class);
+        colNames.add(labels.getString("PONTOS.DOMINATION"));
+        classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("NACAO"));
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("TERRENO"));
@@ -176,6 +176,7 @@ public class CidadeConverter implements Serializable {
             cArray[ii++] = cidadeFacade.getCapital(cidade);
         }
         cArray[ii++] = cidadeFacade.getSitiado(cidade);
+        cArray[ii++] = cidadeFacade.getPointsDomination(cidade);
         cArray[ii++] = cidadeFacade.getNacaoNome(cidade);
         cArray[ii++] = localFacade.getTerrenoNome(cidadeFacade.getLocal(cidade));
         cArray[ii++] = localFacade.getClima(cidadeFacade.getLocal(cidade));

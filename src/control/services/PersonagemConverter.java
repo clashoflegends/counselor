@@ -501,14 +501,14 @@ public class PersonagemConverter implements Serializable {
      */
     public static String getResultado(Personagem personagem) {
         //Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
-        return personagemFacade.getResultado(personagem) + getPericias(personagem);
+        return personagemFacade.getResultado(personagem) + "\n" + getPericias(personagem);
     }
 
     public static String getPericias(Personagem personagem) {
         String mask1 = "   %s %d(%d)\n";
         String mask2 = "   %s %d\n";
         Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
-        String ret = "";
+        String ret = String.format(labels.getString("PERSONAGEM.HAS.SKILLS"), personagem.getNome()) + "\n";
         if (personagem.getPericiaAgenteNatural() > 0) {
             if (personagem.getPericiaAgente() != personagem.getPericiaAgenteNatural()) {
                 ret += String.format(mask1,
