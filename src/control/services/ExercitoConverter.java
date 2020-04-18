@@ -37,6 +37,7 @@ import persistence.local.ListFactory;
 import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import utils.StringIntSortedCell;
 import utils.StringRet;
 
 /**
@@ -145,7 +146,7 @@ public class ExercitoConverter implements Serializable {
         cArray[ii++] = exercitoFacade.getEsquadra(exercito);
         cArray[ii++] = exercitoFacade.getComida(exercito);
         cArray[ii++] = exercitoFacade.getUpkeepFood(exercito);
-        cArray[ii++] = exercitoFacade.getDescricaoTamanho(exercito);
+        cArray[ii++] = exercitoFacade.getTamanhoCell(exercito);
         cArray[ii++] = exercitoFacade.getTacticNameSelected(exercito);
         cArray[ii++] = exercitoFacade.getUpkeepCost(exercito);
         cArray[ii++] = exercitoFacade.getSiege(exercito);
@@ -177,7 +178,7 @@ public class ExercitoConverter implements Serializable {
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class,
-                            java.lang.String.class,
+                            StringIntSortedCell.class,
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
