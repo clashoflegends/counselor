@@ -12,7 +12,7 @@ import business.facade.CidadeFacade;
 import business.facade.ExercitoFacade;
 import business.facade.LocalFacade;
 import business.interfaces.IExercito;
-import business.services.TitleFactory;
+import business.converter.TitleFactory;
 import control.facade.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
