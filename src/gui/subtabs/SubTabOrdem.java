@@ -4,7 +4,7 @@ import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import business.facade.JogadorFacade;
 import business.facade.OrdemFacade;
-import business.services.TitleFactory;
+import business.converter.TitleFactory;
 import control.MapaControler;
 import control.OrdemControler;
 import control.OrdemControlerFloater;

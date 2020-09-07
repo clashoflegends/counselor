@@ -354,7 +354,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
                 boolean first = true;
                 for (String item : msgDanoT) {
                     if (first) {
-//                        msg += "\t\t" + SysMsgs.CombateCasualitiesLabel + SysMsgs.Separador + rounds + "\n";
+//                        msg += "\t\t" + SysMsgs.CombateCasualtiesLabel + SysMsgs.Separador + rounds + "\n";
                         first = false;
                     }
 //                    msg += "\t\t" + item + "\n";
