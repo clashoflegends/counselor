@@ -6,6 +6,7 @@
 package gui;
 
 import business.ImageManager;
+import business.MapaManager;
 import control.MapaControler;
 import control.WorldControler;
 import control.facade.WorldFacadeCounselor;
@@ -23,8 +24,10 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+import model.Cenario;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
@@ -503,7 +506,17 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             this.labelNacao.setText(String.format("%s: %s", labels.getString("NACAO"), wc.getNacoesJogadorAtivoQtd() + " ... "));
         }
 
-        MapaControler mapaControl = new MapaControler(this);
+        MapaControler mapaControl = WorldFacadeCounselor.getInstance().getMapaControler();//new MapaControler(this);
+        if (mapaControl == null) {
+            mapaControl = new MapaControler(this);  
+        } else {
+            final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
+            MapaManager mapaManager = new MapaManager(cenario, this);
+            mapaManager.setLocais(new ListFactory().listLocais());
+            mapaControl.setMapaManager(mapaManager);
+        }
+
+     //   MapaControler mapaControl = new MapaControler(this);
         WorldFacadeCounselor.getInstance().setMapaControler(mapaControl);
         MainMapaGui mapaGui = new MainMapaGui(mapaControl);
         //Monta área do mapa
@@ -659,5 +672,5 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     public JToggleButton getDisplayPortraits() {
         return this.toggleDisplayPortrait;
     }
-
+        
 }
