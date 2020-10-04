@@ -60,7 +60,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private static final LocalFacade localFacade = new LocalFacade();
     private static final ExercitoFacade exercitoFacade = new ExercitoFacade();
-    private MapaManager mapaManager; //tem que criar depois para incluir o form
+    private static MapaManager mapaManager; //tem que criar depois para incluir o form
     private static final ListFactory listFactory = new ListFactory();
     private MainMapaGui tabGui;
     private DialogTextArea hexInfo;
@@ -408,13 +408,4 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         hexView.setText(text);
         hexView.setTitle(title);
     }
-
-    public MapaManager getMapaManager() {
-        return mapaManager;
-    }
-
-    public void setMapaManager(MapaManager mapaManager) {
-        this.mapaManager = mapaManager;
-    }
-    
 }
