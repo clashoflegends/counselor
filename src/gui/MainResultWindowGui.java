@@ -19,18 +19,22 @@ import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.Serializable;
+import java.util.SortedMap;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import model.Cenario;
+import model.Local;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
+import radialMenu.mapmenu.MapMenuManager;
+import radialMenu.worldBuilder.WorldBuilderMenuManager;
 
 /**
  *
@@ -506,23 +510,20 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             this.labelNacao.setText(String.format("%s: %s", labels.getString("NACAO"), wc.getNacoesJogadorAtivoQtd() + " ... "));
         }
 
-        MapaControler mapaControl = WorldFacadeCounselor.getInstance().getMapaControler();//new MapaControler(this);
+        MapaControler mapaControl = WorldFacadeCounselor.getInstance().getMapaControler();//new MapaControler(this); //
         if (mapaControl == null) {
             mapaControl = new MapaControler(this);  
         } else {
-            final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
-            MapaManager mapaManager = new MapaManager(cenario, this);
-            mapaManager.setLocais(new ListFactory().listLocais());
-            mapaControl.setMapaManager(mapaManager);
+            mapaControl.initialize(this);
         }
 
      //   MapaControler mapaControl = new MapaControler(this);
         WorldFacadeCounselor.getInstance().setMapaControler(mapaControl);
-        MainMapaGui mapaGui = new MainMapaGui(mapaControl);
+        MainMapaGui mapaGui = new MainMapaGui();
         //Monta área do mapa
         this.splitMainPanel.setRightComponent(mapaGui);
         // Monta tabbed panel para dados
-        MainDadosGui dadosGui = new MainDadosGui(mapaControl);
+        MainDadosGui dadosGui = new MainDadosGui();
         this.splitMainPanel.setLeftComponent(dadosGui);
         this.tabPersonagem = dadosGui.getTabPersonagem();
 

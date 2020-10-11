@@ -11,6 +11,7 @@ import business.MovimentoExercito;
 import business.converter.ConverterFactory;
 import business.services.TagManager;
 import control.MapaControler;
+import control.facade.WorldFacadeCounselor;
 import control.services.MapaDragListener;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -54,9 +55,9 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     /**
      * Creates new form MainMapaGui
      */
-    public MainMapaGui(MapaControler mapaControl) {
+    public MainMapaGui() {
         initComponents();
-
+        MapaControler mapaControl = WorldFacadeCounselor.getInstance().getMapaControler();
         mapaControl.setTabGui(this);
         doMapa(mapaControl.printMapaGeral());
         this.mapaLabel.addMouseMotionListener(new MapaDragListener(this));

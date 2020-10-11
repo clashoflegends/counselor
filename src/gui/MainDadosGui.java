@@ -34,8 +34,9 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
     /**
      * Creates new form MainDadosGui
      */
-    public MainDadosGui(MapaControler mapaControl) {
+    public MainDadosGui() {
         initComponents();
+        MapaControler mapaControl = WorldFacadeCounselor.getInstance().getMapaControler();
         // prepara as tabs
         if (!SettingsManager.getInstance().isConfig("SetTabPosition", "1", "1")) {
             this.jTabbedPane1.setTabPlacement(SettingsManager.getInstance().getConfigAsInt("SetTabPosition"));
