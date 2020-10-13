@@ -58,21 +58,27 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
 
     private static final Log log = LogFactory.getLog(MapaControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private static final LocalFacade localFacade = new LocalFacade();
-    private static final ExercitoFacade exercitoFacade = new ExercitoFacade();
-    private static MapaManager mapaManager; //tem que criar depois para incluir o form
-    private static final ListFactory listFactory = new ListFactory();
+    private final LocalFacade localFacade = new LocalFacade();
+    private ExercitoFacade exercitoFacade = null;
+    private MapaManager mapaManager; //tem que criar depois para incluir o form
+    private ListFactory listFactory = null;
     private MainMapaGui tabGui;
     private DialogTextArea hexInfo;
     private Local localAtual;
     private final List<JTable> tables = new ArrayList<JTable>();
     private RadialMenu rmActive;
-    private final MapMenuManager mapMenuManager;
+    private MapMenuManager mapMenuManager;
     private DialogHexView hexView;
-    private final Jogador jogadorAtivo;
+    private Jogador jogadorAtivo;
 
     public MapaControler(JPanel form) {
+        initialize(form);
+    }
+
+    public void initialize(JPanel form) {
         this.jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
+        listFactory = new ListFactory();
+        exercitoFacade = new ExercitoFacade();
         final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         mapaManager = new MapaManager(cenario, form);
         mapaManager.setLocais(listFactory.listLocais());
@@ -92,22 +98,26 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         mapMenuManager.setLocais(listFactory.listLocais());
         mapMenuManager.setNacoes(listFactory.listNacoes());
         mapMenuManager.setTerrenos(cenario.getTerrenos());
+        rmActive = getMapMenuManager().getMainMenu();
+        
+        
+        
     }
-
+    
     private ImageIcon printActionsOnMap() {
-        return new ImageIcon(mapaManager.printActionsOnMap(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
+        return new ImageIcon(mapaManager.printActionsOnMap(listFactory.listLocais().values(), listFactory.listPersonagens(), getJogadorAtivo()));
     }
 
     public ImageIcon printMapaGeral() {
-        return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
+        return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), getJogadorAtivo()));
     }
 
     private ImageIcon refreshMapaGeral() {
-        return new ImageIcon(mapaManager.redrawMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
+        return new ImageIcon(mapaManager.redrawMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), getJogadorAtivo()));
     }
 
     public BufferedImage getMap() {
-        return mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo);
+        return mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), getJogadorAtivo());
     }
 
     public MainMapaGui getTabGui() {
@@ -222,7 +232,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
                     hideRadialMenu();
                     rmActive = WorldBuilderMenuManager.getInstance().getRmWorldBuilder();
                 } else if (rmActive == null) {
-                    rmActive = mapMenuManager.getMainMenu();
+                    rmActive = getMapMenuManager().getMainMenu();
                 }
                 this.printTag(local);
             }
@@ -352,7 +362,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         if (rmActive == null && SettingsManager.getInstance().isWorldBuilder()) {
             rmActive = WorldBuilderMenuManager.getInstance().getRmWorldBuilder();
         } else if (rmActive == null) {
-            rmActive = mapMenuManager.getMainMenu();
+            rmActive = getMapMenuManager().getMainMenu();
         }
         rmActive.setHierarchyAncestor(this);
 
@@ -408,4 +418,43 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         hexView.setText(text);
         hexView.setTitle(title);
     }
+
+    public MapaManager getMapaManager() {
+        return mapaManager;
+    }
+
+    public void setMapaManager(MapaManager mapaManager) {
+        this.mapaManager = mapaManager;
+    }
+
+    /**
+     * @return the mapMenuManager
+     */
+    public MapMenuManager getMapMenuManager() {
+        return mapMenuManager;
+    }
+
+    /**
+     * @param mapMenuManager the mapMenuManager to set
+     */
+    public void setMapMenuManager(MapMenuManager mapMenuManager) {
+        this.mapMenuManager = mapMenuManager;
+    }
+
+    /**
+     * @return the jogadorAtivo
+     */
+    public Jogador getJogadorAtivo() {
+        return jogadorAtivo;
+    }
+
+    /**
+     * @param jogadorAtivo the jogadorAtivo to set
+     */
+    public void setJogadorAtivo(Jogador jogadorAtivo) {
+        this.jogadorAtivo = jogadorAtivo;
+    }
+
+    
+    
 }
