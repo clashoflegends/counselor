@@ -211,7 +211,7 @@ public class PersonagemConverter implements Serializable {
 
     private static String[] getArtefatoColNames() {
         //PENDING: COlocar artefato em uso e se o personagem pode usar o artefato ou nao(disable color?)
-        String[] colNames = {labels.getString("NOME"), labels.getString("PODER"), labels.getString("VALOR"),
+        String[] colNames = {labels.getString("NOME"), labels.getString("PODER"), labels.getString("VALOR"), labels.getString("ALINHAMENTO"),
             labels.getString("TIPO"), labels.getString("LATENTE")
         };
         return (colNames);
@@ -227,6 +227,7 @@ public class PersonagemConverter implements Serializable {
             ret[ii][i++] = artefatoFacade.getNome(artefato);
             ret[ii][i++] = artefatoFacade.getPrimario(artefato);
             ret[ii][i++] = artefatoFacade.getValor(artefato);
+            ret[ii][i++] = artefatoFacade.getAlinhamento(artefato);
             ret[ii][i++] = artefatoFacade.getDescricao(artefato);
             ret[ii][i++] = artefatoFacade.getLatente(artefato);
             ii++;
