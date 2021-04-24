@@ -93,11 +93,13 @@ public class TipoTropaConverter implements Serializable {
                 }
             }
         } else if (filtro.equalsIgnoreCase("active")) {
-            for (TipoTropa tpTropa : listFactory.listTropas()) {
-                if (tpTropa.isTransferable()) {
-                    ret.add(tpTropa);
+            final Set<TipoTropa> tropas = new TreeSet<>();
+            for (Nacao nation : listFactory.listNacoes().values()) {
+                if (nacaoFacade.isAtiva(nation)) {
+                    tropas.addAll(nacaoFacade.getTropas(nation).keySet());
                 }
             }
+            ret.addAll(tropas);
         } else if (filtro.equalsIgnoreCase("siege")) {
             for (TipoTropa tpTropa : listFactory.listTropas()) {
                 if (tpTropa.isSiege()) {
