@@ -45,13 +45,13 @@ public class TipoTropaConverter implements Serializable {
             ret.addAll(listFactory.listTropas());
         } else if (filtro.equalsIgnoreCase("own")) {
             final Collection<Nacao> nacoes = jAtivo.getNacoes().values();
-            final Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
+            final Set<TipoTropa> tropas = new TreeSet<>();
             for (Nacao nacao : nacoes) {
                 tropas.addAll(nacaoFacade.getTropas(nacao).keySet());
             }
             ret.addAll(tropas);
         } else if (filtro.equalsIgnoreCase("team") && jAtivo != null) {
-            final Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
+            final Set<TipoTropa> tropas = new TreeSet<>();
             for (Nacao ally : listFactory.listNacoes().values()) {
                 if (jAtivo.isJogadorAliado(ally) || jAtivo.isNacao(ally)) {
                     tropas.addAll(nacaoFacade.getTropas(ally).keySet());
@@ -59,7 +59,7 @@ public class TipoTropaConverter implements Serializable {
             }
             ret.addAll(tropas);
         } else if (filtro.equalsIgnoreCase("allies") && jAtivo != null) {
-            final Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
+            final Set<TipoTropa> tropas = new TreeSet<>();
             for (Nacao ally : listFactory.listNacoes().values()) {
                 if (jAtivo.isJogadorAliado(ally) && !jAtivo.isNacao(ally)) {
                     tropas.addAll(nacaoFacade.getTropas(ally).keySet());
@@ -67,7 +67,7 @@ public class TipoTropaConverter implements Serializable {
             }
             ret.addAll(tropas);
         } else if (filtro.equalsIgnoreCase("enemies") && jAtivo != null) {
-            final Set<TipoTropa> tropas = new TreeSet<TipoTropa>();
+            final Set<TipoTropa> tropas = new TreeSet<>();
             for (Nacao ally : listFactory.listNacoes().values()) {
                 if (!jAtivo.isJogadorAliado(ally) && !jAtivo.isNacao(ally)) {
                     tropas.addAll(nacaoFacade.getTropas(ally).keySet());
@@ -92,6 +92,14 @@ public class TipoTropaConverter implements Serializable {
                     ret.add(tpTropa);
                 }
             }
+        } else if (filtro.equalsIgnoreCase("active")) {
+            final Set<TipoTropa> tropas = new TreeSet<>();
+            for (Nacao nation : listFactory.listNacoes().values()) {
+                if (nacaoFacade.isAtiva(nation)) {
+                    tropas.addAll(nacaoFacade.getTropas(nation).keySet());
+                }
+            }
+            ret.addAll(tropas);
         } else if (filtro.equalsIgnoreCase("siege")) {
             for (TipoTropa tpTropa : listFactory.listTropas()) {
                 if (tpTropa.isSiege()) {
@@ -115,12 +123,12 @@ public class TipoTropaConverter implements Serializable {
     }
 
     public static List<TipoTropa> listaByNacao(Nacao filtro) {
-        return new ArrayList<TipoTropa>(nacaoFacade.getTropas(filtro).keySet());
+        return new ArrayList<>(nacaoFacade.getTropas(filtro).keySet());
     }
 
     public static IBaseModel[] listFiltroTroopHab() {
-        List<IBaseModel> lista = new ArrayList<IBaseModel>();
-        Set<Habilidade> habList = new TreeSet<Habilidade>();
+        List<IBaseModel> lista = new ArrayList<>();
+        Set<Habilidade> habList = new TreeSet<>();
         for (TipoTropa tpTropa : listFactory.listTropas()) {
             for (Habilidade habilidade : tpTropa.getHabilidades().values()) {
                 habList.add(habilidade);
@@ -274,7 +282,7 @@ public class TipoTropaConverter implements Serializable {
     }
 
     private static String[] getTerrainColNames(TipoTropa tpTropa) {
-        final List<String> colNames = new ArrayList<String>();
+        final List<String> colNames = new ArrayList<>();
         colNames.add(labels.getString("TROPA.NOME"));
         for (Terreno terreno : tpTropa.getAtaqueTerreno().keySet()) {
             colNames.add(terreno.getNome());
@@ -291,12 +299,16 @@ public class TipoTropaConverter implements Serializable {
             SortedMap<Terreno, Integer> listaTerreno;
             int ii = 0;
             for (TipoTropa tpTropa : lista) {
-                if (tipo == 0) {
-                    listaTerreno = tpTropa.getAtaqueTerreno();
-                } else if (tipo == 1) {
-                    listaTerreno = tpTropa.getDefesaTerreno();
-                } else {
-                    listaTerreno = tpTropa.getMovimentoTerreno();
+                switch (tipo) {
+                    case 0:
+                        listaTerreno = tpTropa.getAtaqueTerreno();
+                        break;
+                    case 1:
+                        listaTerreno = tpTropa.getDefesaTerreno();
+                        break;
+                    default:
+                        listaTerreno = tpTropa.getMovimentoTerreno();
+                        break;
                 }
                 int nn = 0;
                 ret[ii][nn++] = tpTropa.getNome();
@@ -335,7 +347,7 @@ public class TipoTropaConverter implements Serializable {
     }
 
     private static String[] getHabilidadeColNames() {
-        final List<String> colNames = new ArrayList<String>();
+        final List<String> colNames = new ArrayList<>();
         colNames.add(labels.getString("TROPA.HABILIDADE"));
         return (colNames.toArray(new String[0]));
     }
