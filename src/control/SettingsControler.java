@@ -275,6 +275,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
         JSpinner jspiner = (JSpinner) ce.getSource();
         int sizeValue = (Integer) jspiner.getValue();
         SettingsManager.getInstance().setConfig("splitSize", String.valueOf(sizeValue));
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SPLIT_PANE_CHANGED, String.valueOf(sizeValue));       
     }
 
     @Override

@@ -111,6 +111,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         registerDispatchManagerForMsg(DispatchManager.STATUS_BAR_MSG);
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
         registerDispatchManagerForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL);
+        registerDispatchManagerForMsg(DispatchManager.SPLIT_PANE_CHANGED);
     }
 
     @Override
@@ -949,6 +950,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             getGui().setStatusMsg(msg);
         } else if (msgName == DispatchManager.SWITCH_PORTRAIT_PANEL) {
             gui.getDisplayPortraits().setSelected(msg.equals("1"));
+        } else if (msgName == DispatchManager.SPLIT_PANE_CHANGED) {
+            gui.setSplitPaneValue(Integer.parseInt(msg));
         }
     }
 
