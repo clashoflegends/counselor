@@ -24,7 +24,7 @@ import persistenceCommons.SettingsManager;
  */
 public final class TabFeiticosGui extends TabBase implements Serializable {
 
-    private static final Log log = LogFactory.getLog(TabFeiticosGui.class);
+    private static final Log LOG = LogFactory.getLog(TabFeiticosGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final FeiticoControler feiticoControl;
 
@@ -81,8 +81,13 @@ public final class TabFeiticosGui extends TabBase implements Serializable {
         qtFeiticos.setText(labels.getString("QTD")); // NOI18N
 
         jSplitPane1.setBorder(null);
-        jSplitPane1.setDividerLocation(200);
+        jSplitPane1.setDividerLocation(SettingsManager.getInstance().getConfigAsInt("spellsSplitSize", "200"));
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jSplitPane1PropertyChange(evt);
+            }
+        });
 
         jScrollPane3.setBorder(null);
 
@@ -177,6 +182,15 @@ public final class TabFeiticosGui extends TabBase implements Serializable {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jSplitPane1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane1PropertyChange
+        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY) ) {
+            String splitHeight = evt.getNewValue().toString();
+            LOG.debug("Split spells pane divisor modified to " + splitHeight + " px.");
+            SettingsManager.getInstance().setConfig("spellsSplitSize", splitHeight);            
+        }
+    }//GEN-LAST:event_jSplitPane1PropertyChange
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox comboFiltro;
     private javax.swing.JLabel jLabel2;

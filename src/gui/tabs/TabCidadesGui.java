@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 import utils.OpenSlotCounter;
 
 /**
@@ -39,7 +40,7 @@ import utils.OpenSlotCounter;
  */
 public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
 
-    private static final Log log = LogFactory.getLog(TabCidadesGui.class);
+    private static final Log LOG = LogFactory.getLog(TabCidadesGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private CidadeControler cidadeControl;
     private final CenarioFacade cenarioFacade = new CenarioFacade();
@@ -94,8 +95,13 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         qtCidades.setText("999");
 
         jSplitPane1.setBorder(null);
-        jSplitPane1.setDividerLocation(200);
+        jSplitPane1.setDividerLocation(SysApoio.parseInt(SettingsManager.getInstance().getConfig("citySplitSize", "200")));
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jSplitPane1PropertyChange(evt);
+            }
+        });
         jSplitPane1.setRightComponent(detalhesCidade);
 
         jScrollPane3.setBorder(null);
@@ -176,6 +182,15 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
             .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jSplitPane1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane1PropertyChange
+        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY) ) {
+            String splitHeight = evt.getNewValue().toString();
+            LOG.debug("Split city pane divisor modified to " + splitHeight + " px.");
+            SettingsManager.getInstance().setConfig("citySplitSize", splitHeight);
+        } 
+    }//GEN-LAST:event_jSplitPane1PropertyChange
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox comboFiltro;
     private javax.swing.JTabbedPane detalhesCidade;

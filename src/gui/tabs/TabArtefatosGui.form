@@ -113,9 +113,14 @@
         </Component>
         <Container class="javax.swing.JSplitPane" name="jSplitPane1">
           <Properties>
-            <Property name="dividerLocation" type="int" value="200"/>
+            <Property name="dividerLocation" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="SysApoio.parseInt(SettingsManager.getInstance().getConfig(&quot;itemsSplitSize&quot;, &quot;200&quot;))" type="code"/>
+            </Property>
             <Property name="orientation" type="int" value="0"/>
           </Properties>
+          <Events>
+            <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="jSplitPane1PropertyChange"/>
+          </Events>
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout"/>
           <SubComponents>

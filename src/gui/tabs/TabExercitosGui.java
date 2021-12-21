@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 
 /**
  *
@@ -30,7 +31,7 @@ import persistenceCommons.SettingsManager;
  */
 public class TabExercitosGui extends TabBase implements Serializable {
 
-    private static final Log log = LogFactory.getLog(TabExercitosGui.class);
+    private static final Log LOG = LogFactory.getLog(TabExercitosGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final ExercitoControler exercitoControl;
 
@@ -135,8 +136,13 @@ public class TabExercitosGui extends TabBase implements Serializable {
         );
 
         jSplitPane2.setBorder(null);
-        jSplitPane2.setDividerLocation(200);
+        jSplitPane2.setDividerLocation(SysApoio.parseInt(SettingsManager.getInstance().getConfig("armySplitSize", "200")));
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane2.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jSplitPane2PropertyChange(evt);
+            }
+        });
 
         jScrollPane3.setBorder(null);
 
@@ -240,6 +246,15 @@ public class TabExercitosGui extends TabBase implements Serializable {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jSplitPane2PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane2PropertyChange
+        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY) ) {
+            String splitHeight = evt.getNewValue().toString();
+            LOG.debug("Split army pane divisor modified to " + splitHeight + " px.");
+            SettingsManager.getInstance().setConfig("armySplitSize", splitHeight);
+        } 
+    }//GEN-LAST:event_jSplitPane2PropertyChange
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox comboFiltro;
     private javax.swing.JLabel jLabel1;

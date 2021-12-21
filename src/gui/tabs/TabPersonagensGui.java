@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 import utils.OpenSlotCounter;
 
 /**
@@ -38,7 +39,7 @@ import utils.OpenSlotCounter;
  */
 public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui {
 
-    private static final Log log = LogFactory.getLog(TabPersonagensGui.class);
+    private static final Log LOG = LogFactory.getLog(TabPersonagensGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private PersonagemControler personagemControl;
     private final PersonagemFacade personagemFacade = new PersonagemFacade();
@@ -125,8 +126,13 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         );
 
         jSplitPane1.setBorder(null);
-        jSplitPane1.setDividerLocation(200);
+        jSplitPane1.setDividerLocation(SysApoio.parseInt(SettingsManager.getInstance().getConfig("charSplitSize", "200")));
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jSplitPane1PropertyChange(evt);
+            }
+        });
 
         jScrollPane3.setBorder(null);
         jScrollPane3.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -233,6 +239,15 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
             .addComponent(jpMaster, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jSplitPane1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane1PropertyChange
+        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY) ) {
+            String splitHeight = evt.getNewValue().toString();
+            LOG.debug("Split character pane divisor modified to " + splitHeight + " px.");
+            SettingsManager.getInstance().setConfig("charSplitSize", splitHeight);
+        } 
+    }//GEN-LAST:event_jSplitPane1PropertyChange
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox comboFiltro;
     private javax.swing.JTabbedPane detalhesPersonagem;
