@@ -112,9 +112,14 @@
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="null"/>
             </Property>
-            <Property name="dividerLocation" type="int" value="200"/>
+            <Property name="dividerLocation" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="SettingsManager.getInstance().getConfigAsInt(&quot;spellsSplitSize&quot;, &quot;200&quot;)" type="code"/>
+            </Property>
             <Property name="orientation" type="int" value="0"/>
           </Properties>
+          <Events>
+            <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="jSplitPane1PropertyChange"/>
+          </Events>
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout"/>
           <SubComponents>

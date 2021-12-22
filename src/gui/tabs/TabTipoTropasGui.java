@@ -28,7 +28,7 @@ import persistenceCommons.SettingsManager;
  */
 public class TabTipoTropasGui extends TabBase {
 
-    private static final Log log = LogFactory.getLog(TabTipoTropasGui.class);
+    private static final Log LOG = LogFactory.getLog(TabTipoTropasGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private TipoTropaControler controler;
 
@@ -107,11 +107,16 @@ public class TabTipoTropasGui extends TabBase {
         );
 
         jSplitPane1.setBorder(null);
-        jSplitPane1.setDividerLocation(200);
+        jSplitPane1.setDividerLocation(SettingsManager.getInstance().getConfigAsInt("troopsSplitSize", "200"));
         jSplitPane1.setDividerSize(3);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane1.setResizeWeight(0.5);
         jSplitPane1.setAutoscrolls(true);
+        jSplitPane1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jSplitPane1PropertyChange(evt);
+            }
+        });
 
         jScrollPane3.setBorder(null);
 
@@ -290,6 +295,15 @@ public class TabTipoTropasGui extends TabBase {
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jSplitPane1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane1PropertyChange
+        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY) ) {
+            String splitHeight = evt.getNewValue().toString();
+            LOG.debug("Split troops pane divisor modified to " + splitHeight + " px.");
+            SettingsManager.getInstance().setConfig("troopsSplitSize", splitHeight);            
+        } 
+    }//GEN-LAST:event_jSplitPane1PropertyChange
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox comboFiltro;
     private javax.swing.JLabel jLabel1;

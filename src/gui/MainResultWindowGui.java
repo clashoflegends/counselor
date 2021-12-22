@@ -6,7 +6,6 @@
 package gui;
 
 import business.ImageManager;
-import business.MapaManager;
 import control.MapaControler;
 import control.WorldControler;
 import control.facade.WorldFacadeCounselor;
@@ -19,22 +18,16 @@ import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.Serializable;
-import java.util.SortedMap;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
-import model.Cenario;
-import model.Local;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
-import radialMenu.mapmenu.MapMenuManager;
-import radialMenu.worldBuilder.WorldBuilderMenuManager;
 
 /**
  *
@@ -42,7 +35,7 @@ import radialMenu.worldBuilder.WorldBuilderMenuManager;
  */
 public class MainResultWindowGui extends javax.swing.JPanel implements Serializable {
 
-    private static final Log log = LogFactory.getLog(MainResultWindowGui.class);
+    private static final Log LOG = LogFactory.getLog(MainResultWindowGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final WorldControler wc = new WorldControler(this);
     private TabPersonagensGui tabPersonagem;
@@ -52,6 +45,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
     /**
      * Creates new form MainResultWindowGui
+     * @param autoLoad 
      */
     public MainResultWindowGui(String autoLoad) {
         this.settingsManager = SettingsManager.getInstance();
@@ -384,6 +378,11 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         splitMainPanel.setAutoscrolls(true);
         splitMainPanel.setMinimumSize(new java.awt.Dimension(0, 0));
         splitMainPanel.setOneTouchExpandable(true);
+        splitMainPanel.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                splitMainPanelPropertyChange(evt);
+            }
+        });
 
         jlLeft.setToolTipText("Open.");
         splitMainPanel.setLeftComponent(jlLeft);
@@ -433,6 +432,16 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
                 .addComponent(statusBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void splitMainPanelPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_splitMainPanelPropertyChange
+        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY) ) {
+            String splitWidth = evt.getNewValue().toString();
+            LOG.debug("Split pane divisor modified to " + splitWidth + " px.");
+            if (Integer.parseInt(splitWidth) > 0)
+                SettingsManager.getInstance().setConfig("splitSize", splitWidth);
+        } 
+    }//GEN-LAST:event_splitMainPanelPropertyChange
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
@@ -474,7 +483,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     // End of variables declaration//GEN-END:variables
 
     public void iniciaConfig() {
-        log.info(labels.getString("INICIALIZANDO.GUI"));
+        LOG.info(labels.getString("INICIALIZANDO.GUI"));
         //infopanel
         this.labelCenario.setText(String.format("%s: %s", labels.getString("CENARIO"), wc.getCenarioNome()));
         if (wc.isGameOver()) {
@@ -559,7 +568,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         // divide a janela ao meio = -1
         //        this.splitMainPanel.setDividerLocation(55555);
         int splitWid = SysApoio.parseInt(SettingsManager.getInstance().getConfig("splitSize", "660"));
-        this.splitMainPanel.setDividerLocation(splitWid);
+        this.splitMainPanel.setDividerLocation(splitWid);        
         doMinimizeMap();
     }
 
@@ -672,6 +681,10 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
     public JToggleButton getDisplayPortraits() {
         return this.toggleDisplayPortrait;
+    }
+    
+    public void setSplitPaneValue(int value) {
+        this.splitMainPanel.setDividerLocation(value);
     }
         
 }

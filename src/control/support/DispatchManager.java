@@ -49,6 +49,7 @@ public class DispatchManager implements Serializable {
     public static final int WINDOWS_CLOSING = 17;
     public static final int WINDOWS_MAXIMIZING = 18;
     public static final int WINDOWS_MINIMIZING = 19;
+    public static final int SPLIT_PANE_CHANGED = 20;
 
     private DispatchManager() {
     }
