@@ -65,7 +65,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     private MainMapaGui tabGui;
     private DialogTextArea hexInfo;
     private Local localAtual;
-    private final List<JTable> tables = new ArrayList<JTable>();
+    private final List<JTable> tables = new ArrayList<>();
     private RadialMenu rmActive;
     private MapMenuManager mapMenuManager;
     private DialogHexView hexView;
@@ -75,7 +75,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         initialize(form);
     }
 
-    public void initialize(JPanel form) {
+    public final void initialize(JPanel form) {
         this.jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
         listFactory = new ListFactory();
         exercitoFacade = new ExercitoFacade();
