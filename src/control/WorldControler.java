@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.imageio.ImageIO;
-import javax.mail.internet.AddressException;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -70,7 +69,6 @@ import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.PersistenceException;
 import persistenceCommons.SettingsManager;
-import persistenceCommons.SmtpManager;
 import persistenceCommons.SysApoio;
 import persistenceCommons.WebCounselorManager;
 import persistenceCommons.XmlManager;
@@ -446,19 +444,13 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
         /*
          * Try to post
-         * if fail, hen try to email
          * if fail, then alternate message
          */
         this.getGui().setStatusMsg(labels.getString("ENVIAR.POST.JUDGE"));
-        if (!SettingsManager.getInstance().getConfig("SendOrderWebPopUp", "1").equals("1")) {
-            doSendViaEmail(attachment, labels.getString("ENVIAR.FAILREASON.PROPERTYSET"));
-        } else if (!doSendPost(attachment)) {
-            //try to send via email
-            final String lastResponse = WebCounselorManager.getInstance().getLastResponseString();
-            doSendViaEmail(attachment, lastResponse);
-        } else {
-            //fail msg displayed by doSendViaEmail
-            //nao deu post nem email
+        if (!doSendPost(attachment)) {
+            //nao deu post 
+            this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO"));
+            SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), this.getGui());
         }
     }
 
@@ -688,7 +680,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private String listaOrdensBySequence() {
         String ret = labels.getString("TITLE.LIST.BYSEQ") + ":\n";
         Jogador jogadorAtivo = WFC.getJogadorAtivo();
-        SortedMap<Integer, List<PersonagemOrdem>> ordens = new TreeMap<Integer, List<PersonagemOrdem>>();
+        SortedMap<Integer, List<PersonagemOrdem>> ordens = new TreeMap<>();
         //list all actions from all actors
         for (BaseModel actor : WFC.getActors()) {
             if (jogadorAtivo.isNacao(actor.getNacao())) {
@@ -696,7 +688,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     if (po != null) {
                         List<PersonagemOrdem> lista = ordens.get(po.getOrdem().getNumero());
                         if (lista == null) {
-                            lista = new ArrayList<PersonagemOrdem>();
+                            lista = new ArrayList<>();
                         }
                         lista.add(po);
                         ordens.put(po.getOrdem().getNumero(), lista);
@@ -790,7 +782,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 throw new IllegalStateException(labels.getString("TURNO.ERRADO") + file.getName());
             }
             final int qtPackageCarregadas = this.setPackage(comando.getPackages());
-            List<String> errorMsgs = new ArrayList<String>();
+            List<String> errorMsgs = new ArrayList<>();
             int qtOrdensCarregadas = this.setOrdens(comando, errorMsgs);
             this.getGui().setStatusMsg(String.format("%d %s %s", qtOrdensCarregadas, labels.getString("ORDENS.CARREGADAS"), file.getName()));
             doCountActions();
@@ -804,7 +796,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             }
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_COUNT);
-        } catch (IllegalStateException ex) {
+        } catch (IllegalStateException | PersistenceException ex) {
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             log.info(ex.getMessage());
@@ -812,10 +804,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             SysApoio.showDialogError(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName(), this.getGui());
             this.getGui().setStatusMsg(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName());
             log.error(ex.getMessage());
-        } catch (PersistenceException ex) {
-            SysApoio.showDialogError(ex.getMessage(), this.getGui());
-            this.getGui().setStatusMsg(ex.getMessage());
-            log.info(ex.getMessage());
         }
     }
 
@@ -941,17 +929,24 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     @Override
     public void receiveDispatch(int msgName, String msg) {
-        if (msgName == DispatchManager.SET_LABEL_MONEY) {
-            final Nacao nacao = WFC.getNacao(msg);
-            int actionCost = WFC.getNacaoOrderCost(nacao);
-            final String labelActionsCost = String.format(labels.getString("MENU.ACTION.COST"), nacaoFacade.getNome(nacao), actionCost);
-            getGui().setLabelMoney(labelActionsCost);
-        } else if (msgName == DispatchManager.STATUS_BAR_MSG) {
-            getGui().setStatusMsg(msg);
-        } else if (msgName == DispatchManager.SWITCH_PORTRAIT_PANEL) {
-            gui.getDisplayPortraits().setSelected(msg.equals("1"));
-        } else if (msgName == DispatchManager.SPLIT_PANE_CHANGED) {
-            gui.setSplitPaneValue(Integer.parseInt(msg));
+        switch (msgName) {
+            case DispatchManager.SET_LABEL_MONEY:
+                final Nacao nacao = WFC.getNacao(msg);
+                int actionCost = WFC.getNacaoOrderCost(nacao);
+                final String labelActionsCost = String.format(labels.getString("MENU.ACTION.COST"), nacaoFacade.getNome(nacao), actionCost);
+                getGui().setLabelMoney(labelActionsCost);
+                break;
+            case DispatchManager.STATUS_BAR_MSG:
+                getGui().setStatusMsg(msg);
+                break;
+            case DispatchManager.SWITCH_PORTRAIT_PANEL:
+                gui.getDisplayPortraits().setSelected(msg.equals("1"));
+                break;
+            case DispatchManager.SPLIT_PANE_CHANGED:
+                gui.setSplitPaneValue(Integer.parseInt(msg));
+                break;
+            default:
+                break;
         }
     }
 
@@ -1038,7 +1033,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private List<Habilidade> getPackages(Nacao nacao) {
-        List<Habilidade> ret = new ArrayList<Habilidade>();
+        List<Habilidade> ret = new ArrayList<>();
         for (Habilidade habilidade : nacao.getHabilidades().values()) {
             try {
                 if (habilidade.isPackage()) {
@@ -1066,7 +1061,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private void clearPackages(Nacao nacao) {
-        final List<Habilidade> list = new ArrayList<Habilidade>();
+        final List<Habilidade> list = new ArrayList<>();
         list.addAll(nacao.getHabilidades().values());
         for (Habilidade habilidade : list) {
             if (habilidade.isPackage()) {
@@ -1125,68 +1120,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         info.setPlayerLogin(jogador.getLogin());
         info.setPlayerEmail(jogador.getEmail());
         return info;
-    }
-
-    private boolean doSendViaEmail(File attachment, String msg) {
-        /* prepara o email, pede informacoes se properties
-         * nao estao preenchidas salva novas informacoes no properties !
-         * pergunta se quer receber uma copia? ! 
-         * envia o email e avisa do recibo.
-         */
-        this.getGui().setStatusMsg(labels.getString("ENVIAR.JUDGE"));
-        final String from = getEmail();
-        if (from.equals("none")) {
-            return false;
-        }
-        try {
-            SmtpManager email = new SmtpManager();
-            email.addToCc(from);
-            email.setFrom(from);
-            email.setBody(listaOrdensEmailBody(msg));
-            String subject;
-            try {
-                subject = String.format("[Orders] %s - %s (%s) [%s]",
-                        WorldManager.getInstance().getPartida().getCodigo(),
-                        WorldManager.getInstance().getPartida().getJogadorAtivo().getLogin(),
-                        attachment.getName(), SysApoio.nowTimestamp());
-            } catch (NullPointerException e) {
-                subject = String.format("[Orders] NULL (%s) [%s]",
-                        attachment.getName(), SysApoio.nowTimestamp());
-            }
-            email.setSubject(subject);
-            email.addAttachment(attachment);
-            if (email.sendCounselor()) {
-                this.getGui().setStatusMsg(String.format(labels.getString("ENVIAR.DONE"), attachment.getName()));
-                return true;
-            } else {
-                this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO"));
-                SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), this.getGui());
-                return false;
-            }
-        } catch (PersistenceException ex) {
-            this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO") + " => " + ex.getMessage());
-            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), this.getGui());
-            return false;
-        } catch (AddressException ex) {
-            this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO.MALFORMED") + " => " + ex.getMessage());
-            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO.MALFORMED"), this.getGui());
-            return false;
-        }
-    }
-
-    private String getEmail() {
-        String from = SettingsManager.getInstance().getConfig("MyEmail", "none");
-        if (from.equals("none")) {
-            from = JOptionPane.showInputDialog(labels.getString("ENVIAR.INPUT.EMAIL"), from);
-            if (from == null || from.equals("none")) {
-                this.getGui().setStatusMsg(labels.getString("ENVIAR.FALTOU.FROM"));
-                SysApoio.showDialogError(labels.getString("ENVIAR.FALTOU.FROM"), this.getGui());
-                return "none";
-            }
-            //salva novas informacoes no properties
-            SettingsManager.getInstance().setConfigAndSaveToFile("MyEmail", from);
-        }
-        return from;
     }
 
     private boolean isLoadTeamOrders() {
