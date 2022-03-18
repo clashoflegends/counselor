@@ -102,7 +102,7 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
         for (int ii = 0; ii < cbmTemp.getSize(); ii++) {
             final GenericoComboObject temp = (GenericoComboObject) cbmTemp.getElementAt(ii);
             final TipoTropa tpTropa = (TipoTropa) temp.getObject();
-            final List<TipoTropa> tropas = new ArrayList<TipoTropa>(2);
+            final List<TipoTropa> tropas = new ArrayList<>(2);
             tropas.add(tpTropa);
             final int current = ef.getCustoMovimentoBase(tropas, origem.getTerreno(), false, isAgua());
             if (current > slow) {
@@ -367,7 +367,7 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
     }
 
     public void doApaga() {
-        this.direcoesId = new ArrayList<String>();
+        this.direcoesId = new ArrayList<>();
         this.setDirecaoDisplay("");
         this.destino = this.origem;
         this.getMapaControler().remMovementTag();
@@ -385,7 +385,7 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
                 MovimentoExercito movEx = new MovimentoExercito();
                 movEx.setEvasivo(jrbEvasivo.isSelected());
                 if (!isAll()) {
-                    List<TipoTropa> list = new ArrayList<TipoTropa>();
+                    List<TipoTropa> list = new ArrayList<>();
                     GenericoComboBoxModel model = getTropaModel();
                     for (GenericoComboObject gco : model.getElementAll()) {
                         list.add((TipoTropa) gco.getObject());
@@ -426,7 +426,7 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
     }
 
     private void doMovementTagsPaint(String vlInicial) {
-        final List<String> directions = new ArrayList<String>();
+        final List<String> directions = new ArrayList<>();
         directions.addAll(ConverterFactory.armyPathToList(vlInicial));
         for (String elem : directions) {
             this.doMovementTagAdd(elem);
