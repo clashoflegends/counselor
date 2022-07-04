@@ -23,6 +23,7 @@ import model.ActorAction;
 import model.Artefato;
 import model.Cenario;
 import model.Feitico;
+import model.Habilidade;
 import model.Jogador;
 import model.Local;
 import model.Nacao;
@@ -57,7 +58,7 @@ public class PersonagemConverter implements Serializable {
     private static final ListFactory listFactory = new ListFactory();
 
     public static GenericoTableModel getPersonagemModel(List<Personagem> lista) {
-        List<Class> classes = new ArrayList<Class>(30);
+        List<Class> classes = new ArrayList<>(30);
         GenericoTableModel model = new GenericoTableModel(
                 getPersonagemColNames(classes),
                 getPersonagemAsArray(lista),
@@ -67,7 +68,7 @@ public class PersonagemConverter implements Serializable {
 
     private static String[] getPersonagemColNames(List<Class> classes) {
         int qtOrdens = WorldFacadeCounselor.getInstance().getOrdensQtMax();
-        List<String> colNames = new ArrayList<String>(30);
+        List<String> colNames = new ArrayList<>(30);
         colNames.add(labels.getString("NOME"));
         classes.add(java.lang.String.class);
         if (SettingsManager.getInstance().isConfig("CharOpenSlotColumn", "1", "0")) {
@@ -508,6 +509,7 @@ public class PersonagemConverter implements Serializable {
     public static String getPericias(Personagem personagem) {
         String mask1 = "   %s %d(%d)\n";
         String mask2 = "   %s %d\n";
+        String mask3 = "   %s\n";
         Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         String ret = String.format(labels.getString("PERSONAGEM.HAS.SKILLS"), personagem.getNome()) + "\n";
         if (personagem.getPericiaAgenteNatural() > 0) {
@@ -591,6 +593,15 @@ public class PersonagemConverter implements Serializable {
             ret += String.format(mask2,
                     labels.getString("DUELO"),
                     personagem.getDuelo());
+        }
+        //if there are special habilities, add title for section then list them
+        boolean title = true;
+        for (Habilidade hab : personagemFacade.getHabilidades(personagem)) {
+            if (title) {
+                ret += "\n" + String.format(labels.getString("PERSONAGEM.HAS.POWERS"), personagem.getNome()) + "\n";
+                title = false;
+            }
+            ret += String.format(mask3, hab.getNome());
         }
         return ret;
     }
