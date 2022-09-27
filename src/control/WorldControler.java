@@ -13,6 +13,7 @@ import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
 import business.facade.PersonagemFacade;
 import control.facade.WorldFacadeCounselor;
+import control.services.NacaoConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
@@ -37,8 +38,10 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -127,6 +130,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doMapSave(jbTemp);
             } else if ("jbCopy".equals(jbTemp.getActionCommand())) {
                 doCopy();
+            } else if ("jbEmailList".equals(jbTemp.getActionCommand())) {
+                doEmailList();
             } else if ("jbSend".equals(jbTemp.getActionCommand())) {
                 doSend(jbTemp);
             } else if ("jbScoreGraph".equals(jbTemp.getActionCommand())) {
@@ -389,7 +394,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     /**
-     * Transictional method for development porpuse. Must be deleted after new methods in SettingsManager would be implemented.
+     * Transitional method for development purpose. Must be deleted after new methods in SettingsManager would be implemented.
      *
      * @param props
      * @return * private Map<String, String> getMapProperties(SettingsManager settingsManager) { Map<String, String> mapProperties = new
@@ -414,7 +419,35 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             JScrollPane jsp = new javax.swing.JScrollPane(jtaResultado);
             //configura jDialog
             JDialog dAbout = new JDialog(new JFrame(), true);
-            dAbout.setTitle(labels.getString("MENU.ABOUT"));
+            dAbout.setTitle(labels.getString("COPIAR.ACOES"));
+            dAbout.setAlwaysOnTop(true);
+            dAbout.setPreferredSize(new Dimension(600, 400));
+            dAbout.add(jsp);
+            dAbout.setLocationRelativeTo(this.getGui());
+            dAbout.pack();
+            dAbout.setVisible(true);
+        }
+    }
+
+    private void doEmailList() throws HeadlessException {
+        //config text Area
+        JTextArea jtaResultado = new javax.swing.JTextArea(80, 20);
+        jtaResultado.setLineWrap(false);
+        jtaResultado.setWrapStyleWord(false);
+        jtaResultado.setEditable(false);
+        //carrega o texto
+        jtaResultado.setText(listaEmails());
+        //copy para o clipboard
+        jtaResultado.selectAll();
+        jtaResultado.copy();
+        this.getGui().setStatusMsg(labels.getString("COPIAR.EMAILS.STATUS"));
+        jtaResultado.select(0, 0);
+        if (SettingsManager.getInstance().getConfig("CopyEmailListPopUp", "1").equals("1")) {
+            //scroll pane
+            JScrollPane jsp = new javax.swing.JScrollPane(jtaResultado);
+            //configura jDialog
+            JDialog dAbout = new JDialog(new JFrame(), true);
+            dAbout.setTitle(labels.getString("COPIAR.EMAILS"));
             dAbout.setAlwaysOnTop(true);
             dAbout.setPreferredSize(new Dimension(600, 400));
             dAbout.add(jsp);
@@ -550,6 +583,24 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 labels.getString("ENVIAR.FAILREASON.TITLE"),
                 msg);
         ret += listaOrdens();
+        return ret;
+    }
+
+    private String listaEmails() {
+        Set<String> emailList = new TreeSet<>();
+        //find allied nations
+        List<Nacao> nationList = NacaoConverter.listaByFiltro("team");
+        for (Nacao nation : nationList) {
+            if (nation.getOwner().isNpc()) {
+                continue;
+            }
+            emailList.add(nation.getOwner().getEmail());
+        }
+        //format return String
+        String ret = "";
+        for (String address : emailList) {
+            ret += String.format("%s\n", address);
+        }
         return ret;
     }
 

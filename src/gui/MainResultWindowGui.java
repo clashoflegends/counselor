@@ -62,6 +62,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbSaveWorld.addActionListener(wc);
         jbMap.addActionListener(wc);
         jbCopy.addActionListener(wc);
+        jbEmailList.addActionListener(wc);
         jbSend.addActionListener(wc);
         jbAbout.addActionListener(wc);
         jbScoreGraph.addActionListener(wc);
@@ -101,6 +102,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         jbSaveWorld = new javax.swing.JButton();
         jbCopy = new javax.swing.JButton();
+        jbEmailList = new javax.swing.JButton();
         jbMap = new javax.swing.JButton();
         jbScoreGraph = new javax.swing.JButton();
         jbScoreGraph2 = new javax.swing.JButton();
@@ -208,6 +210,16 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbCopy.setFocusable(false);
         jbCopy.setName("jbCopy"); // NOI18N
         jToolBar1.add(jbCopy);
+
+        jbEmailList.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/email.png"))); // NOI18N
+        jbEmailList.setToolTipText(labels.getString("COPIAR.EMAILS.TOOLTIP")); // NOI18N
+        jbEmailList.setActionCommand("jbEmailList");
+        jbEmailList.setEnabled(false);
+        jbEmailList.setFocusable(false);
+        jbEmailList.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbEmailList.setName("jbEmailList"); // NOI18N
+        jbEmailList.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jbEmailList);
 
         jbMap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save map.png"))); // NOI18N
         jbMap.setText(labels.getString("SALVAR.MAPA")); // NOI18N
@@ -452,6 +464,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JButton jbAbout;
     private javax.swing.JButton jbConfigs;
     private javax.swing.JButton jbCopy;
+    private javax.swing.JButton jbEmailList;
     private javax.swing.JButton jbHexview;
     private javax.swing.JButton jbLoad;
     private javax.swing.JButton jbMap;
@@ -553,6 +566,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph2.setEnabled(wc.isVictoryPointsExists());
         jbHexview.setEnabled(true);
         jbCopy.setEnabled(true);
+        jbEmailList.setEnabled(true);
         jbSend.setEnabled(true);
         jbAbout.setEnabled(true);
         jbHexview.setEnabled(true);
