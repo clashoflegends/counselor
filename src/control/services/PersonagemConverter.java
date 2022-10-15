@@ -102,7 +102,7 @@ public class PersonagemConverter implements Serializable {
         colNames.add(labels.getString("DUELO"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("VITALIDADE"));
-        classes.add(java.lang.Integer.class);
+        classes.add(java.lang.Integer.class); //paint it red when low
         colNames.add(labels.getString("NACAO"));
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("CUSTO.MANUTENCAO"));

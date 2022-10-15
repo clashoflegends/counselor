@@ -17,16 +17,18 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jmoura
  */
-public class LimitTableCellRenderer extends DefaultTableCellRenderer implements Serializable {
+public class LifeTableCellRenderer extends DefaultTableCellRenderer implements Serializable {
 
-    private static final Log log = LogFactory.getLog(LimitTableCellRenderer.class);
+    private static final Log log = LogFactory.getLog(LifeTableCellRenderer.class);
     private final Color colorBgSelected = new Color(46, 106, 197), colorBgNotSelected = Color.WHITE;
     private final Color colorFgSelected = Color.WHITE, colorFgNotSelected = Color.BLACK;
-    private int limit = 0;
+    private int limitRed = 20;
+    private int limitAmber = 60;
 
-    public LimitTableCellRenderer(int limit) {
+    public LifeTableCellRenderer(int limitRed, int limitAmber) {
         super();
-        this.limit = limit;
+        this.limitRed = limitRed;
+        this.limitAmber = limitAmber;
     }
 
     @Override
@@ -43,11 +45,13 @@ public class LimitTableCellRenderer extends DefaultTableCellRenderer implements 
             current = 0;
             log.error("LimitTableCellRenderer = " + value);
         }
-        if (current <= limit && isSelected) {
+        if (current > limitAmber && isSelected) {
             c.setBackground(colorBgSelected);
             c.setForeground(colorFgSelected);
-        } else if (current > limit) {
+        } else if (current <= limitRed) {
             c.setBackground(Color.RED);
+        } else if (current <= limitAmber) {
+            c.setBackground(Color.ORANGE);
         } else {
             c.setBackground(colorBgNotSelected);
             c.setForeground(colorFgNotSelected);
