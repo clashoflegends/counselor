@@ -57,7 +57,7 @@ public class CidadeConverter implements Serializable {
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
     public static GenericoTableModel getCidadeModel(List lista) {
-        List<Class> classes = new ArrayList<Class>(30);
+        List<Class> classes = new ArrayList<>(30);
         GenericoTableModel cidadeModel = new GenericoTableModel(
                 getCidadeColNames(classes),
                 getCidadesAsArray(lista),
@@ -66,7 +66,7 @@ public class CidadeConverter implements Serializable {
     }
 
     private static String[] getCidadeColNames(List<Class> classes) {
-        List<String> colNames = new ArrayList<String>(30);
+        List<String> colNames = new ArrayList<>(30);
         colNames.add(labels.getString("NOME"));
         classes.add(java.lang.String.class);
         if (WorldFacadeCounselor.getInstance().hasOrdensCidade()) {
@@ -493,7 +493,7 @@ public class CidadeConverter implements Serializable {
     }
 
     private static List<Produto> getResourceList() {
-        List<Produto> list = new ArrayList<Produto>();
+        List<Produto> list = new ArrayList<>();
         list.addAll(WorldFacadeCounselor.getInstance().getCenario().getProdutos().values());
         list.remove(WorldFacadeCounselor.getInstance().getCenario().getMoney());
         return list;
