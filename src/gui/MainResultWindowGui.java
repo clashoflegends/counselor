@@ -74,6 +74,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathPj.addActionListener(wc);
         togglePathPjFuture.addActionListener(wc);
         toggleFogWar.addActionListener(wc);
+        toggleScouts.addActionListener(wc);
         togglePathArmy.addActionListener(wc);
         toggleDisplayPortrait.addActionListener(wc);
         wc.doAutoLoad(autoLoad);
@@ -288,7 +289,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
         togglePathArmy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_path_army.png"))); // NOI18N
         togglePathArmy.setSelected(true);
-        togglePathArmy.setToolTipText(bundle.getString("SETTINGS.MAP.ARMYPATH.ARMY")); // NOI18N
+        togglePathArmy.setToolTipText(bundle.getString("SETTINGS.MAP.ARMYPATH.TOOLTIP")); // NOI18N
         togglePathArmy.setActionCommand("drawPathArmy");
         togglePathArmy.setEnabled(false);
         togglePathArmy.setFocusable(false);
@@ -308,13 +309,14 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
         toggleScouts.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_fog.png"))); // NOI18N
         toggleScouts.setSelected(isFogOfWarSelected());
-        toggleScouts.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.FOGOFWAR")); // NOI18N
-        toggleScouts.setActionCommand("drawFogWar");
+        toggleScouts.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SCOUT.TOOLTIP")); // NOI18N
+        toggleScouts.setActionCommand("drawScoutTargets");
         toggleScouts.setEnabled(false);
         toggleScouts.setFocusable(false);
         toggleScouts.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         toggleScouts.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar2.add(toggleScouts);
+        toggleScouts.getAccessibleContext().setAccessibleDescription("Enable scouts on map");
 
         toggleDisplayPortrait.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/display_portrait.png"))); // NOI18N
         toggleDisplayPortrait.setSelected(isDisplayPortraitsSelected());
@@ -590,6 +592,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathPjFuture.setEnabled(true);
         togglePathArmy.setEnabled(true);
         toggleFogWar.setEnabled(true);
+        toggleScouts.setEnabled(true);
         toggleDisplayPortrait.setEnabled(true);
 
         // Joga a janela toda para a esquerda = 0
@@ -684,10 +687,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
     public JToggleButton getPcPath() {
         return this.togglePathPj;
-    }
-
-    public JToggleButton getArmyPath() {
-        return this.togglePathArmy;
     }
 
     public boolean isPcPathFutureSelected() {

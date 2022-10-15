@@ -119,59 +119,93 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     public void actionPerformed(ActionEvent actionEvent) {
         if (actionEvent.getSource() instanceof JButton) {
             JButton jbTemp = (JButton) actionEvent.getSource();
-            //monta csv com as ordens
-            if ("jbOpen".equals(jbTemp.getActionCommand())) {
-                doOpen(jbTemp);
-            } else if ("jbSave".equals(jbTemp.getActionCommand())) {
-                doSave(jbTemp, false);
-            } else if ("jbSaveWorld".equals(jbTemp.getActionCommand())) {
-                doSaveWorld(jbTemp);
-            } else if ("jbExportMap".equals(jbTemp.getActionCommand())) {
-                doMapSave(jbTemp);
-            } else if ("jbCopy".equals(jbTemp.getActionCommand())) {
-                doCopy();
-            } else if ("jbEmailList".equals(jbTemp.getActionCommand())) {
-                doEmailList();
-            } else if ("jbSend".equals(jbTemp.getActionCommand())) {
-                doSend(jbTemp);
-            } else if ("jbScoreGraph".equals(jbTemp.getActionCommand())) {
-                doGraphScore();
-            } else if ("jbGraphSingleTurn".equals(jbTemp.getActionCommand())) {
-                doGraphSingleTurn();
-            } else if ("jbGraphAllTurns".equals(jbTemp.getActionCommand())) {
-                doGraphAllTurns();
-            } else if ("jbAbout".equals(jbTemp.getActionCommand())) {
-                doAbout();
-            } else if ("jbHexview".equals(jbTemp.getActionCommand())) {
-                doHexview();
-            } else if ("jbConfig".equals(jbTemp.getActionCommand())) {
-                doConfig();
-            } else if ("jbLoad".equals(jbTemp.getActionCommand())) {
-                doLoad(jbTemp);
-            } else {
-                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
-            }
+            doActionPerformendButtom(jbTemp);
         } else if (actionEvent.getSource() instanceof JToggleButton) {
             JToggleButton jbTemp = (JToggleButton) actionEvent.getSource();
-            if (("pcPathDraw").equals(jbTemp.getActionCommand())) {
-                doDrawPjPaths();
-            } else if ("drawPathArmy".equals(jbTemp.getActionCommand())) {
-                doDrawArmyPaths();
-            } else if ("drawFogWar".equals(jbTemp.getActionCommand())) {
-                doDrawFogOfWar(jbTemp);
-            } else if ("drawDisplayPortraits".equals(jbTemp.getActionCommand())) {
-                DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
-                if (!displayPortraitsManager.isShowPortraitEnableable()) {
-                    progressMonitor = new ProgressMonitor(gui, "Downloading file...", "", 0, 100);
-                    progressMonitor.setProgress(0);
-                    displayPortraitsManager.downloadPortraits(gui, this);
-                }
-                doDisplayPortraits(jbTemp);
-            } else {
-                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
-            }
+            doActionPerformedToggle(jbTemp);
         } else {
             log.info(labels.getString("OPS.GENERAL.EVENT"));
+        }
+    }
+
+    private void doActionPerformedToggle(JToggleButton jbTemp) {
+        if (null == jbTemp.getActionCommand()) {
+            log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+            return;
+        }
+        switch (jbTemp.getActionCommand()) {
+            case "pcPathDraw":
+                doDrawPjPaths();
+                break;
+            case "drawPathArmy":
+                doDrawArmyPaths(jbTemp);
+                break;
+            case "drawScoutTargets":
+                doScoutTargets(jbTemp);
+                break;
+            case "drawFogWar":
+                doDrawFogOfWar(jbTemp);
+                break;
+            case "drawDisplayPortraits":
+                doPortraits(jbTemp);
+                break;
+            default:
+                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+                break;
+        }
+    }
+
+    private void doActionPerformendButtom(JButton jbTemp) throws HeadlessException {
+        if (null == jbTemp.getActionCommand()) {
+            log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+        }
+        //monta csv com as ordens
+        switch (jbTemp.getActionCommand()) {
+            case "jbOpen":
+                doOpen(jbTemp);
+                break;
+            case "jbSave":
+                doSave(jbTemp, false);
+                break;
+            case "jbSaveWorld":
+                doSaveWorld(jbTemp);
+                break;
+            case "jbExportMap":
+                doMapSave(jbTemp);
+                break;
+            case "jbCopy":
+                doCopy();
+                break;
+            case "jbEmailList":
+                doEmailList();
+                break;
+            case "jbSend":
+                doSend(jbTemp);
+                break;
+            case "jbScoreGraph":
+                doGraphScore();
+                break;
+            case "jbGraphSingleTurn":
+                doGraphSingleTurn();
+                break;
+            case "jbGraphAllTurns":
+                doGraphAllTurns();
+                break;
+            case "jbAbout":
+                doAbout();
+                break;
+            case "jbHexview":
+                doHexview();
+                break;
+            case "jbConfig":
+                doConfig();
+                break;
+            case "jbLoad":
+                doLoad(jbTemp);
+                break;
+            default:
+                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+                break;
         }
     }
 
@@ -1211,10 +1245,18 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
 
-    private void doDrawArmyPaths() {
-        int settingValue = gui.getArmyPath().isSelected() ? 1 : 0;
+    private void doDrawArmyPaths(JToggleButton jbTemp) {
+        int settingValue = jbTemp.isSelected() ? 1 : 0;
         SettingsManager.getInstance().setConfig("drawArmyMovPath", String.valueOf(settingValue));
         SettingsManager.getInstance().doConfigSave("drawArmyMovPath");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
+
+    private void doScoutTargets(JToggleButton jbTemp) {
+        int settingValue = jbTemp.isSelected() ? 1 : 0;
+        SettingsManager.getInstance().setConfig("drawScoutOnMap", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("drawScoutOnMap");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
@@ -1226,6 +1268,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
 
+    }
+
+    private void doPortraits(JToggleButton button) {
+        DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
+        if (!displayPortraitsManager.isShowPortraitEnableable()) {
+            progressMonitor = new ProgressMonitor(gui, "Downloading file...", "", 0, 100);
+            progressMonitor.setProgress(0);
+            displayPortraitsManager.downloadPortraits(gui, this);
+        }
+        doDisplayPortraits(button);
     }
 
     private int calculateDrawPcPathValue(int pcPath, int pcPathFuture) {

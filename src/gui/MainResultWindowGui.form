@@ -427,7 +427,7 @@
                     </Property>
                     <Property name="selected" type="boolean" value="true"/>
                     <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="labels.properties" key="SETTINGS.MAP.ARMYPATH.ARMY" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="labels.properties" key="SETTINGS.MAP.ARMYPATH.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="actionCommand" type="java.lang.String" value="drawPathArmy"/>
                     <Property name="enabled" type="boolean" value="false"/>
@@ -463,14 +463,17 @@
                       <Connection code="isFogOfWarSelected()" type="code"/>
                     </Property>
                     <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="labels.properties" key="SETTINGS.DISPLAY.FILTER.FOGOFWAR" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="labels.properties" key="SETTINGS.DISPLAY.FILTER.SCOUT.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
-                    <Property name="actionCommand" type="java.lang.String" value="drawFogWar"/>
+                    <Property name="actionCommand" type="java.lang.String" value="drawScoutTargets"/>
                     <Property name="enabled" type="boolean" value="false"/>
                     <Property name="focusable" type="boolean" value="false"/>
                     <Property name="horizontalTextPosition" type="int" value="0"/>
                     <Property name="verticalTextPosition" type="int" value="3"/>
                   </Properties>
+                  <AccessibilityProperties>
+                    <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value="Enable scouts on map"/>
+                  </AccessibilityProperties>
                 </Component>
                 <Component class="javax.swing.JToggleButton" name="toggleDisplayPortrait">
                   <Properties>
