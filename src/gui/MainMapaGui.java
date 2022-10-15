@@ -255,14 +255,19 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     public void setTag() {
         final String tagStyle = SettingsManager.getInstance().getConfig("HexTagStyle", "0");
         //prepara tag, chamar depois do printMapaGeral, pois ele carrega todas as imagens.
-        if (tagStyle.equals("1")) {
-            setTagLabel(drawTagStyle0());
-        } else if (tagStyle.equals("2")) {
-            setTagLabel(drawTagStyle2());
-        } else if (tagStyle.equals("3")) {
-            setTagLabel(drawTagStyle3());
-        } else {
-            setTagLabel(drawTagStyleDefault());
+        switch (tagStyle) {
+            case "1":
+                setTagLabel(drawTagStyle0());
+                break;
+            case "2":
+                setTagLabel(drawTagStyle2());
+                break;
+            case "3":
+                setTagLabel(drawTagStyle3());
+                break;
+            default:
+                setTagLabel(drawTagStyleDefault());
+                break;
         }
         getJlTag().setOpaque(false);
         if (SettingsManager.getInstance().getConfig("HexTagFrame", "0").equals("1")) {

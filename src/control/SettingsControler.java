@@ -171,7 +171,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
         } else if (actionCommand.equals("FogOfWar")) {
             JCheckBox fogOfWar = (JCheckBox) e.getSource();
             int selected = (fogOfWar.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("FogOfWarType", String.valueOf(selected));
+            SettingsManager.getInstance().setConfig("fogOfWarType", String.valueOf(selected));
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         } else if (actionCommand.equals("LoadActionsOtherNations")) {
             JCheckBox loadActionsOtherNations = (JCheckBox) e.getSource();

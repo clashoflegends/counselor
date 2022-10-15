@@ -43,7 +43,7 @@ public class LifeTableCellRenderer extends DefaultTableCellRenderer implements S
             }
         } catch (ClassCastException e) {
             current = 0;
-            log.error("LimitTableCellRenderer = " + value);
+            log.error("bad value in LifeTableCellRenderer = " + value);
         }
         if (current > limitAmber && isSelected) {
             c.setBackground(colorBgSelected);

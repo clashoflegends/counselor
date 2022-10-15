@@ -155,28 +155,21 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             JToggleButton jbTemp = (JToggleButton) actionEvent.getSource();
             if (("pcPathDraw").equals(jbTemp.getActionCommand())) {
                 doDrawPjPaths();
-
             } else if ("drawPathArmy".equals(jbTemp.getActionCommand())) {
-                //TODO 
-
+                doDrawArmyPaths();
             } else if ("drawFogWar".equals(jbTemp.getActionCommand())) {
                 doDrawFogOfWar(jbTemp);
-
             } else if ("drawDisplayPortraits".equals(jbTemp.getActionCommand())) {
-
                 DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
                 if (!displayPortraitsManager.isShowPortraitEnableable()) {
                     progressMonitor = new ProgressMonitor(gui, "Downloading file...", "", 0, 100);
                     progressMonitor.setProgress(0);
                     displayPortraitsManager.downloadPortraits(gui, this);
                 }
-
                 doDisplayPortraits(jbTemp);
-
             } else {
                 log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
             }
-
         } else {
             log.info(labels.getString("OPS.GENERAL.EVENT"));
         }
@@ -1216,13 +1209,20 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         SettingsManager.getInstance().doConfigSave("drawPcPath");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
 
+    private void doDrawArmyPaths() {
+        int settingValue = gui.getArmyPath().isSelected() ? 1 : 0;
+        SettingsManager.getInstance().setConfig("drawArmyMovPath", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("drawArmyMovPath");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
 
     private void doDrawFogOfWar(JToggleButton button) {
         int settingValue = button.isSelected() ? 1 : 0;
-        SettingsManager.getInstance().setConfig("FogOfWarType", String.valueOf(settingValue));
-        SettingsManager.getInstance().doConfigSave("FogOfWarType");
+        SettingsManager.getInstance().setConfig("fogOfWarType", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("fogOfWarType");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
 

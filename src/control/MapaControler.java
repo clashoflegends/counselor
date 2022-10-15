@@ -99,11 +99,9 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         mapMenuManager.setNacoes(listFactory.listNacoes());
         mapMenuManager.setTerrenos(cenario.getTerrenos());
         rmActive = getMapMenuManager().getMainMenu();
-        
-        
-        
+
     }
-    
+
     private ImageIcon printActionsOnMap() {
         return new ImageIcon(mapaManager.printActionsOnMap(listFactory.listLocais().values(), listFactory.listPersonagens(), getJogadorAtivo()));
     }
@@ -327,11 +325,12 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
                 tabGui.doMapa(this.refreshMapaGeral());
                 break;
             case DispatchManager.ACTIONS_MAP_REDRAW:
-                if (!SettingsManager.getInstance().isConfig("drawPcPath", "1", "1") && !SettingsManager.getInstance().isConfig("drawPcPath", "3", "1")) {
-                    tabGui.doActionsOnMapHide();
-                } else {
-                    tabGui.doActionsOnMap(this.printActionsOnMap());
-                }
+                tabGui.doActionsOnMap(this.printActionsOnMap());
+//                if (SettingsManager.getInstance().isConfig("drawPcPath", "1", "1") || SettingsManager.getInstance().isConfig("drawPcPath", "3", "1")) {
+//                    tabGui.doActionsOnMap(this.printActionsOnMap());
+//                } else {
+//                    tabGui.doActionsOnMapHide();
+//                }
                 break;
             case DispatchManager.LOCAL_MAP_REDRAW_TAG:
                 tabGui.setTag();
@@ -455,6 +454,4 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         this.jogadorAtivo = jogadorAtivo;
     }
 
-    
-    
 }
