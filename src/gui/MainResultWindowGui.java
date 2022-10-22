@@ -289,7 +289,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
         togglePathArmy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_path_army.png"))); // NOI18N
         togglePathArmy.setSelected(true);
-        togglePathArmy.setToolTipText(bundle.getString("SETTINGS.MAP.ARMYPATH.TOOLTIP")); // NOI18N
+        togglePathArmy.setToolTipText(bundle.getString("SETTINGS.MAP.ARMYPATHORDER.TOOLTIP")); // NOI18N
         togglePathArmy.setActionCommand("drawPathArmy");
         togglePathArmy.setEnabled(false);
         togglePathArmy.setFocusable(false);
