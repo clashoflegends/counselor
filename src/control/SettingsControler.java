@@ -46,227 +46,266 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
     @Override
     public void actionPerformed(ActionEvent e) {
         String actionCommand = e.getActionCommand();
-        if (actionCommand.equals("fSaves")) {
-
-            JFileChooser fc = new JFileChooser();
-            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-            int returnVal = fc.showOpenDialog(settingsGui);
-
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = fc.getSelectedFile();
-                SettingsManager.getInstance().setConfig("saveDir", file.getPath());
-                settingsGui.getSaveDirTextField().setText(file.getPath());
+        switch (actionCommand) {
+            case "fSaves": {
+                JFileChooser fc = new JFileChooser();
+                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int returnVal = fc.showOpenDialog(settingsGui);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    SettingsManager.getInstance().setConfig("saveDir", file.getPath());
+                    settingsGui.getSaveDirTextField().setText(file.getPath());
+                }
+                break;
             }
-        } else if (actionCommand.equals("languageCombo")) {
-            JComboBox languageCombo = (JComboBox) e.getSource();
-            String value = ((ComboItem) languageCombo.getSelectedItem()).getValue();
-            SettingsManager.getInstance().setConfig("language", value);
-        } else if (actionCommand.equals("fLoad")) {
-
-            JFileChooser fc = new JFileChooser();
-            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-            int returnVal = fc.showOpenDialog(settingsGui);
-
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = fc.getSelectedFile();
-                SettingsManager.getInstance().setConfig("loadDir", file.getPath());
-                settingsGui.getLoadDirTextField().setText(file.getPath());
+            case "languageCombo": {
+                JComboBox languageCombo = (JComboBox) e.getSource();
+                String value = ((ComboItem) languageCombo.getSelectedItem()).getValue();
+                SettingsManager.getInstance().setConfig("language", value);
+                break;
             }
-        } else if (actionCommand.equals("fLoadAuto")) {
-
-            JFileChooser fc = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
-            fc.setFileFilter(PathFactory.getFilterResults());
-
-            int returnVal = fc.showOpenDialog(settingsGui);
-
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = fc.getSelectedFile();
-                SettingsManager.getInstance().setConfig("autoLoad", file.getPath());
-                settingsGui.getAutoLoadTextField().setText(file.getPath());
+            case "fLoad": {
+                JFileChooser fc = new JFileChooser();
+                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int returnVal = fc.showOpenDialog(settingsGui);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    SettingsManager.getInstance().setConfig("loadDir", file.getPath());
+                    settingsGui.getLoadDirTextField().setText(file.getPath());
+                }
+                break;
             }
-        } else if (actionCommand.equals("fLoadAutoAction")) {
-
-            JFileChooser fc = new JFileChooser();
-            fc.setFileFilter(PathFactory.getFilterAcoes());
-
-            int returnVal = fc.showOpenDialog(settingsGui);
-
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = fc.getSelectedFile();
-                SettingsManager.getInstance().setConfig("autoLoadActions", file.getPath());
-                settingsGui.getAutoLoadActionTextField().setText(file.getPath());
+            case "fLoadAuto": {
+                JFileChooser fc = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
+                fc.setFileFilter(PathFactory.getFilterResults());
+                int returnVal = fc.showOpenDialog(settingsGui);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    SettingsManager.getInstance().setConfig("autoLoad", file.getPath());
+                    settingsGui.getAutoLoadTextField().setText(file.getPath());
+                }
+                break;
             }
-        } else if (actionCommand.equals("overrideAction")) {
-            JCheckBox overCheck = (JCheckBox) e.getSource();
-            int selected = (overCheck.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("OverrideElimination", String.valueOf(selected));
-
-        } else if (actionCommand.equals("autoSaveOrders")) {
-            JCheckBox overCheck = (JCheckBox) e.getSource();
-            int selected = (overCheck.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("AutoSaveActions", String.valueOf(selected));
-
-        } else if (actionCommand.equals("playerEmail")) {
-
-            String playerEmail = ((JTextField) e.getSource()).getText();
-
-            if (playerEmail != null && !playerEmail.isEmpty()) {
-                SettingsManager.getInstance().setConfig("MyEmail", playerEmail);
+            case "fLoadAutoAction": {
+                JFileChooser fc = new JFileChooser();
+                fc.setFileFilter(PathFactory.getFilterAcoes());
+                int returnVal = fc.showOpenDialog(settingsGui);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    SettingsManager.getInstance().setConfig("autoLoadActions", file.getPath());
+                    settingsGui.getAutoLoadActionTextField().setText(file.getPath());
+                }
+                break;
             }
-        } else if (actionCommand.equals("showPopUp")) {
-            JCheckBox popUpCheck = (JCheckBox) e.getSource();
-            int selected = (popUpCheck.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("SendOrderConfirmationPopUp", String.valueOf(selected));
-
-        } else if (actionCommand.equals("recieveConfirm")) {
-            JCheckBox showCheck = (JCheckBox) e.getSource();
-            int selected = (showCheck.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("SendOrderReceiptRequest", String.valueOf(selected));
-        } else if (actionCommand.equals("allFilter")) {
-            JRadioButton allCheck = (JRadioButton) e.getSource();
-            int selected = (allCheck.isSelected()) ? 1 : 0;
-            if (selected == 1) {
-                SettingsManager.getInstance().setConfig("filtro.default", String.valueOf(0));
+            case "overrideAction": {
+                JCheckBox overCheck = (JCheckBox) e.getSource();
+                int selected = (overCheck.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("OverrideElimination", String.valueOf(selected));
+                break;
             }
-        } else if (actionCommand.equals("ownFilter")) {
-            JRadioButton ownCheck = (JRadioButton) e.getSource();
-            int selected = (ownCheck.isSelected()) ? 1 : 0;
-            if (selected == 1) {
-                SettingsManager.getInstance().setConfig("filtro.default", String.valueOf(1));
+            case "autoSaveOrders": {
+                JCheckBox overCheck = (JCheckBox) e.getSource();
+                int selected = (overCheck.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("AutoSaveActions", String.valueOf(selected));
+                break;
             }
-        } else if (actionCommand.equals("alphaSort")) {
-            JRadioButton alphaCheck = (JRadioButton) e.getSource();
-            int selected = (alphaCheck.isSelected()) ? 1 : 0;
-            if (selected == 1) {
-                SettingsManager.getInstance().setConfig("SortAllCombos", String.valueOf(1));
+            case "playerEmail":
+                String playerEmail = ((JTextField) e.getSource()).getText();
+                if (playerEmail != null && !playerEmail.isEmpty()) {
+                    SettingsManager.getInstance().setConfig("MyEmail", playerEmail);
+                }
+                break;
+            case "showPopUp": {
+                JCheckBox popUpCheck = (JCheckBox) e.getSource();
+                int selected = (popUpCheck.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("SendOrderConfirmationPopUp", String.valueOf(selected));
+                break;
             }
-        } else if (actionCommand.equals("seqSort")) {
-            JRadioButton seqCheck = (JRadioButton) e.getSource();
-            int selected = (seqCheck.isSelected()) ? 1 : 0;
-            if (selected == 1) {
-                SettingsManager.getInstance().setConfig("SortAllCombos", String.valueOf(0));
+            case "recieveConfirm": {
+                JCheckBox showCheck = (JCheckBox) e.getSource();
+                int selected = (showCheck.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("SendOrderReceiptRequest", String.valueOf(selected));
+                break;
             }
-        } else if (actionCommand.equals("maxWindow")) {
-            JCheckBox maxWindow = (JCheckBox) e.getSource();
-            int selected = (maxWindow.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("maximizeWindowOnStart", String.valueOf(selected));
-        } else if (actionCommand.equals("columnAdjust")) {
-            JCheckBox columnAdjust = (JCheckBox) e.getSource();
-            int selected = (columnAdjust.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("TableColumnAdjust", String.valueOf(selected));
-        } else if (actionCommand.equals("copyActions")) {
-            JCheckBox copyActions = (JCheckBox) e.getSource();
-            int selected = (copyActions.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("CopyActionsPopUp", String.valueOf(selected));
-        } else if (actionCommand.equals("copyOrders")) {
-            JCheckBox copyOrders = (JCheckBox) e.getSource();
-            int selected = (copyOrders.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("CopyActionsOrder", String.valueOf(selected));
-        } else if (actionCommand.equals("keepPopUp")) {
-            JCheckBox keepPopUp = (JCheckBox) e.getSource();
-            int selected = (keepPopUp.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("KeepPopupOpen", String.valueOf(selected));
-        } else if (actionCommand.equals("FogOfWar")) {
-            JCheckBox fogOfWar = (JCheckBox) e.getSource();
-            int selected = (fogOfWar.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("fogOfWarType", String.valueOf(selected));
-            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
-        } else if (actionCommand.equals("LoadActionsOtherNations")) {
-            JCheckBox loadActionsOtherNations = (JCheckBox) e.getSource();
-            int selected = (loadActionsOtherNations.isSelected()) ? 1 : 0;
-            if (selected == 0) {
-                SettingsManager.getInstance().setConfig("LoadActionsOtherNations", "deny");
-            } else {
-                SettingsManager.getInstance().setConfig("LoadActionsOtherNations", "allow");
+            case "allFilter": {
+                JRadioButton allCheck = (JRadioButton) e.getSource();
+                int selected = (allCheck.isSelected()) ? 1 : 0;
+                if (selected == 1) {
+                    SettingsManager.getInstance().setConfig("filtro.default", String.valueOf(0));
+                }
+                break;
             }
-        } else if (actionCommand.equals("LoadActionsBehavior")) {
-            JCheckBox loadActionsBehavior = (JCheckBox) e.getSource();
-            int selected = (loadActionsBehavior.isSelected()) ? 1 : 0;
-            if (selected == 0) {
-                SettingsManager.getInstance().setConfig("LoadActionsBehavior", "clean");
-            } else {
-                SettingsManager.getInstance().setConfig("LoadActionsBehavior", "append");
+            case "ownFilter": {
+                JRadioButton ownCheck = (JRadioButton) e.getSource();
+                int selected = (ownCheck.isSelected()) ? 1 : 0;
+                if (selected == 1) {
+                    SettingsManager.getInstance().setConfig("filtro.default", String.valueOf(1));
+                }
+                break;
             }
-        } else if (actionCommand.equals("autoMoveAction")) {
-            JCheckBox autoMoveAction = (JCheckBox) e.getSource();
-            int selected = (autoMoveAction.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("AutoMoveNextAction", String.valueOf(selected));
-        } else if (actionCommand.equals("mapTiles")) {
-            JComboBox mapTiles = (JComboBox) e.getSource();
-            String value = (String) mapTiles.getSelectedItem();
-            SettingsManager.getInstance().setConfig("MapTiles", value);
-            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
-        } else if (actionCommand.equals("tagStyle")) {
-            JComboBox tagStyle = (JComboBox) e.getSource();
-            String value = (String) tagStyle.getSelectedItem();
-            SettingsManager.getInstance().setConfig("HexTagStyle", value);
-            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_TAG);
-        } else if (actionCommand.equals("hexTagFrame")) {
-            JCheckBox hexTagFrame = (JCheckBox) e.getSource();
-            int selected = (hexTagFrame.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("HexTagFrame", String.valueOf(selected));
-            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_TAG);
-        } else if (actionCommand.equals("armyPath")) {
-            JComboBox tagStyle = (JComboBox) e.getSource();
-            int index = tagStyle.getSelectedIndex();
-            SettingsManager.getInstance().setConfig("ShowArmyMovPath", String.valueOf(index));
-        } else if (actionCommand.equals("pcPath")) {
-            JComboBox tagStyle = (JComboBox) e.getSource();
-            int index = tagStyle.getSelectedIndex();
-            SettingsManager.getInstance().setConfig("drawPcPath", String.valueOf(index));
-            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
-            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
-        } else if (actionCommand.equals("autoLoadCheck")) {
-            JCheckBox autoLoad = (JCheckBox) e.getSource();
-
-            if (autoLoad.isSelected()) {
-                this.settingsGui.getAutoLoadTextField().setEnabled(true);
-                this.settingsGui.getAutoLoadButton().setEnabled(true);
-                this.settingsGui.getAutoLoadTextField().setText(SettingsManager.getInstance().getConfig("autoLoad"));
-
-            } else {
-                this.settingsGui.getAutoLoadTextField().setEnabled(false);
-                this.settingsGui.getAutoLoadButton().setEnabled(false);
-                this.settingsGui.getAutoLoadTextField().setText("");
-                SettingsManager.getInstance().setConfig("autoLoad", "");
-
+            case "alphaSort": {
+                JRadioButton alphaCheck = (JRadioButton) e.getSource();
+                int selected = (alphaCheck.isSelected()) ? 1 : 0;
+                if (selected == 1) {
+                    SettingsManager.getInstance().setConfig("SortAllCombos", String.valueOf(1));
+                }
+                break;
             }
-
-        } else if (actionCommand.equals("autoLoadActionCheck")) {
-            JCheckBox autoLoadActions = (JCheckBox) e.getSource();
-
-            if (autoLoadActions.isSelected()) {
-                this.settingsGui.getAutoLoadActionTextField().setEnabled(true);
-                this.settingsGui.getAutoLoadActionButton().setEnabled(true);
-                this.settingsGui.getAutoLoadActionTextField().setText(SettingsManager.getInstance().getConfig("autoLoadActions"));
-
-            } else {
-                this.settingsGui.getAutoLoadActionTextField().setEnabled(false);
-                this.settingsGui.getAutoLoadActionButton().setEnabled(false);
-                this.settingsGui.getAutoLoadActionTextField().setText("");
-                SettingsManager.getInstance().setConfig("autoLoadActions", "");
-
+            case "seqSort": {
+                JRadioButton seqCheck = (JRadioButton) e.getSource();
+                int selected = (seqCheck.isSelected()) ? 1 : 0;
+                if (selected == 1) {
+                    SettingsManager.getInstance().setConfig("SortAllCombos", String.valueOf(0));
+                }
+                break;
             }
-        } else if (actionCommand.equals("showPortraits")) {
-            JCheckBox showPortraits = (JCheckBox) e.getSource();
-            int selected = (showPortraits.isSelected()) ? 1 : 0;
-            SettingsManager.getInstance().setConfig("ShowCharacterPortraits", String.valueOf(selected));
-            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(selected));
-            settingsGui.checkDisplayPortraitCheckBox();
-
-        } else if (actionCommand.equals("downloadPortraits")) {
-
-            DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
-            if (!displayPortraitsManager.isShowPortraitEnableable()) {
-                progressMonitor = new ProgressMonitor(settingsGui, labels.getString("CONFIG.DOWNLOAD.FILE"), "", 0, 100);
-                progressMonitor.setProgress(0);
-                displayPortraitsManager.downloadPortraits(settingsGui, this);
+            case "maxWindow": {
+                JCheckBox maxWindow = (JCheckBox) e.getSource();
+                int selected = (maxWindow.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("maximizeWindowOnStart", String.valueOf(selected));
+                break;
             }
+            case "columnAdjust": {
+                JCheckBox columnAdjust = (JCheckBox) e.getSource();
+                int selected = (columnAdjust.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("TableColumnAdjust", String.valueOf(selected));
+                break;
+            }
+            case "copyActions": {
+                JCheckBox copyActions = (JCheckBox) e.getSource();
+                int selected = (copyActions.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("CopyActionsPopUp", String.valueOf(selected));
+                break;
+            }
+            case "copyOrders": {
+                JCheckBox copyOrders = (JCheckBox) e.getSource();
+                int selected = (copyOrders.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("CopyActionsOrder", String.valueOf(selected));
+                break;
+            }
+            case "keepPopUp": {
+                JCheckBox keepPopUp = (JCheckBox) e.getSource();
+                int selected = (keepPopUp.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("KeepPopupOpen", String.valueOf(selected));
+                break;
+            }
+            case "FogOfWar": {
+                JCheckBox fogOfWar = (JCheckBox) e.getSource();
+                int selected = (fogOfWar.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("fogOfWarType", String.valueOf(selected));
+                DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+                break;
+            }
+            case "LoadActionsOtherNations": {
+                JCheckBox loadActionsOtherNations = (JCheckBox) e.getSource();
+                int selected = (loadActionsOtherNations.isSelected()) ? 1 : 0;
+                if (selected == 0) {
+                    SettingsManager.getInstance().setConfig("LoadActionsOtherNations", "deny");
+                } else {
+                    SettingsManager.getInstance().setConfig("LoadActionsOtherNations", "allow");
+                }
+                break;
+            }
+            case "LoadActionsBehavior": {
+                JCheckBox loadActionsBehavior = (JCheckBox) e.getSource();
+                int selected = (loadActionsBehavior.isSelected()) ? 1 : 0;
+                if (selected == 0) {
+                    SettingsManager.getInstance().setConfig("LoadActionsBehavior", "clean");
+                } else {
+                    SettingsManager.getInstance().setConfig("LoadActionsBehavior", "append");
+                }
+                break;
+            }
+            case "autoMoveAction": {
+                JCheckBox autoMoveAction = (JCheckBox) e.getSource();
+                int selected = (autoMoveAction.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("AutoMoveNextAction", String.valueOf(selected));
+                break;
+            }
+            case "mapTiles": {
+                JComboBox mapTiles = (JComboBox) e.getSource();
+                String value = (String) mapTiles.getSelectedItem();
+                SettingsManager.getInstance().setConfig("MapTiles", value);
+                DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+                break;
+            }
+            case "tagStyle": {
+                JComboBox tagStyle = (JComboBox) e.getSource();
+                String value = (String) tagStyle.getSelectedItem();
+                SettingsManager.getInstance().setConfig("HexTagStyle", value);
+                DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_TAG);
+                break;
+            }
+            case "hexTagFrame": {
+                JCheckBox hexTagFrame = (JCheckBox) e.getSource();
+                int selected = (hexTagFrame.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("HexTagFrame", String.valueOf(selected));
+                DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_TAG);
+                break;
+            }
+            case "armyPath": {
+                JComboBox tagStyle = (JComboBox) e.getSource();
+                int index = tagStyle.getSelectedIndex();
+                SettingsManager.getInstance().setConfig("ShowArmyMovPath", String.valueOf(index));
+                break;
+            }
+            case "pcPath": {
+                JComboBox tagStyle = (JComboBox) e.getSource();
+                int index = tagStyle.getSelectedIndex();
+                SettingsManager.getInstance().setConfig("drawPcPath", String.valueOf(index));
+                DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+                DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+                break;
+            }
+            case "autoLoadCheck":
+                JCheckBox autoLoad = (JCheckBox) e.getSource();
+                if (autoLoad.isSelected()) {
+                    this.settingsGui.getAutoLoadTextField().setEnabled(true);
+                    this.settingsGui.getAutoLoadButton().setEnabled(true);
+                    this.settingsGui.getAutoLoadTextField().setText(SettingsManager.getInstance().getConfig("autoLoad"));
 
-            settingsGui.checkDisplayPortraitCheckBox();
+                } else {
+                    this.settingsGui.getAutoLoadTextField().setEnabled(false);
+                    this.settingsGui.getAutoLoadButton().setEnabled(false);
+                    this.settingsGui.getAutoLoadTextField().setText("");
+                    SettingsManager.getInstance().setConfig("autoLoad", "");
 
+                }
+                break;
+            case "autoLoadActionCheck":
+                JCheckBox autoLoadActions = (JCheckBox) e.getSource();
+                if (autoLoadActions.isSelected()) {
+                    this.settingsGui.getAutoLoadActionTextField().setEnabled(true);
+                    this.settingsGui.getAutoLoadActionButton().setEnabled(true);
+                    this.settingsGui.getAutoLoadActionTextField().setText(SettingsManager.getInstance().getConfig("autoLoadActions"));
+
+                } else {
+                    this.settingsGui.getAutoLoadActionTextField().setEnabled(false);
+                    this.settingsGui.getAutoLoadActionButton().setEnabled(false);
+                    this.settingsGui.getAutoLoadActionTextField().setText("");
+                    SettingsManager.getInstance().setConfig("autoLoadActions", "");
+
+                }
+                break;
+            case "showPortraits": {
+                JCheckBox showPortraits = (JCheckBox) e.getSource();
+                int selected = (showPortraits.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("ShowCharacterPortraits", String.valueOf(selected));
+                DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(selected));
+                settingsGui.checkDisplayPortraitCheckBox();
+                break;
+            }
+            case "downloadPortraits":
+                DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
+                if (!displayPortraitsManager.isShowPortraitEnableable()) {
+                    progressMonitor = new ProgressMonitor(settingsGui, labels.getString("CONFIG.DOWNLOAD.FILE"), "", 0, 100);
+                    progressMonitor.setProgress(0);
+                    displayPortraitsManager.downloadPortraits(settingsGui, this);
+                }
+                settingsGui.checkDisplayPortraitCheckBox();
+                break;
+            default:
+                break;
         }
     }
 
@@ -275,7 +314,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
         JSpinner jspiner = (JSpinner) ce.getSource();
         int sizeValue = (Integer) jspiner.getValue();
         SettingsManager.getInstance().setConfig("splitSize", String.valueOf(sizeValue));
-        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SPLIT_PANE_CHANGED, String.valueOf(sizeValue));       
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SPLIT_PANE_CHANGED, String.valueOf(sizeValue));
     }
 
     @Override
