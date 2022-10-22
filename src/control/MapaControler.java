@@ -306,7 +306,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
 
     public void printTagRange(Local local, int range) {
         HashMap<Local, Integer> localInRange;
-        localInRange = localFacade.getLocalRange(local, range, true, listFactory.listLocais());
+        localInRange = localFacade.getLocalRange(local, range, false, listFactory.listLocais());
         localInRange.remove(local);
         addMovementTagRange(localInRange);
     }
