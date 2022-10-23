@@ -307,7 +307,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         toggleFogWar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar2.add(toggleFogWar);
 
-        toggleScouts.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_fog.png"))); // NOI18N
+        toggleScouts.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_scout.png"))); // NOI18N
         toggleScouts.setSelected(isFogOfWarSelected());
         toggleScouts.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SCOUT.TOOLTIP")); // NOI18N
         toggleScouts.setActionCommand("drawScoutTargets");

@@ -1267,7 +1267,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         SettingsManager.getInstance().doConfigSave("fogOfWarType");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
-
     }
 
     private void doPortraits(JToggleButton button) {
