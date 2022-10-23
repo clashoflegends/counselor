@@ -5,7 +5,7 @@
 package control;
 
 import baseLib.BaseModel;
-import business.BussinessException;
+import business.BusinessException;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
@@ -330,7 +330,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             WFC.doSaveOrdens(comando, ret);
             this.getGui().setStatusMsg(missingActionMsg + " " + String.format(labels.getString("ORDENS.SALVAS"), comando.size(), fc.getSelectedFile().getName()));
             this.saved = true;
-        } catch (BussinessException ex) {
+        } catch (BusinessException ex) {
             log.error(ex.getMessage());
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
@@ -542,7 +542,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 this.saved = false;
                 this.savedWorld = false;
                 doAutoLoadCommands(resultsFile);
-            } catch (BussinessException ex) {
+            } catch (BusinessException ex) {
                 SysApoio.showDialogError(ex.getMessage(), this.getGui());
                 this.getGui().setStatusMsg(ex.getMessage());
                 log.error(ex);
@@ -597,7 +597,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             }
             fc.setSelectedFile(resultsFile);
             this.saved = false;
-        } catch (BussinessException ex) {
+        } catch (BusinessException ex) {
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             log.error(ex);
