@@ -17,6 +17,7 @@ import control.services.FeiticoConverter;
 import control.services.PersonagemConverter;
 import javax.swing.ComboBoxModel;
 import model.ActorAction;
+import model.Cidade;
 import model.Exercito;
 import model.Local;
 import model.Nacao;
@@ -37,6 +38,7 @@ public class ActorInterfacePersonagem extends ActorInterface {
     private static final PersonagemFacade personagemFacade = new PersonagemFacade();
     private static final OrdemFacade ordemFacade = new OrdemFacade();
     private Personagem personagem;
+    private final CidadeFacade cityFacade = new CidadeFacade();
 
     @Override
     public Nacao getNacao() {
@@ -84,9 +86,9 @@ public class ActorInterfacePersonagem extends ActorInterface {
             return CenarioConverter.getInstance().getTropaTipoComboModel();
         } else {
             Raca racaNacao = personagemFacade.getNacaoRaca(getPersonagem());
-            CidadeFacade cid = new CidadeFacade();
-            Raca racaCidade = cid.getRaca(personagemFacade.getCidade(getPersonagem()));
-            return CenarioConverter.getInstance().getTropaTipoComboModel(racaCidade, racaNacao);
+            Cidade city = personagemFacade.getCidade(getPersonagem());
+            Raca racaCidade = cityFacade.getRaca(city);
+            return CenarioConverter.getInstance().getTropaTipoComboModel(racaCidade, racaNacao, city);
         }
     }
 
