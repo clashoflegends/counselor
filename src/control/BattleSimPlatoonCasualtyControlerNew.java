@@ -6,7 +6,7 @@ package control;
 
 import baseLib.GenericoComboObject;
 import baseLib.GenericoTableModel;
-import business.BussinessException;
+import business.BusinessException;
 import business.combat.ArmySim;
 import business.facade.BattleSimFacade;
 import business.services.ComparatorFactory;
@@ -131,7 +131,7 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
             getExercito().getPelotoes().put(platoonClone.getCodigo(), platoonClone);
             setPlatoon(platoonClone);
             this.getTabGui().doRefreshArmy();
-        } catch (BussinessException be) {
+        } catch (BusinessException be) {
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.STATUS_BAR_MSG, labels.getString("PLATOON.NEW.CANCELED"));
         }
     }
@@ -143,7 +143,7 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
             getExercito().getPelotoes().put(platoonNew.getCodigo(), platoonNew);
             setPlatoon(platoonNew);
             this.getTabGui().doRefreshArmy();
-        } catch (BussinessException be) {
+        } catch (BusinessException be) {
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.STATUS_BAR_MSG, labels.getString("PLATOON.NEW.CANCELED"));
         }
     }
@@ -157,7 +157,7 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
         return false;
     }
 
-    private void changeTipoTropaToAvailable(Pelotao aPlatoon) throws BussinessException {
+    private void changeTipoTropaToAvailable(Pelotao aPlatoon) throws BusinessException {
         List<TipoTropa> tropaTipo = CenarioConverter.getInstance().getTropaTipo();
         for (Pelotao pelotao : getExercito().getPelotoes().values()) {
             tropaTipo.remove(pelotao.getTipoTropa());
@@ -165,7 +165,7 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
         if (!tropaTipo.isEmpty()) {
             aPlatoon.setTipoTropa(tropaTipo.get(0));
         } else {
-            throw new BussinessException();
+            throw new BusinessException();
         }
     }
 

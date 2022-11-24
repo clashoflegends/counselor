@@ -69,7 +69,7 @@ public class DispatchManager implements Serializable {
         if (lista.containsKey(msgName)) {
             lista.get(msgName).add(controler);
         } else {
-            HashSet<IDispatchReceiver> set = new HashSet<IDispatchReceiver>();
+            HashSet<IDispatchReceiver> set = new HashSet<>();
             set.add(controler);
             lista.put(msgName, set);
         }

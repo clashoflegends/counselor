@@ -5,7 +5,7 @@
 package control.facade;
 
 import baseLib.BaseModel;
-import business.BussinessException;
+import business.BusinessException;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import control.MapaControler;
@@ -68,21 +68,21 @@ public class WorldFacadeCounselor implements Serializable {
     /*
      * Client Only
      */
-    public synchronized void doStart(File file) throws BussinessException {
+    public synchronized void doStart(File file) throws BusinessException {
         try {
             WorldManager.getInstance().doStart(file);
         } catch (PersistenceException ex) {
-            throw new BussinessException(ex.getMessage());
+            throw new BusinessException(ex.getMessage());
         }
     }
 
-    public void doSaveOrdens(Comando com, File selectedFile) throws BussinessException {
+    public void doSaveOrdens(Comando com, File selectedFile) throws BusinessException {
         try {
             XmlManager.getInstance().save(com, selectedFile);
         } catch (PersistenceException ex) {
-            throw new BussinessException(ex.getMessage());
+            throw new BusinessException(ex.getMessage());
         } catch (NullPointerException ex) {
-            throw new BussinessException(ex.getMessage());
+            throw new BusinessException(ex.getMessage());
         }
 
     }

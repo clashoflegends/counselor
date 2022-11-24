@@ -612,6 +612,9 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
         } else if (ordem.getCodigo().equals("830")) {
             setLimiteMovimento(14);
             setMoveType(MovimentoExercito.BY_WATER);
+        } else if (ordem.getCodigo().equals("831")) {
+            setLimiteMovimento(14);
+            setMoveType(MovimentoExercito.BY_WATER);
         } else {
             setLimiteMovimento(0);
             setMoveType(MovimentoExercito.BY_LAND);

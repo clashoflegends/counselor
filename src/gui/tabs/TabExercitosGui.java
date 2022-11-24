@@ -248,11 +248,11 @@ public class TabExercitosGui extends TabBase implements Serializable {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jSplitPane2PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane2PropertyChange
-        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY) ) {
+        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
             String splitHeight = evt.getNewValue().toString();
             LOG.debug("Split army pane divisor modified to " + splitHeight + " px.");
             SettingsManager.getInstance().setConfig("armySplitSize", splitHeight);
-        } 
+        }
     }//GEN-LAST:event_jSplitPane2PropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

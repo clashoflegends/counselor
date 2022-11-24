@@ -5,7 +5,7 @@
 package control;
 
 import baseLib.BaseModel;
-import business.BussinessException;
+import business.BusinessException;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
@@ -13,6 +13,7 @@ import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
 import business.facade.PersonagemFacade;
 import control.facade.WorldFacadeCounselor;
+import control.services.NacaoConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
@@ -37,8 +38,10 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -116,64 +119,93 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     public void actionPerformed(ActionEvent actionEvent) {
         if (actionEvent.getSource() instanceof JButton) {
             JButton jbTemp = (JButton) actionEvent.getSource();
-            //monta csv com as ordens
-            if ("jbOpen".equals(jbTemp.getActionCommand())) {
-                doOpen(jbTemp);
-            } else if ("jbSave".equals(jbTemp.getActionCommand())) {
-                doSave(jbTemp, false);
-            } else if ("jbSaveWorld".equals(jbTemp.getActionCommand())) {
-                doSaveWorld(jbTemp);
-            } else if ("jbExportMap".equals(jbTemp.getActionCommand())) {
-                doMapSave(jbTemp);
-            } else if ("jbCopy".equals(jbTemp.getActionCommand())) {
-                doCopy();
-            } else if ("jbSend".equals(jbTemp.getActionCommand())) {
-                doSend(jbTemp);
-            } else if ("jbScoreGraph".equals(jbTemp.getActionCommand())) {
-                doGraphScore();
-            } else if ("jbGraphSingleTurn".equals(jbTemp.getActionCommand())) {
-                doGraphSingleTurn();
-            } else if ("jbGraphAllTurns".equals(jbTemp.getActionCommand())) {
-                doGraphAllTurns();
-            } else if ("jbAbout".equals(jbTemp.getActionCommand())) {
-                doAbout();
-            } else if ("jbHexview".equals(jbTemp.getActionCommand())) {
-                doHexview();
-            } else if ("jbConfig".equals(jbTemp.getActionCommand())) {
-                doConfig();
-            } else if ("jbLoad".equals(jbTemp.getActionCommand())) {
-                doLoad(jbTemp);
-            } else {
-                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
-            }
+            doActionPerformendButtom(jbTemp);
         } else if (actionEvent.getSource() instanceof JToggleButton) {
             JToggleButton jbTemp = (JToggleButton) actionEvent.getSource();
-            if (("pcPathDraw").equals(jbTemp.getActionCommand())) {
-                doDrawPjPaths();
-
-            } else if ("drawPathArmy".equals(jbTemp.getActionCommand())) {
-                //TODO 
-
-            } else if ("drawFogWar".equals(jbTemp.getActionCommand())) {
-                doDrawFogOfWar(jbTemp);
-
-            } else if ("drawDisplayPortraits".equals(jbTemp.getActionCommand())) {
-
-                DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
-                if (!displayPortraitsManager.isShowPortraitEnableable()) {
-                    progressMonitor = new ProgressMonitor(gui, "Downloading file...", "", 0, 100);
-                    progressMonitor.setProgress(0);
-                    displayPortraitsManager.downloadPortraits(gui, this);
-                }
-
-                doDisplayPortraits(jbTemp);
-
-            } else {
-                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
-            }
-
+            doActionPerformedToggle(jbTemp);
         } else {
             log.info(labels.getString("OPS.GENERAL.EVENT"));
+        }
+    }
+
+    private void doActionPerformedToggle(JToggleButton jbTemp) {
+        if (null == jbTemp.getActionCommand()) {
+            log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+            return;
+        }
+        switch (jbTemp.getActionCommand()) {
+            case "pcPathDraw":
+                doDrawPjPaths();
+                break;
+            case "drawPathArmy":
+                doDrawArmyPaths(jbTemp);
+                break;
+            case "drawScoutTargets":
+                doScoutTargets(jbTemp);
+                break;
+            case "drawFogWar":
+                doDrawFogOfWar(jbTemp);
+                break;
+            case "drawDisplayPortraits":
+                doPortraits(jbTemp);
+                break;
+            default:
+                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+                break;
+        }
+    }
+
+    private void doActionPerformendButtom(JButton jbTemp) throws HeadlessException {
+        if (null == jbTemp.getActionCommand()) {
+            log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+        }
+        //monta csv com as ordens
+        switch (jbTemp.getActionCommand()) {
+            case "jbOpen":
+                doOpen(jbTemp);
+                break;
+            case "jbSave":
+                doSave(jbTemp, false);
+                break;
+            case "jbSaveWorld":
+                doSaveWorld(jbTemp);
+                break;
+            case "jbExportMap":
+                doMapSave(jbTemp);
+                break;
+            case "jbCopy":
+                doCopy();
+                break;
+            case "jbEmailList":
+                doEmailList();
+                break;
+            case "jbSend":
+                doSend(jbTemp);
+                break;
+            case "jbScoreGraph":
+                doGraphScore();
+                break;
+            case "jbGraphSingleTurn":
+                doGraphSingleTurn();
+                break;
+            case "jbGraphAllTurns":
+                doGraphAllTurns();
+                break;
+            case "jbAbout":
+                doAbout();
+                break;
+            case "jbHexview":
+                doHexview();
+                break;
+            case "jbConfig":
+                doConfig();
+                break;
+            case "jbLoad":
+                doLoad(jbTemp);
+                break;
+            default:
+                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+                break;
         }
     }
 
@@ -298,7 +330,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             WFC.doSaveOrdens(comando, ret);
             this.getGui().setStatusMsg(missingActionMsg + " " + String.format(labels.getString("ORDENS.SALVAS"), comando.size(), fc.getSelectedFile().getName()));
             this.saved = true;
-        } catch (BussinessException ex) {
+        } catch (BusinessException ex) {
             log.error(ex.getMessage());
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
@@ -389,7 +421,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     /**
-     * Transictional method for development porpuse. Must be deleted after new methods in SettingsManager would be implemented.
+     * Transitional method for development purpose. Must be deleted after new methods in SettingsManager would be implemented.
      *
      * @param props
      * @return * private Map<String, String> getMapProperties(SettingsManager settingsManager) { Map<String, String> mapProperties = new
@@ -414,7 +446,35 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             JScrollPane jsp = new javax.swing.JScrollPane(jtaResultado);
             //configura jDialog
             JDialog dAbout = new JDialog(new JFrame(), true);
-            dAbout.setTitle(labels.getString("MENU.ABOUT"));
+            dAbout.setTitle(labels.getString("COPIAR.ACOES"));
+            dAbout.setAlwaysOnTop(true);
+            dAbout.setPreferredSize(new Dimension(600, 400));
+            dAbout.add(jsp);
+            dAbout.setLocationRelativeTo(this.getGui());
+            dAbout.pack();
+            dAbout.setVisible(true);
+        }
+    }
+
+    private void doEmailList() throws HeadlessException {
+        //config text Area
+        JTextArea jtaResultado = new javax.swing.JTextArea(80, 20);
+        jtaResultado.setLineWrap(false);
+        jtaResultado.setWrapStyleWord(false);
+        jtaResultado.setEditable(false);
+        //carrega o texto
+        jtaResultado.setText(listaEmails());
+        //copy para o clipboard
+        jtaResultado.selectAll();
+        jtaResultado.copy();
+        this.getGui().setStatusMsg(labels.getString("COPIAR.EMAILS.STATUS"));
+        jtaResultado.select(0, 0);
+        if (SettingsManager.getInstance().getConfig("CopyEmailListPopUp", "1").equals("1")) {
+            //scroll pane
+            JScrollPane jsp = new javax.swing.JScrollPane(jtaResultado);
+            //configura jDialog
+            JDialog dAbout = new JDialog(new JFrame(), true);
+            dAbout.setTitle(labels.getString("COPIAR.EMAILS"));
             dAbout.setAlwaysOnTop(true);
             dAbout.setPreferredSize(new Dimension(600, 400));
             dAbout.add(jsp);
@@ -482,7 +542,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 this.saved = false;
                 this.savedWorld = false;
                 doAutoLoadCommands(resultsFile);
-            } catch (BussinessException ex) {
+            } catch (BusinessException ex) {
                 SysApoio.showDialogError(ex.getMessage(), this.getGui());
                 this.getGui().setStatusMsg(ex.getMessage());
                 log.error(ex);
@@ -537,7 +597,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             }
             fc.setSelectedFile(resultsFile);
             this.saved = false;
-        } catch (BussinessException ex) {
+        } catch (BusinessException ex) {
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             log.error(ex);
@@ -550,6 +610,24 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 labels.getString("ENVIAR.FAILREASON.TITLE"),
                 msg);
         ret += listaOrdens();
+        return ret;
+    }
+
+    private String listaEmails() {
+        Set<String> emailList = new TreeSet<>();
+        //find allied nations
+        List<Nacao> nationList = NacaoConverter.listaByFiltro("team");
+        for (Nacao nation : nationList) {
+            if (nation.getOwner().isNpc()) {
+                continue;
+            }
+            emailList.add(nation.getOwner().getEmail());
+        }
+        //format return String
+        String ret = "";
+        for (String address : emailList) {
+            ret += String.format("%s\n", address);
+        }
         return ret;
     }
 
@@ -1165,16 +1243,40 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         SettingsManager.getInstance().doConfigSave("drawPcPath");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
 
+    private void doDrawArmyPaths(JToggleButton jbTemp) {
+        int settingValue = jbTemp.isSelected() ? 1 : 0;
+        SettingsManager.getInstance().setConfig("drawArmyMovPath", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("drawArmyMovPath");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
+
+    private void doScoutTargets(JToggleButton jbTemp) {
+        int settingValue = jbTemp.isSelected() ? 1 : 0;
+        SettingsManager.getInstance().setConfig("drawScoutOnMap", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("drawScoutOnMap");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
 
     private void doDrawFogOfWar(JToggleButton button) {
         int settingValue = button.isSelected() ? 1 : 0;
-        SettingsManager.getInstance().setConfig("FogOfWarType", String.valueOf(settingValue));
-        SettingsManager.getInstance().doConfigSave("FogOfWarType");
+        SettingsManager.getInstance().setConfig("fogOfWarType", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("fogOfWarType");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
 
+    private void doPortraits(JToggleButton button) {
+        DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
+        if (!displayPortraitsManager.isShowPortraitEnableable()) {
+            progressMonitor = new ProgressMonitor(gui, "Downloading file...", "", 0, 100);
+            progressMonitor.setProgress(0);
+            displayPortraitsManager.downloadPortraits(gui, this);
+        }
+        doDisplayPortraits(button);
     }
 
     private int calculateDrawPcPathValue(int pcPath, int pcPathFuture) {

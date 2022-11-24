@@ -104,7 +104,7 @@ public class ExercitoConverter implements Serializable {
     }
 
     private static List<Pelotao> listTropasTipoAll(Exercito exercito) {
-        List<Pelotao> ret = new ArrayList<Pelotao>();
+        List<Pelotao> ret = new ArrayList<>();
         for (TipoTropa tipoTropa : WorldManager.getInstance().getCenario().getTipoTropas().values()) {
             Pelotao pelotao;
             try {
@@ -124,7 +124,7 @@ public class ExercitoConverter implements Serializable {
     }
 
     private static List<Pelotao> listTropasTipoTransfer(Exercito exercito) {
-        List<Pelotao> ret = new ArrayList<Pelotao>();
+        List<Pelotao> ret = new ArrayList<>();
         for (Pelotao pelotao : exercito.getPelotoes().values()) {
             if (pelotao.getTipoTropa().isTransferable()) {
                 ret.add(pelotao);
@@ -139,7 +139,7 @@ public class ExercitoConverter implements Serializable {
         cArray[ii++] = exercitoFacade.getComandanteTitulo(exercito, WorldFacadeCounselor.getInstance().getCenario());
         cArray[ii++] = exercitoFacade.getNacaoNome(exercito);
         Local local = exercitoFacade.getLocal(exercito);
-        cArray[ii++] = localFacade.getCoordenadas(local);
+        cArray[ii++] = LocalFacade.getCoordenadas(local);
         cArray[ii++] = exercitoFacade.getMoral(exercito);
         cArray[ii++] = exercitoFacade.getQtTropasCavalaria(exercito);
         cArray[ii++] = exercitoFacade.getQtTropasInfantaria(exercito);
@@ -275,7 +275,7 @@ public class ExercitoConverter implements Serializable {
                 ret[ii][nn++] = pelotao.getModAtaque();
                 ret[ii][nn++] = pelotao.getModDefesa();
                 ret[ii][nn++] = exercitoFacade.getTransportesCapacity(pelotao);
-                ret[ii][nn++] = (int) exercitoFacade.getTransportesCargoUsed(pelotao);
+                ret[ii][nn++] = (int) exercitoFacade.getTransportesBurden(pelotao);
                 ret[ii][nn++] = exercitoFacade.getTransportesMinimo(pelotao);
                 ret[ii][nn++] = pelotao.getNome();
                 ii++;
@@ -401,14 +401,14 @@ public class ExercitoConverter implements Serializable {
      * @return
      */
     private static Object[][] getTropaTiposAsArray(Exercito exercito, SortedMap<String, Integer> vlInicial, int filtro) {
-        List<Pelotao> list = new ArrayList<Pelotao>();
+        List<Pelotao> list = new ArrayList<>();
         switch (filtro) {
             case 1:
                 try {
                     list.addAll(exercito.getPelotoes().values());
                 } catch (NullPointerException ex) {
                     //no garrison at the scene.
-                    list = new ArrayList<Pelotao>();
+                    list = new ArrayList<>();
                 }
                 break;
             case 2:
@@ -420,7 +420,7 @@ public class ExercitoConverter implements Serializable {
         }
         //check if vlInicial is in list. If not, then add.
         if (vlInicial != null) {
-            final SortedMap<String, Integer> setInicial = new TreeMap<String, Integer>(vlInicial);
+            final SortedMap<String, Integer> setInicial = new TreeMap<>(vlInicial);
             for (Pelotao pelotao : list) {
                 setInicial.remove(pelotao.getTipoTropa().getCodigo());
             }
@@ -466,7 +466,7 @@ public class ExercitoConverter implements Serializable {
     public static GenericoComboBoxModel getTropaTipoComboModel(Exercito exercito, boolean water) {
         ExercitoFacade ef = new ExercitoFacade();
         //prep list
-        Collection<TipoTropa> list = new ArrayList<TipoTropa>(WorldManager.getInstance().getCenario().getTipoTropas().size());
+        Collection<TipoTropa> list = new ArrayList<>(WorldManager.getInstance().getCenario().getTipoTropas().size());
         //monta a lista de tropas
         for (Pelotao pelotao : exercito.getPelotoes().values()) {
             final TipoTropa tpTropa = pelotao.getTipoTropa();
@@ -487,7 +487,7 @@ public class ExercitoConverter implements Serializable {
     public static GenericoComboBoxModel getTropaTipoComboModelAll(boolean water) {
         ExercitoFacade ef = new ExercitoFacade();
         //prep list
-        Collection<TipoTropa> list = new ArrayList<TipoTropa>(WorldManager.getInstance().getCenario().getTipoTropas().size());
+        Collection<TipoTropa> list = new ArrayList<>(WorldManager.getInstance().getCenario().getTipoTropas().size());
         //monta a lista de tropas
         for (TipoTropa tpTropa : WorldManager.getInstance().getCenario().getTipoTropas().values()) {
             if (water && ef.isAgua(tpTropa)) {

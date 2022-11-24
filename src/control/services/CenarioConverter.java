@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.SortedMap;
 import javax.swing.ComboBoxModel;
 import model.Cenario;
+import model.Cidade;
 import model.Habilidade;
 import model.Nacao;
 import model.Produto;
@@ -91,7 +92,7 @@ public class CenarioConverter implements Serializable {
     }
 
     private String[] getTaticaColNames(SortedMap<Integer, String> taticas) {
-        final List<String> colNames = new ArrayList<String>();
+        final List<String> colNames = new ArrayList<>();
         colNames.add(labels.getString("TATICA"));
         for (String value : taticas.values()) {
             colNames.add(value);
@@ -117,15 +118,15 @@ public class CenarioConverter implements Serializable {
         return (ret);
     }
 
-    public ComboBoxModel getTropaTipoComboModel(Raca racaCidade, Raca racaNacao) {
-        List<TipoTropa> lista = new ArrayList<TipoTropa>();
-        lista.addAll(cenarioFacade.getTipoTropas(cenario, racaCidade, racaNacao));
+    public ComboBoxModel getTropaTipoComboModel(Raca racaCidade, Raca racaNacao, Cidade city) {
+        List<TipoTropa> lista = new ArrayList<>();
+        lista.addAll(cenarioFacade.getTipoTropas(cenario, racaCidade, racaNacao, city));
         GenericoComboBoxModel model = new GenericoComboBoxModel(lista.toArray(new TipoTropa[0]));
         return model;
     }
 
     public ComboBoxModel getTropaTipoComboBasicModel(Raca racaCidade, Raca racaNacao) {
-        List<TipoTropa> lista = new ArrayList<TipoTropa>();
+        List<TipoTropa> lista = new ArrayList<>();
         for (TipoTropa troop : cenarioFacade.getTipoTropas(cenario, racaCidade, racaNacao)) {
             if (!troop.isBasicType()) {
                 continue;
@@ -137,14 +138,14 @@ public class CenarioConverter implements Serializable {
     }
 
     public ComboBoxModel getTropaTipoComboModel() {
-        List<TipoTropa> lista = new ArrayList<TipoTropa>();
+        List<TipoTropa> lista = new ArrayList<>();
         lista.addAll(cenarioFacade.getTipoTropas(cenario));
         GenericoComboBoxModel model = new GenericoComboBoxModel(lista.toArray(new TipoTropa[0]));
         return model;
     }
 
     public List<TipoTropa> getTropaTipo() {
-        List<TipoTropa> lista = new ArrayList<TipoTropa>();
+        List<TipoTropa> lista = new ArrayList<>();
         lista.addAll(cenarioFacade.getTipoTropas(cenario));
         return lista;
     }
@@ -227,7 +228,7 @@ public class CenarioConverter implements Serializable {
             ComparatorFactory.getComparatorComboDisplaySorter(listaExibir);
             // Converte habilidades para um Array[] 
             for (Habilidade hab : listaExibir) {
-                List<Habilidade> filters = new ArrayList<Habilidade>();
+                List<Habilidade> filters = new ArrayList<>();
                 for (Habilidade superAbilities : hab.getHabilidades().values()) {
                     //add hab filters
                     if (superAbilities.isFilter()) {

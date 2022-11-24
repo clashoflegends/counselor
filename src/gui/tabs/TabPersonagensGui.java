@@ -16,6 +16,7 @@ import control.services.FiltroConverter;
 import control.services.PersonagemConverter;
 import gui.TabBase;
 import gui.services.IAcaoGui;
+import gui.services.LifeTableCellRenderer;
 import gui.subtabs.SubTabBaseList;
 import gui.subtabs.SubTabOrdem;
 import gui.subtabs.SubTabPopup;
@@ -51,6 +52,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     private SubTabOrdem stOrdens;
     private final PortraitControler portraitControler;
     private boolean showPortrait = SettingsManager.getInstance().isConfig("ShowCharacterPortraits", "1", "0"); //must be initialized BEFORE initComponents();
+    private LifeTableCellRenderer ltcr;
 
     /**
      * Creates new form TabPersonagensGui
@@ -241,11 +243,11 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     }// </editor-fold>//GEN-END:initComponents
 
     private void jSplitPane1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane1PropertyChange
-        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY) ) {
+        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
             String splitHeight = evt.getNewValue().toString();
             LOG.debug("Split character pane divisor modified to " + splitHeight + " px.");
             SettingsManager.getInstance().setConfig("charSplitSize", splitHeight);
-        } 
+        }
     }//GEN-LAST:event_jSplitPane1PropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -282,7 +284,10 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         //adiciona listeners
         comboFiltro.addActionListener(personagemControl);
         jtMainLista.getSelectionModel().addListSelectionListener(personagemControl);
-
+        ltcr = new LifeTableCellRenderer(
+                SettingsManager.getInstance().getConfigAsInt("LifeLimitRed", "25"),
+                SettingsManager.getInstance().getConfigAsInt("LifeLimitAmber", "60")
+        );
         doAddTabs();
         doLoadChars();
     }
@@ -305,6 +310,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     public void setMainModel(TableModel model) {
         this.jtMainLista.setModel(model);
         this.doConfigTableColumns(jtMainLista);
+        jtMainLista.getColumnModel().getColumn(jtMainLista.getColumn(labels.getString("VITALIDADE")).getModelIndex()).setCellRenderer(ltcr);
         this.doTagHide();
         this.qtPersonagens.setText(getMainLista().getRowCount() + "");
         //seta primeira linha da tablemaster como selecionado e forca a carga dos detalhes.

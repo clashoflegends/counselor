@@ -5,7 +5,7 @@
  */
 package control.support;
 
-import business.BussinessException;
+import business.BusinessException;
 import business.DownloadPortraitsService;
 import control.services.DownloadPortraitsHttpServiceImpl;
 import gui.accessories.DownloadProgressWork;
@@ -74,7 +74,7 @@ public class DisplayPortraitsManager {
                 SettingsManager.getInstance().setConfig("PortraitsFolder", file.getPath());
 
             } else {
-                throw new BussinessException();
+                throw new BusinessException();
             }
 
             // Read server properties file
@@ -109,7 +109,7 @@ public class DisplayPortraitsManager {
         } catch (IOException ex) {
             String errorLabel = labels.getString("CONFIG.ERROR.PROPERTY");
             JOptionPane.showMessageDialog(panel, errorLabel, "Internal error", JOptionPane.ERROR_MESSAGE);
-        } catch (BussinessException ex) {
+        } catch (BusinessException ex) {
             // Select folder canceled
         } finally {
 
