@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox minWidth="828.0" prefHeight="500.0" prefWidth="838.0" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="control.battlesimulator.BattleFieldController">
+   <children>
+      <MenuBar>
+         <menus>
+            <Menu mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Close" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Edit">
+               <items>
+                  <MenuItem fx:id="combatMenuItem" mnemonicParsing="false" text="Combat" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Help">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="About" />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+      <ButtonBar prefHeight="40.0" prefWidth="200.0">
+        <buttons>
+            <AnchorPane>
+               <children>
+                  <HBox layoutX="-474.0" prefHeight="36.0" prefWidth="808.0" AnchorPane.leftAnchor="-474.0" AnchorPane.rightAnchor="0.0">
+                     <children>
+                        <GridPane prefHeight="36.0" prefWidth="425.0">
+                          <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="135.0" minWidth="10.0" prefWidth="135.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.0" minWidth="10.0" prefWidth="90.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="112.0" minWidth="10.0" prefWidth="88.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="84.0" minWidth="10.0" prefWidth="66.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <ChoiceBox prefWidth="150.0" GridPane.columnIndex="1">
+                                 <GridPane.margin>
+                                    <Insets right="1.0" />
+                                 </GridPane.margin>
+                              </ChoiceBox>
+                              <ChoiceBox prefHeight="24.0" prefWidth="92.0" GridPane.columnIndex="2">
+                                 <GridPane.margin>
+                                    <Insets left="1.0" right="1.0" />
+                                 </GridPane.margin>
+                              </ChoiceBox>
+                              <Spinner editable="true" maxWidth="-Infinity" prefHeight="24.0" prefWidth="72.0" GridPane.columnIndex="3">
+                                 <GridPane.margin>
+                                    <Insets left="1.0" />
+                                 </GridPane.margin>
+                              </Spinner>
+                              <CheckBox maxWidth="-Infinity" mnemonicParsing="false" prefHeight="18.0" prefWidth="180.0" selected="true" text="Pob_name" />
+                           </children>
+                        </GridPane>
+                     </children>
+                     <padding>
+                        <Insets right="5.0" />
+                     </padding>
+                  </HBox>
+                  <Pane layoutX="208.0" prefHeight="34.0" prefWidth="119.0">
+                     <children>
+                      <Button fx:id="addArmyButton" alignment="CENTER_RIGHT" layoutX="26.0" layoutY="5.0" mnemonicParsing="false" onAction="#addArmy" text="Add_Army" />
+                     </children>
+                  </Pane>
+               </children>
+            </AnchorPane>
+        </buttons>
+         <padding>
+            <Insets right="5.0" />
+         </padding>
+      </ButtonBar>
+      <VBox spacing="5.0" VBox.vgrow="ALWAYS">
+         <children>
+            <ScrollPane>
+               <content>
+                  <AnchorPane>
+                     <children>
+                        <VBox fx:id="armyBox" alignment="CENTER_RIGHT" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </ScrollPane>
+         </children>
+      </VBox>
+   </children>
+</VBox>

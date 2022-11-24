@@ -33,6 +33,7 @@ import persistenceCommons.SettingsManager;
  *
  * @author jmoura
  */
+@Deprecated
 public class BattleSimFx extends JApplet {
 
     private static final Log log = LogFactory.getLog(BattleSimFx.class);
