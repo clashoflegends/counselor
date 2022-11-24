@@ -28,7 +28,7 @@ import persistenceCommons.SettingsManager;
 public class OrdemJogadorControler implements Serializable, ListSelectionListener {
 
     private static final Log log = LogFactory.getLog(OrdemJogadorControler.class);
-    private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();;
+    private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private GenericoTableModel mainTableModel;
     private final TabOrdensGui tabGui;
     private List<Personagem> listaExibida;
@@ -65,10 +65,10 @@ public class OrdemJogadorControler implements Serializable, ListSelectionListene
                 int modelIndex = table.convertRowIndexToModel(rowIndex);
                 Personagem personagem = (Personagem) listaExibida.get(modelIndex);
                 getTabGui().doMudaAcao(personagem);
-            //PENDING atualizar table mensagens
+                //PENDING atualizar table mensagens
             }
         } catch (IndexOutOfBoundsException ex) {
-        //lista vazia?
+            //lista vazia?
         }
     }
 }

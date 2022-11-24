@@ -84,7 +84,7 @@ public class ActorInterfaceCidade extends ActorInterface {
         } else {
             Raca racaNacao = cidadeFacade.getNacaoRaca(getCidade());
             Raca racaCidade = cidadeFacade.getRaca(getCidade());
-            return CenarioConverter.getInstance().getTropaTipoComboModel(racaCidade, racaNacao);
+            return CenarioConverter.getInstance().getTropaTipoComboModel(racaCidade, racaNacao, getCidade());
         }
     }
 

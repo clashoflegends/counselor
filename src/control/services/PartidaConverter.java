@@ -57,7 +57,7 @@ public class PartidaConverter implements Serializable {
         final CenarioFacade cenarioFacade = new CenarioFacade();
         int ii = 0;
         // Converte Partida para um Array[] 
-        List<String[]> lista = new ArrayList<String[]>();
+        List<String[]> lista = new ArrayList<>();
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.NOME"), partida.getNome()});
         final Cenario cenario = partida.getCenario();
         lista.add(new String[]{labels.getString("PARTIDA.LABEL.CENARIO"), cenario.getNome()});
@@ -81,7 +81,7 @@ public class PartidaConverter implements Serializable {
         for (Habilidade hab : cenario.getHabilidades().values()) {
             lista.add(new String[]{labels.getString("PARTIDA.LABEL.HABCENARIO"), hab.getNome()});
         }
-        Set<Habilidade> habList = new TreeSet<Habilidade>();
+        Set<Habilidade> habList = new TreeSet<>();
         for (TipoTropa tpTropa : cenario.getTipoTropas().values()) {
             for (Habilidade habilidade : tpTropa.getHabilidades().values()) {
                 habList.add(habilidade);

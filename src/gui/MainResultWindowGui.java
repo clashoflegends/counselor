@@ -45,7 +45,8 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
     /**
      * Creates new form MainResultWindowGui
-     * @param autoLoad 
+     *
+     * @param autoLoad
      */
     public MainResultWindowGui(String autoLoad) {
         this.settingsManager = SettingsManager.getInstance();
@@ -62,6 +63,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbSaveWorld.addActionListener(wc);
         jbMap.addActionListener(wc);
         jbCopy.addActionListener(wc);
+        jbEmailList.addActionListener(wc);
         jbSend.addActionListener(wc);
         jbAbout.addActionListener(wc);
         jbScoreGraph.addActionListener(wc);
@@ -72,6 +74,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathPj.addActionListener(wc);
         togglePathPjFuture.addActionListener(wc);
         toggleFogWar.addActionListener(wc);
+        toggleScouts.addActionListener(wc);
         togglePathArmy.addActionListener(wc);
         toggleDisplayPortrait.addActionListener(wc);
         wc.doAutoLoad(autoLoad);
@@ -101,6 +104,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         jbSaveWorld = new javax.swing.JButton();
         jbCopy = new javax.swing.JButton();
+        jbEmailList = new javax.swing.JButton();
         jbMap = new javax.swing.JButton();
         jbScoreGraph = new javax.swing.JButton();
         jbScoreGraph2 = new javax.swing.JButton();
@@ -111,6 +115,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathPjFuture = new javax.swing.JToggleButton();
         togglePathArmy = new javax.swing.JToggleButton();
         toggleFogWar = new javax.swing.JToggleButton();
+        toggleScouts = new javax.swing.JToggleButton();
         toggleDisplayPortrait = new javax.swing.JToggleButton();
         filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         jbHexview = new javax.swing.JButton();
@@ -209,6 +214,16 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbCopy.setName("jbCopy"); // NOI18N
         jToolBar1.add(jbCopy);
 
+        jbEmailList.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/email.png"))); // NOI18N
+        jbEmailList.setToolTipText(labels.getString("COPIAR.EMAILS.TOOLTIP")); // NOI18N
+        jbEmailList.setActionCommand("jbEmailList");
+        jbEmailList.setEnabled(false);
+        jbEmailList.setFocusable(false);
+        jbEmailList.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbEmailList.setName("jbEmailList"); // NOI18N
+        jbEmailList.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(jbEmailList);
+
         jbMap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save map.png"))); // NOI18N
         jbMap.setText(labels.getString("SALVAR.MAPA")); // NOI18N
         jbMap.setToolTipText(labels.getString("SALVAR.MAPA.TOOLTIP")); // NOI18N
@@ -274,7 +289,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
         togglePathArmy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_path_army.png"))); // NOI18N
         togglePathArmy.setSelected(true);
-        togglePathArmy.setToolTipText(bundle.getString("SETTINGS.MAP.ARMYPATH.ARMY")); // NOI18N
+        togglePathArmy.setToolTipText(bundle.getString("SETTINGS.MAP.ARMYPATHORDER.TOOLTIP")); // NOI18N
         togglePathArmy.setActionCommand("drawPathArmy");
         togglePathArmy.setEnabled(false);
         togglePathArmy.setFocusable(false);
@@ -291,6 +306,17 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         toggleFogWar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         toggleFogWar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar2.add(toggleFogWar);
+
+        toggleScouts.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_scout.png"))); // NOI18N
+        toggleScouts.setSelected(isFogOfWarSelected());
+        toggleScouts.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SCOUT.TOOLTIP")); // NOI18N
+        toggleScouts.setActionCommand("drawScoutTargets");
+        toggleScouts.setEnabled(false);
+        toggleScouts.setFocusable(false);
+        toggleScouts.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        toggleScouts.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar2.add(toggleScouts);
+        toggleScouts.getAccessibleContext().setAccessibleDescription("Enable scouts on map");
 
         toggleDisplayPortrait.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/display_portrait.png"))); // NOI18N
         toggleDisplayPortrait.setSelected(isDisplayPortraitsSelected());
@@ -434,12 +460,13 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     }// </editor-fold>//GEN-END:initComponents
 
     private void splitMainPanelPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_splitMainPanelPropertyChange
-        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY) ) {
+        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
             String splitWidth = evt.getNewValue().toString();
             LOG.debug("Split pane divisor modified to " + splitWidth + " px.");
-            if (Integer.parseInt(splitWidth) > 0)
+            if (Integer.parseInt(splitWidth) > 0) {
                 SettingsManager.getInstance().setConfig("splitSize", splitWidth);
-        } 
+            }
+        }
     }//GEN-LAST:event_splitMainPanelPropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -452,6 +479,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JButton jbAbout;
     private javax.swing.JButton jbConfigs;
     private javax.swing.JButton jbCopy;
+    private javax.swing.JButton jbEmailList;
     private javax.swing.JButton jbHexview;
     private javax.swing.JButton jbLoad;
     private javax.swing.JButton jbMap;
@@ -480,6 +508,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JToggleButton togglePathArmy;
     private javax.swing.JToggleButton togglePathPj;
     private javax.swing.JToggleButton togglePathPjFuture;
+    private javax.swing.JToggleButton toggleScouts;
     // End of variables declaration//GEN-END:variables
 
     public void iniciaConfig() {
@@ -521,12 +550,12 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
         MapaControler mapaControl = WorldFacadeCounselor.getInstance().getMapaControler();//new MapaControler(this); //
         if (mapaControl == null) {
-            mapaControl = new MapaControler(this);  
+            mapaControl = new MapaControler(this);
         } else {
             mapaControl.initialize(this);
         }
 
-     //   MapaControler mapaControl = new MapaControler(this);
+        //   MapaControler mapaControl = new MapaControler(this);
         WorldFacadeCounselor.getInstance().setMapaControler(mapaControl);
         MainMapaGui mapaGui = new MainMapaGui();
         //Monta área do mapa
@@ -553,6 +582,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph2.setEnabled(wc.isVictoryPointsExists());
         jbHexview.setEnabled(true);
         jbCopy.setEnabled(true);
+        jbEmailList.setEnabled(true);
         jbSend.setEnabled(true);
         jbAbout.setEnabled(true);
         jbHexview.setEnabled(true);
@@ -562,13 +592,14 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathPjFuture.setEnabled(true);
         togglePathArmy.setEnabled(true);
         toggleFogWar.setEnabled(true);
+        toggleScouts.setEnabled(true);
         toggleDisplayPortrait.setEnabled(true);
 
         // Joga a janela toda para a esquerda = 0
         // divide a janela ao meio = -1
         //        this.splitMainPanel.setDividerLocation(55555);
         int splitWid = SysApoio.parseInt(SettingsManager.getInstance().getConfig("splitSize", "660"));
-        this.splitMainPanel.setDividerLocation(splitWid);        
+        this.splitMainPanel.setDividerLocation(splitWid);
         doMinimizeMap();
     }
 
@@ -668,7 +699,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     }
 
     public boolean isFogOfWarSelected() {
-        return settingsManager.getConfig("FogOfWarType", "1").equals("1");
+        return settingsManager.getConfig("fogOfWarType", "1").equals("1");
     }
 
     public JToggleButton getFogOfWar() {
@@ -682,9 +713,9 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     public JToggleButton getDisplayPortraits() {
         return this.toggleDisplayPortrait;
     }
-    
+
     public void setSplitPaneValue(int value) {
         this.splitMainPanel.setDividerLocation(value);
     }
-        
+
 }
