@@ -4,18 +4,46 @@
  */
 package radialMenu;
 
+import control.battlesimulator.BattleFieldController;
 import control.services.LocalConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.accessories.ArmyMoveSimulator;
 import gui.accessories.BattleCasualtySimulatorNew;
+import gui.accessories.BattleSimFx;
 import gui.accessories.TroopsCasualtiesList;
+import gui.accessories.battlesimulator.model.ArmySim;
+import gui.accessories.battlesimulator.model.BattleFieldSim;
+import gui.accessories.battlesimulator.model.NationSim;
+import gui.accessories.battlesimulator.model.PlatoonSim;
+import gui.accessories.battlesimulator.model.TroopTypeSim;
 import gui.components.DialogTextArea;
 import gui.services.ComponentFactory;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.SortedMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.embed.swing.JFXPanel;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import model.Local;
 import model.Nacao;
@@ -233,17 +261,52 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
     }
 
     private void createBattleSim(RadialButton rb) {
-        BattleCasualtySimulatorNew battleSim = new BattleCasualtySimulatorNew(rb.getLocal());
-        battleSim.setLocationRelativeTo(rb);
-        battleSim.setVisible(true);
-        /*
-            BattleSimFx battleSim = new BattleSimFx();
-            battleSim.start();
-            create a blank new FX window.
+        Optional<String> battleSimFxProperty = Optional.ofNullable(SettingsManager.getInstance().getConfig("BattleSimFX", "0"));
+        if (battleSimFxProperty.isPresent() && battleSimFxProperty.get().equals("1")) {
+            JFrame frame = new JFrame(labels.getString("BATTLESIM.LOCAL.TITLE"));
+            final JFXPanel battleSimPane = new JFXPanel(); 
+            frame.add(battleSimPane);
+            frame.setSize(828, 500);
+          
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+   //         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            
+            Platform.runLater(() -> initFX(battleSimPane));   
+        
+                    
+        } else {
+            BattleCasualtySimulatorNew battleSim = new BattleCasualtySimulatorNew(rb.getLocal());
+            battleSim.setLocationRelativeTo(rb);
+            battleSim.setVisible(true);
+        }
+        
+            
+        /*    create a blank new FX window.
             start over Counselor (setLocationRelativeTo)?
             list armies.
             go from there.
          */
+    }
+    
+     private  void initFX(JFXPanel fxPanel) {
+        // This method is invoked on the JavaFX thread
+        FXMLLoader loader = new  FXMLLoader(getClass().getResource("/gui/accessories/battlesimulator/views/MainView.fxml"));
+        Parent root = null;
+        try {
+            root = loader.load();
+            BattleFieldController controller = loader.getController();
+            BattleFieldSim battleField = controller.getBattleField();
+            controller.setLocal(localMenu);
+                      
+            Scene scene = new Scene(root);
+            fxPanel.setScene(scene);
+        } catch (IOException ex) {
+            Logger.getLogger(RmActionListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+       
+        
     }
 
     private void createArmyMovSim(RadialButton rb, boolean water) {
