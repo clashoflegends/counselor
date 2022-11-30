@@ -18,6 +18,7 @@ import control.services.FeiticoConverter;
 import control.services.PersonagemConverter;
 import javax.swing.ComboBoxModel;
 import model.ActorAction;
+import model.Cidade;
 import model.Exercito;
 import model.Local;
 import model.Nacao;
@@ -75,13 +76,21 @@ public class ActorInterfaceNacao extends ActorInterface {
 
     @Override
     public ComboBoxModel getTropaTipoComboModel(int tipo) {
-        //tipo=0 then ALL; =1 then by city=char race
-        if (tipo == 0) {
-            return CenarioConverter.getInstance().getTropaTipoComboModel();
-        } else {
-            Raca racaNacao = nacaoFacade.getRaca(getNacao());
-            Raca racaCidade = cidadeFacade.getRaca(nacaoFacade.getCapital(getNacao()));
-            return CenarioConverter.getInstance().getTropaTipoComboModel(racaCidade, racaNacao);
+        final Cidade city = nacaoFacade.getCapital(getNacao());
+        //tipo=0 then ALL; =1 then by city=char race; =2 then basic troops that can be recruited at capital
+        switch (tipo) {
+            case 0:
+                return CenarioConverter.getInstance().getTropaTipoComboModel();
+            case 1: {
+                Raca racaNacao = nacaoFacade.getRaca(getNacao());
+                Raca racaCidade = cidadeFacade.getRaca(city);
+                return CenarioConverter.getInstance().getTropaTipoComboModel(racaCidade, racaNacao, city);
+            }
+            default: {
+                Raca racaNacao = nacaoFacade.getRaca(getNacao());
+                Raca racaCidade = cidadeFacade.getRaca(city);
+                return CenarioConverter.getInstance().getTropaTipoComboBasicModel(racaCidade, racaNacao);
+            }
         }
     }
 

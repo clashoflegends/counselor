@@ -5,7 +5,7 @@
 package control;
 
 import baseLib.BaseModel;
-import business.BussinessException;
+import business.BusinessException;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
@@ -13,12 +13,14 @@ import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
 import business.facade.PersonagemFacade;
 import control.facade.WorldFacadeCounselor;
+import control.services.NacaoConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
 import gui.accessories.GraphPopupScoreByNation;
 import gui.accessories.GraphPopupVpPerTeam;
+import gui.accessories.GraphPopupVpPerTurn;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
 import java.awt.Component;
@@ -36,10 +38,11 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import javax.imageio.ImageIO;
-import javax.mail.internet.AddressException;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -69,7 +72,6 @@ import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.PersistenceException;
 import persistenceCommons.SettingsManager;
-import persistenceCommons.SmtpManager;
 import persistenceCommons.SysApoio;
 import persistenceCommons.WebCounselorManager;
 import persistenceCommons.XmlManager;
@@ -112,68 +114,100 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         registerDispatchManagerForMsg(DispatchManager.STATUS_BAR_MSG);
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
         registerDispatchManagerForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL);
+        registerDispatchManagerForMsg(DispatchManager.SPLIT_PANE_CHANGED);
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         if (actionEvent.getSource() instanceof JButton) {
             JButton jbTemp = (JButton) actionEvent.getSource();
-            //monta csv com as ordens
-            if ("jbOpen".equals(jbTemp.getActionCommand())) {
-                doOpen(jbTemp);
-            } else if ("jbSave".equals(jbTemp.getActionCommand())) {
-                doSave(jbTemp, false);
-            } else if ("jbSaveWorld".equals(jbTemp.getActionCommand())) {
-                doSaveWorld(jbTemp);
-            } else if ("jbExportMap".equals(jbTemp.getActionCommand())) {
-                doMapSave(jbTemp);
-            } else if ("jbCopy".equals(jbTemp.getActionCommand())) {
-                doCopy();
-            } else if ("jbSend".equals(jbTemp.getActionCommand())) {
-                doSend(jbTemp);
-            } else if ("jbScoreGraph".equals(jbTemp.getActionCommand())) {
-                doGraphScore();
-            } else if ("jbGraphSingleTurn".equals(jbTemp.getActionCommand())) {
-                doGraphSingleTurn();
-            } else if ("jbAbout".equals(jbTemp.getActionCommand())) {
-                doAbout();
-            } else if ("jbHexview".equals(jbTemp.getActionCommand())) {
-                doHexview();
-            } else if ("jbConfig".equals(jbTemp.getActionCommand())) {
-                doConfig();
-            } else if ("jbLoad".equals(jbTemp.getActionCommand())) {
-                doLoad(jbTemp);
-            } else {
-                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
-            }
+            doActionPerformendButtom(jbTemp);
         } else if (actionEvent.getSource() instanceof JToggleButton) {
             JToggleButton jbTemp = (JToggleButton) actionEvent.getSource();
-            if (("pcPathDraw").equals(jbTemp.getActionCommand())) {
-                doDrawPjPaths();
-
-            } else if ("drawPathArmy".equals(jbTemp.getActionCommand())) {
-                //TODO 
-
-            } else if ("drawFogWar".equals(jbTemp.getActionCommand())) {
-                doDrawFogOfWar(jbTemp);
-
-            } else if ("drawDisplayPortraits".equals(jbTemp.getActionCommand())) {
-
-                DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
-                if (!displayPortraitsManager.isShowPortraitEnableable()) {
-                    progressMonitor = new ProgressMonitor(gui, "Downloading file...", "", 0, 100);
-                    progressMonitor.setProgress(0);
-                    displayPortraitsManager.downloadPortraits(gui, this);
-                }
-
-                doDisplayPortraits(jbTemp);
-
-            } else {
-                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
-            }
-
+            doActionPerformedToggle(jbTemp);
         } else {
             log.info(labels.getString("OPS.GENERAL.EVENT"));
+        }
+    }
+
+    private void doActionPerformedToggle(JToggleButton jbTemp) {
+        if (null == jbTemp.getActionCommand()) {
+            log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+            return;
+        }
+        switch (jbTemp.getActionCommand()) {
+            case "pcPathDraw":
+                doDrawPjPaths();
+                break;
+            case "drawPathArmy":
+                doDrawArmyPaths(jbTemp);
+                break;
+            case "drawScoutTargets":
+                doScoutTargets(jbTemp);
+                break;
+            case "drawFogWar":
+                doDrawFogOfWar(jbTemp);
+                break;
+            case "drawDisplayPortraits":
+                doPortraits(jbTemp);
+                break;
+            default:
+                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+                break;
+        }
+    }
+
+    private void doActionPerformendButtom(JButton jbTemp) throws HeadlessException {
+        if (null == jbTemp.getActionCommand()) {
+            log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+        }
+        //monta csv com as ordens
+        switch (jbTemp.getActionCommand()) {
+            case "jbOpen":
+                doOpen(jbTemp);
+                break;
+            case "jbSave":
+                doSave(jbTemp, false);
+                break;
+            case "jbSaveWorld":
+                doSaveWorld(jbTemp);
+                break;
+            case "jbExportMap":
+                doMapSave(jbTemp);
+                break;
+            case "jbCopy":
+                doCopy();
+                break;
+            case "jbEmailList":
+                doEmailList();
+                break;
+            case "jbSend":
+                doSend(jbTemp);
+                break;
+            case "jbScoreGraph":
+                doGraphScore();
+                break;
+            case "jbGraphSingleTurn":
+                doGraphSingleTurn();
+                break;
+            case "jbGraphAllTurns":
+                doGraphAllTurns();
+                break;
+            case "jbAbout":
+                doAbout();
+                break;
+            case "jbHexview":
+                doHexview();
+                break;
+            case "jbConfig":
+                doConfig();
+                break;
+            case "jbLoad":
+                doLoad(jbTemp);
+                break;
+            default:
+                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+                break;
         }
     }
 
@@ -298,7 +332,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             WFC.doSaveOrdens(comando, ret);
             this.getGui().setStatusMsg(missingActionMsg + " " + String.format(labels.getString("ORDENS.SALVAS"), comando.size(), fc.getSelectedFile().getName()));
             this.saved = true;
-        } catch (BussinessException ex) {
+        } catch (BusinessException ex) {
             log.error(ex.getMessage());
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
@@ -348,6 +382,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         graph.start();
     }
 
+    private void doGraphAllTurns() throws HeadlessException {
+        GraphPopupVpPerTurn graph = new GraphPopupVpPerTurn(WorldFacadeCounselor.getInstance().getNacoes().values());
+        graph.start(WFC.getVictoryPoints());
+    }
+
     private void doHexview() {
         WFC.getMapaControler().doHexViewToggle();
     }
@@ -384,7 +423,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     /**
-     * Transictional method for development porpuse. Must be deleted after new methods in SettingsManager would be implemented.
+     * Transitional method for development purpose. Must be deleted after new methods in SettingsManager would be implemented.
      *
      * @param props
      * @return * private Map<String, String> getMapProperties(SettingsManager settingsManager) { Map<String, String> mapProperties = new
@@ -409,7 +448,35 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             JScrollPane jsp = new javax.swing.JScrollPane(jtaResultado);
             //configura jDialog
             JDialog dAbout = new JDialog(new JFrame(), true);
-            dAbout.setTitle(labels.getString("MENU.ABOUT"));
+            dAbout.setTitle(labels.getString("COPIAR.ACOES"));
+            dAbout.setAlwaysOnTop(true);
+            dAbout.setPreferredSize(new Dimension(600, 400));
+            dAbout.add(jsp);
+            dAbout.setLocationRelativeTo(this.getGui());
+            dAbout.pack();
+            dAbout.setVisible(true);
+        }
+    }
+
+    private void doEmailList() throws HeadlessException {
+        //config text Area
+        JTextArea jtaResultado = new javax.swing.JTextArea(80, 20);
+        jtaResultado.setLineWrap(false);
+        jtaResultado.setWrapStyleWord(false);
+        jtaResultado.setEditable(false);
+        //carrega o texto
+        jtaResultado.setText(listaEmails());
+        //copy para o clipboard
+        jtaResultado.selectAll();
+        jtaResultado.copy();
+        this.getGui().setStatusMsg(labels.getString("COPIAR.EMAILS.STATUS"));
+        jtaResultado.select(0, 0);
+        if (SettingsManager.getInstance().getConfig("CopyEmailListPopUp", "1").equals("1")) {
+            //scroll pane
+            JScrollPane jsp = new javax.swing.JScrollPane(jtaResultado);
+            //configura jDialog
+            JDialog dAbout = new JDialog(new JFrame(), true);
+            dAbout.setTitle(labels.getString("COPIAR.EMAILS"));
             dAbout.setAlwaysOnTop(true);
             dAbout.setPreferredSize(new Dimension(600, 400));
             dAbout.add(jsp);
@@ -439,19 +506,13 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
         /*
          * Try to post
-         * if fail, hen try to email
          * if fail, then alternate message
          */
         this.getGui().setStatusMsg(labels.getString("ENVIAR.POST.JUDGE"));
-        if (!SettingsManager.getInstance().getConfig("SendOrderWebPopUp", "1").equals("1")) {
-            doSendViaEmail(attachment, labels.getString("ENVIAR.FAILREASON.PROPERTYSET"));
-        } else if (!doSendPost(attachment)) {
-            //try to send via email
-            final String lastResponse = WebCounselorManager.getInstance().getLastResponseString();
-            doSendViaEmail(attachment, lastResponse);
-        } else {
-            //fail msg displayed by doSendViaEmail
-            //nao deu post nem email
+        if (!doSendPost(attachment)) {
+            //nao deu post 
+            this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO"));
+            SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), this.getGui());
         }
     }
 
@@ -483,7 +544,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 this.saved = false;
                 this.savedWorld = false;
                 doAutoLoadCommands(resultsFile);
-            } catch (BussinessException ex) {
+            } catch (BusinessException ex) {
                 SysApoio.showDialogError(ex.getMessage(), this.getGui());
                 this.getGui().setStatusMsg(ex.getMessage());
                 log.error(ex);
@@ -538,7 +599,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             }
             fc.setSelectedFile(resultsFile);
             this.saved = false;
-        } catch (BussinessException ex) {
+        } catch (BusinessException ex) {
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             log.error(ex);
@@ -554,6 +615,24 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return ret;
     }
 
+    private String listaEmails() {
+        Set<String> emailList = new TreeSet<>();
+        //find allied nations
+        List<Nacao> nationList = NacaoConverter.listaByFiltro("team");
+        for (Nacao nation : nationList) {
+            if (nation.getOwner().isNpc()) {
+                continue;
+            }
+            emailList.add(nation.getOwner().getEmail());
+        }
+        //format return String
+        String ret = "";
+        for (String address : emailList) {
+            ret += String.format("%s\n", address);
+        }
+        return ret;
+    }
+
     private String listaOrdens() {
         String ret = "";
         if (WFC.isStartupPackages() && WFC.getTurno() == 0) {
@@ -563,7 +642,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         if (cenarioFacade.hasOrdensNacao(WFC.getPartida())) {
             ret += listaOrdensByNation() + "\n\n";
         }
-        if (cenarioFacade.hasOrdensCidade(WFC.getCenario())) {
+        if (WFC.hasOrdensCidade()) {
             ret += listaOrdensByCity() + "\n\n";
         }
         if (SettingsManager.getInstance().getConfig("CopyActionsOrder", "1").equals("1")) {
@@ -578,31 +657,29 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         //lista todos os personagens
         for (Iterator<Personagem> iter = WFC.getPersonagens(); iter.hasNext();) {
             Personagem personagem = iter.next();
-            if (jogadorAtivo.isNacao(personagem.getNacao())) {
-                //ret += personagemFacade.getNome(personagem);
-                //ret += "\t@" + personagemFacade.getCoordenadas(personagem) + "\n";
-                ret += personagemFacade.getResultadoLocal(personagem);
-                List<String[]> pericias = personagemFacade.getPericias(personagem, WFC.getCenario());
-                int aTipo = 0, aTitulo = 1, aNatural = 2, aFinal = 3;
-                for (String[] sPericias : pericias) {
-                    if (sPericias[aTitulo].equals("") && sPericias[aNatural].equals(sPericias[aFinal])) {
-                        ret += String.format("\t. %s: %s \n", sPericias[aTipo], sPericias[aNatural]);
-                    } else if (sPericias[aTitulo].equals("") && !sPericias[aNatural].equals(sPericias[aFinal])) {
-                        ret += String.format("\t. %s: %s (%s)\n", sPericias[aTipo], sPericias[aNatural], sPericias[aFinal]);
-                    } else if (sPericias[aNatural].equals(sPericias[aFinal])) {
-                        ret += String.format("\t. %s: %s - %s\n", sPericias[aTipo], sPericias[aNatural], sPericias[aTitulo]);
-                    } else {
-                        ret += String.format("\t. %s: %s (%s) - %s\n", sPericias[aTipo], sPericias[aNatural], sPericias[aFinal], sPericias[aTitulo]);
-                    }
-                }
-
-                //Hero
-                if (personagemFacade.hasExtraOrdem(personagem)) {
-                    ret += String.format("\t. %s: %s \n", labels.getString("EPIC.HERO"), labels.getString("EPIC.HERO.DESCRIPTION"));
-                }
-                ret += getActorOrdersString(personagem);
-                ret += "\n";
+            if (!jogadorAtivo.isNacao(personagem.getNacao())) {
+                continue;
             }
+            ret += personagemFacade.getResultadoLocal(personagem);
+            ret += "\n\t" + String.format(labels.getString("PERSONAGEM.HAS.SKILLS"), personagem.getNome()) + "\n";
+            List<String[]> pericias = personagemFacade.getPericias(personagem, WFC.getCenario());
+            int aTipo = 0, aTitulo = 1, aNatural = 2, aFinal = 3;
+            for (String[] sPericias : pericias) {
+                if (sPericias[aTitulo].equals("") && sPericias[aNatural].equals(sPericias[aFinal])) {
+                    ret += String.format("\t. %s: %s \n", sPericias[aTipo], sPericias[aNatural]);
+                } else if (sPericias[aTitulo].equals("") && !sPericias[aNatural].equals(sPericias[aFinal])) {
+                    ret += String.format("\t. %s: %s (%s)\n", sPericias[aTipo], sPericias[aNatural], sPericias[aFinal]);
+                } else if (sPericias[aNatural].equals(sPericias[aFinal])) {
+                    ret += String.format("\t. %s: %s - %s\n", sPericias[aTipo], sPericias[aNatural], sPericias[aTitulo]);
+                } else {
+                    ret += String.format("\t. %s: %s (%s) - %s\n", sPericias[aTipo], sPericias[aNatural], sPericias[aFinal], sPericias[aTitulo]);
+                }
+            }
+            if (personagemFacade.hasExtraOrdem(personagem)) {
+                ret += String.format("\t. %s: %s \n", labels.getString("EPIC.HERO"), labels.getString("EPIC.HERO.DESCRIPTION"));
+            }
+            ret += getActorOrdersString(personagem);
+            ret += "\n";
         }
         return ret;
     }
@@ -683,7 +760,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private String listaOrdensBySequence() {
         String ret = labels.getString("TITLE.LIST.BYSEQ") + ":\n";
         Jogador jogadorAtivo = WFC.getJogadorAtivo();
-        SortedMap<Integer, List<PersonagemOrdem>> ordens = new TreeMap<Integer, List<PersonagemOrdem>>();
+        SortedMap<Integer, List<PersonagemOrdem>> ordens = new TreeMap<>();
         //list all actions from all actors
         for (BaseModel actor : WFC.getActors()) {
             if (jogadorAtivo.isNacao(actor.getNacao())) {
@@ -691,7 +768,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     if (po != null) {
                         List<PersonagemOrdem> lista = ordens.get(po.getOrdem().getNumero());
                         if (lista == null) {
-                            lista = new ArrayList<PersonagemOrdem>();
+                            lista = new ArrayList<>();
                         }
                         lista.add(po);
                         ordens.put(po.getOrdem().getNumero(), lista);
@@ -769,8 +846,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     /**
-     * Carrega o arquivo verifica integridade do arquivo verifica se o turno/nacao/jogador eh correto limpa as ordens atuais existentes carrega as
-     * ordens personagem por personagem atualiza GUI indica quantas ordens foram carregadas/descartadas
+     * Carrega o arquivo verifica integridade do arquivo verifica se o turno/nacao/jogador eh correto limpa as ordens atuais existentes carrega as ordens
+     * personagem por personagem atualiza GUI indica quantas ordens foram carregadas/descartadas
      */
     private void setComando(File file) {
         try {
@@ -785,7 +862,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 throw new IllegalStateException(labels.getString("TURNO.ERRADO") + file.getName());
             }
             final int qtPackageCarregadas = this.setPackage(comando.getPackages());
-            List<String> errorMsgs = new ArrayList<String>();
+            List<String> errorMsgs = new ArrayList<>();
             int qtOrdensCarregadas = this.setOrdens(comando, errorMsgs);
             this.getGui().setStatusMsg(String.format("%d %s %s", qtOrdensCarregadas, labels.getString("ORDENS.CARREGADAS"), file.getName()));
             doCountActions();
@@ -799,7 +876,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             }
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_COUNT);
-        } catch (IllegalStateException ex) {
+        } catch (IllegalStateException | PersistenceException ex) {
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             log.info(ex.getMessage());
@@ -807,10 +884,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             SysApoio.showDialogError(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName(), this.getGui());
             this.getGui().setStatusMsg(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName());
             log.error(ex.getMessage());
-        } catch (PersistenceException ex) {
-            SysApoio.showDialogError(ex.getMessage(), this.getGui());
-            this.getGui().setStatusMsg(ex.getMessage());
-            log.info(ex.getMessage());
         }
     }
 
@@ -907,14 +980,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     String.format("%s: %s [$%s]",
                             after.getNome(),
                             after.getOrdem().getDescricao(),
-                            acaoFacade.getCusto(after)));
+                            WFC.getOrderCost(after, nation)));
         } else if (before != null) {
             //Clear before
             this.getGui().setStatusMsg(
                     String.format("%s: %s [$%s]",
                             before.getNome(),
                             before.getOrdem().getDescricao(),
-                            acaoFacade.getCusto(before)));
+                            WFC.getOrderCost(before, nation)));
         }
     }
 
@@ -936,15 +1009,24 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     @Override
     public void receiveDispatch(int msgName, String msg) {
-        if (msgName == DispatchManager.SET_LABEL_MONEY) {
-            final Nacao nacao = WFC.getNacao(msg);
-            int actionCost = WFC.getNacaoOrderCost(nacao);
-            final String labelActionsCost = String.format(labels.getString("MENU.ACTION.COST"), nacaoFacade.getNome(nacao), actionCost);
-            getGui().setLabelMoney(labelActionsCost);
-        } else if (msgName == DispatchManager.STATUS_BAR_MSG) {
-            getGui().setStatusMsg(msg);
-        } else if (msgName == DispatchManager.SWITCH_PORTRAIT_PANEL) {
-            gui.getDisplayPortraits().setSelected(msg.equals("1"));
+        switch (msgName) {
+            case DispatchManager.SET_LABEL_MONEY:
+                final Nacao nacao = WFC.getNacao(msg);
+                int actionCost = WFC.getNacaoOrderCost(nacao);
+                final String labelActionsCost = String.format(labels.getString("MENU.ACTION.COST"), nacaoFacade.getNome(nacao), actionCost);
+                getGui().setLabelMoney(labelActionsCost);
+                break;
+            case DispatchManager.STATUS_BAR_MSG:
+                getGui().setStatusMsg(msg);
+                break;
+            case DispatchManager.SWITCH_PORTRAIT_PANEL:
+                gui.getDisplayPortraits().setSelected(msg.equals("1"));
+                break;
+            case DispatchManager.SPLIT_PANE_CHANGED:
+                gui.setSplitPaneValue(Integer.parseInt(msg));
+                break;
+            default:
+                break;
         }
     }
 
@@ -1033,7 +1115,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private List<Habilidade> getPackages(Nacao nacao) {
-        List<Habilidade> ret = new ArrayList<Habilidade>();
+        List<Habilidade> ret = new ArrayList<>();
         for (Habilidade habilidade : nacao.getHabilidades().values()) {
             try {
                 if (habilidade.isPackage()) {
@@ -1061,7 +1143,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private void clearPackages(Nacao nacao) {
-        final List<Habilidade> list = new ArrayList<Habilidade>();
+        final List<Habilidade> list = new ArrayList<>();
         list.addAll(nacao.getHabilidades().values());
         for (Habilidade habilidade : list) {
             if (habilidade.isPackage()) {
@@ -1122,68 +1204,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return info;
     }
 
-    private boolean doSendViaEmail(File attachment, String msg) {
-        /* prepara o email, pede informacoes se properties
-         * nao estao preenchidas salva novas informacoes no properties !
-         * pergunta se quer receber uma copia? ! 
-         * envia o email e avisa do recibo.
-         */
-        this.getGui().setStatusMsg(labels.getString("ENVIAR.JUDGE"));
-        final String from = getEmail();
-        if (from.equals("none")) {
-            return false;
-        }
-        try {
-            SmtpManager email = new SmtpManager();
-            email.addToCc(from);
-            email.setFrom(from);
-            email.setBody(listaOrdensEmailBody(msg));
-            String subject;
-            try {
-                subject = String.format("[Orders] %s - %s (%s) [%s]",
-                        WorldManager.getInstance().getPartida().getCodigo(),
-                        WorldManager.getInstance().getPartida().getJogadorAtivo().getLogin(),
-                        attachment.getName(), SysApoio.nowTimestamp());
-            } catch (NullPointerException e) {
-                subject = String.format("[Orders] NULL (%s) [%s]",
-                        attachment.getName(), SysApoio.nowTimestamp());
-            }
-            email.setSubject(subject);
-            email.addAttachment(attachment);
-            if (email.sendCounselor()) {
-                this.getGui().setStatusMsg(String.format(labels.getString("ENVIAR.DONE"), attachment.getName()));
-                return true;
-            } else {
-                this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO"));
-                SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), this.getGui());
-                return false;
-            }
-        } catch (PersistenceException ex) {
-            this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO") + " => " + ex.getMessage());
-            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), this.getGui());
-            return false;
-        } catch (AddressException ex) {
-            this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO.MALFORMED") + " => " + ex.getMessage());
-            SysApoio.showDialogError(ex.getMessage() + "\n\n" + labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO.MALFORMED"), this.getGui());
-            return false;
-        }
-    }
-
-    private String getEmail() {
-        String from = SettingsManager.getInstance().getConfig("MyEmail", "none");
-        if (from.equals("none")) {
-            from = JOptionPane.showInputDialog(labels.getString("ENVIAR.INPUT.EMAIL"), from);
-            if (from == null || from.equals("none")) {
-                this.getGui().setStatusMsg(labels.getString("ENVIAR.FALTOU.FROM"));
-                SysApoio.showDialogError(labels.getString("ENVIAR.FALTOU.FROM"), this.getGui());
-                return "none";
-            }
-            //salva novas informacoes no properties
-            SettingsManager.getInstance().setConfigAndSaveToFile("MyEmail", from);
-        }
-        return from;
-    }
-
     private boolean isLoadTeamOrders() {
         return SettingsManager.getInstance().isConfig("LoadActionsBehavior", "append", "0") && SettingsManager.getInstance().isConfig("LoadActionsOtherNations", "allow", "0");
     }
@@ -1227,16 +1247,40 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         SettingsManager.getInstance().doConfigSave("drawPcPath");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
 
+    private void doDrawArmyPaths(JToggleButton jbTemp) {
+        int settingValue = jbTemp.isSelected() ? 1 : 0;
+        SettingsManager.getInstance().setConfig("drawArmyMovPath", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("drawArmyMovPath");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
+
+    private void doScoutTargets(JToggleButton jbTemp) {
+        int settingValue = jbTemp.isSelected() ? 1 : 0;
+        SettingsManager.getInstance().setConfig("drawScoutOnMap", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("drawScoutOnMap");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
 
     private void doDrawFogOfWar(JToggleButton button) {
         int settingValue = button.isSelected() ? 1 : 0;
-        SettingsManager.getInstance().setConfig("FogOfWarType", String.valueOf(settingValue));
-        SettingsManager.getInstance().doConfigSave("FogOfWarType");
+        SettingsManager.getInstance().setConfig("fogOfWarType", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("fogOfWarType");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
 
+    private void doPortraits(JToggleButton button) {
+        DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
+        if (!displayPortraitsManager.isShowPortraitEnableable()) {
+            progressMonitor = new ProgressMonitor(gui, "Downloading file...", "", 0, 100);
+            progressMonitor.setProgress(0);
+            displayPortraitsManager.downloadPortraits(gui, this);
+        }
+        doDisplayPortraits(button);
     }
 
     private int calculateDrawPcPathValue(int pcPath, int pcPathFuture) {
@@ -1282,5 +1326,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             }
 
         }
+    }
+
+    public boolean isVictoryPointsExists() {
+        return !(WFC.getVictoryPoints() == null || WFC.getVictoryPoints().isEmpty());
     }
 }

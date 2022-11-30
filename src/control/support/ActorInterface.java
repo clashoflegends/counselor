@@ -11,7 +11,6 @@ import baseLib.GenericoTableModel;
 import business.facade.LocalFacade;
 import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
-import persistence.local.ListFactory;
 import control.facade.WorldFacadeCounselor;
 import control.services.CenarioConverter;
 import control.services.CidadeConverter;
@@ -29,6 +28,7 @@ import model.Personagem;
 import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 
@@ -150,6 +150,10 @@ public abstract class ActorInterface extends ControlBase implements Serializable
         } catch (NullPointerException ex) {
             return 0;
         }
+    }
+
+    public int getOrdensOpenSlots() {
+        return ordemFacade.getOrdensOpenSlots(this.getActor());
     }
 
     public abstract Nacao getNacao();

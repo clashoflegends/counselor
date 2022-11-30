@@ -5,7 +5,7 @@
 package control.facade;
 
 import baseLib.BaseModel;
-import business.BussinessException;
+import business.BusinessException;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import control.MapaControler;
@@ -33,6 +33,7 @@ import model.Ordem;
 import model.Partida;
 import model.Personagem;
 import model.PersonagemOrdem;
+import model.VictoryPointsGame;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.local.WorldManager;
@@ -67,21 +68,21 @@ public class WorldFacadeCounselor implements Serializable {
     /*
      * Client Only
      */
-    public synchronized void doStart(File file) throws BussinessException {
+    public synchronized void doStart(File file) throws BusinessException {
         try {
             WorldManager.getInstance().doStart(file);
         } catch (PersistenceException ex) {
-            throw new BussinessException(ex.getMessage());
+            throw new BusinessException(ex.getMessage());
         }
     }
 
-    public void doSaveOrdens(Comando com, File selectedFile) throws BussinessException {
+    public void doSaveOrdens(Comando com, File selectedFile) throws BusinessException {
         try {
             XmlManager.getInstance().save(com, selectedFile);
         } catch (PersistenceException ex) {
-            throw new BussinessException(ex.getMessage());
+            throw new BusinessException(ex.getMessage());
         } catch (NullPointerException ex) {
-            throw new BussinessException(ex.getMessage());
+            throw new BusinessException(ex.getMessage());
         }
 
     }
@@ -258,6 +259,10 @@ public class WorldFacadeCounselor implements Serializable {
         return cf.hasResourceManagement(getCenario());
     }
 
+    public boolean hasOrdensCidade() {
+        return cf.hasOrdensCidade(getCenario());
+    }
+
     public boolean hasCapitals() {
         return getCenario().hasHabilidade(";SNC;");
     }
@@ -304,13 +309,21 @@ public class WorldFacadeCounselor implements Serializable {
     public int getNacaoOrderCost(Nacao nacao) {
         int cost = 0;
         for (PersonagemOrdem po : getMapPersonagemOrdens(nacao)) {
-            cost += acaoFacade.getCusto(po);
+            cost += getOrderCost(po, nacao);
         }
         return cost;
     }
 
+    public int getOrderCost(PersonagemOrdem po, Nacao nacao) {
+        return acaoFacade.getCusto(po, nacao, this.getCenario(), this.getMercado());
+    }
+
     public Nacao getNacao(String idNacao) {
         return WorldManager.getInstance().getNacao(idNacao);
+    }
+
+    public VictoryPointsGame getVictoryPoints() {
+        return WorldManager.getInstance().getVictoryPoints();
     }
 
 }

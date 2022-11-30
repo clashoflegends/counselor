@@ -12,5 +12,5 @@ import model.ActorAction;
  */
 public interface IAcaoGui {
 
-    public void setValueAt(ActorAction actorAction, int ordIndex);
+    public void setValueAt(ActorAction actorAction, int ordIndex, int openSlotsQt);
 }

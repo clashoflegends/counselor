@@ -23,6 +23,7 @@ import model.ActorAction;
 import model.Artefato;
 import model.Cenario;
 import model.Feitico;
+import model.Habilidade;
 import model.Jogador;
 import model.Local;
 import model.Nacao;
@@ -35,6 +36,7 @@ import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
+import utils.OpenSlotCounter;
 import utils.StringRet;
 
 /**
@@ -56,7 +58,7 @@ public class PersonagemConverter implements Serializable {
     private static final ListFactory listFactory = new ListFactory();
 
     public static GenericoTableModel getPersonagemModel(List<Personagem> lista) {
-        List<Class> classes = new ArrayList<Class>(30);
+        List<Class> classes = new ArrayList<>(30);
         GenericoTableModel model = new GenericoTableModel(
                 getPersonagemColNames(classes),
                 getPersonagemAsArray(lista),
@@ -66,9 +68,13 @@ public class PersonagemConverter implements Serializable {
 
     private static String[] getPersonagemColNames(List<Class> classes) {
         int qtOrdens = WorldFacadeCounselor.getInstance().getOrdensQtMax();
-        List<String> colNames = new ArrayList<String>(30);
+        List<String> colNames = new ArrayList<>(30);
         colNames.add(labels.getString("NOME"));
         classes.add(java.lang.String.class);
+        if (SettingsManager.getInstance().isConfig("CharOpenSlotColumn", "1", "0")) {
+            colNames.add(labels.getString("OPEN.SLOTS"));
+            classes.add(OpenSlotCounter.class);
+        }
         for (int nn = 1; nn <= qtOrdens; nn++) {
             colNames.add(String.format("%s %s", labels.getString("ACAO"), nn));
 //            classes.add(String.class);
@@ -96,7 +102,7 @@ public class PersonagemConverter implements Serializable {
         colNames.add(labels.getString("DUELO"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("VITALIDADE"));
-        classes.add(java.lang.Integer.class);
+        classes.add(java.lang.Integer.class); //paint it red when low
         colNames.add(labels.getString("NACAO"));
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("CUSTO.MANUTENCAO"));
@@ -117,21 +123,23 @@ public class PersonagemConverter implements Serializable {
     private static Object[] personagemToArray(Personagem personagem) {
         int qtOrdens = WorldFacadeCounselor.getInstance().getOrdensQtMax();
         int ii = 0;
-        String[] temp;
         Object[] cArray = new Object[getPersonagemColNames(new ArrayList<Class>(30)).length];
         Local local = personagemFacade.getLocal(personagem);
-        Local localOrigem = personagemFacade.getLocalOrigem(personagem);
         //inicia array
         cArray[ii++] = personagemFacade.getNome(personagem);
-//        for (int nn = 0; nn < qtOrdens; nn++) {
-//            temp = ordemFacade.getOrdemDisplay(personagem, nn, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-//            cArray[ORDEM_COL_INDEX_START + nn] = temp[0] + temp[1];
-//            ii++;
-//        }
+        final OpenSlotCounter openSlot = new OpenSlotCounter(ordemFacade.getOrdensOpenSlots(personagem));
+        if (SettingsManager.getInstance().isConfig("CharOpenSlotColumn", "1", "0")) {
+            cArray[ii++] = openSlot;
+        }
         final int orderMax = ordemFacade.getOrdemMax(personagem, WorldFacadeCounselor.getInstance().getCenario());
         for (int nn = 0; nn < qtOrdens; nn++) {
-            cArray[ORDEM_COL_INDEX_START + nn] = ordemFacade.getActorAction(personagem, nn, orderMax, WorldFacadeCounselor.getInstance().getJogadorAtivo());
+            final ActorAction actorAction = ordemFacade.getActorAction(personagem, nn, orderMax, WorldFacadeCounselor.getInstance().getJogadorAtivo());
+            cArray[ORDEM_COL_INDEX_START + nn] = actorAction;
             ii++;
+            if (nn == 0 || actorAction.isBlank()) {
+                //Sync the status of the first order, or if blank,  to OpenSlots column
+                openSlot.setStatus(actorAction.getStatus());
+            }
         }
         cArray[ii++] = local;
         cArray[ii++] = personagem.getPericiaComandante();
@@ -204,7 +212,7 @@ public class PersonagemConverter implements Serializable {
 
     private static String[] getArtefatoColNames() {
         //PENDING: COlocar artefato em uso e se o personagem pode usar o artefato ou nao(disable color?)
-        String[] colNames = {labels.getString("NOME"), labels.getString("PODER"), labels.getString("VALOR"),
+        String[] colNames = {labels.getString("NOME"), labels.getString("PODER"), labels.getString("VALOR"), labels.getString("ALINHAMENTO"),
             labels.getString("TIPO"), labels.getString("LATENTE")
         };
         return (colNames);
@@ -220,6 +228,7 @@ public class PersonagemConverter implements Serializable {
             ret[ii][i++] = artefatoFacade.getNome(artefato);
             ret[ii][i++] = artefatoFacade.getPrimario(artefato);
             ret[ii][i++] = artefatoFacade.getValor(artefato);
+            ret[ii][i++] = artefatoFacade.getAlinhamento(artefato);
             ret[ii][i++] = artefatoFacade.getDescricao(artefato);
             ret[ii][i++] = artefatoFacade.getLatente(artefato);
             ii++;
@@ -494,14 +503,15 @@ public class PersonagemConverter implements Serializable {
      */
     public static String getResultado(Personagem personagem) {
         //Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
-        return personagemFacade.getResultado(personagem) + getPericias(personagem);
+        return personagemFacade.getResultado(personagem) + "\n" + getPericias(personagem);
     }
 
     public static String getPericias(Personagem personagem) {
         String mask1 = "   %s %d(%d)\n";
         String mask2 = "   %s %d\n";
+        String mask3 = "   %s\n";
         Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
-        String ret = "";
+        String ret = String.format(labels.getString("PERSONAGEM.HAS.SKILLS"), personagem.getNome()) + "\n";
         if (personagem.getPericiaAgenteNatural() > 0) {
             if (personagem.getPericiaAgente() != personagem.getPericiaAgenteNatural()) {
                 ret += String.format(mask1,
@@ -583,6 +593,15 @@ public class PersonagemConverter implements Serializable {
             ret += String.format(mask2,
                     labels.getString("DUELO"),
                     personagem.getDuelo());
+        }
+        //if there are special habilities, add title for section then list them
+        boolean title = true;
+        for (Habilidade hab : personagemFacade.getHabilidades(personagem)) {
+            if (title) {
+                ret += "\n" + String.format(labels.getString("PERSONAGEM.HAS.POWERS"), personagem.getNome()) + "\n";
+                title = false;
+            }
+            ret += String.format(mask3, hab.getNome());
         }
         return ret;
     }

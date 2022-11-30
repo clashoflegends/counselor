@@ -20,6 +20,7 @@ import gui.MainMapaGui;
 import gui.accessories.DialogHexView;
 import gui.components.DialogTextArea;
 import gui.services.ComponentFactory;
+import gui.services.IPopupTabGui;
 import java.awt.Point;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -57,21 +58,27 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
 
     private static final Log log = LogFactory.getLog(MapaControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private static final LocalFacade localFacade = new LocalFacade();
-    private static final ExercitoFacade exercitoFacade = new ExercitoFacade();
-    private static MapaManager mapaManager; //tem que criar depois para incluir o form
-    private static final ListFactory listFactory = new ListFactory();
+    private final LocalFacade localFacade = new LocalFacade();
+    private ExercitoFacade exercitoFacade = null;
+    private MapaManager mapaManager; //tem que criar depois para incluir o form
+    private ListFactory listFactory = null;
     private MainMapaGui tabGui;
     private DialogTextArea hexInfo;
     private Local localAtual;
-    private final List<JTable> tables = new ArrayList<JTable>();
+    private final List<JTable> tables = new ArrayList<>();
     private RadialMenu rmActive;
-    private final MapMenuManager mapMenuManager;
+    private MapMenuManager mapMenuManager;
     private DialogHexView hexView;
-    private final Jogador jogadorAtivo;
+    private Jogador jogadorAtivo;
 
     public MapaControler(JPanel form) {
+        initialize(form);
+    }
+
+    public final void initialize(JPanel form) {
         this.jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
+        listFactory = new ListFactory();
+        exercitoFacade = new ExercitoFacade();
         final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         mapaManager = new MapaManager(cenario, form);
         mapaManager.setLocais(listFactory.listLocais());
@@ -80,6 +87,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_REDRAW);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_RANGE_CLICK);
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+        registerDispatchManagerForMsg(DispatchManager.GUI_STATUS_PERSIST);
         //inicialize locais
         WorldBuilderMenuManager.getInstance().doCanvasReset(mapaManager.getMapMaxSize(listFactory.listLocais().values()));
         WorldBuilderMenuManager.getInstance().setLocais(listFactory.listLocais());
@@ -90,22 +98,24 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         mapMenuManager.setLocais(listFactory.listLocais());
         mapMenuManager.setNacoes(listFactory.listNacoes());
         mapMenuManager.setTerrenos(cenario.getTerrenos());
+        rmActive = getMapMenuManager().getMainMenu();
+
     }
 
     private ImageIcon printActionsOnMap() {
-        return new ImageIcon(mapaManager.printActionsOnMap(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
+        return new ImageIcon(mapaManager.printActionsOnMap(listFactory.listLocais().values(), listFactory.listPersonagens(), getJogadorAtivo()));
     }
 
     public ImageIcon printMapaGeral() {
-        return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
+        return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), getJogadorAtivo()));
     }
 
     private ImageIcon refreshMapaGeral() {
-        return new ImageIcon(mapaManager.redrawMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo));
+        return new ImageIcon(mapaManager.redrawMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), getJogadorAtivo()));
     }
 
     public BufferedImage getMap() {
-        return mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), jogadorAtivo);
+        return mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), getJogadorAtivo());
     }
 
     public MainMapaGui getTabGui() {
@@ -220,7 +230,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
                     hideRadialMenu();
                     rmActive = WorldBuilderMenuManager.getInstance().getRmWorldBuilder();
                 } else if (rmActive == null) {
-                    rmActive = mapMenuManager.getMainMenu();
+                    rmActive = getMapMenuManager().getMainMenu();
                 }
                 this.printTag(local);
             }
@@ -296,7 +306,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
 
     public void printTagRange(Local local, int range) {
         HashMap<Local, Integer> localInRange;
-        localInRange = localFacade.getLocalRange(local, range, true, listFactory.listLocais());
+        localInRange = localFacade.getLocalRange(local, range, false, listFactory.listLocais());
         localInRange.remove(local);
         addMovementTagRange(localInRange);
     }
@@ -315,14 +325,18 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
                 tabGui.doMapa(this.refreshMapaGeral());
                 break;
             case DispatchManager.ACTIONS_MAP_REDRAW:
-                if (!SettingsManager.getInstance().isConfig("drawPcPath", "1", "1") && !SettingsManager.getInstance().isConfig("drawPcPath", "3", "1")) {
-                    tabGui.doActionsOnMapHide();
-                } else {
-                    tabGui.doActionsOnMap(this.printActionsOnMap());
-                }
+                tabGui.doActionsOnMap(this.printActionsOnMap());
+//                if (SettingsManager.getInstance().isConfig("drawPcPath", "1", "1") || SettingsManager.getInstance().isConfig("drawPcPath", "3", "1")) {
+//                    tabGui.doActionsOnMap(this.printActionsOnMap());
+//                } else {
+//                    tabGui.doActionsOnMapHide();
+//                }
                 break;
             case DispatchManager.LOCAL_MAP_REDRAW_TAG:
                 tabGui.setTag();
+                break;
+            case DispatchManager.GUI_STATUS_PERSIST:
+                doConfigHexView();
                 break;
             default:
                 break;
@@ -347,7 +361,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         if (rmActive == null && SettingsManager.getInstance().isWorldBuilder()) {
             rmActive = WorldBuilderMenuManager.getInstance().getRmWorldBuilder();
         } else if (rmActive == null) {
-            rmActive = mapMenuManager.getMainMenu();
+            rmActive = getMapMenuManager().getMainMenu();
         }
         rmActive.setHierarchyAncestor(this);
 
@@ -364,13 +378,34 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         showActiveRadialMenu(local);
     }
 
-    public void doHexViewToggle() {
-        if (hexView != null) {
-            hexView.setVisible(!hexView.isVisible());
-        } else {
-            hexView = ComponentFactory.showDialogHexView(this.getTabGui());
-            doHexViewUpdate();
+    private void doConfigHexView() {
+        //check status of popups
+        if (SettingsManager.getInstance().isConfig("GuiHexViewDetachedStatus", IPopupTabGui.POPUP_FLOATING, IPopupTabGui.POPUP_HIDDEN)) {
+            doCreateHexView();
         }
+    }
+
+    public void doHexViewToggle() {
+        if (hexView == null) {
+            doCreateHexView();
+            SettingsManager.getInstance().setConfigAndSaveToFile("GuiHexViewDetachedStatus", IPopupTabGui.POPUP_FLOATING);
+        } else if (hexView.isVisible()) {
+            //hide
+            hexView.setVisible(!hexView.isVisible());
+            SettingsManager.getInstance().setConfigAndSaveToFile("GuiHexViewDetachedStatus", IPopupTabGui.POPUP_HIDDEN);
+        } else {
+            //display
+            hexView.setVisible(!hexView.isVisible());
+            SettingsManager.getInstance().setConfigAndSaveToFile("GuiHexViewDetachedStatus", IPopupTabGui.POPUP_FLOATING);
+        }
+    }
+
+    private void doCreateHexView() {
+        //create on first time
+        if (hexView == null) {
+            hexView = ComponentFactory.showDialogHexView(this.getTabGui());
+        }
+        doHexViewUpdate();
     }
 
     private void doHexViewUpdate() {
@@ -382,4 +417,41 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         hexView.setText(text);
         hexView.setTitle(title);
     }
+
+    public MapaManager getMapaManager() {
+        return mapaManager;
+    }
+
+    public void setMapaManager(MapaManager mapaManager) {
+        this.mapaManager = mapaManager;
+    }
+
+    /**
+     * @return the mapMenuManager
+     */
+    public MapMenuManager getMapMenuManager() {
+        return mapMenuManager;
+    }
+
+    /**
+     * @param mapMenuManager the mapMenuManager to set
+     */
+    public void setMapMenuManager(MapMenuManager mapMenuManager) {
+        this.mapMenuManager = mapMenuManager;
+    }
+
+    /**
+     * @return the jogadorAtivo
+     */
+    public Jogador getJogadorAtivo() {
+        return jogadorAtivo;
+    }
+
+    /**
+     * @param jogadorAtivo the jogadorAtivo to set
+     */
+    public void setJogadorAtivo(Jogador jogadorAtivo) {
+        this.jogadorAtivo = jogadorAtivo;
+    }
+
 }

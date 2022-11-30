@@ -12,6 +12,7 @@ import business.facade.CidadeFacade;
 import business.facade.ExercitoFacade;
 import business.facade.LocalFacade;
 import business.interfaces.IExercito;
+import business.converter.TitleFactory;
 import control.facade.WorldFacadeCounselor;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,13 +31,13 @@ import model.Pelotao;
 import model.Personagem;
 import model.TipoTropa;
 import msgs.BaseMsgs;
-import business.services.TitleFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.local.ListFactory;
 import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import utils.StringIntSortedCell;
 import utils.StringRet;
 
 /**
@@ -103,7 +104,7 @@ public class ExercitoConverter implements Serializable {
     }
 
     private static List<Pelotao> listTropasTipoAll(Exercito exercito) {
-        List<Pelotao> ret = new ArrayList<Pelotao>();
+        List<Pelotao> ret = new ArrayList<>();
         for (TipoTropa tipoTropa : WorldManager.getInstance().getCenario().getTipoTropas().values()) {
             Pelotao pelotao;
             try {
@@ -123,7 +124,7 @@ public class ExercitoConverter implements Serializable {
     }
 
     private static List<Pelotao> listTropasTipoTransfer(Exercito exercito) {
-        List<Pelotao> ret = new ArrayList<Pelotao>();
+        List<Pelotao> ret = new ArrayList<>();
         for (Pelotao pelotao : exercito.getPelotoes().values()) {
             if (pelotao.getTipoTropa().isTransferable()) {
                 ret.add(pelotao);
@@ -138,14 +139,14 @@ public class ExercitoConverter implements Serializable {
         cArray[ii++] = exercitoFacade.getComandanteTitulo(exercito, WorldFacadeCounselor.getInstance().getCenario());
         cArray[ii++] = exercitoFacade.getNacaoNome(exercito);
         Local local = exercitoFacade.getLocal(exercito);
-        cArray[ii++] = localFacade.getCoordenadas(local);
+        cArray[ii++] = LocalFacade.getCoordenadas(local);
+        cArray[ii++] = exercitoFacade.getMoral(exercito);
         cArray[ii++] = exercitoFacade.getQtTropasCavalaria(exercito);
         cArray[ii++] = exercitoFacade.getQtTropasInfantaria(exercito);
         cArray[ii++] = exercitoFacade.getEsquadra(exercito);
         cArray[ii++] = exercitoFacade.getComida(exercito);
         cArray[ii++] = exercitoFacade.getUpkeepFood(exercito);
-        cArray[ii++] = exercitoFacade.getMoral(exercito);
-        cArray[ii++] = exercitoFacade.getDescricaoTamanho(exercito);
+        cArray[ii++] = exercitoFacade.getTamanhoCell(exercito);
         cArray[ii++] = exercitoFacade.getTacticNameSelected(exercito);
         cArray[ii++] = exercitoFacade.getUpkeepCost(exercito);
         cArray[ii++] = exercitoFacade.getSiege(exercito);
@@ -177,7 +178,7 @@ public class ExercitoConverter implements Serializable {
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class,
-                            java.lang.String.class,
+                            StringIntSortedCell.class,
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
@@ -189,9 +190,9 @@ public class ExercitoConverter implements Serializable {
 
     private static String[] getExercitoColNames() {
         String[] colNames = {
-            labels.getString("COMANDANTE"), labels.getString("NACAO"), labels.getString("LOCAL"),
+            labels.getString("COMANDANTE"), labels.getString("NACAO"), labels.getString("LOCAL"), labels.getString("MORAL"),
             labels.getString("CAVALARIAS"), labels.getString("INFANTARIAS"), labels.getString("NAVIOS"),
-            labels.getString("COMIDA"), labels.getString("COMIDA.CONSUMO"), labels.getString("MORAL"),
+            labels.getString("COMIDA"), labels.getString("COMIDA.CONSUMO"),
             labels.getString("TAMANHO"),
             labels.getString("TATICA"),
             labels.getString("CUSTO.MANUTENCAO"), labels.getString("MAQUINAS.GUERRA"),
@@ -274,7 +275,7 @@ public class ExercitoConverter implements Serializable {
                 ret[ii][nn++] = pelotao.getModAtaque();
                 ret[ii][nn++] = pelotao.getModDefesa();
                 ret[ii][nn++] = exercitoFacade.getTransportesCapacity(pelotao);
-                ret[ii][nn++] = (int) exercitoFacade.getTransportesCargoUsed(pelotao);
+                ret[ii][nn++] = (int) exercitoFacade.getTransportesBurden(pelotao);
                 ret[ii][nn++] = exercitoFacade.getTransportesMinimo(pelotao);
                 ret[ii][nn++] = pelotao.getNome();
                 ii++;
@@ -400,14 +401,14 @@ public class ExercitoConverter implements Serializable {
      * @return
      */
     private static Object[][] getTropaTiposAsArray(Exercito exercito, SortedMap<String, Integer> vlInicial, int filtro) {
-        List<Pelotao> list = new ArrayList<Pelotao>();
+        List<Pelotao> list = new ArrayList<>();
         switch (filtro) {
             case 1:
                 try {
                     list.addAll(exercito.getPelotoes().values());
                 } catch (NullPointerException ex) {
                     //no garrison at the scene.
-                    list = new ArrayList<Pelotao>();
+                    list = new ArrayList<>();
                 }
                 break;
             case 2:
@@ -419,7 +420,7 @@ public class ExercitoConverter implements Serializable {
         }
         //check if vlInicial is in list. If not, then add.
         if (vlInicial != null) {
-            final SortedMap<String, Integer> setInicial = new TreeMap<String, Integer>(vlInicial);
+            final SortedMap<String, Integer> setInicial = new TreeMap<>(vlInicial);
             for (Pelotao pelotao : list) {
                 setInicial.remove(pelotao.getTipoTropa().getCodigo());
             }
@@ -465,7 +466,7 @@ public class ExercitoConverter implements Serializable {
     public static GenericoComboBoxModel getTropaTipoComboModel(Exercito exercito, boolean water) {
         ExercitoFacade ef = new ExercitoFacade();
         //prep list
-        Collection<TipoTropa> list = new ArrayList<TipoTropa>(WorldManager.getInstance().getCenario().getTipoTropas().size());
+        Collection<TipoTropa> list = new ArrayList<>(WorldManager.getInstance().getCenario().getTipoTropas().size());
         //monta a lista de tropas
         for (Pelotao pelotao : exercito.getPelotoes().values()) {
             final TipoTropa tpTropa = pelotao.getTipoTropa();
@@ -486,7 +487,7 @@ public class ExercitoConverter implements Serializable {
     public static GenericoComboBoxModel getTropaTipoComboModelAll(boolean water) {
         ExercitoFacade ef = new ExercitoFacade();
         //prep list
-        Collection<TipoTropa> list = new ArrayList<TipoTropa>(WorldManager.getInstance().getCenario().getTipoTropas().size());
+        Collection<TipoTropa> list = new ArrayList<>(WorldManager.getInstance().getCenario().getTipoTropas().size());
         //monta a lista de tropas
         for (TipoTropa tpTropa : WorldManager.getInstance().getCenario().getTipoTropas().values()) {
             if (water && ef.isAgua(tpTropa)) {

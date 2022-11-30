@@ -20,6 +20,7 @@ import gui.subtabs.SubTabRelacionamento;
 import gui.subtabs.SubTabTropas;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LinearGradientPaint;
@@ -126,6 +127,7 @@ public class ComponentFactory implements Serializable {
     private static final String TERRENO = "Terreno";
     private static final String TEXTO_20 = "Texto_20";
     private static final String TROPA_TIPO = "Tropa_Tipo";
+    private static final String TROPA_TIPO_BASIC = "Tropa_Tipo_Basic";
     private static final String TROPA_TABLE = "Tropa_Table";
     private static final String TROPA_TABLE_TR = "Tropa_Table_Tr";
     private static final String TROPA_TABLE_GARRISON = "Tropa_Table_Garrison";
@@ -143,499 +145,781 @@ public class ComponentFactory implements Serializable {
             Ordem ordemSelecionada) {
 
         Component cNovo = null;
-        if (controle.equals(ALIANCA)) {            //Alianca
-            //FIXME: carregar do cenario, nao utilizada no grecia
-            JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
-                    new String[][]{
-                        {labels.getString("ALIANCA.SERVOS.NEGROS"), "sn"},
-                        {labels.getString("ALIANCA.NEUTROS"), "ne"},
-                        {labels.getString("ALIANCA.POVOS.LIVRES"), "pl"}
-                    }));
-            cNovo = cbTemp;
-        } else if (controle.equals(ARTEFATO_ALL)) {            //Artefato-All
-            //é um combo com TODOS os artefatos
-            JComboBox cbTemp = new JComboBox(getActor().getArtefatoComboModel(0));
-            cNovo = cbTemp;
-        } else if (controle.equals(ARTEFATO_CARRIED)) {            //Artefato-Carried
-            //é um combo com os artefatos que o actor possui
-            JComboBox cbTemp;
-            if (isAllSelected()) {
-                cbTemp = new JComboBox(getActor().getArtefatoComboModel(0));
-            } else {
-                cbTemp = new JComboBox(getActor().getArtefatoComboModel(1));
-            }
-            cNovo = cbTemp;
-        } else if (controle.equals(ARTEFATO_CARRIED_SCRY)) {            //Artefato-Carried
-            //é um combo com os artefatos que o actor possui
-            JComboBox cbTemp;
-            if (isAllSelected()) {
-                cbTemp = new JComboBox(getActor().getArtefatoComboModel(0));
-            } else {
-                cbTemp = new JComboBox(getActor().getArtefatoComboModel(4));
-            }
-            cNovo = cbTemp;
-        } else if (controle.equals(ARTEFATO_CARRIED_SUMMON)) {            //Artefato-Carried
-            //é um combo com os artefatos que o actor possui
-            JComboBox cbTemp;
-            if (isAllSelected()) {
-                cbTemp = new JComboBox(getActor().getArtefatoComboModel(0));
-            } else {
-                cbTemp = new JComboBox(getActor().getArtefatoComboModel(5));
-            }
-            cNovo = cbTemp;
-        } else if (controle.equals(ARTEFATO_CARRIED_DRAGONEGG)) {            //Artefato-Carried
-            //é um combo com os artefatos que o actor possui
-            JComboBox cbTemp;
-            if (isAllSelected()) {
-                cbTemp = new JComboBox(getActor().getArtefatoComboModel(0));
-            } else {
-                cbTemp = new JComboBox(getActor().getArtefatoComboModel(6));
-            }
-            cNovo = cbTemp;
-        } else if (controle.equals(ARTEFATO_NACAO_DROP)) {            //Artefato-Nacao-Drop
-            //é um combo com os artefatos que a nacao possui
-            JComboBox cbTemp = new JComboBox(getActor().getArtefatoComboModel(2));
-            cNovo = cbTemp;
-        } else if (controle.equals(ARTEFATO_NONACAO)) {            //Artefato-NoNacao
-            //é um combo com os artefatos que a nacao NAO possui
-            JComboBox cbTemp;
-            if (isAllSelected()) {
-                cbTemp = new JComboBox(getActor().getArtefatoComboModel(0));
-            } else {
-                cbTemp = new JComboBox(getActor().getArtefatoComboModel(3));
-            }
-            cNovo = cbTemp;
-        } else if (controle.equals(CIDADE_ANY)) {            //Cidade-ANY
-            if (isAllSelected()) {
-                //Inputbox
-                JFormattedTextField jtTemp = new JFormattedTextField(
-                        SysApoio.createFormatter("####"));
-                jtTemp.setName("jtCidadeAny"); // NOI18N
-                jtTemp.setColumns(4);
-                cNovo = jtTemp;
-            } else {
-                //é um combo com o model com os personagens conhecidos no local da mesma nacao
-                JComboBox cbTemp = new JComboBox(getActor().getCidadeComboModel(0));
-                cNovo = cbTemp;
-            }
-        } else if (controle.equals(CIDADE_NACAO)) {            //Cidade-Nacao
-            if (isAllSelected()) {
-                //Inputbox
-                JFormattedTextField jtTemp = new JFormattedTextField(
-                        SysApoio.createFormatter("####"));
-                jtTemp.setName("jtCidadeNacao"); // NOI18N
-                jtTemp.setColumns(4);
-                cNovo = jtTemp;
-            } else {
-                //é um combo com o model com os personagens conhecidos no local da mesma nacao
-                JComboBox cbTemp = new JComboBox(getActor().getCidadeComboModel(1));
-                cNovo = cbTemp;
-            }
-        } else if (controle.equals(CIDADE_NEWCAPITAL)) {            //Cidade-NewCapital
-            //Inputbox
-            JFormattedTextField jtTemp = new JFormattedTextField(
-                    SysApoio.createFormatter("####"));
-            jtTemp.setName("jtCidadeNewCapital"); // NOI18N
-            jtTemp.setColumns(4);
-            cNovo = jtTemp;
-        } else if (controle.equals(COORDENADA)) {            //Coordenada
-            //Novo combobox com locais dentro do range
-            final int range = 9999;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 0, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADAC)) {            //Coordenada, cities only
-            //Novo combobox com locais dentro do range
-            final int range = 9999;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 1, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADAX)) {            //Coordenada, hide cities
-            //Novo combobox com locais dentro do range
-            final int range = 9999;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), true, 2, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADAW)) {            //Coordenada
-            //Novo combobox com locais dentro do range
-            final int range = 9999;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), true, 0, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_3)) {            //Coordenada-3
-            //combobox com locais dentro do range
-            final int range = 3;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 0, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_3C)) {            //Coordenada-3, cities only
-            //combobox com locais dentro do range, exclude cities
-            final int range = 3;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 1, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_3X)) {            //Coordenada-3, hide cities
-            //combobox com locais dentro do range, exclude cities
-            final int range = 3;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 2, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_3W)) {            //Coordenada-3, hide cities
-            //combobox com locais dentro do range, exclude cities
-            final int range = 3;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 0, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_5)) {            //Coordenada-5
-            //Novo combobox com locais dentro do range
-            final int range = 5;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 0, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_5C)) {            //Coordenada-5
-            //Novo combobox com locais dentro do range
-            final int range = 5;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 1, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_5X)) {            //Coordenada-5
-            //Novo combobox com locais dentro do range
-            final int range = 5;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 2, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_5W)) {            //Coordenada-5
-            //Novo combobox com locais dentro do range
-            final int range = 5;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 0, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_8)) {            //Coordenada-8
-            //Novo combobox com locais dentro do range
-            final int range = 8;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 0, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_8C)) {            //Coordenada-8
-            //Novo combobox com locais dentro do range
-            final int range = 8;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 1, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_8X)) {            //Coordenada-8
-            //Novo combobox com locais dentro do range
-            final int range = 8;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 2, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_8W)) {            //Coordenada-8
-            //Novo combobox com locais dentro do range
-            final int range = 8;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), true, 0, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_12)) {
-            //Coordenada-12
-            //Novo combobox com locais dentro do range
-            final int range = 12;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 0, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_12C)) {
-            //Coordenada-12
-            //Novo combobox com locais dentro do range
-            final int range = 12;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 1, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_12X)) {
-            //Coordenada-12
-            //Novo combobox com locais dentro do range
-            final int range = 12;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 2, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_12W)) {
-            //Coordenada-12
-            //Novo combobox com locais dentro do range
-            final int range = 12;
-            SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
-                    range, isAllSelected(), false, 0, this.getMapaControler());
-            cNovo = jpTemp;
-        } else if (controle.equals(COORDENADA_NAVIO)) {            //Coordenada-Navio
-            //Inputbox
-            JFormattedTextField jtTemp = new JFormattedTextField(
-                    SysApoio.createFormatter("####"));
-            jtTemp.setName("jtCoordenadaNavio"); // NOI18N
-            jtTemp.setColumns(4);
-            cNovo = jtTemp;
-        } else if (controle.equals(DIRECAO)) {            //Direcao
-            //é um combo com as direcoes validas
-            JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(BaseMsgs.direcoes));
-            cNovo = cbTemp;
-        } else if (controle.equals(DIRECAO_EX)) {    //Direcao-Ex
-            //PENDING: Fazer uma rosa dos ventos?
-            SubTabDirecaoExercito jpTemp = new SubTabDirecaoExercito(
-                    vlInicialDisplay, this.getActor(), this.getMapaControler(), ordemSelecionada, isAllSelected());
-            cNovo = jpTemp;
-        } else if (controle.equals(DIRECAO_3)) {    //Direcao-Ex
-            //PENDING: Fazer uma rosa dos ventos?
-            SubTabDirecao jpTemp = new SubTabDirecao(
-                    vlInicialDisplay, this.getActor().getLocal(), 3, false, this.getMapaControler(), isAllSelected());
-            cNovo = jpTemp;
-        } else if (controle.equals(EVASIVO)) {            //Evasivo
-            //é um combo male/female
-            JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
-                    new String[][]{
-                        {labels.getString("NORMAL"), "nr"},
-                        {labels.getString("EVASIVO"), "EV"}
-                    }));
-            cNovo = cbTemp;
-        } else if (controle.equals(MALE_FEMALE)) {            //M/F
-            //é um combo male/female
-            JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
-                    new String[][]{
-                        {labels.getString("MASCULINO"), "m"},
-                        {labels.getString("FEMININO"), "f"}
-                    }));
-            cNovo = cbTemp;
-        } else if (controle.equals(MAGIA_ALL)) {//Magia-All
-            //é um combo com o model magia, todas as magias que o actor nao tem
-            JComboBox cbTemp = new JComboBox(getActor().getFeiticoComboModel(0));
-            cNovo = cbTemp;
-        } else if (controle.equals(MAGIA_PRE)) {//Magia-Pre
-            //é um combo com o model magia, todas as magias que o actor pode aprender
-            //PENDING: filtrar magias por pre-requisito, talvez livro.
-            int filtro = 2;
-            if (isAllSelected()) {
-                filtro = 1;
-            }
-            JComboBox cbTemp = new JComboBox(getActor().getFeiticoComboModel(filtro));
-            cNovo = cbTemp;
-        } else if (controle.equals(MAGIA_KNOWN)) {//Magia-Known
-            //é um combo com o model magia do actor para a ordem
-            JComboBox cbTemp = new JComboBox(getActor().getFeiticoComboModelByOrdem(ordemSelecionada, isAllSelected()));
-            cbTemp.setActionCommand("jcMagia");
-            cbTemp.addActionListener(getOrdemControl());
-            cNovo = cbTemp;
-        } else if (controle.equals(NACAO)) {//Nacao
-            //é um combo com o model nacao, menos a nacao do actor
-            JComboBox cbNacao = new JComboBox(getActor().getNacaoComboModel());
-            cNovo = cbNacao;
-        } else if (controle.equals(NACAO_ALLY)) {//Nacao
-            //é um combo com o model nacao, menos a nacao do actor
-            JComboBox cbNacao = new JComboBox(getActor().getNacaoAllyComboModel());
-            cNovo = cbNacao;
-        } else if (controle.equals(NACAO_RELACIONAMENTO)) {//Nacao_RELACIONAMENTO
-            SubTabRelacionamento jpTemp = new SubTabRelacionamento(vlDefaultId, getActor().getNacao(),
-                    getActor().getNacaoNoEnemySwornComboModel(), isAllSelected());
-            cNovo = jpTemp;
-        } else if (controle.equals(NOME)) {//Nome
-            //Inputbox
-            JFormattedTextField jtTemp = new JFormattedTextField(
-                    SysApoio.createFormatterName("U*******************"));
-            jtTemp.setColumns(20);
-            cNovo = jtTemp;
-        } else if (controle.equals(NOMEGENDER)) {//Nome, Gender
-            //two in one (name + hex)
-            CompDuplo jtTemp = new CompDuplo();
-            String[] vlDisplay = new String[2];
-            if (vlInicialDisplay.contains(";")) {
-                vlDisplay = vlInicialDisplay.split(";");
-            }
-            String[] vlId = new String[2];
-            if (vlDefaultId.contains(";")) {
-                vlId = vlDefaultId.split(";");
-            }
-            final Component nome = this.getParametroComponent(NOME, vlDisplay[0], vlId[0], ordemSelecionada);
-            final Component hex = this.getParametroComponent(MALE_FEMALE, vlDisplay[1], vlId[1], ordemSelecionada);
-            jtTemp.replaceA(nome);
-            jtTemp.replaceB(hex);
-            cNovo = jtTemp;
-        } else if (controle.equals(NOVACIDADE5)) {//Nome, Hex
-            //two in one (name + hex)
-            CompDuplo jtTemp = new CompDuplo();
-            String[] vlDisplay = new String[2];
-            if (vlInicialDisplay.contains(";")) {
-                vlDisplay = vlInicialDisplay.split(";");
-            }
-            String[] vlId = new String[2];
-            if (vlDefaultId.contains(";")) {
-                vlId = vlDefaultId.split(";");
-            }
-            final Component nome = this.getParametroComponent(NOME, vlDisplay[0], vlId[0], ordemSelecionada);
-            final Component hex = this.getParametroComponent(COORDENADA_5X, vlDisplay[1], vlId[1], ordemSelecionada);
-            jtTemp.replaceA(nome);
-            jtTemp.replaceB(hex);
-            cNovo = jtTemp;
-        } else if (controle.equals(NOVACIDADE8)) {//Nome, Hex
-            //two in one (name + hex)
-            CompDuplo jtTemp = new CompDuplo();
-            String[] vlDisplay = new String[2];
-            if (vlInicialDisplay.contains(";")) {
-                vlDisplay = vlInicialDisplay.split(";");
-            }
-            String[] vlId = new String[2];
-            if (vlDefaultId.contains(";")) {
-                vlId = vlDefaultId.split(";");
-            }
-            final Component nome = this.getParametroComponent(NOME, vlDisplay[0], vlId[0], ordemSelecionada);
-            final Component hex = this.getParametroComponent(COORDENADA_8X, vlDisplay[1], vlId[1], ordemSelecionada);
-            jtTemp.replaceA(nome);
-            jtTemp.replaceB(hex);
-            cNovo = jtTemp;
-        } else if (controle.equals(NO_VALUE)) {         //None
-            //Nao deveria ocorrer nunca para uma ordem. Ocorre para algumas magias.
-            //Esconder o parametro 1
-            throw new UnsupportedOperationException(labels.getString("NOT.IMPLEMENTED"));
-        } else if (controle.equals(OURO)) {//Ouro
-            //Inputbox
-            JFormattedTextField jtTemp = new JFormattedTextField(SysApoio.createFormatterInteger(0, 999999));
-            jtTemp.setName("jtOuro"); // NOI18N
-            jtTemp.setColumns(5);
-            cNovo = jtTemp;
-        } else if (controle.equals(PERCENTAGE)) {//Percentage
-            //Inputbox
-            JFormattedTextField jtTemp = new JFormattedTextField(SysApoio.createFormatterInteger(1, 100));
-            //jtTemp.setName("jtPercentage"); // NOI18N
-            jtTemp.setColumns(3);
-            jtTemp.setText("100");
-            cNovo = jtTemp;
-        } else if (controle.equals(PERSONAGEM_LOCAL_EX_COMANDANTE)) {//Personagem-Comandante-Ex
-            //é um combo com o model com os personagens da mesma nacao conhecidos que comandam exercitos
-            JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(1));
-            if (isAllSelected()) {
-                cbTemp.setEditable(true);
-            }
-            cNovo = cbTemp;
-        } else if (controle.equals(PERSONAGEM_LOCAL)) {//Personagem-Local
-            //é um combo com o model com os personagens conhecidos no local, independente da nacao.
-            JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(2));
-            cbTemp.setEditable(true);
-            cNovo = cbTemp;
-        } else if (controle.equals(PERSONAGEM_LOCAL_NACAO)) {//Personagem-Nacao-Local
-            //é um combo com o model com os personagens conhecidos no local da mesma nacao
-            JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(3));
-            cbTemp.setEditable(true);
-            cNovo = cbTemp;
-        } else if (controle.equals(PERSONAGEM_LOCAL_NACAO_NONHERO)) {
-            //é um combo com o model com os personagens conhecidos no local da mesma nacao nao heros
-            JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(7));
-//            cbTemp.setEditable(true);
-            cNovo = cbTemp;
-        } else if (controle.equals(PERSONAGEM_LOCAL_NONACAO)) {//Personagem-Local-NoNacao
-            //é um combo com o model com os personagens conhecidos no local e de outra nacao
-            JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(4));
-            cbTemp.setEditable(true);
-            cNovo = cbTemp;
-        } else if (controle.equals(PERSONAGEM_LOCAL_SELF)) {//Personagem-Local
-            //é um combo com o model com os personagens conhecidos no local, independente da nacao.
-            JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(6));
-            cbTemp.setEditable(true);
-            cNovo = cbTemp;
-        } else if (controle.equals(PERSONAGEM_NONACAO)) {//Personagem-NoNacao
-            //é um combo com o model com os personagens conhecidos de outras nacoes
-            JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(0));
-            cbTemp.setEditable(true);
-            cNovo = cbTemp;
-        } else if (controle.equals(PERSONAGEM_NACAO)) { //Personagem-Nacao
-            //é um combo com o model com os personagens conhecidos
-            JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(5));
-            cbTemp.setEditable(true);
-            cNovo = cbTemp;
-        } else if (controle.equals(PERSONAGEM_REFEM)) { //Personagem-Refem
-            /*
-             * FIXME: Refem nao ocorre no cenario 4. deixei pra depois
-             */
-        } else if (controle.equals(PERSONAGEM_REFEM_NONACAO)) { //Personagem-Refem-NoNacao
-            /*
-             * FIXME: Refem nao ocorre no cenario 4. deixei pra depois
-             */
-        } else if (controle.equals(PRODUTO)) {//Produto
-            //é um combo com o model com as produtos do cenario, MENOS ouro
-            JComboBox cbTemp = new JComboBox(getActor().getProdutoComboModel(1));
-            cNovo = cbTemp;
-        } else if (controle.equals(PRODUTO_ALL)) {//Produto-All
-            //é um combo com o model com as produtos do cenario, inclusive ouro
-            JComboBox cbTemp = new JComboBox(getActor().getProdutoComboModel(0));
-            cNovo = cbTemp;
-        } else if (controle.equals(PRODUTO_ARMADURA)) {//Produto-Armadura
-            //é um combo com o model com as produtos do cenario
-            JComboBox cbTemp = new JComboBox(getActor().getProdutoComboModel(2));
-            cNovo = cbTemp;
-        } else if (controle.equals(PRODUTO_WEAPON)) {//Produto-Metal
-            //é um combo com o model com as produtos do cenario
-            JComboBox cbTemp = new JComboBox(getActor().getProdutoComboModel(3));
-            cNovo = cbTemp;
-        } else if (controle.equals(QUANTIDADE)) {//Quantidade
-            //Inputbox
-            JFormattedTextField jtTemp = new JFormattedTextField(SysApoio.createFormatterInteger(0, 999999));
-            jtTemp.setColumns(5);
-            cNovo = jtTemp;
-        } else if (controle.equals(RELACIONAMENTO_MUDA)) {//Relacionamento_Muda
-            //é um combo Melhora/Piora
-            JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
-                    new String[][]{
-                        {labels.getString("MELHORAR"), "1"},
-                        {labels.getString("REBAIXAR"), "-1"}}));
-            cNovo = cbTemp;
-        } else if (controle.equals(REFEM)) { //Refem
-            /*
-             * FIXME: Refem nao ocorre no cenario 4. deixei pra depois
-             */
-        } else if (controle.equals(SIM_NAO)) {//Sim_Nao
-            //é um combo sim/nao 
-            JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
-                    new String[][]{
-                        {labels.getString("SIM"), "Sim"},
-                        {labels.getString("NAO"), "Nao"}
-                    }));
-            cNovo = cbTemp;
-        } else if (controle.equals(TATICA)) {//Tatica
-            //é um combo com o model com as taticas do cenario
-            JComboBox cbTemp = new JComboBox(getOrdemControl().getTaticasComboModel());
-            cNovo = cbTemp;
-        } else if (controle.equals(TERRENO)) {//terrain
-            //é um combo com o model com as terrenos do cenario
-            JComboBox cbTemp = new JComboBox(getOrdemControl().getTerrainComboModel());
-            cNovo = cbTemp;
-        } else if (controle.equals(TEXTO_20)) {//Texto-20
-            //Inputbox
-            JFormattedTextField jtTemp = new JFormattedTextField(
-                    SysApoio.createFormatter("********************"));
-            jtTemp.setColumns(20);
-            cNovo = jtTemp;
-        } else if (controle.equals(TROPA_TIPO)) {//Tropa-Tipo
-            //é um combo com o model com os tipos de tropa que a nacao pode recrutar
-            JComboBox cbTemp;
-            if (isAllSelected()) {
-                cbTemp = new JComboBox(getActor().getTropaTipoComboModel(0));
-            } else {
-                cbTemp = new JComboBox(getActor().getTropaTipoComboModel(1));
-            }
-            cNovo = cbTemp;
-        } else if (controle.equals(TROPA_TABLE)) {//Tropa-Table
-            //é uma table com o model com os tipos de tropa do cenario + quantidade
-            SubTabTropas jpTemp = new SubTabTropas(vlDefaultId, this.getActor().getExercito(), isAllSelected(), 1);
-            cNovo = jpTemp;
-        } else if (controle.equals(TROPA_TABLE_TR)) {//Tropa-Table
-            //é uma table com o model com os tipos de tropa que podem transferir + quantidade
-            SubTabTropas jpTemp = new SubTabTropas(vlDefaultId, this.getActor().getExercito(), isAllSelected(), 2);
-            cNovo = jpTemp;
-        } else if (controle.equals(TROPA_TABLE_GARRISON)) {//Tropa-Table
-            //é uma table com o model com os tipos de tropa do cenario + quantidade
-            ExercitoFacade ef = new ExercitoFacade();
-            Exercito guarnicao = ef.getGuarnicao(getActor().getNacao(), this.getActor().getLocal());
-            SubTabTropas jpTemp = new SubTabTropas(vlDefaultId, guarnicao, isAllSelected(), 1);
-            cNovo = jpTemp;
-        } else if (controle.equals(VARIADO)) {//Variado
-            /*
-             * nao gera aki. 
-             * gera especifico na GUI
-             */
-            cNovo = new JLabel(labels.getString("CONTROLE.VARIADO"));
-        } else {
-            cNovo = new JLabel(labels.getString("CONTROLE.NAO.IMPLEMENTADO"));
+        switch (controle) {
+            case ALIANCA:
+                {
+                    //Alianca
+                    //FIXME: carregar do cenario, nao utilizada no grecia
+                    JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
+                            new String[][]{
+                                {labels.getString("ALIANCA.SERVOS.NEGROS"), "sn"},
+                                {labels.getString("ALIANCA.NEUTROS"), "ne"},
+                                {labels.getString("ALIANCA.POVOS.LIVRES"), "pl"}
+                            }));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case ARTEFATO_ALL:
+                {
+                    //Artefato-All
+                    //é um combo com TODOS os artefatos
+                    JComboBox cbTemp = new JComboBox(getActor().getArtefatoComboModel(0));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case ARTEFATO_CARRIED:
+                {
+                    //Artefato-Carried
+                    //é um combo com os artefatos que o actor possui
+                    JComboBox cbTemp;
+                    if (isAllSelected()) {
+                        cbTemp = new JComboBox(getActor().getArtefatoComboModel(0));
+                    } else {
+                        cbTemp = new JComboBox(getActor().getArtefatoComboModel(1));
+                    }       cNovo = cbTemp;
+                    break;
+                }
+            case ARTEFATO_CARRIED_SCRY:
+                {
+                    //Artefato-Carried
+                    //é um combo com os artefatos que o actor possui
+                    JComboBox cbTemp;
+                    if (isAllSelected()) {
+                        cbTemp = new JComboBox(getActor().getArtefatoComboModel(0));
+                    } else {
+                        cbTemp = new JComboBox(getActor().getArtefatoComboModel(4));
+                    }       cNovo = cbTemp;
+                    break;
+                }
+            case ARTEFATO_CARRIED_SUMMON:
+                {
+                    //Artefato-Carried
+                    //é um combo com os artefatos que o actor possui
+                    JComboBox cbTemp;
+                    if (isAllSelected()) {
+                        cbTemp = new JComboBox(getActor().getArtefatoComboModel(0));
+                    } else {
+                        cbTemp = new JComboBox(getActor().getArtefatoComboModel(5));
+                    }       cNovo = cbTemp;
+                    break;
+                }
+            case ARTEFATO_CARRIED_DRAGONEGG:
+                {
+                    //Artefato-Carried
+                    //é um combo com os artefatos que o actor possui
+                    JComboBox cbTemp;
+                    if (isAllSelected()) {
+                        cbTemp = new JComboBox(getActor().getArtefatoComboModel(0));
+                    } else {
+                        cbTemp = new JComboBox(getActor().getArtefatoComboModel(6));
+                    }       cNovo = cbTemp;
+                    break;
+                }
+            case ARTEFATO_NACAO_DROP:
+                {
+                    //Artefato-Nacao-Drop
+                    //é um combo com os artefatos que a nacao possui
+                    JComboBox cbTemp = new JComboBox(getActor().getArtefatoComboModel(2));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case ARTEFATO_NONACAO:
+                {
+                    //Artefato-NoNacao
+                    //é um combo com os artefatos que a nacao NAO possui
+                    JComboBox cbTemp;
+                    if (isAllSelected()) {
+                        cbTemp = new JComboBox(getActor().getArtefatoComboModel(0));
+                    } else {
+                        cbTemp = new JComboBox(getActor().getArtefatoComboModel(3));
+                    }       cNovo = cbTemp;
+                    break;
+                }
+            case CIDADE_ANY:
+                //Cidade-ANY
+                if (isAllSelected()) {
+                    //Inputbox
+                    JFormattedTextField jtTemp = new JFormattedTextField(
+                            SysApoio.createFormatter("####"));
+                    jtTemp.setName("jtCidadeAny"); // NOI18N
+                    jtTemp.setColumns(4);
+                    cNovo = jtTemp;
+                } else {
+                    //é um combo com o model com os personagens conhecidos no local da mesma nacao
+                    JComboBox cbTemp = new JComboBox(getActor().getCidadeComboModel(0));
+                    cNovo = cbTemp;
+                }   break;
+            case CIDADE_NACAO:
+                //Cidade-Nacao
+                if (isAllSelected()) {
+                    //Inputbox
+                    JFormattedTextField jtTemp = new JFormattedTextField(
+                            SysApoio.createFormatter("####"));
+                    jtTemp.setName("jtCidadeNacao"); // NOI18N
+                    jtTemp.setColumns(4);
+                    cNovo = jtTemp;
+                } else {
+                    //é um combo com o model com os personagens conhecidos no local da mesma nacao
+                    JComboBox cbTemp = new JComboBox(getActor().getCidadeComboModel(1));
+                    cNovo = cbTemp;
+                }   break;
+            case CIDADE_NEWCAPITAL:
+                {
+                    //Cidade-NewCapital
+                    //Inputbox
+                    JFormattedTextField jtTemp = new JFormattedTextField(
+                            SysApoio.createFormatter("####"));
+                    jtTemp.setName("jtCidadeNewCapital"); // NOI18N
+                    jtTemp.setColumns(4);
+                    cNovo = jtTemp;
+                    break;
+                }
+            case COORDENADA:
+                {
+                    //Coordenada
+                    //Novo combobox com locais dentro do range
+                    final int range = 9999;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 0, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADAC:
+                {
+                    //Coordenada, cities only
+                    //Novo combobox com locais dentro do range
+                    final int range = 9999;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 1, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADAX:
+                {
+                    //Coordenada, hide cities
+                    //Novo combobox com locais dentro do range
+                    final int range = 9999;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), true, 2, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADAW:
+                {
+                    //Coordenada
+                    //Novo combobox com locais dentro do range
+                    final int range = 9999;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), true, 0, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_3:
+                {
+                    //Coordenada-3
+                    //combobox com locais dentro do range
+                    final int range = 3;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 0, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_3C:
+                {
+                    //Coordenada-3, cities only
+                    //combobox com locais dentro do range, exclude cities
+                    final int range = 3;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 1, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_3X:
+                {
+                    //Coordenada-3, hide cities
+                    //combobox com locais dentro do range, exclude cities
+                    final int range = 3;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 2, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_3W:
+                {
+                    //Coordenada-3, hide cities
+                    //combobox com locais dentro do range, exclude cities
+                    final int range = 3;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 0, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_5:
+                {
+                    //Coordenada-5
+                    //Novo combobox com locais dentro do range
+                    final int range = 5;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 0, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_5C:
+                {
+                    //Coordenada-5
+                    //Novo combobox com locais dentro do range
+                    final int range = 5;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 1, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_5X:
+                {
+                    //Coordenada-5
+                    //Novo combobox com locais dentro do range
+                    final int range = 5;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 2, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_5W:
+                {
+                    //Coordenada-5
+                    //Novo combobox com locais dentro do range
+                    final int range = 5;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 0, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_8:
+                {
+                    //Coordenada-8
+                    //Novo combobox com locais dentro do range
+                    final int range = 8;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 0, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_8C:
+                {
+                    //Coordenada-8
+                    //Novo combobox com locais dentro do range
+                    final int range = 8;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 1, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_8X:
+                {
+                    //Coordenada-8
+                    //Novo combobox com locais dentro do range
+                    final int range = 8;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 2, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_8W:
+                {
+                    //Coordenada-8
+                    //Novo combobox com locais dentro do range
+                    final int range = 8;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), true, 0, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_12:
+                {
+                    //Coordenada-12
+                    //Novo combobox com locais dentro do range
+                    final int range = 12;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 0, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_12C:
+                {
+                    //Coordenada-12
+                    //Novo combobox com locais dentro do range
+                    final int range = 12;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 1, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_12X:
+                {
+                    //Coordenada-12
+                    //Novo combobox com locais dentro do range
+                    final int range = 12;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 2, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_12W:
+                {
+                    //Coordenada-12
+                    //Novo combobox com locais dentro do range
+                    final int range = 12;
+                    SubTabCoordenadas jpTemp = new SubTabCoordenadas(vlDefaultId, getActor().getLocal(),
+                            range, isAllSelected(), false, 0, this.getMapaControler());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case COORDENADA_NAVIO:
+                {
+                    //Coordenada-Navio
+                    //Inputbox
+                    JFormattedTextField jtTemp = new JFormattedTextField(
+                            SysApoio.createFormatter("####"));
+                    jtTemp.setName("jtCoordenadaNavio"); // NOI18N
+                    jtTemp.setColumns(4);
+                    cNovo = jtTemp;
+                    break;
+                }
+            case DIRECAO:
+                {
+                    //Direcao
+                    //é um combo com as direcoes validas
+                    JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(BaseMsgs.direcoes));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case DIRECAO_EX:
+                {
+                    //Direcao-Ex
+                    //PENDING: Fazer uma rosa dos ventos?
+                    SubTabDirecaoExercito jpTemp = new SubTabDirecaoExercito(
+                            vlInicialDisplay, this.getActor(), this.getMapaControler(), ordemSelecionada, isAllSelected());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case DIRECAO_3:
+                {
+                    //Direcao-Ex
+                    //PENDING: Fazer uma rosa dos ventos?
+                    SubTabDirecao jpTemp = new SubTabDirecao(
+                            vlInicialDisplay, this.getActor().getLocal(), 3, false, this.getMapaControler(), isAllSelected());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case EVASIVO:
+                {
+                    //Evasivo
+                    //é um combo male/female
+                    JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
+                            new String[][]{
+                                {labels.getString("NORMAL"), "nr"},
+                                {labels.getString("EVASIVO"), "EV"}
+                            }));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case MALE_FEMALE:
+                {
+                    //M/F
+                    //é um combo male/female
+                    JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
+                            new String[][]{
+                                {labels.getString("MASCULINO"), "m"},
+                                {labels.getString("FEMININO"), "f"}
+                            }));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case MAGIA_ALL:
+                {
+                    //Magia-All
+                    //é um combo com o model magia, todas as magias que o actor nao tem
+                    JComboBox cbTemp = new JComboBox(getActor().getFeiticoComboModel(0));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case MAGIA_PRE:
+                {
+                    //Magia-Pre
+                    //é um combo com o model magia, todas as magias que o actor pode aprender
+                    //PENDING: filtrar magias por pre-requisito, talvez livro.
+                    int filtro = 2;
+                    if (isAllSelected()) {
+                        filtro = 1;
+                    }       JComboBox cbTemp = new JComboBox(getActor().getFeiticoComboModel(filtro));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case MAGIA_KNOWN:
+                {
+                    //Magia-Known
+                    //é um combo com o model magia do actor para a ordem
+                    JComboBox cbTemp = new JComboBox(getActor().getFeiticoComboModelByOrdem(ordemSelecionada, isAllSelected()));
+                    cbTemp.setActionCommand("jcMagia");
+                    cbTemp.addActionListener(getOrdemControl());
+                    cNovo = cbTemp;
+                    break;
+                }
+            case NACAO:
+                {
+                    //Nacao
+                    //é um combo com o model nacao, menos a nacao do actor
+                    JComboBox cbNacao = new JComboBox(getActor().getNacaoComboModel());
+                    cNovo = cbNacao;
+                    break;
+                }
+            case NACAO_ALLY:
+                {
+                    //Nacao
+                    //é um combo com o model nacao, menos a nacao do actor
+                    JComboBox cbNacao = new JComboBox(getActor().getNacaoAllyComboModel());
+                    cNovo = cbNacao;
+                    break;
+                }
+            case NACAO_RELACIONAMENTO:
+                {
+                    //Nacao_RELACIONAMENTO
+                    SubTabRelacionamento jpTemp = new SubTabRelacionamento(vlDefaultId, getActor().getNacao(),
+                            getActor().getNacaoNoEnemySwornComboModel(), isAllSelected());
+                    cNovo = jpTemp;
+                    break;
+                }
+            case NOME:
+                {
+                    //Nome
+                    //Inputbox
+                    JFormattedTextField jtTemp = new JFormattedTextField(
+                            SysApoio.createFormatterName("U*******************"));
+                    jtTemp.setColumns(20);
+                    cNovo = jtTemp;
+                    break;
+                }
+            case NOMEGENDER:
+                {
+                    //Nome, Gender
+                    //two in one (name + hex)
+                    CompDuplo jtTemp = new CompDuplo();
+                    String[] vlDisplay = new String[2];
+                    if (vlInicialDisplay.contains(";")) {
+                        vlDisplay = vlInicialDisplay.split(";");
+                    }       String[] vlId = new String[2];
+                    if (vlDefaultId.contains(";")) {
+                        vlId = vlDefaultId.split(";");
+                    }       final Component nome = this.getParametroComponent(NOME, vlDisplay[0], vlId[0], ordemSelecionada);
+                    final Component hex = this.getParametroComponent(MALE_FEMALE, vlDisplay[1], vlId[1], ordemSelecionada);
+                    jtTemp.replaceA(nome);
+                    jtTemp.replaceB(hex);
+                    cNovo = jtTemp;
+                    break;
+                }
+            case NOVACIDADE5:
+                {
+                    //Nome, Hex
+                    //two in one (name + hex)
+                    CompDuplo jtTemp = new CompDuplo();
+                    String[] vlDisplay = new String[2];
+                    if (vlInicialDisplay.contains(";")) {
+                        vlDisplay = vlInicialDisplay.split(";");
+                    }       String[] vlId = new String[2];
+                    if (vlDefaultId.contains(";")) {
+                        vlId = vlDefaultId.split(";");
+                    }       final Component nome = this.getParametroComponent(NOME, vlDisplay[0], vlId[0], ordemSelecionada);
+                    final Component hex = this.getParametroComponent(COORDENADA_5X, vlDisplay[1], vlId[1], ordemSelecionada);
+                    jtTemp.replaceA(nome);
+                    jtTemp.replaceB(hex);
+                    cNovo = jtTemp;
+                    break;
+                }
+            case NOVACIDADE8:
+                {
+                    //Nome, Hex
+                    //two in one (name + hex)
+                    CompDuplo jtTemp = new CompDuplo();
+                    String[] vlDisplay = new String[2];
+                    if (vlInicialDisplay.contains(";")) {
+                        vlDisplay = vlInicialDisplay.split(";");
+                    }       String[] vlId = new String[2];
+                    if (vlDefaultId.contains(";")) {
+                        vlId = vlDefaultId.split(";");
+                    }       final Component nome = this.getParametroComponent(NOME, vlDisplay[0], vlId[0], ordemSelecionada);
+                    final Component hex = this.getParametroComponent(COORDENADA_8X, vlDisplay[1], vlId[1], ordemSelecionada);
+                    jtTemp.replaceA(nome);
+                    jtTemp.replaceB(hex);
+                    cNovo = jtTemp;
+                    break;
+                }
+            case NO_VALUE:
+                //None
+                //Nao deveria ocorrer nunca para uma ordem. Ocorre para algumas magias.
+                //Esconder o parametro 1
+                throw new UnsupportedOperationException(labels.getString("NOT.IMPLEMENTED"));
+            case OURO:
+                {
+                    //Ouro
+                    //Inputbox
+                    JFormattedTextField jtTemp = new JFormattedTextField(SysApoio.createFormatterInteger(0, 999999));
+                    jtTemp.setName("jtOuro"); // NOI18N
+                    jtTemp.setColumns(5);
+                    cNovo = jtTemp;
+                    break;
+                }
+            case PERCENTAGE:
+                {
+                    //Percentage
+                    //Inputbox
+                    JFormattedTextField jtTemp = new JFormattedTextField(SysApoio.createFormatterInteger(1, 100));
+                    //jtTemp.setName("jtPercentage"); // NOI18N
+                    jtTemp.setColumns(3);
+                    jtTemp.setText("100");
+                    cNovo = jtTemp;
+                    break;
+                }
+            case PERSONAGEM_LOCAL_EX_COMANDANTE:
+                {
+                    //Personagem-Comandante-Ex
+                    //é um combo com o model com os personagens da mesma nacao conhecidos que comandam exercitos
+                    JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(1));
+                    if (isAllSelected()) {
+                        cbTemp.setEditable(true);
+                    }       cNovo = cbTemp;
+                    break;
+                }
+            case PERSONAGEM_LOCAL:
+                {
+                    //Personagem-Local
+                    //é um combo com o model com os personagens conhecidos no local, independente da nacao.
+                    JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(2));
+                    cbTemp.setEditable(true);
+                    cNovo = cbTemp;
+                    break;
+                }
+            case PERSONAGEM_LOCAL_NACAO:
+                {
+                    //Personagem-Nacao-Local
+                    //é um combo com o model com os personagens conhecidos no local da mesma nacao
+                    JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(3));
+                    cbTemp.setEditable(true);
+                    cNovo = cbTemp;
+                    break;
+                }
+            case PERSONAGEM_LOCAL_NACAO_NONHERO:
+                {
+                    //é um combo com o model com os personagens conhecidos no local da mesma nacao nao heros
+                    JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(7));
+                    //            cbTemp.setEditable(true);
+                    cNovo = cbTemp;
+                    break;
+                }
+            case PERSONAGEM_LOCAL_NONACAO:
+                {
+                    //Personagem-Local-NoNacao
+                    //é um combo com o model com os personagens conhecidos no local e de outra nacao
+                    JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(4));
+                    cbTemp.setEditable(true);
+                    cNovo = cbTemp;
+                    break;
+                }
+            case PERSONAGEM_LOCAL_SELF:
+                {
+                    //Personagem-Local
+                    //é um combo com o model com os personagens conhecidos no local, independente da nacao.
+                    JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(6));
+                    cbTemp.setEditable(true);
+                    cNovo = cbTemp;
+                    break;
+                }
+            case PERSONAGEM_NONACAO:
+                {
+                    //Personagem-NoNacao
+                    //é um combo com o model com os personagens conhecidos de outras nacoes
+                    JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(0));
+                    cbTemp.setEditable(true);
+                    cNovo = cbTemp;
+                    break;
+                }
+            case PERSONAGEM_NACAO:
+                {
+                    //Personagem-Nacao
+                    //é um combo com o model com os personagens conhecidos
+                    JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(5));
+                    cbTemp.setEditable(true);
+                    cNovo = cbTemp;
+                    break;
+                }
+        //Personagem-Refem
+        /*
+         * FIXME: Refem nao ocorre no cenario 4. deixei pra depois
+         */
+            case PERSONAGEM_REFEM:
+                break;
+        //Personagem-Refem-NoNacao
+        /*
+         * FIXME: Refem nao ocorre no cenario 4. deixei pra depois
+         */
+            case PERSONAGEM_REFEM_NONACAO:
+                break;
+            case PRODUTO:
+                {
+                    //Produto
+                    //é um combo com o model com as produtos do cenario, MENOS ouro
+                    JComboBox cbTemp = new JComboBox(getActor().getProdutoComboModel(1));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case PRODUTO_ALL:
+                {
+                    //Produto-All
+                    //é um combo com o model com as produtos do cenario, inclusive ouro
+                    JComboBox cbTemp = new JComboBox(getActor().getProdutoComboModel(0));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case PRODUTO_ARMADURA:
+                {
+                    //Produto-Armadura
+                    //é um combo com o model com as produtos do cenario
+                    JComboBox cbTemp = new JComboBox(getActor().getProdutoComboModel(2));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case PRODUTO_WEAPON:
+                {
+                    //Produto-Metal
+                    //é um combo com o model com as produtos do cenario
+                    JComboBox cbTemp = new JComboBox(getActor().getProdutoComboModel(3));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case QUANTIDADE:
+                {
+                    //Quantidade
+                    //Inputbox
+                    JFormattedTextField jtTemp = new JFormattedTextField(SysApoio.createFormatterInteger(0, 999999));
+                    jtTemp.setColumns(5);
+                    cNovo = jtTemp;
+                    break;
+                }
+            case RELACIONAMENTO_MUDA:
+                {
+                    //Relacionamento_Muda
+                    //é um combo Melhora/Piora
+                    JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
+                            new String[][]{
+                                {labels.getString("MELHORAR"), "1"},
+                                {labels.getString("REBAIXAR"), "-1"}}));
+                    cNovo = cbTemp;
+                    break;
+                }
+        //Refem
+        /*
+         * FIXME: Refem nao ocorre no cenario 4. deixei pra depois
+         */
+            case REFEM:
+                break;
+            case SIM_NAO:
+                {
+                    //Sim_Nao
+                    //é um combo sim/nao
+                    JComboBox cbTemp = new JComboBox(new GenericoComboBoxModel(
+                            new String[][]{
+                                {labels.getString("SIM"), "Sim"},
+                                {labels.getString("NAO"), "Nao"}
+                            }));
+                    cNovo = cbTemp;
+                    break;
+                }
+            case TATICA:
+                {
+                    //Tatica
+                    //é um combo com o model com as taticas do cenario
+                    JComboBox cbTemp = new JComboBox(getOrdemControl().getTaticasComboModel());
+                    cNovo = cbTemp;
+                    break;
+                }
+            case TERRENO:
+                {
+                    //terrain
+                    //é um combo com o model com as terrenos do cenario
+                    JComboBox cbTemp = new JComboBox(getOrdemControl().getTerrainComboModel());
+                    cNovo = cbTemp;
+                    break;
+                }
+            case TEXTO_20:
+                {
+                    //Texto-20
+                    //Inputbox
+                    JFormattedTextField jtTemp = new JFormattedTextField(
+                            SysApoio.createFormatter("********************"));
+                    jtTemp.setColumns(20);
+                    cNovo = jtTemp;
+                    break;
+                }
+            case TROPA_TIPO:
+                {
+                    //Tropa-Tipo
+                    //é um combo com o model com os tipos de tropa que a nacao pode recrutar
+                    JComboBox cbTemp;
+                    if (isAllSelected()) {
+                        cbTemp = new JComboBox(getActor().getTropaTipoComboModel(0));
+                    } else {
+                        cbTemp = new JComboBox(getActor().getTropaTipoComboModel(1));
+                    }       cNovo = cbTemp;
+                    break;
+                }
+            case TROPA_TIPO_BASIC:
+                {
+                    //Tropa-Tipo-vanilla
+                    //é um combo com o model com os tipos de tropa BASICOS que a nacao pode recrutar
+                    JComboBox cbTemp;
+                    if (isAllSelected()) {
+                        cbTemp = new JComboBox(getActor().getTropaTipoComboModel(0));
+                    } else {
+                        cbTemp = new JComboBox(getActor().getTropaTipoComboModel(2));
+                    }       cNovo = cbTemp;
+                    break;
+                }
+            case TROPA_TABLE:
+                {
+                    //Tropa-Table
+                    //é uma table com o model com os tipos de tropa do cenario + quantidade
+                    SubTabTropas jpTemp = new SubTabTropas(vlDefaultId, this.getActor().getExercito(), isAllSelected(), 1);
+                    cNovo = jpTemp;
+                    break;
+                }
+            case TROPA_TABLE_TR:
+                {
+                    //Tropa-Table
+                    //é uma table com o model com os tipos de tropa que podem transferir + quantidade
+                    SubTabTropas jpTemp = new SubTabTropas(vlDefaultId, this.getActor().getExercito(), isAllSelected(), 2);
+                    cNovo = jpTemp;
+                    break;
+                }
+            case TROPA_TABLE_GARRISON:
+                {
+                    //Tropa-Table
+                    //é uma table com o model com os tipos de tropa do cenario + quantidade
+                    ExercitoFacade ef = new ExercitoFacade();
+                    Exercito guarnicao = ef.getGuarnicao(getActor().getNacao(), this.getActor().getLocal());
+                    SubTabTropas jpTemp = new SubTabTropas(vlDefaultId, guarnicao, isAllSelected(), 1);
+                    cNovo = jpTemp;
+                    break;
+                }
+            case VARIADO:
+                //Variado
+                /*
+                * nao gera aki.
+                * gera especifico na GUI
+                */
+                cNovo = new JLabel(labels.getString("CONTROLE.VARIADO"));
+                break;
+            default:
+                cNovo = new JLabel(labels.getString("CONTROLE.NAO.IMPLEMENTADO"));
+                break;
         }
         //seleciona item default
         if (cNovo instanceof JComboBox) {
@@ -659,6 +943,7 @@ public class ComponentFactory implements Serializable {
             } catch (ClassCastException ex) {
                 log.info(ex);
             } catch (IllegalArgumentException ex) {
+                //ignore
             } catch (NullPointerException ex) {
                 //PENDING: nao tem nada pra selecionar, provavelmente nao pode dar esta ordem agora
                 //log.info("JG: " + ex);
@@ -782,10 +1067,18 @@ public class ComponentFactory implements Serializable {
 
     public static DialogHexView showDialogHexView(Component relativeTo) {
         DialogHexView hexViewDialog = new DialogHexView(false);
+        //load configs
+        int width = SettingsManager.getInstance().getConfigAsInt("GuiHexViewSizeWidth", "500");
+        int height = SettingsManager.getInstance().getConfigAsInt("GuiHexViewSizeHeight", "400");
+        int posX = SettingsManager.getInstance().getConfigAsInt("GuiHexViewPositionX", "1");
+        int posY = SettingsManager.getInstance().getConfigAsInt("GuiHexViewPositionY", "1");
         //configura jDialog
-        if (relativeTo != null) {
+        if (relativeTo != null && !SettingsManager.getInstance().isKeyExist("GuiHexViewPositionY")) {
             hexViewDialog.setLocationRelativeTo(relativeTo);
+        } else {
+            hexViewDialog.setLocation(posX, posY);
         }
+        hexViewDialog.setPreferredSize(new Dimension(width, height));
         hexViewDialog.pack();
         hexViewDialog.setVisible(true);
         return hexViewDialog;

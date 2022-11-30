@@ -19,7 +19,7 @@ import model.Jogador;
 import model.Nacao;
 import model.Pelotao;
 import model.TipoTropa;
-import business.services.TitleFactory;
+import business.converter.TitleFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -37,7 +37,7 @@ public class FiltroConverter implements Serializable {
 
     public static ComboBoxModel getFiltroComboModelByJogador(Jogador jogadorAtivo, int options) {
         boolean filterMine = "1".equals(SettingsManager.getInstance().getConfig("filter.mine", "0"));
-        List<IBaseModel> lista = new ArrayList<IBaseModel>();
+        List<IBaseModel> lista = new ArrayList<>();
         lista.add(new GenericoComboObject(labels.getString("FILTRO.TODOS"), "all"));
         lista.add(new GenericoComboObject(labels.getString("FILTRO.PROPRIOS"), "own"));
         if (options == 4) {
@@ -79,9 +79,10 @@ public class FiltroConverter implements Serializable {
             lista.add(new GenericoComboObject(labels.getString("TROPA.FILTRO.BARCOS"), "barcos"));
             lista.add(new GenericoComboObject(labels.getString("TROPA.FILTRO.SIEGE"), "siege"));
             lista.add(new GenericoComboObject(labels.getString("TROPA.FILTRO.TRASNFER"), "trasnfer"));
+            lista.add(new GenericoComboObject(labels.getString("TROPA.FILTRO.ACTIVE"), "active"));
         }
         if (options > 0) {
-            final List<Nacao> listNacao = new ArrayList<Nacao>(NacaoConverter.listNacoesDisponiveis(null).length);
+            final List<Nacao> listNacao = new ArrayList<>(NacaoConverter.listNacoesDisponiveis(null).length);
             for (Nacao nacao : NacaoConverter.listNacoesDisponiveis(null)) {
                 if (filterMine) {
                     if (nacao.getOwner() == jogadorAtivo) {

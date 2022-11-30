@@ -30,9 +30,9 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <Component id="infoPanel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="splitMainPanel" pref="648" max="32767" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="statusBar" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -279,6 +279,22 @@
                 <Property name="name" type="java.lang.String" value="jbCopy" noResource="true"/>
               </Properties>
             </Component>
+            <Component class="javax.swing.JButton" name="jbEmailList">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/images/email.png"/>
+                </Property>
+                <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                  <ResourceString bundle="gui/Bundle.properties" key="COPIAR.EMAILS.TOOLTIP" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+                </Property>
+                <Property name="actionCommand" type="java.lang.String" value="jbEmailList"/>
+                <Property name="enabled" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="horizontalTextPosition" type="int" value="0"/>
+                <Property name="name" type="java.lang.String" value="jbEmailList" noResource="true"/>
+                <Property name="verticalTextPosition" type="int" value="3"/>
+              </Properties>
+            </Component>
             <Component class="javax.swing.JButton" name="jbMap">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
@@ -311,6 +327,25 @@
                 <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusable" type="boolean" value="false"/>
                 <Property name="name" type="java.lang.String" value="jbScoreGraph" noResource="true"/>
+                <Property name="verticalTextPosition" type="int" value="3"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="jbScoreGraph2">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/images/areagraph icon.png"/>
+                </Property>
+                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                  <ResourceString bundle="labels.properties" key="PONTOS.VITORIA.GAME" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+                </Property>
+                <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                  <ResourceString bundle="labels.properties" key="MENU.PNTOS.VITORIA.TOOLTIP" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+                </Property>
+                <Property name="actionCommand" type="java.lang.String" value="jbGraphAllTurns"/>
+                <Property name="enabled" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="horizontalTextPosition" type="int" value="4"/>
+                <Property name="name" type="java.lang.String" value="jbGraphAllTurns" noResource="true"/>
                 <Property name="verticalTextPosition" type="int" value="3"/>
               </Properties>
             </Component>
@@ -392,7 +427,7 @@
                     </Property>
                     <Property name="selected" type="boolean" value="true"/>
                     <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="labels.properties" key="SETTINGS.MAP.ARMYPATH.ARMY" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="labels.properties" key="SETTINGS.MAP.ARMYPATHORDER.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                     </Property>
                     <Property name="actionCommand" type="java.lang.String" value="drawPathArmy"/>
                     <Property name="enabled" type="boolean" value="false"/>
@@ -418,6 +453,27 @@
                     <Property name="horizontalTextPosition" type="int" value="0"/>
                     <Property name="verticalTextPosition" type="int" value="3"/>
                   </Properties>
+                </Component>
+                <Component class="javax.swing.JToggleButton" name="toggleScouts">
+                  <Properties>
+                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                      <Image iconType="3" name="/images/hex_scout.png"/>
+                    </Property>
+                    <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="isFogOfWarSelected()" type="code"/>
+                    </Property>
+                    <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                      <ResourceString bundle="labels.properties" key="SETTINGS.DISPLAY.FILTER.SCOUT.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                    </Property>
+                    <Property name="actionCommand" type="java.lang.String" value="drawScoutTargets"/>
+                    <Property name="enabled" type="boolean" value="false"/>
+                    <Property name="focusable" type="boolean" value="false"/>
+                    <Property name="horizontalTextPosition" type="int" value="0"/>
+                    <Property name="verticalTextPosition" type="int" value="3"/>
+                  </Properties>
+                  <AccessibilityProperties>
+                    <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value="Enable scouts on map"/>
+                  </AccessibilityProperties>
                 </Component>
                 <Component class="javax.swing.JToggleButton" name="toggleDisplayPortrait">
                   <Properties>
@@ -514,6 +570,9 @@
         </Property>
         <Property name="oneTouchExpandable" type="boolean" value="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="splitMainPanelPropertyChange"/>
+      </Events>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout"/>
       <SubComponents>

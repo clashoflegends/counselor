@@ -2,3 +2,6 @@
 counselor.log
 /dist/
 /build/
+/out/
+/.idea/
+/nbproject/
