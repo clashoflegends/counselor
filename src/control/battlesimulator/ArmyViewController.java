@@ -220,7 +220,9 @@ public class ArmyViewController implements Initializable {
             Platform.runLater(() -> armySim.getAvalaibleTroopTypes().add(p.getTroopTypeProperty().getValue()));
         });
 
-        platoonTable.addRow(platoonTable.getRowCount(), platoonFx);
+        //FIXME URGENT: compile error from Sergue
+        //platoonTable.addRow(platoonTable.getRowCount(), platoonFx);
+
         armySim.getAvalaibleTroopTypes().remove(p.getTroopTypeProperty().getValue());
     }
     
