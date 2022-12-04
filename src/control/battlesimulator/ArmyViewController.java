@@ -220,9 +220,25 @@ public class ArmyViewController implements Initializable {
             Platform.runLater(() -> armySim.getAvalaibleTroopTypes().add(p.getTroopTypeProperty().getValue()));
         });
 
-        //FIXME URGENT: compile error from Sergue
-        //platoonTable.addRow(platoonTable.getRowCount(), platoonFx);
+        int lastRowIndex = getRowCount(platoonTable);
+        platoonTable.addRow(lastRowIndex, platoonFx);
         armySim.getAvalaibleTroopTypes().remove(p.getTroopTypeProperty().getValue());
     }
     
+    public final int getRowCount(GridPane gridPane) {
+        int nRows = gridPane.getRowConstraints().size();
+        for (int i = 0; i < gridPane.getChildren().size(); i++) {
+            Node child = gridPane.getChildren().get(i);
+            if (child.isManaged()) {
+                Integer nodeRowIndex = GridPane.getRowIndex(child);
+                int rowIndex = nodeRowIndex != null ? nodeRowIndex : 0 ;
+                Integer nodeRowSpan = GridPane.getRowSpan(child);
+                int rowSpan = nodeRowSpan != null ? nodeRowSpan : 1;
+               
+                int rowEnd =  rowSpan != GridPane.REMAINING ? rowIndex + rowSpan - 1 : GridPane.REMAINING;
+                nRows = Math.max(nRows, (rowEnd != GridPane.REMAINING ? rowEnd : rowIndex) + 1);
+            }
+        }
+        return nRows;
+    }
 }
