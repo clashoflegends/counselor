@@ -18,13 +18,14 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
-import gui.graphs.GraphPopupKeyCityPerTeam;
+import gui.graphs.GraphPopupKeyCityPerNation;
 import gui.graphs.GraphPopupScoreByNation;
 import gui.graphs.GraphPopupVpPerTeam;
 import gui.graphs.GraphPopupVpPerTurn;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
 import gui.graphs.GraphPopupDominationPerTeam;
+import gui.graphs.GraphPopupKeyCityPerTeam;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
@@ -195,6 +196,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 break;
             case "jbGraphKeyCityPerTeam":
                 doGraphKeyCityPerTeam();
+                break;
+            case "jbGraphKeyCityPerNation":
+                doGraphKeyCityPerNation();
                 break;
             case "jbGraphDomination":
                 doGraphDominationPerTeam();
@@ -390,6 +394,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private void doGraphKeyCityPerTeam() throws HeadlessException {
         GraphPopupKeyCityPerTeam graph = new GraphPopupKeyCityPerTeam();
+        graph.start();
+    }
+    private void doGraphKeyCityPerNation() throws HeadlessException {
+        GraphPopupKeyCityPerNation graph = new GraphPopupKeyCityPerNation();
         graph.start();
     }
 

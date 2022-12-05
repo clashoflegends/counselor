@@ -71,6 +71,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph2.addActionListener(wc);
         jbScoreGraph3.addActionListener(wc);
         jbScoreGraph4.addActionListener(wc);
+        jbScoreGraph5.addActionListener(wc);
         jbHexview.addActionListener(wc);
         jbConfigs.addActionListener(wc);
         togglePathPj.addActionListener(wc);
@@ -114,6 +115,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph2 = new javax.swing.JButton();
         jbScoreGraph1 = new javax.swing.JButton();
         jbScoreGraph4 = new javax.swing.JButton();
+        jbScoreGraph5 = new javax.swing.JButton();
         jbScoreGraph3 = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         jToolBar2 = new javax.swing.JToolBar();
@@ -273,14 +275,24 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar3.add(jbScoreGraph1);
 
         jbScoreGraph4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/bargraph icon.png"))); // NOI18N
-        jbScoreGraph4.setToolTipText(labels.getString("PONTOS.KEYCITY.TEAM")); // NOI18N
-        jbScoreGraph4.setActionCommand("jbGraphKeyCityPerTeam");
+        jbScoreGraph4.setToolTipText(labels.getString("PONTOS.KEYCITY.NATION")); // NOI18N
+        jbScoreGraph4.setActionCommand("jbGraphKeyCityPerNation");
         jbScoreGraph4.setEnabled(false);
         jbScoreGraph4.setFocusable(false);
         jbScoreGraph4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jbScoreGraph4.setName("jbGraphKeyCityPerTeam"); // NOI18N
+        jbScoreGraph4.setName("jbGraphKeyCityPerNation"); // NOI18N
         jbScoreGraph4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar3.add(jbScoreGraph4);
+
+        jbScoreGraph5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/pie-chart-icon.png"))); // NOI18N
+        jbScoreGraph5.setToolTipText(labels.getString("PONTOS.KEYCITY.TEAM")); // NOI18N
+        jbScoreGraph5.setActionCommand("jbGraphKeyCityPerTeam");
+        jbScoreGraph5.setEnabled(false);
+        jbScoreGraph5.setFocusable(false);
+        jbScoreGraph5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbScoreGraph5.setName("jbGraphKeyCityPerTeam"); // NOI18N
+        jbScoreGraph5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar3.add(jbScoreGraph5);
 
         jbScoreGraph3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/bargraph icon.png"))); // NOI18N
         jbScoreGraph3.setToolTipText(labels.getString("PONTOS.DOMINATION.BATTLEROYAL.TEAM")); // NOI18N
@@ -523,6 +535,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JButton jbScoreGraph2;
     private javax.swing.JButton jbScoreGraph3;
     private javax.swing.JButton jbScoreGraph4;
+    private javax.swing.JButton jbScoreGraph5;
     private javax.swing.JButton jbSend;
     private javax.swing.JLabel jlActionCountPlaceholder;
     private javax.swing.JLabel jlLeft;
@@ -616,6 +629,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph2.setEnabled(wc.isVictoryPointsExists());
         jbScoreGraph3.setEnabled(true);
         jbScoreGraph4.setEnabled(true);
+        jbScoreGraph5.setEnabled(true);
         jbHexview.setEnabled(true);
         jbCopy.setEnabled(true);
         jbEmailList.setEnabled(true);

@@ -6,21 +6,15 @@
 package gui.graphs;
 
 import business.facade.PointsFacade;
-import business.services.ComparatorFactory;
 import control.facade.WorldFacadeCounselor;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.StackedBarChart;
-import javafx.scene.chart.XYChart;
-import javafx.scene.chart.XYChart.Data;
-import javafx.scene.chart.XYChart.Series;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -30,11 +24,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
-import persistenceCommons.SysApoio;
 import utils.CounterStringInt;
 
 /**
- * best example at: https://docs.oracle.com/javafx/2/charts/bar-chart.htm
+ * best example at: https://docs.oracle.com/javafx/2/charts/pie-chart.htm
  *
  * @author jmoura
  */
@@ -67,7 +60,7 @@ public class GraphPopupKeyCityPerTeam {
         window.setTitle(labels.getString("PONTOS.KEYCITY.TEAM"));
         window.setMinWidth(500);
 
-        StackedBarChart chart = createStackedBarChart();
+        PieChart chart = createPizzaChartTemp();
         chart.setAnimated(true);
         Scene scene = new Scene(chart);
 
@@ -79,104 +72,46 @@ public class GraphPopupKeyCityPerTeam {
 
     }
 
-    private StackedBarChart createStackedBarChart() {
-        final CategoryAxis xAxis = new CategoryAxis();
-        final NumberAxis yAxis = new NumberAxis();
+    private PieChart createPizzaChartTemp() {
+        CounterStringInt totalCount = populateData();
+        final double total = totalCount.getTotal();
 
-        //format axis
-        yAxis.setLabel(labels.getString("COUNT"));
-        xAxis.setLabel(labels.getString("TEAM"));
-        xAxis.setTickMarkVisible(false);
-        yAxis.setTickMarkVisible(false);
-
-        final StackedBarChart<Number, String> stackedBarChart = new StackedBarChart<>(yAxis, xAxis);
-        stackedBarChart.setLegendVisible(true);
-        int totalCount = populateData(stackedBarChart);
-        stackedBarChart.setTitle(String.format("%s (%s %s)", labels.getString("PONTOS.KEYCITY.TEAM"), totalCount, labels.getString("TOTAL")));
-
-        return stackedBarChart;
-    }
-
-    private int populateData(final StackedBarChart<Number, String> stackedBarChart) {
-        doPrepNations();
-        List<XYChart.Series<Number, String>> seriesList = new ArrayList<>();
-        PointsFacade pf = new PointsFacade();
-        CounterStringInt pointsCount = pf.doVictoryDomination(WorldFacadeCounselor.getInstance().getLocais().values(), WorldFacadeCounselor.getInstance().getNacaoNeutra());
-        for (String nmNation : pointsCount.getKeys()) {
-            //Series 1
-            final XYChart.Series<Number, String> series = new XYChart.Series();
-            series.setName(nmNation);
-//            log.error(String.format("%s-%s = %s", nmNation, mapNations.get(nmNation).getTeamFlag(), pointsCount.getValue(nmNation) ));
-            series.getData().add(new XYChart.Data(pointsCount.getValue(nmNation), mapNations.get(nmNation).getTeamFlag()));
-            seriesList.add(series);
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+        for (String nmTeam : totalCount.getKeys()) {
+            pieChartData.add(new PieChart.Data(nmTeam, totalCount.getValue(nmTeam)));
         }
-
-        stackedBarChart.getData().addAll(seriesList);
-
-        //config bars
-        styleNew(stackedBarChart);
-
+        final PieChart chart = new PieChart(pieChartData);
+        chart.setTitle(String.format("%s (%s %s)", labels.getString("PONTOS.KEYCITY.TEAM"), total, labels.getString("TOTAL")));
+        chart.setLegendVisible(false);
+        chart.setLabelLineLength(10);
         //install tooltips for the graph
-        for (final Series< Number, String> series : stackedBarChart.getData()) {
-            for (final Data<Number, String> data : series.getData()) {
-                Tooltip tooltip = new Tooltip();
-                tooltip.setText(String.format("%s - %s", series.getName(), data.getXValue().toString()));
-                Tooltip.install(data.getNode(), tooltip);
-            }
-        }
-        return pointsCount.getTotal();
+        chart.getData().stream().forEach(data -> {
+            final String percentage = String.format("%.0f\n%.1f%%", data.getPieValue(), (data.getPieValue() / total * 100));
+            Tooltip toolTip = new Tooltip(percentage);
+            Tooltip.install(data.getNode(), toolTip);
+        });
+        applyCustomColorSequence(
+                pieChartData,
+                "grey",
+                "navy",
+                "red",
+                "yellow",
+                "green"
+        );
+        return chart;
     }
 
-    private List<Nacao> doPrepNations() {
-        List<Nacao> nations = new ArrayList<>(WorldFacadeCounselor.getInstance().getNacoes().values());
-        //sort by points
-        ComparatorFactory.getComparatorNationVictoryPointsSorter(nations);
-        for (Nacao nation : nations) {
-            //collect information
-            mapNations.put(nation.getNome(), nation);
-        }
-        return nations;
+    private CounterStringInt populateData() {
+        final PointsFacade pf = new PointsFacade();
+        final CounterStringInt pointsCount = pf.doVictoryDominationTeam(WorldFacadeCounselor.getInstance().getLocais().values(), WorldFacadeCounselor.getInstance().getNacaoNeutra());
+        return pointsCount;
     }
 
-    private void styleNew(StackedBarChart<Number, String> chart) {
-        for (final XYChart.Series< Number, String> series : chart.getData()) {
-            for (final XYChart.Data<Number, String> data : series.getData()) {
-                StringBuilder style = new StringBuilder();
-                style.append(String.format("-fx-background-color: %s; ", getNationColorFill(series.getName())));
-                style.append(String.format("-fx-border-color: %s; ", getNationColorBorder(series.getName())));
-                data.getNode().setStyle(style.toString());
-            }
-        }
-    }
-
-    private String getNationColorFill(String nmNation) {
-        try {
-            final String color = SysApoio.colorToHexa(mapNations.get(nmNation).getFillColor());
-            log.debug(String.format("%s %s", nmNation, color));
-            if (color.equals("#030303")) {
-                //invert colors, too much black. Particularly important for WDO where all orcs are black.
-                return SysApoio.colorToHexa(mapNations.get(nmNation).getBorderColor());
-            } else {
-                //use ok color
-                return color;
-            }
-        } catch (NullPointerException e) {
-            return "GREY";
-        }
-    }
-
-    private String getNationColorBorder(String nmNation) {
-        try {
-            final String color = SysApoio.colorToHexa(mapNations.get(nmNation).getFillColor());
-            if (color.equals("#030303")) {
-                //invert colors, too much black. Particularly important for WDO where all orcs are black.
-                return color;
-            } else {
-                //use ok color
-                return SysApoio.colorToHexa(mapNations.get(nmNation).getBorderColor());
-            }
-        } catch (NullPointerException e) {
-            return "GREY";
+    private void applyCustomColorSequence(ObservableList<PieChart.Data> pieChartData, String... pieColors) {
+        int i = 0;
+        for (PieChart.Data data : pieChartData) {
+            data.getNode().setStyle("-fx-pie-color: " + pieColors[i % pieColors.length] + ";");
+            i++;
         }
     }
 }
