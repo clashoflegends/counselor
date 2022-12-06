@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefWidth="820.0" style="-fx-border-color: gray; -fx-border-width: 2;" xmlns="http://javafx.com/javafx/11" xmlns:fx="http://javafx.com/fxml/1" fx:controller="control.battlesimulator.ArmyViewController">
+<VBox alignment="CENTER" prefWidth="820.0" style="-fx-border-color: gray; -fx-border-width: 2;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="control.battlesimulator.ArmyViewController">
    <children>
       <GridPane alignment="TOP_CENTER" hgap="4.0" vgap="2.0">
          <columnConstraints>
