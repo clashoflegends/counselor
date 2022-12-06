@@ -18,11 +18,14 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
-import gui.accessories.GraphPopupScoreByNation;
-import gui.accessories.GraphPopupVpPerTeam;
-import gui.accessories.GraphPopupVpPerTurn;
+import gui.graphs.GraphPopupKeyCityPerNation;
+import gui.graphs.GraphPopupScoreByNation;
+import gui.graphs.GraphPopupVpPerTeam;
+import gui.graphs.GraphPopupVpPerTurn;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
+import gui.graphs.GraphPopupDominationPerTeam;
+import gui.graphs.GraphPopupKeyCityPerTeam;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
@@ -190,6 +193,15 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 break;
             case "jbGraphAllTurns":
                 doGraphAllTurns();
+                break;
+            case "jbGraphKeyCityPerTeam":
+                doGraphKeyCityPerTeam();
+                break;
+            case "jbGraphKeyCityPerNation":
+                doGraphKeyCityPerNation();
+                break;
+            case "jbGraphDomination":
+                doGraphDominationPerTeam();
                 break;
             case "jbAbout":
                 doAbout();
@@ -377,6 +389,20 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private void doGraphSingleTurn() throws HeadlessException {
         GraphPopupVpPerTeam graph = new GraphPopupVpPerTeam();
+        graph.start();
+    }
+
+    private void doGraphKeyCityPerTeam() throws HeadlessException {
+        GraphPopupKeyCityPerTeam graph = new GraphPopupKeyCityPerTeam();
+        graph.start();
+    }
+    private void doGraphKeyCityPerNation() throws HeadlessException {
+        GraphPopupKeyCityPerNation graph = new GraphPopupKeyCityPerNation();
+        graph.start();
+    }
+
+    private void doGraphDominationPerTeam() throws HeadlessException {
+        GraphPopupDominationPerTeam graph = new GraphPopupDominationPerTeam();
         graph.start();
     }
 
@@ -1080,7 +1106,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                         comando.addComando(actor, ordemFacade.getOrdem(actor, index),
                                 ordemFacade.getParametrosId(actor, index),
                                 ordemFacade.getParametrosDisplay(actor, index));
-                    } else if (actor.isNacao()) {
+                    } else if (actor.isNacaoClass()) {
                         //count points, not open slots
                         if (acaoFacade.isPointsSetupUnderLimit(actor, nationPackagesLimit)) {
                             ret = String.format(labels.getString("MISSING.PACKAGE.NATION"), actor.getNome());
