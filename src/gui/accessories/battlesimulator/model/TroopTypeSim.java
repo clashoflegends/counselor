@@ -6,6 +6,7 @@
 package gui.accessories.battlesimulator.model;
 
 import gui.accessories.battlesimulator.model.engine.ITroopType;
+import java.util.Objects;
 
 /**
  *
@@ -14,6 +15,11 @@ import gui.accessories.battlesimulator.model.engine.ITroopType;
 public class TroopTypeSim implements ITroopType {
     
     private String name;
+    private String code;
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     public String getName() {
         return name;
@@ -32,6 +38,24 @@ public class TroopTypeSim implements ITroopType {
 
     @Override
     public String getCode() {
-        return name;
+        return code;
+    }
+    
+    @Override 
+    public boolean equals(Object obj) {
+        if (obj instanceof TroopTypeSim) {
+            TroopTypeSim newType = (TroopTypeSim)obj;
+            return this.getCode().equals(newType.getCode());
+             
+        }
+        
+        return false;
+    } 
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(getCode());
+        return hash;
     }
 }

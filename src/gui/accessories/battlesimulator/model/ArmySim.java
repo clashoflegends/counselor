@@ -37,7 +37,7 @@ public class ArmySim implements IArmy {
     }
 
     public void addPlatoon(PlatoonSim platoon) {
-        this.platoons.add(platoon);
+        this.platoons.add(platoon);       
     }
 
     @Override

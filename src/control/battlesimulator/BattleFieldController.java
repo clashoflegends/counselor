@@ -161,7 +161,7 @@ public class BattleFieldController implements Initializable {
                 Logger.getLogger(BattleFieldController.class.getName()).log(Level.FINEST, "Loading flag army: {0}.", !flag.isError());
                 
                 armyNation.setFlag(flag);
-     
+                newArmy.setNation(armyNation);
                 army.getPelotoes().values().stream().map(pelotao -> {
                     PlatoonSim newPlatoon = new PlatoonSim();
                     newPlatoon.getTroopTypeProperty().setValue(convertTroop(pelotao.getTipoTropa()));
@@ -172,10 +172,12 @@ public class BattleFieldController implements Initializable {
                     newPlatoon.setTroops(pelotao.getQtd());
                     return newPlatoon;
                     
-                }).forEach(newArmy::addPlatoon);
+                }).forEach( p -> {
+                    newArmy.addPlatoon(p);
+                    newArmy.getAvalaibleTroopTypes().remove(p.getTroopTypeProperty().getValue());                    
+                });
                
-                                      
-                newArmy.setNation(armyNation);
+                
                 addArmySim(newArmy);
             } catch (IOException ex) {
                 Logger.getLogger(BattleFieldController.class.getName()).log(Level.SEVERE, null, ex);
@@ -187,6 +189,7 @@ public class BattleFieldController implements Initializable {
     private TroopTypeSim convertTroop(TipoTropa tipoTropa) {
         TroopTypeSim newTroop = new TroopTypeSim();
         newTroop.setName(tipoTropa.getNome());
+        newTroop.setCode(tipoTropa.getCodigo());
         return newTroop;        
     }
     
