@@ -43,7 +43,7 @@
             <Label text="Offensive spell" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
             <Label text="Tactic" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
             <Label text="Combat artifact" GridPane.columnIndex="5" GridPane.halignment="RIGHT" />
-            <ChoiceBox prefWidth="150.0" GridPane.columnIndex="6" GridPane.rowIndex="1" />
+            <ChoiceBox fx:id="tactics" prefWidth="150.0" GridPane.columnIndex="6" GridPane.rowIndex="1" />
             <TextField maxWidth="-Infinity" prefWidth="60.0" GridPane.columnIndex="4" />
             <TextField maxWidth="-Infinity" prefWidth="60.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
             <TextField maxWidth="-Infinity" prefWidth="60.0" GridPane.columnIndex="6" />

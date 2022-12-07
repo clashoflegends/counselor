@@ -26,10 +26,10 @@ public class BasicCombatEngine implements ICombatEngine {
             army.getPlatoons().forEach(platoon -> {
                 System.out.println("\t- " + platoon.getTroops() + " " + platoon.getTroopType().getCode() + " with " 
                         + platoon.getWeapon() + " weapons and wearing a " + platoon.getArmor() + " armor arrayed in " + platoon.getTrainning() + " formation.");
-                
-                
+                                    
                 platoon.setTroopLeft(platoon.getTroops()/2);
             });
+            System.out.println("Against the enemy forces, we tried to '" + army.getTacticsKey() + "' the enemy");
             System.out.println();
         });
         

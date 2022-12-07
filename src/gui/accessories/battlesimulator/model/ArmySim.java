@@ -30,8 +30,8 @@ public class ArmySim implements IArmy {
     private final Set<PlatoonSim> platoons = new HashSet<>();
     
     private ObservableList avalaibleTroopTypes;
+    private String tacticsKey;
 
-    
     public Set<PlatoonSim> getPlatoonsSim() {
         return platoons;
     }
@@ -111,6 +111,15 @@ public class ArmySim implements IArmy {
         Set<IPlatoon> set = new HashSet<>();        
         platoons.forEach(p -> set.add(p));
         return set;
+    }
+    
+    @Override
+    public String getTacticsKey() {
+        return tacticsKey;
+    }
+
+    public void setTacticsKey(String tacticsKey) {
+        this.tacticsKey = tacticsKey;
     }
     
 }

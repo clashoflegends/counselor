@@ -8,7 +8,6 @@ package control.battlesimulator;
 import business.ImageManager;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.ResourceBundle;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -174,8 +173,8 @@ public class BattleFieldController implements Initializable {
                     return newPlatoon;
                     
                 }).forEach(newArmy::addPlatoon);
-                        
-                
+               
+                                      
                 newArmy.setNation(armyNation);
                 addArmySim(newArmy);
             } catch (IOException ex) {
