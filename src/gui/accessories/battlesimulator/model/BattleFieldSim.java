@@ -30,6 +30,7 @@ public class BattleFieldSim implements IBattleField {
         this.hexType = hexType;
     }
 
+    @Override
     public List<IArmy> getArmyList() {
         return armyList;
     }

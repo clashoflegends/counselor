@@ -12,5 +12,6 @@ package gui.accessories.battlesimulator.model.engine;
 public interface ITroopType {
    
     public String getCode();
+    public String getName();
     
 }
