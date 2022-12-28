@@ -72,6 +72,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph3.addActionListener(wc);
         jbScoreGraph4.addActionListener(wc);
         jbScoreGraph5.addActionListener(wc);
+        jbScoreGraph6.addActionListener(wc);
         jbHexview.addActionListener(wc);
         jbConfigs.addActionListener(wc);
         togglePathPj.addActionListener(wc);
@@ -117,6 +118,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph4 = new javax.swing.JButton();
         jbScoreGraph5 = new javax.swing.JButton();
         jbScoreGraph3 = new javax.swing.JButton();
+        jbScoreGraph6 = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         jToolBar2 = new javax.swing.JToolBar();
         togglePathPj = new javax.swing.JToggleButton();
@@ -303,6 +305,16 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph3.setName("jbGraphDomination"); // NOI18N
         jbScoreGraph3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar3.add(jbScoreGraph3);
+
+        jbScoreGraph6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/bargraph icon.png"))); // NOI18N
+        jbScoreGraph6.setToolTipText(labels.getString("PONTOS.VITORIA.OVERVIEW")); // NOI18N
+        jbScoreGraph6.setActionCommand("jbGraphVictoryOverview");
+        jbScoreGraph6.setEnabled(false);
+        jbScoreGraph6.setFocusable(false);
+        jbScoreGraph6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jbScoreGraph6.setName("jbGraphKeyCityPerNation"); // NOI18N
+        jbScoreGraph6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar3.add(jbScoreGraph6);
 
         jToolBar1.add(jToolBar3);
         jToolBar1.add(filler1);
@@ -536,6 +548,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JButton jbScoreGraph3;
     private javax.swing.JButton jbScoreGraph4;
     private javax.swing.JButton jbScoreGraph5;
+    private javax.swing.JButton jbScoreGraph6;
     private javax.swing.JButton jbSend;
     private javax.swing.JLabel jlActionCountPlaceholder;
     private javax.swing.JLabel jlLeft;
@@ -630,6 +643,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph3.setEnabled(true);
         jbScoreGraph4.setEnabled(true);
         jbScoreGraph5.setEnabled(true);
+        jbScoreGraph6.setEnabled(true);
         jbHexview.setEnabled(true);
         jbCopy.setEnabled(true);
         jbEmailList.setEnabled(true);
