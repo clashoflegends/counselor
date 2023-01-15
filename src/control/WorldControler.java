@@ -405,6 +405,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         GraphPopupKeyCityPerNation graph = new GraphPopupKeyCityPerNation();
         graph.start();
     }
+
     private void doGraphVictoryOverview() throws HeadlessException {
         GraphPopupVictoryOverview graph = new GraphPopupVictoryOverview();
         graph.start();
@@ -1192,6 +1193,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 case WebCounselorManager.OK:
                     final String msg = String.format(labels.getString("POST.DONE"), attachment.getName());
                     log.info(msg);
+                    if (SettingsManager.getInstance().isConfig("DebugWebpostTime", "1", "0")) {
+                        log.info(WebCounselorManager.getInstance().getLastResponseString());
+                    }
                     this.getGui().setStatusMsg(msg);
                     if (SettingsManager.getInstance().getConfig("SendOrderConfirmationPopUp", "1").equals("1")) {
                         SysApoio.showDialogInfo(labels.getString("POST.DONE.TITLE"), labels.getString("POST.DONE.TITLE"), this.getGui());
