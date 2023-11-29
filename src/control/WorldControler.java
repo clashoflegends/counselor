@@ -905,8 +905,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 for (String line : errorMsgs) {
                     msg += line + "\n";
                 }
-                SysApoio.showDialogError(String.format("%d %s %s\n%s",
-                        errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(), msg), this.getGui());
+                if (SettingsManager.getInstance().isConfig("LoadActionsFailToLoadBehavior", "LogOnly", "Display")) {
+                    log.error(String.format("LoadActionsFailToLoadBehavior=LogOnly. Set 'Display' for popup. %d %s %s", errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName()));
+                } else {
+                    SysApoio.showDialogError(String.format("%d %s %s\n%s",
+                            errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(), msg), this.getGui());
+                }
             }
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_COUNT);
