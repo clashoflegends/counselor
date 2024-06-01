@@ -62,7 +62,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Terrain">
+            <TitledBorder title="Battle Simulator">
               <ResourceString PropertyName="titleX" bundle="labels.properties" key="BATTLESIM.LOCAL.TITLE" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
             </TitledBorder>
           </Border>
@@ -738,6 +738,25 @@
           <AuxValues>
             <AuxValue name="classDetails" type="java.lang.String" value="Box.Filler.HorizontalGlue"/>
           </AuxValues>
+        </Component>
+        <Component class="javax.swing.JButton" name="jbCopyDetails">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/images/book.gif"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="COPIAR.ARMY.ACOES" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="jbCopyDetails"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="name" type="java.lang.String" value="jbCopyDetails" noResource="true"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <AccessibilityProperties>
+            <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="jbCopyDetails" noResource="true"/>
+            <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value="Copy army details to clipboard"/>
+          </AccessibilityProperties>
         </Component>
         <Component class="javax.swing.Box$Filler" name="filler2">
           <Properties>
