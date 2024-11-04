@@ -71,6 +71,7 @@ public class FiltroConverter implements Serializable {
             for (String skillName : TitleFactory.getTipoSkill()) {
                 lista.add(new GenericoComboObject(labels.getString(skillName), skillName));
             }
+            lista.add(new GenericoComboObject(labels.getString("FILTRO.EPICS"), "herosall"));
         }
         if (options == 3) {
             lista.add(new GenericoComboObject(labels.getString("TROPA.FILTRO.CAVALARIA"), "fast"));

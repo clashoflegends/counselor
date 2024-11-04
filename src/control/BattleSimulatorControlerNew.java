@@ -13,12 +13,14 @@ import business.converter.ConverterFactory;
 import business.facade.BattleSimFacade;
 import business.facade.CidadeFacade;
 import business.facade.ExercitoFacade;
+import business.facade.LocalFacade;
 import business.facade.NacaoFacade;
 import control.facade.WorldFacadeCounselor;
 import control.services.AcaoConverter;
 import control.services.CenarioConverter;
 import control.services.ExercitoConverter;
 import control.services.FiltroConverter;
+import control.support.DispatchManager;
 import control.support.WindowPopupText;
 import gui.accessories.BattleCasualtySimulatorNew;
 import gui.accessories.TroopsCasualtiesList;
@@ -44,11 +46,13 @@ import model.Cidade;
 import model.Exercito;
 import model.Nacao;
 import model.Ordem;
+import model.Pelotao;
 import model.Terreno;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 
 /**
  *
@@ -59,7 +63,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
     private static final Log log = LogFactory.getLog(BattleSimulatorControlerNew.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final BattleCasualtySimulatorNew tabGui;
-    private final List<ArmySim> armiesList = new ArrayList<ArmySim>();
+    private final List<ArmySim> armiesList = new ArrayList<>();
     private ArmySim armySelected;
     private Terreno terreno;
     private Cidade cityClone;
@@ -69,6 +73,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
     private final NacaoFacade nacaoFacade = new NacaoFacade();
     private final CidadeFacade cidadeFacade = new CidadeFacade();
     private final ExercitoFacade exercitoFacade = new ExercitoFacade();
+    private final LocalFacade localFacade = new LocalFacade();
 
     public BattleSimulatorControlerNew(BattleCasualtySimulatorNew tabGui) {
         this.tabGui = tabGui;
@@ -120,7 +125,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
     }
 
     public GenericoComboBoxModel getNacaoComboModel() {
-        List<IBaseModel> lista = new ArrayList<IBaseModel>(WorldFacadeCounselor.getInstance().getNacoes().values());
+        List<IBaseModel> lista = new ArrayList<>(WorldFacadeCounselor.getInstance().getNacoes().values());
         return new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]));
     }
 
@@ -133,7 +138,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
     }
 
     public GenericoComboBoxModel getTerrenoComboModel() {
-        List<IBaseModel> lista = new ArrayList<IBaseModel>(WorldFacadeCounselor.getInstance().getCenario().getTerrenos().values());
+        List<IBaseModel> lista = new ArrayList<>(WorldFacadeCounselor.getInstance().getCenario().getTerrenos().values());
         return new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]));
     }
 
@@ -178,14 +183,23 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
         } else if (event.getSource() instanceof JSpinner) {
             try {
                 JSpinner source = (JSpinner) event.getSource();
-                if ("jsArmyCommander".equals(source.getName())) {
-                    armySelected.setComandante((Integer) source.getValue());
-                } else if ("jsArmyMorale".equals(source.getName())) {
-                    armySelected.setMoral((Integer) source.getValue());
-                } else if ("jsArmyAbonus".equals(source.getName())) {
-                    armySelected.setBonusAttack((Integer) source.getValue());
-                } else if ("jsArmyDbonus".equals(source.getName())) {
-                    armySelected.setBonusDefense((Integer) source.getValue());
+                if (null != source.getName()) {
+                    switch (source.getName()) {
+                        case "jsArmyCommander":
+                            armySelected.setComandante((Integer) source.getValue());
+                            break;
+                        case "jsArmyMorale":
+                            armySelected.setMoral((Integer) source.getValue());
+                            break;
+                        case "jsArmyAbonus":
+                            armySelected.setBonusAttack((Integer) source.getValue());
+                            break;
+                        case "jsArmyDbonus":
+                            armySelected.setBonusDefense((Integer) source.getValue());
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 doRefreshArmies();
             } catch (NullPointerException e) {
@@ -232,60 +246,86 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
 
     protected void doActionButton(ActionEvent event) {
         JButton jbTemp = (JButton) event.getSource();
-        //monta csv com as ordens
-        if ("jbAbout".equals(jbTemp.getActionCommand())) {
-            doAbout();
-        } else if ("jbTacticHelp".equals(jbTemp.getActionCommand())) {
-            doTacticHelp();
-        } else if ("jbCasualtiesList".equals(jbTemp.getActionCommand())) {
-            doLocalCasualties();
-        } else if ("jbSimulation".equals(jbTemp.getActionCommand())) {
-            doSimulation();
-        } else if ("jbNewArmy".equals(jbTemp.getActionCommand())) {
-            doNewArmy();
-        } else if ("jbCloneArmy".equals(jbTemp.getActionCommand())) {
-            doCloneArmy(armySelected);
-        } else if ("jbRemArmy".equals(jbTemp.getActionCommand())) {
-            doRemoveArmy(armySelected);
-        } else {
+        if (null == jbTemp.getActionCommand()) {
             log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+        } else //monta csv com as ordens
+        {
+            switch (jbTemp.getActionCommand()) {
+                case "jbAbout":
+                    doAbout();
+                    break;
+                case "jbTacticHelp":
+                    doTacticHelp();
+                    break;
+                case "jbCopyDetails":
+                    doCopyTableArmy();
+                    break;
+                case "jbCasualtiesList":
+                    doLocalCasualties();
+                    break;
+                case "jbSimulation":
+                    doSimulation();
+                    break;
+                case "jbNewArmy":
+                    doNewArmy();
+                    break;
+                case "jbCloneArmy":
+                    doCloneArmy(armySelected);
+                    break;
+                case "jbRemArmy":
+                    doRemoveArmy(armySelected);
+                    break;
+                default:
+                    log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+                    break;
+            }
         }
     }
 
     private void actionOnTabGui(ActionEvent event) {
         JComboBox jcbActive = (JComboBox) event.getSource();
-        if ("jcbTerrain".equals(jcbActive.getActionCommand())) {
-            try {
-                final GenericoComboObject obj = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
-                final Terreno terrain = (Terreno) obj.getObject();
-                for (ArmySim army : armiesList) {
-                    army.setTerreno(terrain);
-                }
-                doRefreshArmies();
-                this.doChangeTerrain(terrain);
-                getTabGui().setCasualtyBorder(armySelected, terrain);
-                //set short casualties list
-                updateArmyCasualtyControler(armySelected, getTerrain());
-            } catch (NullPointerException ex) {
-            }
-        } else if ("cbTactic".equals(jcbActive.getActionCommand())) {
-            final GenericoComboObject tactic = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
-            if (armySelected != null) {
-                armySelected.setTatica(ConverterFactory.taticaToInt(tactic.getComboId()));
-            }
-            doRefreshArmies();
-            updateArmyCasualtyControler(armySelected, getTerrain());
-        } else if ("cbNation".equals(jcbActive.getActionCommand())) {
-            final GenericoComboObject nation = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
-            if (armySelected != null) {
-                armySelected.setNacao((Nacao) nation.getObject());
-            }
-            doRefreshArmies();
-            updateArmyCasualtyControler(armySelected, getTerrain());
-        } else if ("comboFiltro".equals(jcbActive.getActionCommand())) {
-            updateArmyCasualtyControler(armySelected, getTerrain());
-        } else {
+        if (null == jcbActive.getActionCommand()) {
             log.info(String.format("actionOnTabGui %s %s", jcbActive.getActionCommand(), jcbActive.getName()));
+        } else {
+            switch (jcbActive.getActionCommand()) {
+                case "jcbTerrain":
+                    try {
+                        final GenericoComboObject obj = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
+                        final Terreno terrain = (Terreno) obj.getObject();
+                        for (ArmySim army : armiesList) {
+                            army.setTerreno(terrain);
+                        }
+                        doRefreshArmies();
+                        this.doChangeTerrain(terrain);
+                        getTabGui().setCasualtyBorder(armySelected, terrain);
+                        //set short casualties list
+                        updateArmyCasualtyControler(armySelected, getTerrain());
+                    } catch (NullPointerException ex) {
+                    }
+                    break;
+                case "cbTactic":
+                    final GenericoComboObject tactic = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
+                    if (armySelected != null) {
+                        armySelected.setTatica(ConverterFactory.taticaToInt(tactic.getComboId()));
+                    }
+                    doRefreshArmies();
+                    updateArmyCasualtyControler(armySelected, getTerrain());
+                    break;
+                case "cbNation":
+                    final GenericoComboObject nation = (GenericoComboObject) jcbActive.getModel().getSelectedItem();
+                    if (armySelected != null) {
+                        armySelected.setNacao((Nacao) nation.getObject());
+                    }
+                    doRefreshArmies();
+                    updateArmyCasualtyControler(armySelected, getTerrain());
+                    break;
+                case "comboFiltro":
+                    updateArmyCasualtyControler(armySelected, getTerrain());
+                    break;
+                default:
+                    log.info(String.format("actionOnTabGui %s %s", jcbActive.getActionCommand(), jcbActive.getName()));
+                    break;
+            }
         }
     }
 
@@ -349,7 +389,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
             //how to apply damage from PbmCommons?
 //            army.sumCombateDano(danoPer);
 //            List<String> msgDanoT = army.doCombateDano();
-            List<String> msgDanoT = new ArrayList<String>();
+            List<String> msgDanoT = new ArrayList<>();
             try {
                 boolean first = true;
                 for (String item : msgDanoT) {
@@ -373,4 +413,104 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
         }
     }
 
+    private void doCopyTableArmy() {
+        //copy para o clipboard
+        SysApoio.setClipboardContents(listArmies());
+        //update status bar
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.STATUS_BAR_MSG, labels.getString("COPIAR.ARMY.DETAILS"));
+    }
+
+    private String listArmies() {
+        String ret = "";
+        if (SettingsManager.getInstance().isConfig("BattleSimArmyCopyLabels", "1", "1")) {
+            for (String details : listArmyDetailLabels()) {
+                ret += String.format("%s\t", details);
+            }
+            ret += "\n";
+            ret += "\t";
+            for (String details : listPlatoonDetailLabels()) {
+                ret += String.format("%s\t", details);
+            }
+            ret += "\n";
+            ret += "\n";
+        }
+        for (ArmySim objArmy : armiesList) {
+            //get army info
+            ArmySim army = (ArmySim) objArmy;
+            ret += listArmyDetails(army);
+            ret += listPlatoonDetails(army);
+            ret += "\n";
+            ret += "\n";
+        }
+        return ret;
+    }
+
+    private String listArmyDetails(ArmySim army) {
+        String ret = "";
+        for (String details : armyToArray(army)) {
+            ret += String.format("%s\t", details);
+        }
+        ret += "\n";
+        return ret;
+    }
+
+    private String listPlatoonDetails(ArmySim army) {
+        String ret = "";
+        for (Pelotao platoon : army.getPelotoes().values()) {
+            //for each platoon, get list of information
+            ret += "\t";
+            for (String details : platoonToArray(platoon)) {
+                ret += String.format("%s\t", details);
+            }
+            ret += "\n";
+        }
+        ret += "\n";
+        return ret;
+    }
+
+    private List<String> platoonToArray(Pelotao platoon) {
+        List<String> platoonDetail = new ArrayList<>();
+        platoonDetail.add(platoon.getTipoTropa().getNome());
+        platoonDetail.add(platoon.getQtd() + "");
+        platoonDetail.add(platoon.getTreino() + "");
+        platoonDetail.add(platoon.getModAtaque() + "");
+        platoonDetail.add(platoon.getModDefesa() + "");
+        return platoonDetail;
+    }
+
+    private List<String> listPlatoonDetailLabels() {
+        List<String> armiesLabels = new ArrayList<>();
+        armiesLabels.add("Troop Type");
+        armiesLabels.add("# of Soldiers");
+        armiesLabels.add("Training");
+        armiesLabels.add("Weapon");
+        armiesLabels.add("Armor");
+        return armiesLabels;
+    }
+
+    private List<String> armyToArray(ArmySim army) {
+        List<String> armyDetail = new ArrayList<>();
+        armyDetail.add(exercitoFacade.getComandanteTitulo(army, WorldFacadeCounselor.getInstance().getCenario()));
+        armyDetail.add(army.getComandantePericia() + "");
+        armyDetail.add(exercitoFacade.getMoral(army) + "");
+        armyDetail.add(exercitoFacade.getAtaqueExercito(army, true) + "");
+        armyDetail.add(exercitoFacade.getDefesaExercito(army, true) + "");
+        armyDetail.add(exercitoFacade.getAtaqueExercito(army, false) + "");
+        armyDetail.add(exercitoFacade.getDefesaExercito(army, false) + "");
+        armyDetail.add(exercitoFacade.getTerreno(army));
+        return armyDetail;
+    }
+
+    private List<String> listArmyDetailLabels() {
+        List<String> armiesLabels = new ArrayList<>();
+        armiesLabels.add("Name");
+        armiesLabels.add("Commander rank");
+        armiesLabels.add("Moral");
+        armiesLabels.add("Land attack");
+        armiesLabels.add("Land defense");
+        armiesLabels.add("Navy attack");
+        armiesLabels.add("Navy defense");
+        armiesLabels.add("Terrain");
+        return armiesLabels;
+    }
 }

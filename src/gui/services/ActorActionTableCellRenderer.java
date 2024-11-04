@@ -13,22 +13,24 @@ import javax.swing.table.DefaultTableCellRenderer;
 import model.ActorAction;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistenceCommons.SettingsManager;
 
 /**
  *
  * @author jmoura
  */
 public class ActorActionTableCellRenderer extends DefaultTableCellRenderer implements Serializable {
-    
+
     private static final Log log = LogFactory.getLog(ActorActionTableCellRenderer.class);
     private final Color colorBgSelected = new Color(128, 128, 255), colorBgNotSelected = Color.WHITE;
     private final Color colorFgSelected = Color.WHITE, colorFgNotSelected = Color.BLACK;
-    private final Color colorBgMissing = new Color(255, 230, 230), colorFgDisable = Color.LIGHT_GRAY;
-    
+    private final Color colorBgMissing = new Color(255, 230, 230), colorBgMissingAlly = new Color(255, 250, 250);
+    private final Color colorFgDisable = Color.LIGHT_GRAY, colorFgReadOnly = Color.LIGHT_GRAY;
+
     public ActorActionTableCellRenderer(JTable table) {
         super();
     }
-    
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -44,15 +46,25 @@ public class ActorActionTableCellRenderer extends DefaultTableCellRenderer imple
         }
         try {
             ActorAction actorAction = (ActorAction) value;
+            if (actorAction.isValid()) {
+                //not in use, leave the defaults go by
+            }
             if (actorAction.isBlank()) {
                 background = colorBgMissing;
+            }
+            if (actorAction.isBlankAlly()) {
+                //if it does not paint, then it is ok to leave ally the same as enemy
+                if (SettingsManager.getInstance().isConfig("GuiAllyMissingOrdersPaint", "1", "1")) {
+                    background = colorBgMissingAlly;
+                }
+                alignment = SwingConstants.CENTER;
             }
             if (actorAction.isDisabled()) {
                 foreground = colorFgDisable;
                 alignment = SwingConstants.CENTER;
             }
             if (actorAction.isReadonly()) {
-                foreground = colorFgDisable;
+                foreground = colorFgReadOnly;
             }
         } catch (NullPointerException ex) {
             log.error("ActorActionTableCellRenderer issue: " + value);

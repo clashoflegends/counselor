@@ -56,7 +56,7 @@
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="comboFiltro" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="47" max="32767" attributes="0"/>
+                      <EmptySpace pref="103" max="32767" attributes="0"/>
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="qtExercitos" min="-2" max="-2" attributes="0"/>
@@ -74,7 +74,7 @@
                           <Component id="comboFiltro" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="14" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -103,6 +103,7 @@
                     <StringItem index="1" value="Pr&#xf3;prios"/>
                   </StringArray>
                 </Property>
+                <Property name="actionCommand" type="java.lang.String" value="comboFiltro"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel1">

@@ -90,7 +90,7 @@ public class GraphPopupKeyCityPerNation {
         yAxis.setTickMarkVisible(false);
 
         final StackedBarChart<Number, String> stackedBarChart = new StackedBarChart<>(yAxis, xAxis);
-        stackedBarChart.setLegendVisible(true);
+        stackedBarChart.setLegendVisible(false);
         int totalCount = populateData(stackedBarChart);
         stackedBarChart.setTitle(String.format("%s (%s %s)", labels.getString("PONTOS.KEYCITY.NATION"), totalCount, labels.getString("TOTAL")));
 

@@ -69,15 +69,22 @@ public class DirecaoExercitoControler implements Serializable, ActionListener {
             }
         } else if (actionEvent.getSource() instanceof JCheckBox) {
             JCheckBox jbDir = (JCheckBox) actionEvent.getSource();
-            if ("cavalarias".equals(jbDir.getActionCommand())) {
-                //cavalarias
-                tabGui.doMovementTagsRepaint();
-            } else if ("comida".equals(jbDir.getActionCommand())) {
-                //sem comida
-                tabGui.doMovementTagsRepaint();
-            } else {
+            if (null == jbDir.getActionCommand()) {
                 //nao devia ocorrer.
                 log.error(jbDir.getActionCommand());
+            } else switch (jbDir.getActionCommand()) {
+                case "cavalarias":
+                    //cavalarias
+                    tabGui.doMovementTagsRepaint();
+                    break;
+                case "comida":
+                    //sem comida
+                    tabGui.doMovementTagsRepaint();
+                    break;
+                default:
+                    //nao devia ocorrer.
+                    log.error(jbDir.getActionCommand());
+                    break;
             }
         } else {
             log.info(labels.getString("EVENTO.NAO.MAPEADO"));

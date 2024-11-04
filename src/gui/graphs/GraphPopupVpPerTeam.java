@@ -92,7 +92,7 @@ public class GraphPopupVpPerTeam {
 
         final StackedBarChart<Number, String> stackedBarChart = new StackedBarChart<>(yAxis, xAxis);
         stackedBarChart.setTitle(labels.getString("PONTOS.VITORIA.TEAM"));
-        stackedBarChart.setLegendVisible(true);
+        stackedBarChart.setLegendVisible(false);
         populateData(stackedBarChart);
 
         return stackedBarChart;

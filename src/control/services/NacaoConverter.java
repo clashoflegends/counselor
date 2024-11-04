@@ -76,7 +76,7 @@ public class NacaoConverter implements Serializable {
         Object[] cArray = new Object[getNacaoColNames(new ArrayList<Class>(30)).length];
         cArray[ii++] = nacaoFacade.getNome(nacao);
         cArray[ii++] = nacaoFacade.getRacaNome(nacao);
-        cArray[ii++] = nacaoFacade.getPontosVitoria(nacao);
+        cArray[ii++] = nacaoFacade.getPointVictory(nacao);
         cArray[ii++] = nacaoFacade.getPointsDomination(nacao);
         cArray[ii++] = SysApoio.iif(nacaoFacade.isAtiva(nacao), labels.getString("ATIVA"), labels.getString("INATIVA"));
         if (cenarioFacade.hasOrdensNacao(WFC.getPartida())) {

@@ -90,7 +90,7 @@ public class GraphPopupDominationPerTeam {
         yAxis.setTickMarkVisible(false);
 
         final StackedBarChart<Number, String> stackedBarChart = new StackedBarChart<>(yAxis, xAxis);
-        stackedBarChart.setLegendVisible(true);
+        stackedBarChart.setLegendVisible(false);
         int totalCount = populateData(stackedBarChart);
         stackedBarChart.setTitle(String.format("%s (%s %s)", labels.getString("PONTOS.DOMINATION"), totalCount, labels.getString("TOTAL")));
 
@@ -106,7 +106,7 @@ public class GraphPopupDominationPerTeam {
             //Series 1
             final XYChart.Series<Number, String> series = new XYChart.Series();
             series.setName(nmNation);
-            log.error(String.format("%s-%s = %s", nmNation, mapNations.get(nmNation).getTeamFlag(), pointsCount.getValue(nmNation) ));
+            //log.error(String.format("%s-%s = %s", nmNation, mapNations.get(nmNation).getTeamFlag(), pointsCount.getValue(nmNation)));
             series.getData().add(new XYChart.Data(pointsCount.getValue(nmNation), mapNations.get(nmNation).getTeamFlag()));
             seriesList.add(series);
         }
