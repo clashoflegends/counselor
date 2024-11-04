@@ -5,19 +5,12 @@
  */
 package gui.accessories.battlesimulator.model.engine;
 
-import java.util.Set;
-
 /**
  *
  * @author serguei
  */
-public interface IArmy {
+public interface IArmyTactic {
     
-    public int getArmyMoral();
-    public int getCommanderRank();
-    public String getCommanderName();
-    public INation getNation();
-    public Set<IPlatoon> getPlatoons();
-    public String getTacticsKey();
+    public String getCode();
     
 }

@@ -10,39 +10,23 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.accessories.ArmyMoveSimulator;
 import gui.accessories.BattleCasualtySimulatorNew;
-import gui.accessories.BattleSimFx;
 import gui.accessories.TroopsCasualtiesList;
-import gui.accessories.battlesimulator.model.ArmySim;
 import gui.accessories.battlesimulator.model.BattleFieldSim;
-import gui.accessories.battlesimulator.model.NationSim;
-import gui.accessories.battlesimulator.model.PlatoonSim;
-import gui.accessories.battlesimulator.model.TroopTypeSim;
 import gui.components.DialogTextArea;
 import gui.services.ComponentFactory;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.JFXPanel;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import model.Local;
@@ -62,7 +46,7 @@ import radialMenu.worldBuilder.WorldBuilderRadialActions;
  * @author jmoura
  */
 public class RmActionListener extends ControlBase implements Serializable, MouseListener {
-
+    
     private static final Log log = LogFactory.getLog(RmActionListener.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private Local localMenu;
@@ -70,27 +54,27 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
     private final RadialEvents events = new RadialEvents();
     private RadialButton rbActive;
     private DialogTextArea hexInfo;
-
+    
     public RmActionListener(SortedMap<String, Local> locais) {
         events.setLocais(locais);
         registerDispatchManagerForMsg(DispatchManager.LOCAL_MAP_CLICK);
     }
-
+    
     @Override
     public void receiveDispatch(int msgName, Local aLocal) {
         if (msgName == DispatchManager.LOCAL_MAP_CLICK) {
             localMenu = aLocal;
         }
     }
-
+    
     public Enum getCurrentAction() {
         return currentAction;
     }
-
+    
     public void setCurrentAction(Enum action) {
         currentAction = action;
     }
-
+    
     @Override
     public void mouseClicked(MouseEvent event) {
         if (event.getSource() instanceof RadialButton) {
@@ -105,15 +89,15 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
             }
         }
     }
-
+    
     @Override
     public void mousePressed(MouseEvent e) {
     }
-
+    
     @Override
     public void mouseReleased(MouseEvent e) {
     }
-
+    
     @Override
     public void mouseEntered(MouseEvent event) {
         if (event.getSource() instanceof RadialButton) {
@@ -125,11 +109,11 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
             }
         }
     }
-
+    
     @Override
     public void mouseExited(MouseEvent e) {
     }
-
+    
     private void actionPerformed(RadialButton rb) {
         if (rb.hasSubMenu()) {
             //mouse entered
@@ -149,12 +133,12 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
             log.error(ex);
         }
     }
-
+    
     private void openSubMenu(RadialButton rb) {
         this.rbActive = rb;
         rb.updateButtons();
     }
-
+    
     private void closeSubMenu(RadialButton rb) {
         this.rbActive = null;
         try {
@@ -162,7 +146,7 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
         } catch (NullPointerException ex) {
         }
     }
-
+    
     private void doWorldBuilderActions(RadialButton rb, final String actionCommand, WorldBuilderRadialActions action) {
         switch (action) {
             case MAIN_ROAD:
@@ -214,7 +198,7 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
                 log.info("default: " + actionCommand);
         }
     }
-
+    
     private void doMapMenuActions(RadialButton rb, String actionCommand, MapMenuRadialActions action) {
         switch (action) {
             case COMBAT_SIMULATOR:
@@ -239,12 +223,12 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
                 log.info("Radial Action not implemented yet: " + actionCommand);
         }
     }
-
+    
     private void showLocalInfo(RadialButton rb) {
         final Local local = rb.getLocal();
         final String title = String.format(labels.getString("LOCAL.TITLE"), local.getCoordenadas());
         String text = LocalConverter.getInfo(local);
-
+        
         if (SettingsManager.getInstance().getConfig("KeepPopupOpen", "0").equals("0") && hexInfo != null) {
             hexInfo.setText(text);
             hexInfo.setTitle(title);
@@ -253,35 +237,34 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
             hexInfo = ComponentFactory.showDialogPopup(title, text, rb);
         }
     }
-
+    
     private void showLocalCasualties(RadialButton rb) {
         TroopsCasualtiesList casualtiesSim = new TroopsCasualtiesList(rb.getLocal());
         casualtiesSim.setLocationRelativeTo(rb);
         casualtiesSim.setVisible(true);
     }
-
+    
     private void createBattleSim(RadialButton rb) {
         Optional<String> battleSimFxProperty = Optional.ofNullable(SettingsManager.getInstance().getConfig("BattleSimFX", "0"));
         if (battleSimFxProperty.isPresent() && battleSimFxProperty.get().equals("1")) {
             JFrame frame = new JFrame(labels.getString("BATTLESIM.LOCAL.TITLE"));
-            final JFXPanel battleSimPane = new JFXPanel(); 
+            final JFXPanel battleSimPane = new JFXPanel();            
             frame.add(battleSimPane);
             frame.setSize(828, 500);
-          
+            
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
-   //         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            //         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             
-            Platform.runLater(() -> initFX(battleSimPane));   
-        
-                    
+            Platform.runLater(() -> initFX(battleSimPane));            
+            
         } else {
             BattleCasualtySimulatorNew battleSim = new BattleCasualtySimulatorNew(rb.getLocal());
+            battleSim.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             battleSim.setLocationRelativeTo(rb);
             battleSim.setVisible(true);
         }
-        
-            
+
         /*    create a blank new FX window.
             start over Counselor (setLocationRelativeTo)?
             list armies.
@@ -289,32 +272,30 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
          */
     }
     
-     private  void initFX(JFXPanel fxPanel) {
+    private void initFX(JFXPanel fxPanel) {
         // This method is invoked on the JavaFX thread
-        FXMLLoader loader = new  FXMLLoader(getClass().getResource("/gui/accessories/battlesimulator/views/MainView.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/accessories/battlesimulator/views/MainView.fxml"));
         Parent root = null;
         try {
             root = loader.load();
             BattleFieldController controller = loader.getController();
             BattleFieldSim battleField = controller.getBattleField();
             controller.setLocal(localMenu);
-                      
+            
             Scene scene = new Scene(root);
             fxPanel.setScene(scene);
         } catch (IOException ex) {
             Logger.getLogger(RmActionListener.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-       
-        
     }
-
+    
     private void createArmyMovSim(RadialButton rb, boolean water) {
         ArmyMoveSimulator marchSim = new ArmyMoveSimulator(rb.getLocal(), water);
         marchSim.setLocationRelativeTo(rb);
         marchSim.setVisible(true);
     }
-
+    
     private void showRangePlot(RadialButton rb) {
         final Local local = rb.getLocal();
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_RANGE_CLICK, local, 20);

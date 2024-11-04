@@ -593,31 +593,31 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
             setLimiteMovimento(8);
             return;
         }
-        //FIXME: clean up after a while (7/5/2016) once it's in the EGF.
-        if (ordem.getCodigo().equals("850") && WorldFacadeCounselor.getInstance().hasResourceManagement()) {
-            setLimiteMovimento(12);
-            setMoveType(MovimentoExercito.BY_LAND);
-        } else if (ordem.getCodigo().equals("850") && !WorldFacadeCounselor.getInstance().hasResourceManagement()) {
-            setLimiteMovimento(14);
-            setMoveType(MovimentoExercito.BY_LAND);
-        } else if (ordem.getCodigo().equals("851")) {
-            setLimiteMovimento(14);
-            setMoveType(MovimentoExercito.BY_LAND);
-        } else if (ordem.getCodigo().equals("852")) {
-            setLimiteMovimento(14);
-            setMoveType(MovimentoExercito.BY_LAND);
-        } else if (ordem.getCodigo().equals("860")) {
-            setLimiteMovimento(14);
-            setMoveType(MovimentoExercito.BY_LAND);
-        } else if (ordem.getCodigo().equals("830")) {
-            setLimiteMovimento(14);
-            setMoveType(MovimentoExercito.BY_WATER);
-        } else if (ordem.getCodigo().equals("831")) {
-            setLimiteMovimento(14);
-            setMoveType(MovimentoExercito.BY_WATER);
-        } else {
-            setLimiteMovimento(0);
-            setMoveType(MovimentoExercito.BY_LAND);
-        }
+//        //FIXME: clean up after a while (7/5/2016) once it's in the EGF.
+//        if (ordem.getCodigo().equals("850") && WorldFacadeCounselor.getInstance().hasResourceManagement()) {
+//            setLimiteMovimento(12);
+//            setMoveType(MovimentoExercito.BY_LAND);
+//        } else if (ordem.getCodigo().equals("850") && !WorldFacadeCounselor.getInstance().hasResourceManagement()) {
+//            setLimiteMovimento(14);
+//            setMoveType(MovimentoExercito.BY_LAND);
+//        } else if (ordem.getCodigo().equals("851")) {
+//            setLimiteMovimento(14);
+//            setMoveType(MovimentoExercito.BY_LAND);
+//        } else if (ordem.getCodigo().equals("852")) {
+//            setLimiteMovimento(14);
+//            setMoveType(MovimentoExercito.BY_LAND);
+//        } else if (ordem.getCodigo().equals("860")) {
+//            setLimiteMovimento(14);
+//            setMoveType(MovimentoExercito.BY_LAND);
+//        } else if (ordem.getCodigo().equals("830")) {
+//            setLimiteMovimento(14);
+//            setMoveType(MovimentoExercito.BY_WATER);
+//        } else if (ordem.getCodigo().equals("831")) {
+//            setLimiteMovimento(14);
+//            setMoveType(MovimentoExercito.BY_WATER);
+//        } else {
+//            setLimiteMovimento(0);
+//            setMoveType(MovimentoExercito.BY_LAND);
+//        }
     }
 }

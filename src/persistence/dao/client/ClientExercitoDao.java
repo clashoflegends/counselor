@@ -22,14 +22,17 @@ public class ClientExercitoDao implements IExercitoDao, Serializable {
 
     private static final Log log = LogFactory.getLog(ClientExercitoDao.class);
 
+    @Override
     public SortedMap<String, Exercito> list(Partida partida) throws PersistenceException {
         return WorldManager.getInstance().getExercitos();
     }
 
+    @Override
     public void clear() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public SortedMap<String, Exercito> loadVisible(Partida partida) throws PersistenceException {
         throw new UnsupportedOperationException("Not supported yet.");
     }

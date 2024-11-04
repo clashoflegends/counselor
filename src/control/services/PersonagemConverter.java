@@ -123,7 +123,7 @@ public class PersonagemConverter implements Serializable {
     private static Object[] personagemToArray(Personagem personagem) {
         int qtOrdens = WorldFacadeCounselor.getInstance().getOrdensQtMax();
         int ii = 0;
-        Object[] cArray = new Object[getPersonagemColNames(new ArrayList<Class>(30)).length];
+        Object[] cArray = new Object[getPersonagemColNames(new ArrayList<>(30)).length];
         Local local = personagemFacade.getLocal(personagem);
         //inicia array
         cArray[ii++] = personagemFacade.getNome(personagem);
@@ -192,7 +192,7 @@ public class PersonagemConverter implements Serializable {
             return (ret);
         } else {
             int ii = 0;
-            Object[][] ret = new Object[listaExibir.size()][getPersonagemColNames(new ArrayList<Class>(30)).length];
+            Object[][] ret = new Object[listaExibir.size()][getPersonagemColNames(new ArrayList<>(30)).length];
             for (Personagem personagem : listaExibir) {
                 ret[ii++] = PersonagemConverter.personagemToArray(personagem);
             }
@@ -373,6 +373,15 @@ public class PersonagemConverter implements Serializable {
             for (Personagem personagem : listFactory.listPersonagens()) {
                 try {
                     if (personagemFacade.isDoubleAgent(personagem)) {
+                        ret.add(personagem);
+                    }
+                } catch (NullPointerException e) {
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("herosall")) {
+            for (Personagem personagem : listFactory.listPersonagens()) {
+                try {
+                    if (personagemFacade.isHero(personagem)) {
                         ret.add(personagem);
                     }
                 } catch (NullPointerException e) {

@@ -41,7 +41,7 @@ public class ExercitoControler implements Serializable, ActionListener, ListSele
     }
 
     public GenericoTableModel getMainTableModel(GenericoComboObject filtro) {
-        Nacao nacao = null;
+        Nacao nacao;
         try {
             nacao = (Nacao) filtro.getObject();
             listaExibida = ExercitoConverter.listaByNacao(nacao);
@@ -61,19 +61,6 @@ public class ExercitoControler implements Serializable, ActionListener, ListSele
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() instanceof JTable) {
-            log.info(labels.getString("OPS.JTABLE.EVENT"));
-        } else if (e.getSource() instanceof JComboBox) {
-            JComboBox cb = (JComboBox) e.getSource();
-            if ("comboFiltro".equals(cb.getName())) {
-                SettingsManager.getInstance().setConfigAndSaveToFile(getTabGui().getKeyFilterProperty(), cb.getSelectedIndex() + "");
-                getTabGui().setMainModel(getMainTableModel((GenericoComboObject) cb.getSelectedItem()));
-            }
-        }
-    }
-
-    @Override
     public void valueChanged(ListSelectionEvent event) {
         if (event.getValueIsAdjusting()) {
             return;
@@ -90,6 +77,32 @@ public class ExercitoControler implements Serializable, ActionListener, ListSele
             }
         } catch (IndexOutOfBoundsException ex) {
             //lista vazia?
+        }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent actionEvent) {
+        if (actionEvent.getSource() instanceof JComboBox) {
+            JComboBox cb = (JComboBox) actionEvent.getSource();
+            doActionPerformedCombobox(cb);
+        } else {
+            log.info(labels.getString("OPS.GENERAL.EVENT"));
+        }
+    }
+
+    private void doActionPerformedCombobox(JComboBox cb) {
+        if (null == cb.getActionCommand()) {
+            log.info(labels.getString("NOT.IMPLEMENTED") + cb.getActionCommand());
+            return;
+        }
+        switch (cb.getActionCommand()) {
+            case "comboFiltro":
+                SettingsManager.getInstance().setConfigAndSaveToFile(getTabGui().getKeyFilterProperty(), cb.getSelectedIndex() + "");
+                getTabGui().setMainModel(getMainTableModel((GenericoComboObject) cb.getSelectedItem()));
+                break;
+            default:
+                log.info(labels.getString("NOT.IMPLEMENTED") + cb.getActionCommand());
+                break;
         }
     }
 }

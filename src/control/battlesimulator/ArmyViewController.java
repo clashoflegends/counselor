@@ -7,6 +7,8 @@ package control.battlesimulator;
 
 
 import business.ImageManager;
+import business.facade.CenarioFacade;
+import control.facade.WorldFacadeCounselor;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -35,9 +37,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.util.converter.NumberStringConverter;
 import gui.accessories.battlesimulator.model.ArmySim;
+import gui.accessories.battlesimulator.model.ArmyTacticSim;
 import gui.accessories.battlesimulator.model.PlatoonSim;
 import gui.accessories.battlesimulator.model.TroopTypeSim;
+import gui.accessories.battlesimulator.model.engine.IArmyTactic;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
 
 /**
@@ -67,6 +75,9 @@ public class ArmyViewController implements Initializable {
     @FXML
     private ImageView nationFlag;
     
+    @FXML
+    private ChoiceBox tactics;
+    
     public ArmyViewController() {
         armySim = new ArmySim();
     }
@@ -92,6 +103,7 @@ public class ArmyViewController implements Initializable {
         try {
             initializePlatoons(armySim.getPlatoonsSim());
             initializeAddPlatoonCombo(armySim.getAvalaibleTroopTypes());
+            initializeTacticsCombo();
         } catch (IOException ex) {
             Logger.getLogger(ArmyViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -220,9 +232,44 @@ public class ArmyViewController implements Initializable {
             Platform.runLater(() -> armySim.getAvalaibleTroopTypes().add(p.getTroopTypeProperty().getValue()));
         });
 
-        //FIXME URGENT: compile error from Sergue
-        //platoonTable.addRow(platoonTable.getRowCount(), platoonFx);
+        int lastRowIndex = getRowCount(platoonTable);
+        platoonTable.addRow(lastRowIndex, platoonFx);
         armySim.getAvalaibleTroopTypes().remove(p.getTroopTypeProperty().getValue());
     }
     
+    public final int getRowCount(GridPane gridPane) {
+        int nRows = gridPane.getRowConstraints().size();
+        for (int i = 0; i < gridPane.getChildren().size(); i++) {
+            Node child = gridPane.getChildren().get(i);
+            if (child.isManaged()) {
+                Integer nodeRowIndex = GridPane.getRowIndex(child);
+                int rowIndex = nodeRowIndex != null ? nodeRowIndex : 0 ;
+                Integer nodeRowSpan = GridPane.getRowSpan(child);
+                int rowSpan = nodeRowSpan != null ? nodeRowSpan : 1;
+               
+                int rowEnd =  rowSpan != GridPane.REMAINING ? rowIndex + rowSpan - 1 : GridPane.REMAINING;
+                nRows = Math.max(nRows, (rowEnd != GridPane.REMAINING ? rowEnd : rowIndex) + 1);
+            }
+        }
+        return nRows;
+    }
+
+    private void initializeTacticsCombo() {
+        String[][] tacticsArray= new CenarioFacade().listTaticas(WorldFacadeCounselor.getInstance().getCenario());      
+        List<IArmyTactic> tacticList = Arrays.stream(tacticsArray).map(this::convertTactics).collect(Collectors.toList());
+        tactics.setItems(FXCollections.observableArrayList(tacticList)); 
+        tactics.getSelectionModel().selectedItemProperty().addListener((ObservableValue option, Object oldValue, Object newValue) -> {
+            if (newValue instanceof IArmyTactic) {
+                armySim.setTacticsKey(((IArmyTactic)newValue).getCode());
+            }
+        });
+        tactics.getSelectionModel().selectFirst();
+        
+      
+    }
+    
+    private IArmyTactic convertTactics(String[] tactic) {
+        IArmyTactic armyTatic = new ArmyTacticSim(tactic[1], tactic[0]);        
+        return armyTatic;
+    }
 }

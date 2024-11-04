@@ -18,11 +18,15 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
-import gui.accessories.GraphPopupScoreByNation;
-import gui.accessories.GraphPopupVpPerTeam;
-import gui.accessories.GraphPopupVpPerTurn;
+import gui.graphs.GraphPopupKeyCityPerNation;
+import gui.graphs.GraphPopupScoreByNation;
+import gui.graphs.GraphPopupVpPerTeam;
+import gui.graphs.GraphPopupVpPerTurn;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
+import gui.graphs.GraphPopupDominationPerTeam;
+import gui.graphs.GraphPopupKeyCityPerTeam;
+import gui.graphs.GraphPopupVictoryOverview;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
@@ -86,6 +90,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private static final Log log = LogFactory.getLog(WorldControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final JFileChooser fc = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
+    private File fileSelected;
     private boolean saved = false;
     private boolean savedWorld = false;
     private boolean msgSubmitReady = false;
@@ -193,6 +198,18 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             case "jbGraphAllTurns":
                 doGraphAllTurns();
                 break;
+            case "jbGraphKeyCityPerTeam":
+                doGraphKeyCityPerTeam();
+                break;
+            case "jbGraphKeyCityPerNation":
+                doGraphKeyCityPerNation();
+                break;
+            case "jbGraphVictoryOverview":
+                doGraphVictoryOverview();
+                break;
+            case "jbGraphDomination":
+                doGraphDominationPerTeam();
+                break;
             case "jbAbout":
                 doAbout();
                 break;
@@ -227,7 +244,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         fc.setFileFilter(PathFactory.getFilterAcoes());
         int returnVal = fc.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            final File file = fc.getSelectedFile();
+            final File file = getFileSelected();
             log.info(labels.getString("LOADING: ") + file.getName());
             setComando(file);
             this.saved = false;
@@ -328,9 +345,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private File doFileSave(Comando comando, String missingActionMsg) {
         File ret = null;
         try {
-            ret = fc.getSelectedFile();
+            ret = getFileSelected();
             WFC.doSaveOrdens(comando, ret);
-            this.getGui().setStatusMsg(missingActionMsg + " " + String.format(labels.getString("ORDENS.SALVAS"), comando.size(), fc.getSelectedFile().getName()));
+            this.getGui().setStatusMsg(missingActionMsg + " " + String.format(labels.getString("ORDENS.SALVAS"), comando.size(), getFileSelected().getName()));
             this.saved = true;
         } catch (BusinessException ex) {
             log.error(ex.getMessage());
@@ -379,6 +396,26 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private void doGraphSingleTurn() throws HeadlessException {
         GraphPopupVpPerTeam graph = new GraphPopupVpPerTeam();
+        graph.start();
+    }
+
+    private void doGraphKeyCityPerTeam() throws HeadlessException {
+        GraphPopupKeyCityPerTeam graph = new GraphPopupKeyCityPerTeam();
+        graph.start();
+    }
+
+    private void doGraphKeyCityPerNation() throws HeadlessException {
+        GraphPopupKeyCityPerNation graph = new GraphPopupKeyCityPerNation();
+        graph.start();
+    }
+
+    private void doGraphVictoryOverview() throws HeadlessException {
+        GraphPopupVictoryOverview graph = new GraphPopupVictoryOverview();
+        graph.start();
+    }
+
+    private void doGraphDominationPerTeam() throws HeadlessException {
+        GraphPopupDominationPerTeam graph = new GraphPopupDominationPerTeam();
         graph.start();
     }
 
@@ -533,7 +570,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         int returnVal = fc.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             try {
-                final File resultsFile = fc.getSelectedFile();
+                final File resultsFile = getFileSelected();
                 log.info(labels.getString("OPENING: ") + resultsFile.getName());
                 WFC.doStart(resultsFile);
                 this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
@@ -544,6 +581,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 this.saved = false;
                 this.savedWorld = false;
                 doAutoLoadCommands(resultsFile);
+                setFileSelected(resultsFile);
             } catch (BusinessException ex) {
                 SysApoio.showDialogError(ex.getMessage(), this.getGui());
                 this.getGui().setStatusMsg(ex.getMessage());
@@ -598,6 +636,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doAutoLoadCommands(resultsFile);
             }
             fc.setSelectedFile(resultsFile);
+            setFileSelected(resultsFile);
             this.saved = false;
         } catch (BusinessException ex) {
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
@@ -871,8 +910,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 for (String line : errorMsgs) {
                     msg += line + "\n";
                 }
-                SysApoio.showDialogError(String.format("%d %s %s\n%s",
-                        errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(), msg), this.getGui());
+                if (SettingsManager.getInstance().isConfig("LoadActionsFailToLoadBehavior", "LogOnly", "Display")) {
+                    log.error(String.format("LoadActionsFailToLoadBehavior=LogOnly. Set 'Display' for popup. %d %s %s", errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName()));
+                } else {
+                    SysApoio.showDialogError(String.format("%d %s %s\n%s",
+                            errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(), msg), this.getGui());
+                }
             }
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_COUNT);
@@ -1049,10 +1092,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     public void saveWorldFile(World world) {
         //salva o arquivo
         try {
-            String filename = PersistFactory.getWorldDao().save(world, fc.getSelectedFile());
+            String filename = PersistFactory.getWorldDao().save(world, getFileSelected());
             this.getGui().setStatusMsg(String.format(labels.getString("WORLD.SALVAS"), world.getLocais().size(), filename));
             this.savedWorld = true;
-            log.info("Saved World file:" + fc.getSelectedFile().getAbsolutePath());
+            log.info("Saved World file:" + getFileSelected().getAbsolutePath());
         } catch (PersistenceException ex) {
             log.fatal("Can't save???", ex);
         }
@@ -1062,8 +1105,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         try {
             // Save image
             BufferedImage buffered = WFC.getMapaControler().getMap();
-            ImageIO.write(buffered, "png", fc.getSelectedFile());
-            this.getGui().setStatusMsg(String.format(labels.getString("MAPA.SALVAS"), fc.getSelectedFile().getName()));
+            ImageIO.write(buffered, "png", getFileSelected());
+            this.getGui().setStatusMsg(String.format(labels.getString("MAPA.SALVAS"), getFileSelected().getName()));
         } catch (IOException ex) {
             log.fatal("IOException Problem", ex);
             this.getGui().setStatusMsg(labels.getString("IO.ERROR"));
@@ -1084,7 +1127,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                         comando.addComando(actor, ordemFacade.getOrdem(actor, index),
                                 ordemFacade.getParametrosId(actor, index),
                                 ordemFacade.getParametrosDisplay(actor, index));
-                    } else if (actor.isNacao()) {
+                    } else if (actor.isNacaoClass()) {
                         //count points, not open slots
                         if (acaoFacade.isPointsSetupUnderLimit(actor, nationPackagesLimit)) {
                             ret = String.format(labels.getString("MISSING.PACKAGE.NATION"), actor.getNome());
@@ -1161,6 +1204,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 case WebCounselorManager.OK:
                     final String msg = String.format(labels.getString("POST.DONE"), attachment.getName());
                     log.info(msg);
+                    if (SettingsManager.getInstance().isConfig("DebugWebpostTime", "1", "0")) {
+                        log.info(WebCounselorManager.getInstance().getLastResponseString());
+                    }
                     this.getGui().setStatusMsg(msg);
                     if (SettingsManager.getInstance().getConfig("SendOrderConfirmationPopUp", "1").equals("1")) {
                         SysApoio.showDialogInfo(labels.getString("POST.DONE.TITLE"), labels.getString("POST.DONE.TITLE"), this.getGui());
@@ -1330,5 +1376,13 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     public boolean isVictoryPointsExists() {
         return !(WFC.getVictoryPoints() == null || WFC.getVictoryPoints().isEmpty());
+    }
+
+    private File getFileSelected() {
+        return fileSelected;
+    }
+
+    private void setFileSelected(File fileSelected) {
+        this.fileSelected = fileSelected;
     }
 }
