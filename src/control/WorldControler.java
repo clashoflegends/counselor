@@ -568,7 +568,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         int returnVal = fc.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             try {
-                final File resultsFile = getFileSelected();
+                final File resultsFile = fc.getSelectedFile();
                 log.info(labels.getString("OPENING: ") + resultsFile.getName());
                 WFC.doStart(resultsFile);
                 this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
