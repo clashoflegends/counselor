@@ -18,19 +18,25 @@ import control.services.NacaoConverter;
 import gui.TabBase;
 import gui.services.IAcaoGui;
 import gui.services.LimitTableCellRenderer;
+import gui.subtabs.SubTabAccordionPanel;
 import gui.subtabs.SubTabBaseList;
 import gui.subtabs.SubTabOrdem;
 import gui.subtabs.SubTabTextArea;
 import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import model.ActorAction;
 import model.Habilidade;
 import model.HabilidadeNacao;
+import model.Local;
 import model.Nacao;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.ListFactory;
 import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
@@ -49,7 +55,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     private final CenarioFacade cenarioFacade = new CenarioFacade();
     private final JogadorFacade jogadorFacade = new JogadorFacade();
     private final SubTabTextArea stResults = new SubTabTextArea();
-    private final SubTabTextArea stCombats = new SubTabTextArea();
+    private SubTabAccordionPanel accordionCombats;
     private final SubTabBaseList stDiplomacy = new SubTabBaseList();
     private final SubTabBaseList stDiplomacyAll = new SubTabBaseList();
     private final SubTabBaseList stTroops = new SubTabBaseList();
@@ -64,8 +70,8 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         setDica(dica);
         this.setKeyFilterProperty("GuiFilterNation");
 
-        this.setMapaControler(mapaControl);
-        initConfig();
+        this.setMapaControler(mapaControl);        
+        initConfig();        
     }
 
     /**
@@ -223,7 +229,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     public final void setMainModel(TableModel model) {
         //clear stuff
         stResults.setText("");
-        stCombats.setText("");
+        accordionCombats.removeAll();
         stDiplomacy.setListModelClear();
         stDiplomacyAll.setListModelClear();
         stTroops.setListModelClear();
@@ -251,6 +257,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
 
     private void initConfig() {
         stOrdens = new SubTabOrdem(this, getMapaControler());
+        accordionCombats = new SubTabAccordionPanel(getMapaControler());
         //configura grid
         jtMainLista.setAutoCreateColumnsFromModel(true);
         jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -264,7 +271,6 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         //Cria o Controle da lista 
         nacaoControl = new NacaoControler(this);
         stResults.setFontText(detalhesNacao.getFont());
-        stCombats.setFontText(detalhesNacao.getFont());
         addTabs();
         //adiciona listeners
         comboFiltro.addActionListener(nacaoControl);
@@ -288,7 +294,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
                 stResults, labels.getString("RESULTADOS.TOOLTIP"));
         detalhesNacao.addTab(labels.getString("RESULTADOS.COMBAT"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/combat.png")),
-                stCombats, labels.getString("RESULTADOS.COMBAT.TOOLTIP"));
+                accordionCombats, labels.getString("RESULTADOS.COMBAT.TOOLTIP"));
         detalhesNacao.addTab(labels.getString("DIPLOMACY"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/diplomacy.gif")),
                 stDiplomacy, labels.getString("DIPLOMACY.TOOLTIP"));
@@ -335,17 +341,27 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     }
 
     private void setCombats(Nacao nacao) {
-        String hab = "\n";
+        boolean areCombats = false;
         try {
+            accordionCombats.removeAll();
             for (String msg : nacaoFacade.getMensagensCombatesDuelos(nacao)) {
-//                hab += "\n\n\n" + msg.replace(',', '\n');
-                hab += "\n\n\n" + msg;
+                String title = msg.substring(0, msg.indexOf("."));
+                String message = msg.substring(msg.indexOf(".") +1);
+                final SubTabTextArea subTabTextArea = new SubTabTextArea();
+               
+                subTabTextArea.setFontText(detalhesNacao.getFont());
+                subTabTextArea.setText(message);
+                Local hexCombat = (new ListFactory()).getLocal(getLocationFromDescription(title));
+                accordionCombats.addBar(title.trim(), subTabTextArea, hexCombat);
+                areCombats = true;
             }
+            if (!areCombats) {
+                accordionCombats.addBar("No data", new JPanel(), null);
+            }
+            
         } catch (NullPointerException ex) {
             //just skip
-            hab += labels.getString("?");
         }
-        stCombats.setText(hab);
     }
 
     public void doMudaNacao(Nacao nacao) {
@@ -372,5 +388,14 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     @Override
     protected int getComboFiltroSize() {
         return this.comboFiltro.getModel().getSize();
+    }
+    
+    private String getLocationFromDescription(String line) {
+        Pattern pattern = Pattern.compile("\\d{4}");
+        Matcher matcher = pattern.matcher(line);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
     }
 }
