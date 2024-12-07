@@ -151,6 +151,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             case "drawFogWar":
                 doDrawFogOfWar(jbTemp);
                 break;
+            case "drawShowCityCap":
+                doDrawShowCityCap(jbTemp);
+                break;
             case "drawDisplayPortraits":
                 doPortraits(jbTemp);
                 break;
@@ -1042,6 +1045,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 gui.getPcPath().setSelected(gui.isPcPathSelected());
                 gui.getPcPathFuture().setSelected(gui.isPcPathFutureSelected());
                 gui.getFogOfWar().setSelected(gui.isFogOfWarSelected());
+                gui.getShowCityCap().setSelected(gui.isShowCityCapSelected());
                 break;
             default:
                 break;
@@ -1311,6 +1315,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         int settingValue = button.isSelected() ? 1 : 0;
         SettingsManager.getInstance().setConfig("fogOfWarType", String.valueOf(settingValue));
         SettingsManager.getInstance().doConfigSave("fogOfWarType");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
+
+    private void doDrawShowCityCap(JToggleButton button) {
+        int settingValue = button.isSelected() ? 1 : 0;
+        SettingsManager.getInstance().setConfig("showCityCap", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("showCityCap");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
