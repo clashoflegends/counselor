@@ -353,7 +353,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathArmy.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar2.add(togglePathArmy);
 
-        toggleShowCityCap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_fog.png"))); // NOI18N
+        toggleShowCityCap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_redfog.png"))); // NOI18N
         toggleShowCityCap.setSelected(isFogOfWarSelected());
         toggleShowCityCap.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SHOWCITYCAP")); // NOI18N
         toggleShowCityCap.setActionCommand("drawShowCityCap");

@@ -515,7 +515,7 @@
                 <Component class="javax.swing.JToggleButton" name="toggleShowCityCap">
                   <Properties>
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                      <Image iconType="3" name="/images/hex_fog.png"/>
+                      <Image iconType="3" name="/images/hex_redfog.png"/>
                     </Property>
                     <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="isFogOfWarSelected()" type="code"/>
