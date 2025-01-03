@@ -12,7 +12,7 @@ import business.converter.ConverterFactory;
 import business.services.TagManager;
 import control.MapaControler;
 import control.facade.WorldFacadeCounselor;
-import control.services.MapaDragListener;
+import gui.services.MapaDragListener;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;

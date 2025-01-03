@@ -232,6 +232,10 @@ public class WorldFacadeCounselor implements Serializable {
         return WorldManager.getInstance().getCenario().hasHabilidade(";SLS;");
     }
 
+    public boolean isBattleRoyal() {
+        return WorldManager.getInstance().getPartida().isBattleRoyal();
+    }
+
     public boolean isStartupPackages() {
         return WorldManager.getInstance().getPartida().isStartupPackages();
     }
