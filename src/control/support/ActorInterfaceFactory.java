@@ -6,6 +6,7 @@ package control.support;
 
 import java.io.Serializable;
 import model.Cidade;
+import model.Local;
 import model.Nacao;
 import model.Personagem;
 
@@ -33,6 +34,12 @@ public class ActorInterfaceFactory implements Serializable {
     public ActorInterface getActorInterface(Cidade cidade) {
         ActorInterfaceCidade ordPers = new ActorInterfaceCidade();
         ordPers.setCidade(cidade);
+        return ordPers;
+    }
+
+    public ActorInterface getActorInterface(Local hex) {
+        ActorInterfaceLocal ordPers = new ActorInterfaceLocal();
+        ordPers.setLocal(hex);
         return ordPers;
     }
 

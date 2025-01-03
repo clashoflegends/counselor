@@ -158,11 +158,11 @@ public class FiltroConverter implements Serializable {
         return new GenericoComboBoxModel(itens);
     }
 
-    public static String[][] listTipoPersonagem() {
+    private static String[][] listTipoPersonagem() {
         String[][] ret = new String[TitleFactory.getTipoPersonagem().length + 1][2];
         int ii = 0;
         ret[ii][0] = labels.getString("TODOS"); //Display
-        ret[ii++][1] = "Todos"; //Id
+        ret[ii++][1] = "All"; //Id
         for (String elem : TitleFactory.getTipoPersonagem()) {
             ret[ii][0] = elem;
             ret[ii++][1] = elem;
