@@ -8,7 +8,7 @@ package gui.tabs;
 import baseLib.GenericoComboObject;
 import business.facade.CenarioFacade;
 import business.facade.LocalFacade;
-import control.HexagonoControler;
+import control.LocationControler;
 import control.MapaControler;
 import control.facade.WorldFacadeCounselor;
 import control.services.FiltroConverter;
@@ -20,6 +20,7 @@ import gui.subtabs.SubTabPopup;
 import java.io.Serializable;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
+import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import model.ActorAction;
@@ -37,11 +38,11 @@ import utils.OpenSlotCounter;
  *
  * @author gurgel
  */
-public class TabHexagonosGui extends TabBase implements Serializable, IAcaoGui {
+public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
 
-    private static final Log LOG = LogFactory.getLog(TabHexagonosGui.class);
+    private static final Log LOG = LogFactory.getLog(TabLocationsGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private HexagonoControler hexagonoControl;
+    private LocationControler locationControl;
     private final CenarioFacade cenarioFacade = new CenarioFacade();
     private final LocalFacade localFacade = new LocalFacade();
     private final SubTabPopup stResults = new SubTabPopup();
@@ -52,7 +53,7 @@ public class TabHexagonosGui extends TabBase implements Serializable, IAcaoGui {
     /**
      * Creates new form TabHexagonosGui
      */
-    public TabHexagonosGui(String titulo, String dica, MapaControler mapaControl) {
+    public TabLocationsGui(String titulo, String dica, MapaControler mapaControl) {
         initComponents();
         //Basico
         setIcone("/images/hex_base.png");
@@ -80,6 +81,8 @@ public class TabHexagonosGui extends TabBase implements Serializable, IAcaoGui {
         detalhesHex = new javax.swing.JTabbedPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
+        jToolBar1 = new javax.swing.JToolBar();
+        toggleShowCampRestrictions = new javax.swing.JToggleButton();
 
         jLabel3.setText(labels.getString("LISTAR:")); // NOI18N
 
@@ -139,6 +142,18 @@ public class TabHexagonosGui extends TabBase implements Serializable, IAcaoGui {
 
         jSplitPane1.setLeftComponent(jScrollPane3);
 
+        jToolBar1.setRollover(true);
+
+        toggleShowCampRestrictions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_redfog.png"))); // NOI18N
+        toggleShowCampRestrictions.setSelected(isCampRestrictionSelected());
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
+        toggleShowCampRestrictions.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SHOWCITYCAP")); // NOI18N
+        toggleShowCampRestrictions.setActionCommand("showCampRestriction");
+        toggleShowCampRestrictions.setFocusable(false);
+        toggleShowCampRestrictions.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        toggleShowCampRestrictions.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(toggleShowCampRestrictions);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -153,6 +168,7 @@ public class TabHexagonosGui extends TabBase implements Serializable, IAcaoGui {
                 .addGap(2, 2, 2)
                 .addComponent(qtHexes))
             .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -163,8 +179,10 @@ public class TabHexagonosGui extends TabBase implements Serializable, IAcaoGui {
                     .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(qtHexes)
                     .addComponent(jLabel5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -195,8 +213,10 @@ public class TabHexagonosGui extends TabBase implements Serializable, IAcaoGui {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JTable jtMainLista;
     private javax.swing.JLabel qtHexes;
+    private javax.swing.JToggleButton toggleShowCampRestrictions;
     // End of variables declaration//GEN-END:variables
 
     private void initConfig() {
@@ -209,13 +229,14 @@ public class TabHexagonosGui extends TabBase implements Serializable, IAcaoGui {
         comboFiltro.setSelectedIndex(this.getFiltroDefault());
 
         //create hexes control
-        hexagonoControl = new HexagonoControler(this);
+        locationControl = new LocationControler(this);
 
         //adiciona listeners
-        comboFiltro.addActionListener(hexagonoControl);
-        jtMainLista.getSelectionModel().addListSelectionListener(hexagonoControl);
+        comboFiltro.addActionListener(locationControl);
+        jtMainLista.getSelectionModel().addListSelectionListener(locationControl);
+        toggleShowCampRestrictions.addActionListener(locationControl);
 
-        TableModel model = hexagonoControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
+        TableModel model = locationControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
         this.setMainModel(model);
         stResults.setFontText(detalhesHex.getFont());
         doAddTabs();
@@ -224,9 +245,9 @@ public class TabHexagonosGui extends TabBase implements Serializable, IAcaoGui {
     @Override
     public void setValueAt(ActorAction actorAction, int ordIndex, int openSlotsQt) {
         //set Col=1 at front, before skills so that it doesn't have to calculate where is the column.
-        OpenSlotCounter openSlotCounter = (OpenSlotCounter) this.jtMainLista.getModel().getValueAt(hexagonoControl.getModelRowIndex(), 1);
+        OpenSlotCounter openSlotCounter = (OpenSlotCounter) this.jtMainLista.getModel().getValueAt(locationControl.getModelRowIndex(), 1);
         openSlotCounter.setOpenSlotQt(openSlotsQt);
-        this.jtMainLista.getModel().setValueAt(openSlotCounter, hexagonoControl.getModelRowIndex(), 1);
+        this.jtMainLista.getModel().setValueAt(openSlotCounter, locationControl.getModelRowIndex(), 1);
     }
 
     public JTable getMainLista() {
@@ -281,11 +302,15 @@ public class TabHexagonosGui extends TabBase implements Serializable, IAcaoGui {
         stProdutos.setListModel(LocalConverter.getProdutoModel(hex));
         stPersonagens.setListModel(LocalConverter.getPresencasModel(hex));
         final String popupTitle = labels.getString("RESULTADOS.OF") + ": " + LocalFacade.getCoordenadas(hex);
-        stResults.setText(popupTitle, hexagonoControl.getResultados(hex));
+        stResults.setText(popupTitle, locationControl.getResultados(hex));
     }
 
     @Override
     protected int getComboFiltroSize() {
         return this.comboFiltro.getModel().getSize();
+    }
+
+    public boolean isCampRestrictionSelected() {
+        return SettingsManager.getInstance().getConfig("showCampRestriction", "1").equals("1");
     }
 }

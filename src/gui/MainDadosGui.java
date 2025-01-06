@@ -13,9 +13,8 @@ import gui.tabs.TabCidadesGui;
 import gui.tabs.TabExercitosGui;
 import gui.tabs.TabFeiticosGui;
 import gui.tabs.TabFinancesGui;
-import gui.tabs.TabHexagonosGui;
+import gui.tabs.TabLocationsGui;
 import gui.tabs.TabNacoesGui;
-import gui.tabs.TabOrdensGui;
 import gui.tabs.TabPackagesGui;
 import gui.tabs.TabPartidaGui;
 import gui.tabs.TabPersonagensGui;
@@ -52,7 +51,7 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
         this.addTabBase(new TabExercitosGui(labels.getString("EXERCITOS"), labels.getString("EXERCITOS.DISPONIVEL"), mapaControl));
         this.addTabBase(new TabArtefatosGui(labels.getString("ARTEFATOS"), labels.getString("ARTEFATOS.DISPONIVEL"), mapaControl));
         if (WorldFacadeCounselor.getInstance().isBattleRoyal()) {
-            this.addTabBase(new TabHexagonosGui(labels.getString("LOCALS"), labels.getString("LOCAL.LIST"), mapaControl));
+            this.addTabBase(new TabLocationsGui(labels.getString("LOCALS"), labels.getString("LOCAL.LIST"), mapaControl));
         }
         this.addTabBase(new TabNacoesGui(labels.getString("NACOES"), labels.getString("NACOES"), mapaControl));
         this.addTabBase(new TabFinancesGui(labels.getString("FINANCAS"), labels.getString("FINANCAS"), mapaControl));
