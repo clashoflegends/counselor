@@ -970,6 +970,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     po.setOrdem(ordem);
                     po.setParametrosDisplay(comandoDetail.getParametroDisplay());
                     po.setParametrosId(comandoDetail.getParametroId());
+                    po.setUpdateTime(comandoDetail.getUpdateTime());
+                    log.fatal(comandoDetail.getUpdateTime().toString());
                     final Nacao nation = WFC.getNacao(comandoDetail.getNacaoCodigo());
                     //atualiza financas e outras dependencias
                     getDispatchManager().sendDispatchForChar(nation, null, po);
@@ -1123,7 +1125,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     if (ordemFacade.getOrdem(actor, index) != null) {
                         comando.addComando(actor, ordemFacade.getOrdem(actor, index),
                                 ordemFacade.getParametrosId(actor, index),
-                                ordemFacade.getParametrosDisplay(actor, index));
+                                ordemFacade.getParametrosDisplay(actor, index),
+                                ordemFacade.getTimeLastChange(actor, index));
                     } else if (actor.isNacaoClass()) {
                         //count points, not open slots
                         if (acaoFacade.isPointsSetupUnderLimit(actor, nationPackagesLimit)) {
