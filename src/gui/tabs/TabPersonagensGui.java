@@ -83,6 +83,8 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         comboFiltro = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         qtPersonagens = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        searchField = new javax.swing.JTextField();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
@@ -101,6 +103,13 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         qtPersonagens.setText(labels.getString("QTD")); // NOI18N
         qtPersonagens.setFocusable(false);
 
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
+        jLabel1.setText(bundle.getString("TAB.SEARCH.LABEL")); // NOI18N
+
+        searchField.setToolTipText(bundle.getString("TAB.SEARCH.TOOLTIP")); // NOI18N
+        searchField.setMinimumSize(new java.awt.Dimension(80, 20));
+        searchField.setPreferredSize(new java.awt.Dimension(80, 20));
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -110,7 +119,11 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 260, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(qtPersonagens))
@@ -123,7 +136,9 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
                     .addComponent(qtPersonagens)
                     .addComponent(jLabel2)
                     .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel1)
+                    .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(15, Short.MAX_VALUE))
         );
 
@@ -253,6 +268,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox comboFiltro;
     private javax.swing.JTabbedPane detalhesPersonagem;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
@@ -263,6 +279,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     private javax.swing.JTable jtMainLista;
     private javax.swing.JPanel portraitPanel;
     private javax.swing.JLabel qtPersonagens;
+    private javax.swing.JTextField searchField;
     // End of variables declaration//GEN-END:variables
     // FIM das Constantes para busca das chaves no banco.
 
@@ -282,6 +299,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         jtMainLista.setAutoCreateRowSorter(true);
 
         //adiciona listeners
+        addDocumentListener(searchField);
         comboFiltro.addActionListener(personagemControl);
         jtMainLista.getSelectionModel().addListSelectionListener(personagemControl);
         ltcr = new LifeTableCellRenderer(

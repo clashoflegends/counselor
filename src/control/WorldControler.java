@@ -971,7 +971,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     po.setParametrosDisplay(comandoDetail.getParametroDisplay());
                     po.setParametrosId(comandoDetail.getParametroId());
                     po.setUpdateTime(comandoDetail.getUpdateTime());
-                    log.fatal(comandoDetail.getUpdateTime().toString());
+//                    log.fatal(comandoDetail.getUpdateTime().toString());
                     final Nacao nation = WFC.getNacao(comandoDetail.getNacaoCodigo());
                     //atualiza financas e outras dependencias
                     getDispatchManager().sendDispatchForChar(nation, null, po);

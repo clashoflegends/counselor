@@ -11,9 +11,17 @@ import gui.services.ColumnWidthsAdjuster;
 import gui.services.LocalTableCellRenderer;
 import gui.services.OpenSlotTableCellRenderer;
 import java.io.Serializable;
+import java.util.regex.Pattern;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import model.ActorAction;
 import model.Local;
 import org.apache.commons.logging.Log;
@@ -152,5 +160,64 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
 
     protected DefaultComboBoxModel getDefaultComboBoxModelTodosProprio() {
         return new DefaultComboBoxModel(new String[]{labels.getString("FILTRO.TODOS"), labels.getString("FILTRO.PROPRIOS")});
+    }
+
+    private void applyGlobalFilter(String searchText) {
+        // Make sure we have a row sorter
+        TableRowSorter<TableModel> sorter = (TableRowSorter<TableModel>) getMainLista().getRowSorter();
+        if (sorter == null) {
+            sorter = new TableRowSorter<>(getMainLista().getModel());
+            getMainLista().setRowSorter(sorter);
+        }
+
+        if (searchText == null || searchText.trim().isEmpty()) {
+            // No search text -> show all rows
+            sorter.setRowFilter(null);
+        } else {
+            // Build a case-insensitive partial-match regex,
+            // quoting any special regex characters from the user input:
+            String regex = "(?i).*" + Pattern.quote(searchText.trim()) + ".*";
+
+            try {
+                // If you omit column indices here, it will search ALL columns
+                sorter.setRowFilter(RowFilter.regexFilter(regex));
+            } catch (java.util.regex.PatternSyntaxException e) {
+                // In case the user types an invalid regex, fall back to no filter
+                sorter.setRowFilter(null);
+            }
+        }
+    }
+
+    protected void addDocumentListener(JTextField searchField) {
+        //add listener to search field for filtering.
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                applyGlobalFilter(searchField.getText());
+                refocusField(searchField);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                applyGlobalFilter(searchField.getText());
+                refocusField(searchField);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                // Typically not fired for plain text components, but just in case:
+                applyGlobalFilter(searchField.getText());
+            }
+        });
+    }
+
+    private void refocusField(JTextField field) {
+        SwingUtilities.invokeLater(() -> {
+            field.requestFocusInWindow();
+        });
+    }
+
+    public JTable getMainLista() {
+        return null;
     }
 }

@@ -18,11 +18,16 @@ import gui.services.IAcaoGui;
 import gui.subtabs.SubTabBaseList;
 import gui.subtabs.SubTabPopup;
 import java.io.Serializable;
+import java.util.regex.Pattern;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
-import javax.swing.JToggleButton;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import model.ActorAction;
 import model.Cenario;
 import model.Local;
@@ -83,6 +88,8 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
         jtMainLista = new javax.swing.JTable();
         jToolBar1 = new javax.swing.JToolBar();
         toggleShowCampRestrictions = new javax.swing.JToggleButton();
+        searchField = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
 
         jLabel3.setText(labels.getString("LISTAR:")); // NOI18N
 
@@ -154,6 +161,12 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
         toggleShowCampRestrictions.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(toggleShowCampRestrictions);
 
+        searchField.setToolTipText(bundle.getString("TAB.SEARCH.TOOLTIP")); // NOI18N
+        searchField.setMinimumSize(new java.awt.Dimension(80, 20));
+        searchField.setPreferredSize(new java.awt.Dimension(80, 20));
+
+        jLabel1.setText(bundle.getString("TAB.SEARCH.LABEL")); // NOI18N
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -163,11 +176,15 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 227, Short.MAX_VALUE)
+                .addGap(31, 31, 31)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel5)
                 .addGap(2, 2, 2)
                 .addComponent(qtHexes))
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
             .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
@@ -178,7 +195,9 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
                     .addComponent(jLabel3)
                     .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(qtHexes)
-                    .addComponent(jLabel5))
+                    .addComponent(jLabel5)
+                    .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -208,6 +227,7 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox comboFiltro;
     private javax.swing.JTabbedPane detalhesHex;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
@@ -216,6 +236,7 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JTable jtMainLista;
     private javax.swing.JLabel qtHexes;
+    private javax.swing.JTextField searchField;
     private javax.swing.JToggleButton toggleShowCampRestrictions;
     // End of variables declaration//GEN-END:variables
 
@@ -232,6 +253,7 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
         locationControl = new LocationControler(this);
 
         //adiciona listeners
+        addDocumentListener(searchField);
         comboFiltro.addActionListener(locationControl);
         jtMainLista.getSelectionModel().addListSelectionListener(locationControl);
         toggleShowCampRestrictions.addActionListener(locationControl);
@@ -250,6 +272,7 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
         this.jtMainLista.getModel().setValueAt(openSlotCounter, locationControl.getModelRowIndex(), 1);
     }
 
+    @Override
     public JTable getMainLista() {
         return jtMainLista;
     }
@@ -312,5 +335,31 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
 
     public boolean isCampRestrictionSelected() {
         return SettingsManager.getInstance().getConfig("showCampRestriction", "1").equals("1");
+    }
+
+    public void applyGlobalFilter(String searchText) {
+        // Make sure we have a row sorter
+        TableRowSorter<TableModel> sorter = (TableRowSorter<TableModel>) getMainLista().getRowSorter();
+        if (sorter == null) {
+            sorter = new TableRowSorter<>(getMainLista().getModel());
+            getMainLista().setRowSorter(sorter);
+        }
+
+        if (searchText == null || searchText.trim().isEmpty()) {
+            // No search text -> show all rows
+            sorter.setRowFilter(null);
+        } else {
+            // Build a case-insensitive partial-match regex,
+            // quoting any special regex characters from the user input:
+            String regex = "(?i).*" + Pattern.quote(searchText.trim()) + ".*";
+
+            try {
+                // If you omit column indices here, it will search ALL columns
+                sorter.setRowFilter(RowFilter.regexFilter(regex));
+            } catch (java.util.regex.PatternSyntaxException e) {
+                // In case the user types an invalid regex, fall back to no filter
+                sorter.setRowFilter(null);
+            }
+        }
     }
 }

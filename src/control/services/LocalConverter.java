@@ -213,8 +213,6 @@ public class LocalConverter implements Serializable {
         classes.add(Local.class);
         colNames.add(labels.getString("CIDADE"));
         classes.add(java.lang.String.class);
-        colNames.add(labels.getString("NOME"));
-        classes.add(java.lang.String.class);
         colNames.add(labels.getString("TERRENO"));
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("PRESENCAS"));
@@ -239,6 +237,8 @@ public class LocalConverter implements Serializable {
                 classes.add(java.lang.Integer.class);
             }
         }
+        colNames.add(labels.getString("INFORMATION.TITLE"));
+        classes.add(java.lang.String.class);
 
         return (colNames.toArray(new String[0]));
     }
@@ -249,7 +249,6 @@ public class LocalConverter implements Serializable {
         //start data structure definition
         cArray[ii++] = local;
         cArray[ii++] = cidadeFacade.getNome(local);
-        cArray[ii++] = localFacade.getNome(local);
         cArray[ii++] = localFacade.getTerrenoNome(local);
         cArray[ii++] = localFacade.getPersonagens(local).size();
         cArray[ii++] = localFacade.getDocasNome(local);
@@ -264,6 +263,7 @@ public class LocalConverter implements Serializable {
                 cArray[ii++] = localFacade.getProduction(local, product, scenario, turn);
             }
         }
+        cArray[ii++] = LocalConverter.getInfo(local);
         return cArray;
     }
 
