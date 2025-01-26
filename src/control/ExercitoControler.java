@@ -66,7 +66,7 @@ public class ExercitoControler implements Serializable, ActionListener, ListSele
             return;
         }
         try {
-            JTable table = this.getTabGui().getListaExercitos();
+            JTable table = this.getTabGui().getMainLista();
             ListSelectionModel lsm = (ListSelectionModel) event.getSource();
             if (!lsm.isSelectionEmpty()) {
                 //testes

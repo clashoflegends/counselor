@@ -84,6 +84,8 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         detalhesCidade = new javax.swing.JTabbedPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        searchField = new javax.swing.JTextField();
 
         jLabel3.setText(labels.getString("LISTAR:")); // NOI18N
 
@@ -143,6 +145,13 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
 
         jSplitPane1.setLeftComponent(jScrollPane3);
 
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
+        jLabel1.setText(bundle.getString("TAB.SEARCH.LABEL")); // NOI18N
+
+        searchField.setToolTipText(bundle.getString("TAB.SEARCH.TOOLTIP")); // NOI18N
+        searchField.setMinimumSize(new java.awt.Dimension(80, 20));
+        searchField.setPreferredSize(new java.awt.Dimension(80, 20));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -152,7 +161,11 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 227, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
                 .addComponent(jLabel5)
                 .addGap(2, 2, 2)
                 .addComponent(qtCidades))
@@ -166,7 +179,10 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
                     .addComponent(jLabel3)
                     .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(qtCidades)
-                    .addComponent(jLabel5))
+                    .addComponent(jLabel5)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel1)
+                        .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE))
         );
@@ -184,16 +200,17 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jSplitPane1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane1PropertyChange
-        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY) ) {
+        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
             String splitHeight = evt.getNewValue().toString();
             LOG.debug("Split city pane divisor modified to " + splitHeight + " px.");
             SettingsManager.getInstance().setConfig("citySplitSize", splitHeight);
-        } 
+        }
     }//GEN-LAST:event_jSplitPane1PropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox comboFiltro;
     private javax.swing.JTabbedPane detalhesCidade;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
@@ -201,6 +218,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTable jtMainLista;
     private javax.swing.JLabel qtCidades;
+    private javax.swing.JTextField searchField;
     // End of variables declaration//GEN-END:variables
 
     private void initConfig() {
@@ -217,6 +235,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         cidadeControl = new CidadeControler(this);
 
         //adiciona listeners
+        addDocumentListener(searchField);
         comboFiltro.addActionListener(cidadeControl);
         jtMainLista.getSelectionModel().addListSelectionListener(cidadeControl);
 

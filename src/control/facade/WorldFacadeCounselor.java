@@ -155,6 +155,10 @@ public class WorldFacadeCounselor implements Serializable {
         return WorldManager.getInstance().getPersonagens().values().iterator();
     }
 
+    public Collection<Personagem> getPersonagemAll() {
+        return WorldManager.getInstance().getPersonagens().values();
+    }
+
     public Collection<Cidade> getCidades() {
         return WorldManager.getInstance().getCidades().values();
     }

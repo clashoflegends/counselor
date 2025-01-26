@@ -51,9 +51,7 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
         this.addTabBase(new TabCidadesGui(labels.getString("CIDADES"), labels.getString("CIDADES.DISPONIVEL"), mapaControl));
         this.addTabBase(new TabExercitosGui(labels.getString("EXERCITOS"), labels.getString("EXERCITOS.DISPONIVEL"), mapaControl));
         this.addTabBase(new TabArtefatosGui(labels.getString("ARTEFATOS"), labels.getString("ARTEFATOS.DISPONIVEL"), mapaControl));
-        if (WorldFacadeCounselor.getInstance().isBattleRoyal() || SettingsManager.getInstance().isConfig("GuiShowLocationsTab", "1", "0")) {
-            this.addTabBase(new TabLocationsGui(labels.getString("LOCALS"), labels.getString("LOCAL.LIST"), mapaControl));
-        }
+        this.addTabBase(new TabLocationsGui(labels.getString("LOCALS"), labels.getString("LOCAL.LIST"), mapaControl));
         this.addTabBase(new TabNacoesGui(labels.getString("NACOES"), labels.getString("NACOES"), mapaControl));
         this.addTabBase(new TabFinancesGui(labels.getString("FINANCAS"), labels.getString("FINANCAS"), mapaControl));
         if (WorldFacadeCounselor.getInstance().isStartupPackages() && WorldFacadeCounselor.getInstance().getTurno() == 0) {
@@ -66,7 +64,7 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
             this.addTabBase(new TabFeiticosGui(labels.getString("FEITICOS"), labels.getString("FEITICOS.DISPONIVEL")));
         }
         if (SettingsManager.getInstance().isConfig("GuiShowLocationsTab", "1", "0")) {
-            this.addTabBase(new TabOrdensGui("Ordens", "Ordens a enviar"));
+            this.addTabBase(new TabOrdensGui("Ordens", labels.getString("ORDENS.SAVED")));
         }
     }
 

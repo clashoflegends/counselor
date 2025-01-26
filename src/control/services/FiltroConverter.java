@@ -100,6 +100,13 @@ public class FiltroConverter implements Serializable {
         return model;
     }
 
+    public static ComboBoxModel getFiltroComboModelAll() {
+        List<IBaseModel> lista = new ArrayList<>();
+        lista.add(new GenericoComboObject(labels.getString("FILTRO.TODOS"), "all"));
+        GenericoComboBoxModel model = new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]), true);
+        return model;
+    }
+
     public static String[][] listFiltroLW() {
         String[][] ret = new String[3][2];
         int ii = 0;

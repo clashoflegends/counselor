@@ -35,7 +35,7 @@ import utils.OpenSlotCounter;
  * @author gurgel
  */
 public abstract class TabBase extends javax.swing.JRootPane implements Serializable {
-
+    
     private static final Log log = LogFactory.getLog(TabBase.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private String dica;
@@ -51,20 +51,20 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
     public TabBase() {
         initComponents();
     }
-
+    
     protected int getComboFiltroSize() {
         return 0;
     }
-
+    
     public final String getKeyFilterProperty() {
         return keyFilterProperty;
     }
-
+    
     public final void setKeyFilterProperty(String keyFilterProperty) {
         this.keyFilterProperty = keyFilterProperty;
         this.setFiltroDefault(SettingsManager.getInstance().getConfigAsInt(keyFilterProperty, "-9999"));
     }
-
+    
     public final int getFiltroDefault() {
         if (filtroDefault == -9999 || this.getComboFiltroSize() <= filtroDefault) {
             //load default
@@ -77,50 +77,50 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
         }
         return filtroDefault;
     }
-
+    
     public final void setFiltroDefault(int filtroDefault) {
         this.filtroDefault = filtroDefault;
     }
-
+    
     public String getDica() {
         return dica;
     }
-
+    
     public final void setDica(String toolTip) {
         this.dica = toolTip;
     }
-
+    
     public String getTitle() {
         return title;
     }
-
+    
     public final void setTitle(String title) {
         this.title = title;
     }
-
+    
     public ImageIcon getIcone() {
         return icone;
     }
-
+    
     public final void setIcone(String iconeName) {
         try {
             this.icone = new ImageIcon(getClass().getResource(iconeName));
         } catch (NullPointerException ex) {
         }
     }
-
+    
     public MapaControler getMapaControler() {
         return this.mapaControler;
     }
-
+    
     protected final void setMapaControler(MapaControler mapaControl) {
         this.mapaControler = mapaControl;
     }
-
+    
     public void doTagHide() {
         this.mapaControler.getTabGui().hidefocusTag();
     }
-
+    
     protected void doConfigTableColumns(JTable table) {
         //set renders for Action columns
         table.setDefaultRenderer(ActorAction.class, new ActorActionTableCellRenderer(table));
@@ -161,7 +161,7 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
     protected DefaultComboBoxModel getDefaultComboBoxModelTodosProprio() {
         return new DefaultComboBoxModel(new String[]{labels.getString("FILTRO.TODOS"), labels.getString("FILTRO.PROPRIOS")});
     }
-
+    
     private void applyGlobalFilter(String searchText) {
         // Make sure we have a row sorter
         TableRowSorter<TableModel> sorter = (TableRowSorter<TableModel>) getMainLista().getRowSorter();
@@ -169,7 +169,7 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
             sorter = new TableRowSorter<>(getMainLista().getModel());
             getMainLista().setRowSorter(sorter);
         }
-
+        
         if (searchText == null || searchText.trim().isEmpty()) {
             // No search text -> show all rows
             sorter.setRowFilter(null);
@@ -177,7 +177,7 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
             // Build a case-insensitive partial-match regex,
             // quoting any special regex characters from the user input:
             String regex = "(?i).*" + Pattern.quote(searchText.trim()) + ".*";
-
+            
             try {
                 // If you omit column indices here, it will search ALL columns
                 sorter.setRowFilter(RowFilter.regexFilter(regex));
@@ -187,8 +187,8 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
             }
         }
     }
-
-    protected void addDocumentListener(JTextField searchField) {
+    
+    protected final void addDocumentListener(JTextField searchField) {
         //add listener to search field for filtering.
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -196,13 +196,13 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
                 applyGlobalFilter(searchField.getText());
                 refocusField(searchField);
             }
-
+            
             @Override
             public void removeUpdate(DocumentEvent e) {
                 applyGlobalFilter(searchField.getText());
                 refocusField(searchField);
             }
-
+            
             @Override
             public void changedUpdate(DocumentEvent e) {
                 // Typically not fired for plain text components, but just in case:
@@ -210,14 +210,15 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
             }
         });
     }
-
+    
     private void refocusField(JTextField field) {
         SwingUtilities.invokeLater(() -> {
             field.requestFocusInWindow();
         });
     }
-
+    
     public JTable getMainLista() {
+        log.fatal("Can't use getMainLista() here. Needs to override int he tab.");
         return null;
     }
 }
