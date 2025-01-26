@@ -58,7 +58,7 @@ public class LocationControler extends ControlBase implements Serializable, Acti
     }
 
     public String getResultados(Local hex) {
-        return LocalConverter.getInfo(hex);
+        return LocalConverter.getInfoBaseHex(hex);
     }
 
     public int getModelRowIndex() {

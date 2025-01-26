@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 import utils.StringRet;
 
 /**
@@ -56,13 +57,12 @@ public class LocalConverter implements Serializable {
         StringRet ret = new StringRet();
         //City
         ret.add(CidadeConverter.getInfo(local.getCidade()));
-        //local
         //"Local : @ 3103 em Planície O Clima é Polar"
         ret.add(String.format(labels.getString("TERRENO.CLIMA"),
                 local.getTerreno().getNome(),
                 BaseMsgs.localClima[local.getClima()]));
         //landmarks and others
-        ret.add("\n");
+        ret.addLinebreak();
         for (Habilidade hab : local.getHabilidades().values()) {
             if (hab.getCodigo().equals(";-;")) {
                 continue;
@@ -80,7 +80,7 @@ public class LocalConverter implements Serializable {
         }
         //personagens
         if (local.getPersonagens().values().size() > 0) {
-            ret.add("\n");
+            ret.addLinebreak();
             ret.add(labels.getString("PERSONAGENS.LOCAL"));
             if (SettingsManager.getInstance().getConfig("HexInfoPcSorting", "N").equals("N")) {
                 //sort by nation
@@ -99,7 +99,7 @@ public class LocalConverter implements Serializable {
         }
         //exercitos
         if (local.getExercitos().values().size() > 0) {
-            ret.add("\n");
+            ret.addLinebreak();
             ret.add(labels.getString("EXERCITOS"));
             for (Exercito exercito : local.getExercitos().values()) {
                 ret.add(ExercitoConverter.getInfo(exercito));
@@ -107,7 +107,7 @@ public class LocalConverter implements Serializable {
         }
         //artefatos
         if (local.getArtefatos().values().size() > 0) {
-            ret.add("\n");
+            ret.addLinebreak();
             ret.add(labels.getString("ARTEFATOS"));
             for (Artefato artefato : local.getArtefatos().values()) {
                 ret.add(ArtefatoConverter.getInfo(artefato));
@@ -260,10 +260,11 @@ public class LocalConverter implements Serializable {
         cArray[ii++] = localFacade.getProductionBestSell(local, mercado, scenario, turn);
         if (hasResourceManagement) {
             for (Produto product : scenario.getProdutos().values()) {
-                cArray[ii++] = localFacade.getProduction(local, product, scenario, turn);
+                cArray[ii++] = localFacade.getProductionBase(local, product, scenario, turn);
+                //cArray[ii++] = localFacade.getProduction(local, product, scenario, turn);
             }
         }
-        cArray[ii++] = LocalConverter.getInfo(local);
+        cArray[ii++] = LocalConverter.getInfoBaseHex(local);
         return cArray;
     }
 
@@ -300,4 +301,39 @@ public class LocalConverter implements Serializable {
         return cidadeModel;
     }
 
+    public static String getInfoBaseHex(Local local) {
+        StringRet ret = new StringRet();
+        //"Local : @ 3103 em Planície O Clima é Polar. Winter is here."
+        ret.add(String.format(labels.getString("LOCAL.INFO.HEADER"),
+                local.getCoordenadas(),
+                local.getTerreno().getNome(),
+                BaseMsgs.localClima[local.getClima()]));
+        ret.addLinebreak();
+        getInfoResources(ret, local);
+        ret.addLinebreak();
+        ret.add(LocalConverter.getInfo(local));
+        return ret.getText();
+    }
+
+    private static void getInfoResources(StringRet ret, Local local) {
+        if (!WorldFacadeCounselor.getInstance().hasResourceManagement()) {
+            //no resources
+            return;
+        }
+        if (local.getCoordenadas().equals("1943")) {
+            log.debug("AKI!");
+        }
+        for (Produto product : local.getProducao().keySet()) {
+            final int productionNatural = localFacade.getProductionNatural(local, product);
+            if (productionNatural <= 0) {
+                continue;
+            }
+            ret.add(product.getNome());
+            ret.add(String.format("\t%s\t:%s", SysApoio.getFormatedNumber(productionNatural), labels.getString("LOCAL.RESOURCEINFO.BASE")));
+            ret.add(String.format("\t%s\t:%s", SysApoio.getFormatedNumber(localFacade.getProductionClimate(local, product)), labels.getString("LOCAL.RESOURCEINFO.CLIMATE")));
+            ret.add(String.format("\t%s\t:%s", SysApoio.getFormatedNumber(localFacade.getProductionBase(local, product, scenario, turn)), labels.getString("LOCAL.RESOURCEINFO.WINTER")));
+            ret.add(String.format("\t%s\t:%s", SysApoio.getFormatedNumber(localFacade.getProductionBonusWihtout(local, product, scenario, turn)), labels.getString("LOCAL.RESOURCEINFO.CITYSIZE")));
+            ret.add(String.format("\t%s\t:%s", SysApoio.getFormatedNumber(localFacade.getProduction(local, product, scenario, turn)), labels.getString("LOCAL.RESOURCEINFO.POWERS")));
+        }
+    }
 }
