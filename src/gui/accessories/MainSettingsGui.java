@@ -70,6 +70,7 @@ public class MainSettingsGui extends JPanel {
         autoLoadActionCheck.addActionListener(settingsControler);
         displayPortraitCheckBox.addActionListener(settingsControler);
         downloadPortraitsButton.addActionListener(settingsControler);
+        mountainColorButton.addActionListener(settingsControler);
 
         //Hiding controls here until they are tested. Set ShowCharacterPortraitsBeta=1 to test.
         if (SettingsManager.getInstance().isConfig("ShowCharacterPortraitsBeta", "1", "1")) {
@@ -127,6 +128,7 @@ public class MainSettingsGui extends JPanel {
         myEmailTextField = new javax.swing.JTextField();
         serverPortTextField = new javax.swing.JFormattedTextField();
         serverPasswordField = new javax.swing.JPasswordField();
+        mountainColorButton = new javax.swing.JButton();
         displayPanel = new javax.swing.JPanel();
         filtroLabel = new javax.swing.JLabel();
         allFiltroRadioButton = new javax.swing.JRadioButton();
@@ -398,6 +400,9 @@ public class MainSettingsGui extends JPanel {
             }
         });
 
+        mountainColorButton.setText("MountainColor");
+        mountainColorButton.setActionCommand("MountainColorButton");
+
         javax.swing.GroupLayout playerPanelLayout = new javax.swing.GroupLayout(playerPanel);
         playerPanel.setLayout(playerPanelLayout);
         playerPanelLayout.setHorizontalGroup(
@@ -426,7 +431,8 @@ public class MainSettingsGui extends JPanel {
                             .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(serverUserTextField)
                                 .addComponent(serverPortTextField)
-                                .addComponent(serverPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)))))
+                                .addComponent(serverPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE))
+                            .addComponent(mountainColorButton))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         playerPanelLayout.setVerticalGroup(
@@ -456,7 +462,9 @@ public class MainSettingsGui extends JPanel {
                 .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(serverPassLabel)
                     .addComponent(serverPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addGap(18, 18, 18)
+                .addComponent(mountainColorButton)
+                .addGap(91, 91, 91))
         );
 
         displayPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.DISPLAY"))); // NOI18N
@@ -756,14 +764,6 @@ public class MainSettingsGui extends JPanel {
         }
     }//GEN-LAST:event_myEmailTextFieldFocusLost
 
-    private void serverSMTPTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverSMTPTextFieldFocusLost
-        // TODO add your handling code here:
-        String serverName = serverSMTPTextField.getText();
-        if (serverName != null) {
-            SettingsManager.getInstance().setConfig("mail.smtp.server", serverName);
-        }
-    }//GEN-LAST:event_serverSMTPTextFieldFocusLost
-
     private void serverPortTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverPortTextFieldFocusLost
         // TODO add your handling code here:
         String port = serverPortTextField.getText();
@@ -798,6 +798,14 @@ public class MainSettingsGui extends JPanel {
     private void portraitFolderNameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portraitFolderNameTextFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_portraitFolderNameTextFieldActionPerformed
+
+    private void serverSMTPTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverSMTPTextFieldFocusLost
+        // TODO add your handling code here:
+        String serverName = serverSMTPTextField.getText();
+        if (serverName != null) {
+            SettingsManager.getInstance().setConfig("mail.smtp.server", serverName);
+        }
+    }//GEN-LAST:event_serverSMTPTextFieldFocusLost
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -837,6 +845,7 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JLabel mapTilesLabel;
     private javax.swing.JCheckBox maximizeWindowCheckBox;
     private javax.swing.JCheckBox minimizeWindowCheckBox;
+    private javax.swing.JButton mountainColorButton;
     private javax.swing.JLabel myEmailLabel;
     private javax.swing.JTextField myEmailTextField;
     private javax.swing.JButton openSaveDir;
