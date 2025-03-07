@@ -70,6 +70,7 @@ public class TabExercitosGui extends TabBase implements Serializable {
         exercitoControl = new ExercitoControler(this);
 
         //adiciona listeners
+        addDocumentListener(searchField);
         comboFiltro.addActionListener(exercitoControl);
         jtMainLista.getSelectionModel().addListSelectionListener(exercitoControl);
 
@@ -90,6 +91,8 @@ public class TabExercitosGui extends TabBase implements Serializable {
         jLabel2 = new javax.swing.JLabel();
         comboFiltro = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        searchField = new javax.swing.JTextField();
         jSplitPane2 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
@@ -109,6 +112,13 @@ public class TabExercitosGui extends TabBase implements Serializable {
 
         jLabel1.setText(labels.getString("LISTAR:")); // NOI18N
 
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
+        jLabel3.setText(bundle.getString("TAB.SEARCH.LABEL")); // NOI18N
+
+        searchField.setToolTipText(bundle.getString("TAB.SEARCH.TOOLTIP")); // NOI18N
+        searchField.setMinimumSize(new java.awt.Dimension(80, 20));
+        searchField.setPreferredSize(new java.awt.Dimension(80, 20));
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -118,7 +128,11 @@ public class TabExercitosGui extends TabBase implements Serializable {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 103, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(qtExercitos)
@@ -132,8 +146,11 @@ public class TabExercitosGui extends TabBase implements Serializable {
                     .addComponent(qtExercitos)
                     .addComponent(jLabel2)
                     .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addContainerGap(14, Short.MAX_VALUE))
+                    .addComponent(jLabel1)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel3)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jSplitPane2.setBorder(null);
@@ -231,9 +248,9 @@ public class TabExercitosGui extends TabBase implements Serializable {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE))
+                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 403, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -260,6 +277,7 @@ public class TabExercitosGui extends TabBase implements Serializable {
     private javax.swing.JComboBox comboFiltro;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -271,9 +289,11 @@ public class TabExercitosGui extends TabBase implements Serializable {
     private javax.swing.JTable jtMainLista;
     private javax.swing.JTextPane listaDetalhes;
     private javax.swing.JLabel qtExercitos;
+    private javax.swing.JTextField searchField;
     // End of variables declaration//GEN-END:variables
 
-    public JTable getListaExercitos() {
+    @Override
+    public JTable getMainLista() {
         return jtMainLista;
     }
 
@@ -305,7 +325,7 @@ public class TabExercitosGui extends TabBase implements Serializable {
     }
 
     private void updateGui() {
-        this.qtExercitos.setText(getListaExercitos().getRowCount() + "");
+        this.qtExercitos.setText(getMainLista().getRowCount() + "");
     }
 
     public void doMudaExercito(Exercito exercito) {

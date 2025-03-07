@@ -5,18 +5,22 @@
  */
 package control;
 
+import business.converter.ColorFactory;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.accessories.MainSettingsGui;
 import gui.accessories.MainSettingsGui.ComboItem;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.Serializable;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JRadioButton;
@@ -304,6 +308,18 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 }
                 settingsGui.checkDisplayPortraitCheckBox();
                 break;
+            case "MountainColorButton":
+                Color colorBefore = ColorFactory.getColorBd(SettingsManager.getInstance().getConfig("MapColorCoordinate", "efefef"));
+                Color c = JColorChooser.showDialog(this.settingsGui, "Choose", colorBefore);
+                if (c == null) {
+                    break;
+                }
+                String colorAfter = ColorFactory.getColorBd(c);
+                SettingsManager.getInstance().setConfigAndSaveToFile("MapColorCoordinate", colorAfter);
+                JButton source = (JButton) e.getSource();
+                source.setBackground(c);
+                DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+                break;
             default:
                 break;
         }
@@ -334,4 +350,3 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
         }
     }
 }
-

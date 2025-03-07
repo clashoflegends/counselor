@@ -90,7 +90,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private static final Log log = LogFactory.getLog(WorldControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final JFileChooser fc = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
-    private File fileSelected;
     private boolean saved = false;
     private boolean savedWorld = false;
     private boolean msgSubmitReady = false;
@@ -150,6 +149,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 break;
             case "drawFogWar":
                 doDrawFogOfWar(jbTemp);
+                break;
+            case "drawShowCityCap":
+                doDrawShowCityCap(jbTemp);
                 break;
             case "drawDisplayPortraits":
                 doPortraits(jbTemp);
@@ -242,7 +244,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         fc.setFileFilter(PathFactory.getFilterAcoes());
         int returnVal = fc.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            final File file = getFileSelected();
+            final File file = fc.getSelectedFile();
             log.info(labels.getString("LOADING: ") + file.getName());
             setComando(file);
             this.saved = false;
@@ -343,9 +345,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private File doFileSave(Comando comando, String missingActionMsg) {
         File ret = null;
         try {
-            ret = getFileSelected();
+            ret = fc.getSelectedFile();
             WFC.doSaveOrdens(comando, ret);
-            this.getGui().setStatusMsg(missingActionMsg + " " + String.format(labels.getString("ORDENS.SALVAS"), comando.size(), getFileSelected().getName()));
+            this.getGui().setStatusMsg(missingActionMsg + " " + String.format(labels.getString("ORDENS.SALVAS"), comando.size(), fc.getSelectedFile().getName()));
             this.saved = true;
         } catch (BusinessException ex) {
             log.error(ex.getMessage());
@@ -568,7 +570,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         int returnVal = fc.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             try {
-                final File resultsFile = getFileSelected();
+                final File resultsFile = fc.getSelectedFile();
                 log.info(labels.getString("OPENING: ") + resultsFile.getName());
                 WFC.doStart(resultsFile);
                 this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
@@ -579,7 +581,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 this.saved = false;
                 this.savedWorld = false;
                 doAutoLoadCommands(resultsFile);
-                setFileSelected(resultsFile);
             } catch (BusinessException ex) {
                 SysApoio.showDialogError(ex.getMessage(), this.getGui());
                 this.getGui().setStatusMsg(ex.getMessage());
@@ -634,7 +635,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doAutoLoadCommands(resultsFile);
             }
             fc.setSelectedFile(resultsFile);
-            setFileSelected(resultsFile);
             this.saved = false;
         } catch (BusinessException ex) {
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
@@ -970,6 +970,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     po.setOrdem(ordem);
                     po.setParametrosDisplay(comandoDetail.getParametroDisplay());
                     po.setParametrosId(comandoDetail.getParametroId());
+                    po.setUpdateTime(comandoDetail.getUpdateTime());
+//                    log.fatal(comandoDetail.getUpdateTime().toString());
                     final Nacao nation = WFC.getNacao(comandoDetail.getNacaoCodigo());
                     //atualiza financas e outras dependencias
                     getDispatchManager().sendDispatchForChar(nation, null, po);
@@ -1042,6 +1044,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 gui.getPcPath().setSelected(gui.isPcPathSelected());
                 gui.getPcPathFuture().setSelected(gui.isPcPathFutureSelected());
                 gui.getFogOfWar().setSelected(gui.isFogOfWarSelected());
+                gui.getShowCityCap().setSelected(gui.isShowCityCapSelected());
                 break;
             default:
                 break;
@@ -1088,10 +1091,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     public void saveWorldFile(World world) {
         //salva o arquivo
         try {
-            String filename = PersistFactory.getWorldDao().save(world, getFileSelected());
+            String filename = PersistFactory.getWorldDao().save(world, fc.getSelectedFile());
             this.getGui().setStatusMsg(String.format(labels.getString("WORLD.SALVAS"), world.getLocais().size(), filename));
             this.savedWorld = true;
-            log.info("Saved World file:" + getFileSelected().getAbsolutePath());
+            log.info("Saved World file:" + fc.getSelectedFile().getAbsolutePath());
         } catch (PersistenceException ex) {
             log.fatal("Can't save???", ex);
         }
@@ -1101,8 +1104,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         try {
             // Save image
             BufferedImage buffered = WFC.getMapaControler().getMap();
-            ImageIO.write(buffered, "png", getFileSelected());
-            this.getGui().setStatusMsg(String.format(labels.getString("MAPA.SALVAS"), getFileSelected().getName()));
+            ImageIO.write(buffered, "png", fc.getSelectedFile());
+            this.getGui().setStatusMsg(String.format(labels.getString("MAPA.SALVAS"), fc.getSelectedFile().getName()));
         } catch (IOException ex) {
             log.fatal("IOException Problem", ex);
             this.getGui().setStatusMsg(labels.getString("IO.ERROR"));
@@ -1122,7 +1125,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     if (ordemFacade.getOrdem(actor, index) != null) {
                         comando.addComando(actor, ordemFacade.getOrdem(actor, index),
                                 ordemFacade.getParametrosId(actor, index),
-                                ordemFacade.getParametrosDisplay(actor, index));
+                                ordemFacade.getParametrosDisplay(actor, index),
+                                ordemFacade.getTimeLastChange(actor, index));
                     } else if (actor.isNacaoClass()) {
                         //count points, not open slots
                         if (acaoFacade.isPointsSetupUnderLimit(actor, nationPackagesLimit)) {
@@ -1315,6 +1319,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
 
+    private void doDrawShowCityCap(JToggleButton button) {
+        int settingValue = button.isSelected() ? 1 : 0;
+        SettingsManager.getInstance().setConfig("showCityCap", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("showCityCap");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
+
     private void doPortraits(JToggleButton button) {
         DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
         if (!displayPortraitsManager.isShowPortraitEnableable()) {
@@ -1373,13 +1385,5 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     public boolean isVictoryPointsExists() {
         return !(WFC.getVictoryPoints() == null || WFC.getVictoryPoints().isEmpty());
-    }
-
-    private File getFileSelected() {
-        return fileSelected;
-    }
-
-    private void setFileSelected(File fileSelected) {
-        this.fileSelected = fileSelected;
     }
 }

@@ -31,6 +31,7 @@ import javax.swing.table.TableModel;
 import model.ActorAction;
 import model.Cidade;
 import model.Feitico;
+import model.Local;
 import model.Nacao;
 import model.Ordem;
 import model.Personagem;
@@ -525,18 +526,31 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
             } else {
                 magia = ((PersonagemFeitico) magiaSelecionada.getObject()).getFeitico();
             }
-            if ("None".equals(magia.getParametroChave())) {
-                cNovo = compFactory.getBlank(false);
-            } else if ("Variado".equals(magia.getParametroChave())) {
-                //recursividade controlada.
-                cNovo = doMagiaParamVariado(magia);
-            } else {
+            if (null == magia.getParametroChave()) {
                 //recupera valor display do parametro da magia
                 int nn = 1;
                 String vlParametro = ordemControl.getParametroDisplay(nn);
                 //pega parametro novo para posicao. Ordem nao importa (=null)
                 cNovo = getParametroComponent(magia.getParametroChave(),
                         vlParametro, null, null, nn);
+            } else {
+                switch (magia.getParametroChave()) {
+                    case "None":
+                        cNovo = compFactory.getBlank(false);
+                        break;
+                    case "Variado":
+                        //recursividade controlada.
+                        cNovo = doMagiaParamVariado(magia);
+                        break;
+                    default:
+                        //recupera valor display do parametro da magia
+                        int nn = 1;
+                        String vlParametro = ordemControl.getParametroDisplay(nn);
+                        //pega parametro novo para posicao. Ordem nao importa (=null)
+                        cNovo = getParametroComponent(magia.getParametroChave(),
+                                vlParametro, null, null, nn);
+                        break;
+                }
             }
         } catch (NullPointerException e) {
             cNovo = compFactory.getBlank(false);
@@ -548,8 +562,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         Component cNovo;
         int nn = 1;
         String vlParametro = ordemControl.getParametroDisplay(nn);
-        cNovo = getParametroComponent(magia.getParametroChave(),
-                vlParametro, null, null, nn);
+        //cNovo = getParametroComponent(magia.getParametroChave(), vlParametro, null, null, nn);
         //Variado eh para ser usado para definir o parametro da magia.
         //ordem de magia pode ter apeans um parametro para que o get(0) funcione.
         JComboBox jcMagia = (JComboBox) parametrosCombos.get(0);
@@ -723,6 +736,11 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
 
     public void doMudaActor(Cidade cidade) {
         this.setActor(ActorInterfaceFactory.getInstance().getActorInterface(cidade));
+        doMudaActor();
+    }
+
+    public void doMudaActor(Local hex) {
+        this.setActor(ActorInterfaceFactory.getInstance().getActorInterface(hex));
         doMudaActor();
     }
 

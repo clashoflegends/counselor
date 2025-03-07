@@ -91,9 +91,9 @@ public class AcaoConverter implements Serializable {
     }
 
     public static List<Ordem> listaByFiltro(String filtro) {
-        List<Ordem> ret = new ArrayList<Ordem>();
+        List<Ordem> ret = new ArrayList<>();
         for (Ordem ordem : listFactory.listAcoes().values()) {
-            if (filtro.equalsIgnoreCase("Todos")
+            if (filtro.equalsIgnoreCase("All")
                     || TitleFactory.getTipoPersonagem(ordem).equals(filtro)) {
                 ret.add(ordem);
             }

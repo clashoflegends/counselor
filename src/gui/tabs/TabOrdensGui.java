@@ -12,6 +12,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import model.Personagem;
+import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -25,7 +26,7 @@ public class TabOrdensGui extends TabBase implements Serializable {
 
     private static final Log log = LogFactory.getLog(TabOrdensGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private final OrdemJogadorControler nacaoOrdemControl;
+    private OrdemJogadorControler orderSavedControl;
 
     /**
      * Creates new form TabAcoesGui
@@ -36,20 +37,7 @@ public class TabOrdensGui extends TabBase implements Serializable {
         setIcone("/images/right.gif");
         setTitle(titulo);
         setDica(dica);
-
-        //configura grid
-        jtMainLista.setAutoCreateColumnsFromModel(true);
-        jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jtMainLista.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jtMainLista.setAutoCreateRowSorter(true);
-        //Cria o Controle da lista de acoes
-        nacaoOrdemControl = new OrdemJogadorControler(this);
-
-        //adiciona listeners
-        jtMainLista.getSelectionModel().addListSelectionListener(nacaoOrdemControl);
-
-        TableModel model = nacaoOrdemControl.getMainTableModel();
-        this.setMainModel(model);
+        initConfig();
     }
 
     /**
@@ -187,25 +175,52 @@ public class TabOrdensGui extends TabBase implements Serializable {
     private javax.swing.JLabel qtOrdens;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public JTable getMainLista() {
         return jtMainLista;
     }
 
-    public final void setMainModel(TableModel model) {
+    public void setMainModel(TableModel model) {
         this.setHelp("");
         this.jtMainLista.setModel(model);
-        this.qtOrdens.setText(getMainLista().getRowCount() + "");
-        this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);
+        this.doConfigTableColumns(jtMainLista);
+        this.updateGui();
     }
 
-    public void setHelp(String help) {
+    private void updateGui() {
+        this.qtOrdens.setText(getMainLista().getRowCount() + "");
+    }
+
+    private void setHelp(String help) {
         this.listaHelp.setText(help);
     }
 
-    public void doMudaAcao(Personagem personagem) {
+    public void doMudaAcao(PersonagemOrdem ordem) {
         try {
+            //setHelp(orderSavedControl.getAjuda(ordem));
         } catch (NullPointerException ex) {
             setHelp("");
         }
+    }
+
+    private void initConfig() {
+        //configura grid
+        jtMainLista.setAutoCreateColumnsFromModel(true);
+        jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jtMainLista.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jtMainLista.setAutoCreateRowSorter(true);
+        comboFiltro.setActionCommand("comboFiltro");
+        //Cria o Controle da lista de acoes
+        orderSavedControl = new OrdemJogadorControler(this);
+        TableModel model = orderSavedControl.getMainTableModel((String) comboFiltro.getSelectedItem());
+        this.setMainModel(model);
+
+        //adiciona listeners
+        //addDocumentListener(searchField);
+        comboFiltro.setModel(orderSavedControl.getFiltroComboModel());
+        comboFiltro.addActionListener(orderSavedControl);
+        jtMainLista.getSelectionModel().addListSelectionListener(orderSavedControl);
+        jtMainLista.getSelectionModel().addListSelectionListener(orderSavedControl);
+
     }
 }

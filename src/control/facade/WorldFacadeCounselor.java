@@ -155,6 +155,10 @@ public class WorldFacadeCounselor implements Serializable {
         return WorldManager.getInstance().getPersonagens().values().iterator();
     }
 
+    public Collection<Personagem> getPersonagemAll() {
+        return WorldManager.getInstance().getPersonagens().values();
+    }
+
     public Collection<Cidade> getCidades() {
         return WorldManager.getInstance().getCidades().values();
     }
@@ -230,6 +234,10 @@ public class WorldFacadeCounselor implements Serializable {
 
     public boolean isSpells() {
         return WorldManager.getInstance().getCenario().hasHabilidade(";SLS;");
+    }
+
+    public boolean isBattleRoyal() {
+        return WorldManager.getInstance().getPartida().isBattleRoyal();
     }
 
     public boolean isStartupPackages() {

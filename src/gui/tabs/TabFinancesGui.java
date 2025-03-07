@@ -65,6 +65,8 @@ public class TabFinancesGui extends TabBase implements Serializable {
         comboFiltro = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         qtNacoes = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        searchField = new javax.swing.JTextField();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
@@ -78,6 +80,13 @@ public class TabFinancesGui extends TabBase implements Serializable {
 
         qtNacoes.setText("66666"); // NOI18N
 
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
+        jLabel3.setText(bundle.getString("TAB.SEARCH.LABEL")); // NOI18N
+
+        searchField.setToolTipText(bundle.getString("TAB.SEARCH.TOOLTIP")); // NOI18N
+        searchField.setMinimumSize(new java.awt.Dimension(80, 20));
+        searchField.setPreferredSize(new java.awt.Dimension(80, 20));
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -87,7 +96,11 @@ public class TabFinancesGui extends TabBase implements Serializable {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(qtNacoes)
@@ -101,7 +114,10 @@ public class TabFinancesGui extends TabBase implements Serializable {
                     .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2)
-                    .addComponent(qtNacoes))
+                    .addComponent(qtNacoes)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel3)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -162,9 +178,9 @@ public class TabFinancesGui extends TabBase implements Serializable {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE))
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -180,11 +196,11 @@ public class TabFinancesGui extends TabBase implements Serializable {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jSplitPane1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane1PropertyChange
-        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY) ) {
+        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
             String splitHeight = evt.getNewValue().toString();
             LOG.debug("Split finances pane divisor modified to " + splitHeight + " px.");
-            SettingsManager.getInstance().setConfig("financesSplitSize", splitHeight);            
-        } 
+            SettingsManager.getInstance().setConfig("financesSplitSize", splitHeight);
+        }
     }//GEN-LAST:event_jSplitPane1PropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -192,14 +208,17 @@ public class TabFinancesGui extends TabBase implements Serializable {
     private javax.swing.JTabbedPane detalhesNacao;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTable jtMainLista;
     private javax.swing.JLabel qtNacoes;
+    private javax.swing.JTextField searchField;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public JTable getMainLista() {
         return jtMainLista;
     }
@@ -272,6 +291,7 @@ public class TabFinancesGui extends TabBase implements Serializable {
         financasControl = new FinancasControler(this);
 
         //adiciona listeners
+        addDocumentListener(searchField);
         comboFiltro.addActionListener(financasControl);
         jtMainLista.getSelectionModel().addListSelectionListener(financasControl);
 
