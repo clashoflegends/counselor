@@ -4,6 +4,7 @@
  */
 package control.services;
 
+import baseLib.BaseModel;
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoTableModel;
 import baseLib.IBaseModel;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import model.ActorAction;
 import model.Artefato;
 import model.Cenario;
@@ -30,6 +33,7 @@ import model.Nacao;
 import model.Ordem;
 import model.Personagem;
 import model.PersonagemFeitico;
+import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.local.ListFactory;
@@ -236,7 +240,7 @@ public class PersonagemConverter implements Serializable {
         return (ret);
     }
 
-    public static GenericoTableModel getOrdemModel(List<Personagem> listaExibida) {
+    public static GenericoTableModel getOrdemModel(List<PersonagemOrdem> listaExibida) {
         GenericoTableModel model = new GenericoTableModel(
                 new String[]{labels.getString("PERSONAGEM"), labels.getString("ACAO"), labels.getString("PARAMETRO")},
                 getOrdemAsArray(listaExibida),
@@ -483,25 +487,86 @@ public class PersonagemConverter implements Serializable {
         return ret;
     }
 
-    public static List listaOrdens() {
-        List ret = new ArrayList();
-        Jogador jogadorAtivo = WorldFacadeCounselor.getInstance().getJogadorAtivo();
-        //lista todos os personagens, carregando para o xml
-        for (Iterator<Personagem> iter = WorldFacadeCounselor.getInstance().getPersonagens(); iter.hasNext();) {
-            Personagem personagem = iter.next();
-            if (jogadorAtivo.isNacao(personagem.getNacao())) {
-                for (int index = 0; index < personagem.getAcaoSize(); index++) {
-                    String[] elem = {personagem.getNome(),
-                        ordemFacade.getOrdem(personagem, index).getNome(),
-                        ordemFacade.getParametrosId(personagem, index).
-                        toString().replace('[', ' ').replace(']', ' ').trim()
-                    };
-                    ret.add(elem);
+    public static List<PersonagemOrdem> listaOrdensBySequence() {
+        List<PersonagemOrdem> ret = new ArrayList();
+        SortedMap<Integer, List<PersonagemOrdem>> ordens = new TreeMap<>();
+        //list all actions from all actors
+        for (BaseModel actor : WFC.getActors()) {
+            if (actor.getNome().equalsIgnoreCase("Alcalinde")) {
+                log.debug("AKI!");
+            }
+            for (PersonagemOrdem po : actor.getAcoes().values()) {
+                if (po == null) {
+                    continue;
                 }
+                List<PersonagemOrdem> lista = ordens.get(po.getOrdem().getNumero());
+                if (lista == null) {
+                    lista = new ArrayList<>();
+                }
+                lista.add(po);
+                ordens.put(po.getOrdem().getNumero(), lista);
             }
         }
         return ret;
     }
+    private static final WorldFacadeCounselor WFC = WorldFacadeCounselor.getInstance();
+//
+//    public static List listaOrdensDEPRECATED() {
+//        List ret = new ArrayList();
+//        //lista todos os personagens, carregando para o xml
+//        for (Personagem pc : WorldFacadeCounselor.getInstance().getPersonagemAll()) {
+//            for (int index = 0; index < pc.getAcaoSize(); index++) {
+//                String[] elem = {pc.getNome(),
+//                    ordemFacade.getOrdem(pc, index).getNome(),
+//                    ordemFacade.getParametrosId(pc, index).
+//                    toString().replace('[', ' ').replace(']', ' ').trim()
+//                };
+//                ret.add(elem);
+//            }
+//        }
+//        //now format output
+//        List<String> par;
+//        for (List<PersonagemOrdem> lista : ordens.values()) {
+//            for (PersonagemOrdem po : lista) {
+//                String temp = "";
+//                par = po.getParametrosDisplay();
+//                boolean first = true;
+//                for (String elem : par) {
+//                    if (first) {
+//                        temp += ": ";
+//                        first = false;
+//                    } else {
+//                        temp += ", ";
+//                    }
+//                    temp += elem;
+//                }
+//                ret += String.format("%s - %s %s\n",
+//                        po.getNome(),
+//                        po.getOrdem().getDescricao(),
+//                        temp);
+//            }
+//        }
+//
+//        return ret;
+//    }
+//
+//    private String listaOrdensWC() {
+//        String ret = "";
+//        if (WFC.isStartupPackages() && WFC.getTurno() == 0) {
+//            ret += listaPackages() + "\n\n";
+//        }
+//        ret += listaOrdensBySequence() + "\n\n";
+//        if (cenarioFacade.hasOrdensNacao(WFC.getPartida())) {
+//            ret += listaOrdensByNation() + "\n\n";
+//        }
+//        if (WFC.hasOrdensCidade()) {
+//            ret += listaOrdensByCity() + "\n\n";
+//        }
+//        if (SettingsManager.getInstance().getConfig("CopyActionsOrder", "1").equals("1")) {
+//            ret += listaOrdensByPers() + "\n\n";
+//        }
+//        return ret;
+//    }
 
     /*
      * Níveis : Comandante 0 Agente 0 Emissário 65 Mago 0 Vitalidade 100

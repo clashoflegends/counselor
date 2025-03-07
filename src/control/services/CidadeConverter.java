@@ -47,10 +47,10 @@ public class CidadeConverter implements Serializable {
 
     private static final Log log = LogFactory.getLog(CidadeConverter.class);
     private static final CidadeFacade cidadeFacade = new CidadeFacade();
-    private static final ExercitoFacade exercitoFacade = new ExercitoFacade();
     private static final LocalFacade localFacade = new LocalFacade();
     private static final OrdemFacade ordemFacade = new OrdemFacade();
     private static final NacaoFacade nacaoFacade = new NacaoFacade();
+    private static final ExercitoFacade exercitoFacade = new ExercitoFacade();
     private static final PersonagemFacade personagemFacade = new PersonagemFacade();
     private static final JogadorFacade jogadorFacade = new JogadorFacade();
     private static final ListFactory listFactory = new ListFactory();
@@ -141,7 +141,7 @@ public class CidadeConverter implements Serializable {
     private static Object[] toArray(Cidade cidade) {
         final Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
         int ii = 0;
-        Object[] cArray = new Object[getCidadeColNames(new ArrayList<Class>(30)).length];
+        Object[] cArray = new Object[getCidadeColNames(new ArrayList<>(30)).length];
         cArray[ii++] = cidadeFacade.getNome(cidade);
         if (WorldFacadeCounselor.getInstance().hasOrdensCidade()) {
             //default to can receive orders
@@ -197,7 +197,7 @@ public class CidadeConverter implements Serializable {
             return (ret);
         } else {
             int ii = 0;
-            Object[][] ret = new Object[listaExibir.size()][getCidadeColNames(new ArrayList<Class>(30)).length];
+            Object[][] ret = new Object[listaExibir.size()][getCidadeColNames(new ArrayList<>(30)).length];
             Iterator lista = listaExibir.iterator();
             while (lista.hasNext()) {
                 Cidade cidade = (Cidade) lista.next();
@@ -457,10 +457,10 @@ public class CidadeConverter implements Serializable {
         }
         final String cityDefense;
         if (cidade.getLealdade() > 0) {
-            cityDefense = SysApoio.getMyFormatter().format(cidadeFacade.getDefesa(cidade));
+            cityDefense = SysApoio.getFormatedNumber(cidadeFacade.getDefesa(cidade));
         } else {
-            String cityDefenseLow = SysApoio.getMyFormatter().format(cidadeFacade.getDefesa(cidade.getTamanho(), cidade.getFortificacao(), 1));
-            String cityDefenseHigh = SysApoio.getMyFormatter().format(cidadeFacade.getDefesa(cidade.getTamanho(), cidade.getFortificacao(), 100));
+            String cityDefenseLow = SysApoio.getFormatedNumber(cidadeFacade.getDefesa(cidade.getTamanho(), cidade.getFortificacao(), 1));
+            String cityDefenseHigh = SysApoio.getFormatedNumber(cidadeFacade.getDefesa(cidade.getTamanho(), cidade.getFortificacao(), 100));
             cityDefense = String.format("%s - %s", cityDefenseLow, cityDefenseHigh);
         }
         ret.addTab(String.format("%s: %s", labels.getString("CIDADE.DEFESA"), cityDefense));
@@ -484,7 +484,14 @@ public class CidadeConverter implements Serializable {
             if ((Integer) resource[4] <= 0) {
                 continue;
             }
-            ret.addTab(String.format("%s: %s %s %s %s", resource));
+            Object[] resLabels = new String[5];
+            int ii = 0;
+            resLabels[ii] = (String) resource[ii++];
+            resLabels[ii] = SysApoio.getFormatedNumber((int) resource[ii++]);
+            resLabels[ii] = SysApoio.getFormatedNumber((int) resource[ii++]);
+            resLabels[ii] = SysApoio.getFormatedNumber((int) resource[ii++]);
+            resLabels[ii] = SysApoio.getFormatedNumber((int) resource[ii++]);
+            ret.addTab(String.format("%s: %s %s %s %s", resLabels));
             qtRes++;
         }
         if (qtRes == 0) {

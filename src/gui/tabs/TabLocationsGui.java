@@ -7,28 +7,29 @@ package gui.tabs;
 
 import baseLib.GenericoComboObject;
 import business.facade.CenarioFacade;
-import business.facade.CidadeFacade;
-import business.facade.JogadorFacade;
-import control.CidadeControler;
+import business.facade.LocalFacade;
+import control.LocationControler;
 import control.MapaControler;
 import control.facade.WorldFacadeCounselor;
-import control.services.CidadeConverter;
 import control.services.FiltroConverter;
+import control.services.LocalConverter;
 import gui.TabBase;
 import gui.services.IAcaoGui;
 import gui.subtabs.SubTabBaseList;
-import gui.subtabs.SubTabOrdem;
 import gui.subtabs.SubTabPopup;
 import java.io.Serializable;
+import java.util.regex.Pattern;
+import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import model.ActorAction;
 import model.Cenario;
-import model.Cidade;
+import model.Local;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
@@ -38,32 +39,29 @@ import utils.OpenSlotCounter;
  *
  * @author gurgel
  */
-public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
+public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
 
-    private static final Log LOG = LogFactory.getLog(TabCidadesGui.class);
+    private static final Log LOG = LogFactory.getLog(TabLocationsGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private CidadeControler cidadeControl;
+    private LocationControler locationControl;
     private final CenarioFacade cenarioFacade = new CenarioFacade();
-    private final CidadeFacade cidadeFacade = new CidadeFacade();
-    private final JogadorFacade jogadorFacade = new JogadorFacade();
-//    private SubTabConfigActor stRename = new SubTabConfigActor();
+    private final LocalFacade localFacade = new LocalFacade();
     private final SubTabPopup stResults = new SubTabPopup();
     private final SubTabBaseList stPersonagens = new SubTabBaseList();
     private final SubTabBaseList stProdutos = new SubTabBaseList();
-    private SubTabOrdem stOrdens;
     private Cenario cenario;
 
     /**
-     * Creates new form TabCidadesGui
+     * Creates new form TabHexagonosGui
      */
-    public TabCidadesGui(String titulo, String dica, MapaControler mapaControl) {
+    public TabLocationsGui(String titulo, String dica, MapaControler mapaControl) {
         initComponents();
         //Basico
-        setIcone("/images/cp_acampamento.gif");
+        setIcone("/images/hex_base.png");
         setTitle(titulo);
         setDica(dica);
         this.setMapaControler(mapaControl);
-        this.setKeyFilterProperty("GuiFilterCity");
+        this.setKeyFilterProperty("GuiFilterHex");
 
         initConfig();
     }
@@ -79,13 +77,15 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         jLabel3 = new javax.swing.JLabel();
         comboFiltro = new javax.swing.JComboBox();
         jLabel5 = new javax.swing.JLabel();
-        qtCidades = new javax.swing.JLabel();
+        qtHexes = new javax.swing.JLabel();
         jSplitPane1 = new javax.swing.JSplitPane();
-        detalhesCidade = new javax.swing.JTabbedPane();
+        detalhesHex = new javax.swing.JTabbedPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
+        jToolBar1 = new javax.swing.JToolBar();
+        toggleShowCampRestrictions = new javax.swing.JToggleButton();
         searchField = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
 
         jLabel3.setText(labels.getString("LISTAR:")); // NOI18N
 
@@ -94,17 +94,17 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
 
         jLabel5.setText(labels.getString("TOTAL:")); // NOI18N
 
-        qtCidades.setText("999");
+        qtHexes.setText("999");
 
         jSplitPane1.setBorder(null);
-        jSplitPane1.setDividerLocation(SysApoio.parseInt(SettingsManager.getInstance().getConfig("citySplitSize", "200")));
+        jSplitPane1.setDividerLocation(SysApoio.parseInt(SettingsManager.getInstance().getConfig("localSplitSize", "200")));
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 jSplitPane1PropertyChange(evt);
             }
         });
-        jSplitPane1.setRightComponent(detalhesCidade);
+        jSplitPane1.setRightComponent(detalhesHex);
 
         jScrollPane3.setBorder(null);
 
@@ -145,12 +145,23 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
 
         jSplitPane1.setLeftComponent(jScrollPane3);
 
+        jToolBar1.setRollover(true);
+
+        toggleShowCampRestrictions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_redfog.png"))); // NOI18N
+        toggleShowCampRestrictions.setSelected(isCampRestrictionSelected());
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
-        jLabel1.setText(bundle.getString("TAB.SEARCH.LABEL")); // NOI18N
+        toggleShowCampRestrictions.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SHOWCITYCAP")); // NOI18N
+        toggleShowCampRestrictions.setActionCommand("showCampRestriction");
+        toggleShowCampRestrictions.setFocusable(false);
+        toggleShowCampRestrictions.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        toggleShowCampRestrictions.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(toggleShowCampRestrictions);
 
         searchField.setToolTipText(bundle.getString("TAB.SEARCH.TOOLTIP")); // NOI18N
         searchField.setMinimumSize(new java.awt.Dimension(80, 20));
         searchField.setPreferredSize(new java.awt.Dimension(80, 20));
+
+        jLabel1.setText(bundle.getString("TAB.SEARCH.LABEL")); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -161,29 +172,32 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(31, 31, 31)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel5)
                 .addGap(2, 2, 2)
-                .addComponent(qtCidades))
+                .addComponent(qtHexes))
             .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(qtCidades)
-                    .addComponent(jLabel5)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel1)
-                        .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel3)
+                        .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(qtHexes)
+                        .addComponent(jLabel5)
+                        .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel1))
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE))
         );
 
@@ -202,57 +216,60 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     private void jSplitPane1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane1PropertyChange
         if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
             String splitHeight = evt.getNewValue().toString();
-            LOG.debug("Split city pane divisor modified to " + splitHeight + " px.");
-            SettingsManager.getInstance().setConfig("citySplitSize", splitHeight);
+            LOG.debug("Split hex pane divisor modified to " + splitHeight + " px.");
+            SettingsManager.getInstance().setConfig("localSplitSize", splitHeight);
         }
     }//GEN-LAST:event_jSplitPane1PropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox comboFiltro;
-    private javax.swing.JTabbedPane detalhesCidade;
+    private javax.swing.JTabbedPane detalhesHex;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JTable jtMainLista;
-    private javax.swing.JLabel qtCidades;
+    private javax.swing.JLabel qtHexes;
     private javax.swing.JTextField searchField;
+    private javax.swing.JToggleButton toggleShowCampRestrictions;
     // End of variables declaration//GEN-END:variables
 
     private void initConfig() {
         cenario = WorldFacadeCounselor.getInstance().getCenario();
-        stOrdens = new SubTabOrdem(this, getMapaControler());
         jtMainLista.setAutoCreateColumnsFromModel(true);
         jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jtMainLista.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jtMainLista.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         comboFiltro.setName("comboFiltro");
-        comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 5));
+        comboFiltro.setModel(FiltroConverter.getFiltroComboModelAll());
         comboFiltro.setSelectedIndex(this.getFiltroDefault());
 
-        //Cria o Controle da lista de cidades
-        cidadeControl = new CidadeControler(this);
+        //create hexes control
+        locationControl = new LocationControler(this);
 
         //adiciona listeners
         addDocumentListener(searchField);
-        comboFiltro.addActionListener(cidadeControl);
-        jtMainLista.getSelectionModel().addListSelectionListener(cidadeControl);
+        comboFiltro.addActionListener(locationControl);
+        jtMainLista.getSelectionModel().addListSelectionListener(locationControl);
+        toggleShowCampRestrictions.addActionListener(locationControl);
 
-        TableModel model = cidadeControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
+        TableModel model = locationControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
         this.setMainModel(model);
-        stResults.setFontText(detalhesCidade.getFont());
+        stResults.setFontText(detalhesHex.getFont());
         doAddTabs();
     }
 
     @Override
     public void setValueAt(ActorAction actorAction, int ordIndex, int openSlotsQt) {
         //set Col=1 at front, before skills so that it doesn't have to calculate where is the column.
-        OpenSlotCounter openSlotCounter = (OpenSlotCounter) this.jtMainLista.getModel().getValueAt(cidadeControl.getModelRowIndex(), 1);
+        OpenSlotCounter openSlotCounter = (OpenSlotCounter) this.jtMainLista.getModel().getValueAt(locationControl.getModelRowIndex(), 1);
         openSlotCounter.setOpenSlotQt(openSlotsQt);
-        this.jtMainLista.getModel().setValueAt(openSlotCounter, cidadeControl.getModelRowIndex(), 1);
+        this.jtMainLista.getModel().setValueAt(openSlotCounter, locationControl.getModelRowIndex(), 1);
     }
 
+    @Override
     public JTable getMainLista() {
         return jtMainLista;
     }
@@ -272,12 +289,12 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     }
 
     public void updateGui() {
-        this.qtCidades.setText(getMainLista().getRowCount() + "");
+        this.qtHexes.setText(getMainLista().getRowCount() + "");
     }
 
-    private void doPrintTag(Cidade cidade) {
+    private void doPrintTag(Local hex) {
         try {
-            getMapaControler().printTag(cidade.getLocal());
+            getMapaControler().printTag(hex);
         } catch (NullPointerException ex) {
             this.doTagHide();
         }
@@ -285,58 +302,61 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
 
     private void doAddTabs() {
         //config tabs
-        if (cenarioFacade.hasOrdensCidade(cenario)) {
-            detalhesCidade.addTab(labels.getString("ACAO"),
-                    new javax.swing.ImageIcon(getClass().getResource("/images/right.gif")),
-                    stOrdens, labels.getString("ORDERNS.TOOLTIP"));
-            detalhesCidade.addTab(labels.getString("RESULTADOS"),
-                    new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png")),
-                    stResults, labels.getString("RESULTADOS.TOOLTIP"));
-        }
+        detalhesHex.addTab(labels.getString("RESULTADOS"), new ImageIcon(getClass().getResource("/images/write-document-20x20.png")), stResults, labels.getString("RESULTADOS.TOOLTIP"));
         if (cenarioFacade.hasResourceManagement(cenario)) {
-            detalhesCidade.addTab(labels.getString("ESTOQUES"),
-                    new javax.swing.ImageIcon(getClass().getResource("/images/financas.gif")),
-                    stProdutos, labels.getString("ESTOQUE.TOOLTIP"));
+            detalhesHex.addTab(labels.getString("ESTOQUES"), new ImageIcon(getClass().getResource("/images/financas.gif")), stProdutos, labels.getString("ESTOQUE.TOOLTIP"));
         }
-        detalhesCidade.addTab(labels.getString("PRESENCAS"),
-                new javax.swing.ImageIcon(getClass().getResource("/images/hex_personagem.gif")),
-                stPersonagens, labels.getString("PRESENCA.TOOLTIP"));
-        if (!cenarioFacade.hasOrdensCidade(cenario)) {
-            //resultados no final.
-            detalhesCidade.addTab(labels.getString("RESULTADOS"),
-                    new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png")),
-                    stResults, labels.getString("RESULTADOS.TOOLTIP"));
-        }
-        stResults.setGuiConfig("GuiCityResults");
+        detalhesHex.addTab(labels.getString("PRESENCAS"), new ImageIcon(getClass().getResource("/images/hex_personagem.gif")), stPersonagens, labels.getString("PRESENCA.TOOLTIP"));
+        stResults.setGuiConfig("GuiLocalResults");
     }
 
-    public void doMudaCidadeClear() {
+    public void doMudaHexClear() {
         this.doTagHide();
         stProdutos.setListModelClear();
         stPersonagens.setListModelClear();
         stResults.setText("", "");
     }
 
-    public void doMudaCidade(Cidade cidade) {
-        doPrintTag(cidade);
-        stProdutos.setListModel(CidadeConverter.getProdutoModel(cidade));
-        stPersonagens.setListModel(CidadeConverter.getPresencasModel(cidade));
-        final String popupTitle = labels.getString("RESULTADOS.OF") + ": " + cidadeFacade.getNomeCoordenada(cidade);
-        stResults.setText(popupTitle, cidadeControl.getResultados(cidade));
-        stOrdens.doMudaActor(cidade);
-        if (jogadorFacade.isMine(cidade, WorldFacadeCounselor.getInstance().getJogadorAtivo())
-                && cidadeFacade.isAtivo(cidade)) {
-            //can receive orders
-            stOrdens.doMudaActor(cidade);
-        } else {
-            //refem ou morto, nao pode dar ordem
-            //forca selecao para vazio, limpando quadro de parametros
-            stOrdens.doOrdemClear();
-        }
+    public void doMudaHex(Local hex) {
+        doPrintTag(hex);
+        stProdutos.setListModel(LocalConverter.getProdutoModel(hex));
+        stPersonagens.setListModel(LocalConverter.getPresencasModel(hex));
+        final String popupTitle = labels.getString("RESULTADOS.OF") + ": " + LocalFacade.getCoordenadas(hex);
+        stResults.setText(popupTitle, locationControl.getResultados(hex));
     }
 
     @Override
     protected int getComboFiltroSize() {
         return this.comboFiltro.getModel().getSize();
+    }
+
+    public boolean isCampRestrictionSelected() {
+        return SettingsManager.getInstance().getConfig("showCampRestriction", "1").equals("1");
+    }
+
+    public void applyGlobalFilter(String searchText) {
+        // Make sure we have a row sorter
+        TableRowSorter<TableModel> sorter = (TableRowSorter<TableModel>) getMainLista().getRowSorter();
+        if (sorter == null) {
+            sorter = new TableRowSorter<>(getMainLista().getModel());
+            getMainLista().setRowSorter(sorter);
+        }
+
+        if (searchText == null || searchText.trim().isEmpty()) {
+            // No search text -> show all rows
+            sorter.setRowFilter(null);
+        } else {
+            // Build a case-insensitive partial-match regex,
+            // quoting any special regex characters from the user input:
+            String regex = "(?i).*" + Pattern.quote(searchText.trim()) + ".*";
+
+            try {
+                // If you omit column indices here, it will search ALL columns
+                sorter.setRowFilter(RowFilter.regexFilter(regex));
+            } catch (java.util.regex.PatternSyntaxException e) {
+                // In case the user types an invalid regex, fall back to no filter
+                sorter.setRowFilter(null);
+            }
+        }
     }
 }

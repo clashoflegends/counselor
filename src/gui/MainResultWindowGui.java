@@ -78,6 +78,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathPj.addActionListener(wc);
         togglePathPjFuture.addActionListener(wc);
         toggleFogWar.addActionListener(wc);
+        toggleShowCityCap.addActionListener(wc);
         toggleScouts.addActionListener(wc);
         togglePathArmy.addActionListener(wc);
         toggleDisplayPortrait.addActionListener(wc);
@@ -124,6 +125,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathPj = new javax.swing.JToggleButton();
         togglePathPjFuture = new javax.swing.JToggleButton();
         togglePathArmy = new javax.swing.JToggleButton();
+        toggleShowCityCap = new javax.swing.JToggleButton();
         toggleFogWar = new javax.swing.JToggleButton();
         toggleScouts = new javax.swing.JToggleButton();
         toggleDisplayPortrait = new javax.swing.JToggleButton();
@@ -351,6 +353,16 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathArmy.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar2.add(togglePathArmy);
 
+        toggleShowCityCap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_redfog.png"))); // NOI18N
+        toggleShowCityCap.setSelected(isShowCityCapSelected());
+        toggleShowCityCap.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SHOWCITYCAP")); // NOI18N
+        toggleShowCityCap.setActionCommand("drawShowCityCap");
+        toggleShowCityCap.setEnabled(false);
+        toggleShowCityCap.setFocusable(false);
+        toggleShowCityCap.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        toggleShowCityCap.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar2.add(toggleShowCityCap);
+
         toggleFogWar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_fog.png"))); // NOI18N
         toggleFogWar.setSelected(isFogOfWarSelected());
         toggleFogWar.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.FOGOFWAR")); // NOI18N
@@ -569,6 +581,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JToggleButton togglePathPj;
     private javax.swing.JToggleButton togglePathPjFuture;
     private javax.swing.JToggleButton toggleScouts;
+    private javax.swing.JToggleButton toggleShowCityCap;
     // End of variables declaration//GEN-END:variables
 
     public void iniciaConfig() {
@@ -656,6 +669,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathPjFuture.setEnabled(true);
         togglePathArmy.setEnabled(true);
         toggleFogWar.setEnabled(true);
+        toggleShowCityCap.setEnabled(true);
         toggleScouts.setEnabled(true);
         toggleDisplayPortrait.setEnabled(true);
 
@@ -766,8 +780,16 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         return settingsManager.getConfig("fogOfWarType", "1").equals("1");
     }
 
+    public boolean isShowCityCapSelected() {
+        return settingsManager.getConfig("showCityCap", "1").equals("1");
+    }
+
     public JToggleButton getFogOfWar() {
         return this.toggleFogWar;
+    }
+
+    public JToggleButton getShowCityCap() {
+        return this.toggleShowCityCap;
     }
 
     public boolean isDisplayPortraitsSelected() {

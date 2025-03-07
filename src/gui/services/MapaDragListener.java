@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package control.services;
+package gui.services;
 
 import gui.MainMapaGui;
 import java.awt.event.MouseEvent;

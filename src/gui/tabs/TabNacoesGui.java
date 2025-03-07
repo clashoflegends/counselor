@@ -18,19 +18,25 @@ import control.services.NacaoConverter;
 import gui.TabBase;
 import gui.services.IAcaoGui;
 import gui.services.LimitTableCellRenderer;
+import gui.subtabs.SubTabAccordionPanel;
 import gui.subtabs.SubTabBaseList;
 import gui.subtabs.SubTabOrdem;
 import gui.subtabs.SubTabTextArea;
 import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import model.ActorAction;
 import model.Habilidade;
 import model.HabilidadeNacao;
+import model.Local;
 import model.Nacao;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistence.local.ListFactory;
 import persistence.local.WorldManager;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
@@ -49,7 +55,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     private final CenarioFacade cenarioFacade = new CenarioFacade();
     private final JogadorFacade jogadorFacade = new JogadorFacade();
     private final SubTabTextArea stResults = new SubTabTextArea();
-    private final SubTabTextArea stCombats = new SubTabTextArea();
+    private SubTabAccordionPanel accordionCombats;
     private final SubTabBaseList stDiplomacy = new SubTabBaseList();
     private final SubTabBaseList stDiplomacyAll = new SubTabBaseList();
     private final SubTabBaseList stTroops = new SubTabBaseList();
@@ -81,6 +87,8 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         comboFiltro = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         qtNacoes = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        searchField = new javax.swing.JTextField();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jtMainLista = new javax.swing.JTable();
@@ -94,6 +102,13 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
 
         qtNacoes.setText("66666"); // NOI18N
 
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
+        jLabel3.setText(bundle.getString("TAB.SEARCH.LABEL")); // NOI18N
+
+        searchField.setToolTipText(bundle.getString("TAB.SEARCH.TOOLTIP")); // NOI18N
+        searchField.setMinimumSize(new java.awt.Dimension(80, 20));
+        searchField.setPreferredSize(new java.awt.Dimension(80, 20));
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -103,7 +118,11 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(qtNacoes)
@@ -117,7 +136,10 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
                     .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2)
-                    .addComponent(qtNacoes))
+                    .addComponent(qtNacoes)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel3)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -178,9 +200,9 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE))
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -196,11 +218,11 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jSplitPane1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jSplitPane1PropertyChange
-        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY) ) {
+        if (evt.getPropertyName().equals(javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
             String splitHeight = evt.getNewValue().toString();
             LOG.debug("Split nations pane divisor modified to " + splitHeight + " px.");
-            SettingsManager.getInstance().setConfig("nationsSplitSize", splitHeight);            
-        } 
+            SettingsManager.getInstance().setConfig("nationsSplitSize", splitHeight);
+        }
     }//GEN-LAST:event_jSplitPane1PropertyChange
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -208,14 +230,17 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     private javax.swing.JTabbedPane detalhesNacao;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTable jtMainLista;
     private javax.swing.JLabel qtNacoes;
+    private javax.swing.JTextField searchField;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public JTable getMainLista() {
         return jtMainLista;
     }
@@ -223,7 +248,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     public final void setMainModel(TableModel model) {
         //clear stuff
         stResults.setText("");
-        stCombats.setText("");
+        accordionCombats.removeAll();
         stDiplomacy.setListModelClear();
         stDiplomacyAll.setListModelClear();
         stTroops.setListModelClear();
@@ -251,6 +276,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
 
     private void initConfig() {
         stOrdens = new SubTabOrdem(this, getMapaControler());
+        accordionCombats = new SubTabAccordionPanel(getMapaControler());
         //configura grid
         jtMainLista.setAutoCreateColumnsFromModel(true);
         jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -264,9 +290,9 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         //Cria o Controle da lista 
         nacaoControl = new NacaoControler(this);
         stResults.setFontText(detalhesNacao.getFont());
-        stCombats.setFontText(detalhesNacao.getFont());
         addTabs();
         //adiciona listeners
+        addDocumentListener(searchField);
         comboFiltro.addActionListener(nacaoControl);
         jtMainLista.getSelectionModel().addListSelectionListener(nacaoControl);
         //rendered
@@ -288,7 +314,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
                 stResults, labels.getString("RESULTADOS.TOOLTIP"));
         detalhesNacao.addTab(labels.getString("RESULTADOS.COMBAT"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/combat.png")),
-                stCombats, labels.getString("RESULTADOS.COMBAT.TOOLTIP"));
+                accordionCombats, labels.getString("RESULTADOS.COMBAT.TOOLTIP"));
         detalhesNacao.addTab(labels.getString("DIPLOMACY"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/diplomacy.gif")),
                 stDiplomacy, labels.getString("DIPLOMACY.TOOLTIP"));
@@ -335,17 +361,27 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     }
 
     private void setCombats(Nacao nacao) {
-        String hab = "\n";
+        boolean areCombats = false;
         try {
+            accordionCombats.removeAll();
             for (String msg : nacaoFacade.getMensagensCombatesDuelos(nacao)) {
-//                hab += "\n\n\n" + msg.replace(',', '\n');
-                hab += "\n\n\n" + msg;
+                String title = msg.substring(0, msg.indexOf("."));
+                String message = msg.substring(msg.indexOf(".") + 1);
+                final SubTabTextArea subTabTextArea = new SubTabTextArea();
+
+                subTabTextArea.setFontText(detalhesNacao.getFont());
+                subTabTextArea.setText(message);
+                Local hexCombat = (new ListFactory()).getLocal(getLocationFromDescription(title));
+                accordionCombats.addBar(title.trim(), subTabTextArea, hexCombat);
+                areCombats = true;
             }
+            if (!areCombats) {
+                accordionCombats.addBar("No data", new JPanel(), null);
+            }
+
         } catch (NullPointerException ex) {
             //just skip
-            hab += labels.getString("?");
         }
-        stCombats.setText(hab);
     }
 
     public void doMudaNacao(Nacao nacao) {
@@ -372,5 +408,14 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     @Override
     protected int getComboFiltroSize() {
         return this.comboFiltro.getModel().getSize();
+    }
+
+    private String getLocationFromDescription(String line) {
+        Pattern pattern = Pattern.compile("\\d{4}");
+        Matcher matcher = pattern.matcher(line);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
     }
 }
