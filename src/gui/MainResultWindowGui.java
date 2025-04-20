@@ -251,7 +251,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/bargraph icon.png"))); // NOI18N
         jbScoreGraph.setToolTipText(labels.getString("PONTOS.VITORIA.NATION")); // NOI18N
         jbScoreGraph.setActionCommand("jbScoreGraph");
-        jbScoreGraph.setEnabled(false);
         jbScoreGraph.setFocusable(false);
         jbScoreGraph.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jbScoreGraph.setName("jbScoreGraph"); // NOI18N
@@ -650,13 +649,13 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             jbSaveWorld.setVisible(false);
         }
         jbMap.setEnabled(true);
-        jbScoreGraph.setEnabled(true);
-        jbScoreGraph1.setEnabled(true);
-        jbScoreGraph2.setEnabled(wc.isVictoryPointsExists());
-        jbScoreGraph3.setEnabled(true);
-        jbScoreGraph4.setEnabled(true);
-        jbScoreGraph5.setEnabled(true);
-        jbScoreGraph6.setEnabled(true);
+        jbScoreGraph.setEnabled(false);
+        jbScoreGraph1.setEnabled(false);
+        jbScoreGraph2.setEnabled(false);
+        jbScoreGraph3.setEnabled(false);
+        jbScoreGraph4.setEnabled(false);
+        jbScoreGraph5.setEnabled(false);
+        jbScoreGraph6.setEnabled(false);
         jbHexview.setEnabled(true);
         jbCopy.setEnabled(true);
         jbEmailList.setEnabled(true);

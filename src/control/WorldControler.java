@@ -18,15 +18,8 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
-import gui.graphs.GraphPopupKeyCityPerNation;
-import gui.graphs.GraphPopupScoreByNation;
-import gui.graphs.GraphPopupVpPerTeam;
-import gui.graphs.GraphPopupVpPerTurn;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
-import gui.graphs.GraphPopupDominationPerTeam;
-import gui.graphs.GraphPopupKeyCityPerTeam;
-import gui.graphs.GraphPopupVictoryOverview;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
@@ -188,27 +181,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 break;
             case "jbSend":
                 doSend(jbTemp);
-                break;
-            case "jbScoreGraph":
-                doGraphScore();
-                break;
-            case "jbGraphSingleTurn":
-                doGraphSingleTurn();
-                break;
-            case "jbGraphAllTurns":
-                doGraphAllTurns();
-                break;
-            case "jbGraphKeyCityPerTeam":
-                doGraphKeyCityPerTeam();
-                break;
-            case "jbGraphKeyCityPerNation":
-                doGraphKeyCityPerNation();
-                break;
-            case "jbGraphVictoryOverview":
-                doGraphVictoryOverview();
-                break;
-            case "jbGraphDomination":
-                doGraphDominationPerTeam();
                 break;
             case "jbAbout":
                 doAbout();
@@ -387,41 +359,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         dAbout.setLocationRelativeTo(this.getGui());
         dAbout.pack();
         dAbout.setVisible(true);
-    }
-
-    private void doGraphScore() throws HeadlessException {
-        GraphPopupScoreByNation graph = new GraphPopupScoreByNation();
-        graph.start();
-    }
-
-    private void doGraphSingleTurn() throws HeadlessException {
-        GraphPopupVpPerTeam graph = new GraphPopupVpPerTeam();
-        graph.start();
-    }
-
-    private void doGraphKeyCityPerTeam() throws HeadlessException {
-        GraphPopupKeyCityPerTeam graph = new GraphPopupKeyCityPerTeam();
-        graph.start();
-    }
-
-    private void doGraphKeyCityPerNation() throws HeadlessException {
-        GraphPopupKeyCityPerNation graph = new GraphPopupKeyCityPerNation();
-        graph.start();
-    }
-
-    private void doGraphVictoryOverview() throws HeadlessException {
-        GraphPopupVictoryOverview graph = new GraphPopupVictoryOverview();
-        graph.start();
-    }
-
-    private void doGraphDominationPerTeam() throws HeadlessException {
-        GraphPopupDominationPerTeam graph = new GraphPopupDominationPerTeam();
-        graph.start();
-    }
-
-    private void doGraphAllTurns() throws HeadlessException {
-        GraphPopupVpPerTurn graph = new GraphPopupVpPerTurn(WorldFacadeCounselor.getInstance().getNacoes().values());
-        graph.start(WFC.getVictoryPoints());
     }
 
     private void doHexview() {
