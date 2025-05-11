@@ -7,6 +7,8 @@ package gui.accessories;
 
 import business.DownloadPortraitsService;
 import control.services.DownloadPortraitsHttpServiceImpl;
+import control.support.DispatchManager;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -75,6 +77,8 @@ public class DownloadProgressWork extends SwingWorker<Void, Void> {
         downloadFile.delete();
         String successLabel = "Successful download and uncompress process. A total of " + filesCount + " portraits have been obtained.";
         JOptionPane.showMessageDialog(null, successLabel);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(1));
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_RELOAD, "");        
 
     }
 
