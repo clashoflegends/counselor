@@ -50,7 +50,7 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
     private BattleCasualtySimulatorNew tabGui;
     private ArmySim exercito;
     private Pelotao platoon;
-    private List<Pelotao> listaExibida = new ArrayList<Pelotao>();
+    private List<Pelotao> listaExibida = new ArrayList<>();
     private final BattleSimFacade combSim = new BattleSimFacade();
     private int indexOfPlatoon = 0;
 
@@ -93,9 +93,9 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
 
     public GenericoTableModel getPlatoonTableModel(String filtro, Terreno terrain) {
         if (getExercito().getTatica() == 2) {
-            listaExibida = new ArrayList<Pelotao>();
+            listaExibida = new ArrayList<>();
         } else if (getExercito() == null) {
-            listaExibida = new ArrayList<Pelotao>();
+            listaExibida = new ArrayList<>();
         } else {
             listaExibida = FiltroConverter.listaByFiltroCasualty(filtro, getExercito().getPelotoes().values());
         }
@@ -175,14 +175,21 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
         if (doNoArmySelectedMsg()) {
             return;
         }
-        if ("jbNewPlatoon".equals(jbTemp.getActionCommand())) {
-            doNewPlatoon();
-        } else if ("jbClonePlatoon".equals(jbTemp.getActionCommand())) {
-            doClonePlatoon();
-        } else if ("jbRemPlatoon".equals(jbTemp.getActionCommand())) {
-            doRemovePlatoon();
-        } else {
+        if (null == jbTemp.getActionCommand()) {
             log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+        } else switch (jbTemp.getActionCommand()) {
+            case "jbNewPlatoon":
+                doNewPlatoon();
+                break;
+            case "jbClonePlatoon":
+                doClonePlatoon();
+                break;
+            case "jbRemPlatoon":
+                doRemovePlatoon();
+                break;
+            default:
+                log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
+                break;
         }
     }
 
@@ -225,14 +232,21 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
             try {
                 JSpinner source = (JSpinner) event.getSource();
                 final Integer value = (Integer) source.getValue();
-                if ("jsPlatoonQty".equals(source.getName())) {
-                    platoon.setQtd(value);
-                } else if ("jsPlatoonTraining".equals(source.getName())) {
-                    platoon.setTreino(value);
-                } else if ("jsPlatoonWeapon".equals(source.getName())) {
-                    platoon.setModAtaque(value);
-                } else if ("jsPlatoonArmor".equals(source.getName())) {
-                    platoon.setModDefesa(value);
+                if (null != source.getName()) switch (source.getName()) {
+                    case "jsPlatoonQty":
+                        platoon.setQtd(value);
+                        break;
+                    case "jsPlatoonTraining":
+                        platoon.setTreino(value);
+                        break;
+                    case "jsPlatoonWeapon":
+                        platoon.setModAtaque(value);
+                        break;
+                    case "jsPlatoonArmor":
+                        platoon.setModDefesa(value);
+                        break;
+                    default:
+                        break;
                 }
                 this.getTabGui().doRefreshArmy();
             } catch (NullPointerException e) {

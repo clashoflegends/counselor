@@ -25,9 +25,20 @@ public class Main implements Serializable {
     @SuppressWarnings("static-access")
     public static void main(String[] args) {
         // Invokes Gui to display turn results
-        log.info("Starting...");
+        if (!SysApoio.getVersionJavaSpecification().equals("1.8")) {
+            log.fatal("Counselor only works with Java Community version 1.8. Dounload it from java.com");
+        }
+        log.info(String.format("Starting... %s ...", SysApoio.getPidOs()));
         log.info("Counselor version: " + SysApoio.getVersionClash("version_counselor"));
         log.info("Commons version: " + SysApoio.getVersionClash("version_commons"));
+        log.info("Java Specification Version: " + SysApoio.getVersionJavaSpecification());
+        log.info("Java Runtime Version: " + SysApoio.getVersionJava());
+        log.info("Java Runtime Name: " + SysApoio.getVersionJavaRuntime());
+        log.info("Java VM Version: " + SysApoio.getVersionJavaVm());
+        log.info("Java VM Name: " + SysApoio.getVersionJavaVmName());
+        log.info("OS version: " + SysApoio.getVersionOs());
+        log.info("Screen Size: " + SysApoio.getScreenSize());
+
         final SettingsManager sm = SettingsManager.getInstance();
         sm.setConfigurationMode("Client");
         sm.setLanguage(sm.getConfig("language", "en"));

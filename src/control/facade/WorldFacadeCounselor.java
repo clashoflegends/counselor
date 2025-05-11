@@ -75,7 +75,7 @@ public class WorldFacadeCounselor implements Serializable {
         try {
             WorldManager.getInstance().doStart(file);
         } catch (PersistenceException ex) {
-            throw new BusinessException(ex.getMessage());
+            throw new BusinessException(ex);
         }
     }
 
@@ -83,7 +83,7 @@ public class WorldFacadeCounselor implements Serializable {
         try {
             XmlManager.getInstance().save(com, selectedFile);
         } catch (PersistenceException | NullPointerException ex) {
-            throw new BusinessException(ex.getMessage());
+            throw new BusinessException(ex);
         }
 
     }

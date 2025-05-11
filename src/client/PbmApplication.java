@@ -14,10 +14,13 @@ import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.MissingResourceException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.SettingsManager;
+import persistenceCommons.SysApoio;
 
 /**
  *
@@ -104,6 +107,7 @@ public class PbmApplication extends Application implements Serializable {
             SettingsManager.getInstance().setConfig("maximizeWindowOnStart", "0");
         }
         SettingsManager.getInstance().saveToFile();
+        log.info(String.format("Closing... %s ...", SysApoio.getPidOs()));
     }
 
     private void setListeners(JgFrame frame) {

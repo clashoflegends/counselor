@@ -82,7 +82,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private static final Log log = LogFactory.getLog(WorldControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private final JFileChooser fc = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
+    private final JFileChooser fcResults;
+    private final JFileChooser fcOrders;
+    private final JFileChooser fcWorld;
+    private final JFileChooser fcMapImage;
     private boolean saved = false;
     private boolean savedWorld = false;
     private boolean msgSubmitReady = false;
@@ -100,7 +103,22 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private ProgressMonitor progressMonitor;
 
     public WorldControler(MainResultWindowGui aGui) {
+        //initialize file choosers
+        this.fcResults = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
+        fcResults.resetChoosableFileFilters();
+        fcResults.setFileFilter(PathFactory.getFilterResults());
+        this.fcOrders = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
+        fcOrders.resetChoosableFileFilters();
+        fcOrders.setFileFilter(PathFactory.getFilterAcoes());
+        this.fcWorld = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
+        fcWorld.resetChoosableFileFilters();
+        fcWorld.setFileFilter(PathFactory.getFilterWorld());
+        this.fcMapImage = new JFileChooser(SettingsManager.getInstance().getConfig("loadDir"));
+        fcMapImage.resetChoosableFileFilters();
+        fcMapImage.setFileFilter(PathFactory.getFilterImages());
+
         setGui(aGui);
+
         registerDispatchManager();
         registerDispatchManagerForMsg(DispatchManager.SET_LABEL_MONEY);
         registerDispatchManagerForMsg(DispatchManager.SAVE_WORLDBUILDER_FILE);
@@ -110,6 +128,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
         registerDispatchManagerForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL);
         registerDispatchManagerForMsg(DispatchManager.SPLIT_PANE_CHANGED);
+
     }
 
     @Override
@@ -209,14 +228,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private void doLoad(JButton jbTemp) throws HeadlessException {
         String nomeArquivo = getCommandFileName();
         //salva o arquivo
-        fc.setSelectedFile(new File(nomeArquivo));
+        fcOrders.setSelectedFile(new File(nomeArquivo));
         //Create a file chooser
         //In response to a button click:
-        fc.resetChoosableFileFilters();
-        fc.setFileFilter(PathFactory.getFilterAcoes());
-        int returnVal = fc.showOpenDialog(jbTemp);
+        int returnVal = fcOrders.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            final File file = fc.getSelectedFile();
+            final File file = fcOrders.getSelectedFile();
             log.info(labels.getString("LOADING: ") + file.getName());
             setComando(file);
             this.saved = false;
@@ -277,14 +294,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         if (!this.saved) {
             //monta o dialogo
             //define default
-            fc.setSelectedFile(new File(fileName));
-            //seta filters
-            fc.resetChoosableFileFilters();
-            fc.setFileFilter(PathFactory.getFilterAcoes());
+            fcOrders.setSelectedFile(new File(fileName));
             //exibe dialogo
-            if (fc.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
+            if (fcOrders.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
                 ret = doFileSave(comando, missingActionMsg);
-                log.info("Saved Server file:" + ret.getAbsolutePath());
+                log.info(String.format("Saved Server file[%s]: %s", SysApoio.getPidOs(), ret.getAbsolutePath()));
             } else {
                 this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
             }
@@ -299,12 +313,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         World world = WorldManager.getInstance().getWorld();
         if (!this.savedWorld) {
             //monta o dialogo
-            fc.setSelectedFile(new File(PathFactory.getWorldFileName(world)));
-            //seta filters
-            fc.resetChoosableFileFilters();
-            fc.setFileFilter(PathFactory.getFilterWorld());
+            fcWorld.setSelectedFile(new File(PathFactory.getWorldFileName(world)));
             //exibe dialogo
-            if (fc.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
+            if (fcWorld.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
                 saveWorldFile(world);
             } else {
                 this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
@@ -317,9 +328,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private File doFileSave(Comando comando, String missingActionMsg) {
         File ret = null;
         try {
-            ret = fc.getSelectedFile();
+            ret = fcOrders.getSelectedFile();
             WFC.doSaveOrdens(comando, ret);
-            this.getGui().setStatusMsg(missingActionMsg + " " + String.format(labels.getString("ORDENS.SALVAS"), comando.size(), fc.getSelectedFile().getName()));
+            this.getGui().setStatusMsg(missingActionMsg + " " + String.format(labels.getString("ORDENS.SALVAS"), comando.size(), fcOrders.getSelectedFile().getName()));
             this.saved = true;
         } catch (BusinessException ex) {
             log.error(ex.getMessage());
@@ -335,13 +346,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         String nomeArquivo = String.format(labels.getString("FILENAME.MAP"),
                 partida.getId(), partida.getTurno(), partida.getJogadorAtivo().getLogin());
 
-        fc.setSelectedFile(new File(nomeArquivo));
-        //seta filters
-        fc.resetChoosableFileFilters();
-        fc.setFileFilter(PathFactory.getFilterImages());
+        fcMapImage.setSelectedFile(new File(nomeArquivo));
         //exibe dialogo
 
-        if (fc.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
+        if (fcMapImage.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
             saveMapFile();
         } else {
             this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
@@ -498,17 +506,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      */
     private void doOpen(JButton jbTemp) throws HeadlessException {
         //Create a file chooser
-        //In response to a button click:
-        fc.resetChoosableFileFilters();
-        fc.setFileFilter(PathFactory.getFilterResults());
         if (SettingsManager.getInstance().isWorldBuilder()) {
-            fc.addChoosableFileFilter(PathFactory.getFilterWorld());
+            fcResults.addChoosableFileFilter(PathFactory.getFilterWorld());
         }
-        int returnVal = fc.showOpenDialog(jbTemp);
+        int returnVal = fcResults.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             try {
-                final File resultsFile = fc.getSelectedFile();
-                log.info(labels.getString("OPENING: ") + resultsFile.getName());
+                final File resultsFile = fcResults.getSelectedFile();
+                log.info(labels.getString("OPENING: ") + resultsFile.getName() + String.format(" [%s]", SysApoio.getPidOs()));
                 WFC.doStart(resultsFile);
                 this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
                 log.info(labels.getString("INICIALIZANDO.GUI"));
@@ -518,13 +523,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 this.saved = false;
                 this.savedWorld = false;
                 doAutoLoadCommands(resultsFile);
+                fcOrders.setCurrentDirectory(fcResults.getCurrentDirectory());
+                fcWorld.setCurrentDirectory(fcResults.getCurrentDirectory());
+                fcMapImage.setCurrentDirectory(fcResults.getCurrentDirectory());
             } catch (BusinessException ex) {
                 SysApoio.showDialogError(ex.getMessage(), this.getGui());
                 this.getGui().setStatusMsg(ex.getMessage());
                 log.error(ex);
             }
         } else {
-            log.info(labels.getString("OPEN.CANCELLED"));
+            log.info(labels.getString("OPEN.CANCELLED") + String.format(" [%s]", SysApoio.getPidOs()));
         }
     }
 
@@ -557,7 +565,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             return;
         }
         try {
-            log.info(labels.getString("AUTOLOADING.OPENING") + autoLoad);
+            log.info(labels.getString("AUTOLOADING.OPENING") + autoLoad + String.format(" [%s]", SysApoio.getPidOs()));
             this.getGui().setStatusMsg(labels.getString("AUTOLOADING.OPENING") + autoLoad);
             final File resultsFile = new File(autoLoad);
             WFC.doStart(resultsFile);
@@ -571,7 +579,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             } else {
                 doAutoLoadCommands(resultsFile);
             }
-            fc.setSelectedFile(resultsFile);
+            fcOrders.setSelectedFile(resultsFile);
             this.saved = false;
         } catch (BusinessException ex) {
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
@@ -1028,10 +1036,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     public void saveWorldFile(World world) {
         //salva o arquivo
         try {
-            String filename = PersistFactory.getWorldDao().save(world, fc.getSelectedFile());
+            String filename = PersistFactory.getWorldDao().save(world, fcWorld.getSelectedFile());
             this.getGui().setStatusMsg(String.format(labels.getString("WORLD.SALVAS"), world.getLocais().size(), filename));
             this.savedWorld = true;
-            log.info("Saved World file:" + fc.getSelectedFile().getAbsolutePath());
+            log.info("Saved World file:" + fcWorld.getSelectedFile().getAbsolutePath());
         } catch (PersistenceException ex) {
             log.fatal("Can't save???", ex);
         }
@@ -1041,8 +1049,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         try {
             // Save image
             BufferedImage buffered = WFC.getMapaControler().getMap();
-            ImageIO.write(buffered, "png", fc.getSelectedFile());
-            this.getGui().setStatusMsg(String.format(labels.getString("MAPA.SALVAS"), fc.getSelectedFile().getName()));
+            ImageIO.write(buffered, "png", fcMapImage.getSelectedFile());
+            this.getGui().setStatusMsg(String.format(labels.getString("MAPA.SALVAS"), fcMapImage.getSelectedFile().getName()));
         } catch (IOException ex) {
             log.fatal("IOException Problem", ex);
             this.getGui().setStatusMsg(labels.getString("IO.ERROR"));
