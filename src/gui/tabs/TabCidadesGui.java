@@ -175,14 +175,15 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(qtCidades)
-                    .addComponent(jLabel5)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel1)
-                        .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3)
+                        .addComponent(comboFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(qtCidades)
+                        .addComponent(jLabel5)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE))
         );
@@ -289,10 +290,10 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
             detalhesCidade.addTab(labels.getString("ACAO"),
                     new javax.swing.ImageIcon(getClass().getResource("/images/right.gif")),
                     stOrdens, labels.getString("ORDERNS.TOOLTIP"));
-            detalhesCidade.addTab(labels.getString("RESULTADOS"),
-                    new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png")),
-                    stResults, labels.getString("RESULTADOS.TOOLTIP"));
         }
+        detalhesCidade.addTab(labels.getString("RESULTADOS"),
+                new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png")),
+                stResults, labels.getString("RESULTADOS.TOOLTIP"));
         if (cenarioFacade.hasResourceManagement(cenario)) {
             detalhesCidade.addTab(labels.getString("ESTOQUES"),
                     new javax.swing.ImageIcon(getClass().getResource("/images/financas.gif")),
@@ -301,12 +302,6 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         detalhesCidade.addTab(labels.getString("PRESENCAS"),
                 new javax.swing.ImageIcon(getClass().getResource("/images/hex_personagem.gif")),
                 stPersonagens, labels.getString("PRESENCA.TOOLTIP"));
-        if (!cenarioFacade.hasOrdensCidade(cenario)) {
-            //resultados no final.
-            detalhesCidade.addTab(labels.getString("RESULTADOS"),
-                    new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png")),
-                    stResults, labels.getString("RESULTADOS.TOOLTIP"));
-        }
         stResults.setGuiConfig("GuiCityResults");
     }
 

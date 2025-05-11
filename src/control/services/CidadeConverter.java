@@ -508,10 +508,10 @@ public class CidadeConverter implements Serializable {
 
     public static String getResultados(Cidade cidade) {
         final String info = LocalConverter.getInfo(cidadeFacade.getLocal(cidade));
-        if (!WorldFacadeCounselor.getInstance().hasOrdensCidade()) {
-            return info;
-        } else {
-            return ordemFacade.getResultado(cidade) + "\n" + info;
-        }
+//        if (!WorldFacadeCounselor.getInstance().hasOrdensCidade()) {
+//            return info;
+//        } else {
+            return ordemFacade.getResultado(cidade) + "\n\n" + info;
+//        }
     }
 }
