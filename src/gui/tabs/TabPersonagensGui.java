@@ -33,6 +33,9 @@ import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
 import utils.OpenSlotCounter;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.GroupLayout;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 /**
  *
@@ -210,20 +213,20 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         portraitPanel.setVisible(showPortrait);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(1, 1, 1)
-                .addComponent(portraitPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(detalhesPersonagem, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE))
+        	jPanel1Layout.createParallelGroup(Alignment.TRAILING)
+        		.addGroup(jPanel1Layout.createSequentialGroup()
+        			.addGap(6)
+        			.addComponent(portraitPanel, GroupLayout.PREFERRED_SIZE, 120, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addComponent(detalhesPersonagem, GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(portraitPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
-            .addComponent(detalhesPersonagem, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+        	jPanel1Layout.createParallelGroup(Alignment.LEADING)
+        		.addComponent(portraitPanel, GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
+        		.addComponent(detalhesPersonagem, GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
         );
+        jPanel1.setLayout(jPanel1Layout);
 
         detalhesPersonagem.getAccessibleContext().setAccessibleName("Ações");
 

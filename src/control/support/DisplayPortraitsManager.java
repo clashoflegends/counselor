@@ -72,6 +72,8 @@ public class DisplayPortraitsManager {
             if (jFileReturn == JFileChooser.APPROVE_OPTION) {
                 File file = folderChooser.getSelectedFile();
                 SettingsManager.getInstance().setConfig("PortraitsFolder", file.getPath());
+                SettingsManager.getInstance().setConfig("ShowCharacterPortraits", String.valueOf(1));
+                SettingsManager.getInstance().doConfigSave("ShowCharacterPortraits");
 
             } else {
                 throw new BusinessException();
