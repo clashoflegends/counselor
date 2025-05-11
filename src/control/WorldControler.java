@@ -1278,8 +1278,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             progressMonitor = new ProgressMonitor(gui, "Downloading file...", "", 0, 100);
             progressMonitor.setProgress(0);
             displayPortraitsManager.downloadPortraits(gui, this);
+            
+        } else {
+        	doDisplayPortraits(button);
         }
-        doDisplayPortraits(button);
     }
 
     private int calculateDrawPcPathValue(int pcPath, int pcPathFuture) {

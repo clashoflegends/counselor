@@ -792,7 +792,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     }
 
     public boolean isDisplayPortraitsSelected() {
-        return settingsManager.getConfig("ShowCharacterPortraits", "1").equals("1");
+        return settingsManager.getConfig("ShowCharacterPortraits", "0").equals("1");
     }
 
     public JToggleButton getDisplayPortraits() {
