@@ -74,6 +74,10 @@ public class WorldFacadeCounselor implements Serializable {
     public synchronized void doStart(File file) throws BusinessException {
         try {
             WorldManager.getInstance().doStart(file);
+        } catch (ExceptionInInitializerError ex) {
+            //can't open results. Wrong Java Version.
+            log.fatal("can't open results. Wrong Java Version.");
+            throw new BusinessException("Counselor can't open results because you have the wrong version for Java. It needs version 1.8 from java.com!", ex);
         } catch (PersistenceException ex) {
             throw new BusinessException(ex);
         }
