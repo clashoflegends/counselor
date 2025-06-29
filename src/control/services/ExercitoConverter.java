@@ -470,9 +470,9 @@ public class ExercitoConverter implements Serializable {
         //monta a lista de tropas
         for (Pelotao pelotao : exercito.getPelotoes().values()) {
             final TipoTropa tpTropa = pelotao.getTipoTropa();
-            if (water && ef.isAgua(tpTropa)) {
+            if (water && ef.isShips(tpTropa)) {
                 list.add(tpTropa);
-            } else if (!water && !ef.isAgua(tpTropa)) {
+            } else if (!water && !ef.isShips(tpTropa)) {
                 list.add(tpTropa);
             }
         }
@@ -490,9 +490,9 @@ public class ExercitoConverter implements Serializable {
         Collection<TipoTropa> list = new ArrayList<>(WorldManager.getInstance().getCenario().getTipoTropas().size());
         //monta a lista de tropas
         for (TipoTropa tpTropa : WorldManager.getInstance().getCenario().getTipoTropas().values()) {
-            if (water && ef.isAgua(tpTropa)) {
+            if (water && ef.isShips(tpTropa)) {
                 list.add(tpTropa);
-            } else if (!water && !ef.isAgua(tpTropa)) {
+            } else if (!water && !ef.isShips(tpTropa)) {
                 list.add(tpTropa);
             }
         }
