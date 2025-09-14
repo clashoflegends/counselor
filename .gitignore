@@ -5,3 +5,7 @@ counselor.log
 /out/
 /.idea/
 /nbproject/
+/target/
+*.rc.egf
+*.rr.egf
+/testgames/
