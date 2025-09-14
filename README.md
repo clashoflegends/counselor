@@ -11,3 +11,29 @@ An easy to view map will help you see all theatre of operations in a glance. You
 The game is quite stable and recently translated into English. It is far from finished, but we passed the initial beta and I'm looking for more players.
 
 Are you interested in having some fun while crushing your enemies?
+
+## Build with Maven
+
+
+### Quick start
+
+1) Build the jar
+
+```powershell
+mvn -q -DskipTests package
+```
+
+2) Run the application
+
+```powershell
+java -jar target/counselor-1.0.0-SNAPSHOT-executable.jar
+```
+
+A self executing jar is generated, packaging all libs inside it.
+
+### Notes
+
+- System-scoped dependencies are a temporary bridge; consider replacing with proper Maven coordinates from Maven Central where available.
+- Assets from `NewTiles/`, `OldTiles/`, and `properties.config` are added to the jar/classpath.
+- The jar version is written to version_counselor.properties
+
