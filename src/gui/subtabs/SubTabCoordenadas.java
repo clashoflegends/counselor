@@ -91,7 +91,7 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
          *  displayCities == 2, hide cities and landmarks
          */
         //prep list
-        List<MovimentoPersonagem> lista = new ArrayList<MovimentoPersonagem>(WorldManager.getInstance().getLocais().size());
+        List<MovimentoPersonagem> lista = new ArrayList<>(WorldManager.getInstance().getLocais().size());
         //monta a lista de locais
         for (Local local : WorldManager.getInstance().getLocais().values()) {
             if (all) {
