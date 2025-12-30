@@ -135,6 +135,10 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         if (local == null) {
             this.getTabGui().hidefocusTag();
         } else {
+            if (local.getCoordenadas().equals("0101")) {
+                log.info(String.format("Local Tag: %s", local.getCoordenadas()));
+            }
+            log.info(String.format("Local Tag: %s", local.getCoordenadas()));
             int[] pos = mapaManager.doCoordToPosition(local);
             this.getTabGui().setFocusTag(pos[0], pos[1]);
             updateLocal(local);

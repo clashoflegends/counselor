@@ -21,6 +21,8 @@ import gui.tabs.TabPartidaGui;
 import gui.tabs.TabPersonagensGui;
 import gui.tabs.TabTipoTropasGui;
 import java.io.Serializable;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 
@@ -32,6 +34,7 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
 
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final TabPersonagensGui tabPersonagem;
+    private static final Log log = LogFactory.getLog(MainDadosGui.class);
 
     /**
      * Creates new form MainDadosGui
@@ -66,6 +69,7 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
         if (SettingsManager.getInstance().isConfig("GuiShowLocationsTab", "1", "0")) {
             this.addTabBase(new TabOrdensGui("Ordens", labels.getString("ORDENS.SAVED")));
         }
+        log.fatal("MainDadosGui");
     }
 
     //** Adiciona uma Tab ao painel principal de exibição */

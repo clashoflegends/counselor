@@ -43,7 +43,7 @@ public class CidadeControler extends ControlBase implements Serializable, Action
 
     public CidadeControler(TabCidadesGui tabGui) {
         this.tabCidadesGui = tabGui;
-        registerDispatchManagerForMsg(DispatchManager.ACTIONS_RELOAD);
+//        registerDispatchManagerForMsg(DispatchManager.ACTIONS_RELOAD);
 //        registerDispatchManagerForMsg(DispatchManager.LOCAL_CITY_REDRAW);
     }
 

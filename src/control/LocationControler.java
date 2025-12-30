@@ -43,8 +43,8 @@ public class LocationControler extends ControlBase implements Serializable, Acti
 
     public LocationControler(TabLocationsGui tabGui) {
         this.tabHexagonosGui = tabGui;
-        registerDispatchManagerForMsg(DispatchManager.ACTIONS_RELOAD);
-//        registerDispatchManagerForMsg(DispatchManager.LOCAL_CITY_REDRAW);
+//        registerDispatchManagerForMsg(DispatchManager.ACTIONS_RELOAD);
+        registerDispatchManagerForMsg(DispatchManager.LOCAL_CITY_REDRAW);
     }
 
     public GenericoTableModel getMainTableModel(GenericoComboObject filtro) {

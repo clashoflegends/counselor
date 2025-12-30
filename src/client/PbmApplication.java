@@ -14,8 +14,6 @@ import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.Serializable;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.util.MissingResourceException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
