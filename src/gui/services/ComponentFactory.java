@@ -11,6 +11,7 @@ import control.MapaControler;
 import control.OrdemControler;
 import control.support.ActorInterface;
 import gui.accessories.DialogHexView;
+import gui.charts.ChartBar;
 import gui.charts.ChartPie;
 import gui.charts.DataSetForChart;
 import gui.components.DialogTextArea;
@@ -1043,16 +1044,37 @@ public class ComponentFactory implements Serializable {
     }
 
     public static ChartPie showChartPie(String title, List<DataSetForChart> dataSet, String subtitle, Component relativeTo) {
-        ChartPie pie = new ChartPie(title, dataSet, subtitle);
-        pie.pack();
+        ChartPie chart = new ChartPie(title, dataSet, subtitle);
+        chart.pack();
         //configura jDialog
         if (relativeTo != null) {
-            pie.setLocationRelativeTo(relativeTo);
+            chart.setLocationRelativeTo(relativeTo);
         } else {
-            UIUtils.centerFrameOnScreen(pie);
+            UIUtils.centerFrameOnScreen(chart);
         }
-        pie.setVisible(true);
-        return pie;
+        chart.setVisible(true);
+        return chart;
+    }
+
+    public static ChartBar showChartBar(String title, List<DataSetForChart> dataSet, String xLabel, String yLabel, Component relativeTo) {
+        return showChartBar(title, dataSet, null, xLabel, yLabel, relativeTo);
+    }
+
+    public static ChartBar showChartBar(String title, List<DataSetForChart> dataSet, String subtitle, String xLabel, String yLabel) {
+        return showChartBar(title, dataSet, subtitle, xLabel, yLabel, null);
+    }
+
+    public static ChartBar showChartBar(String title, List<DataSetForChart> dataSet, String subtitle, String xLabel, String yLabel, Component relativeTo) {
+        ChartBar chart = new ChartBar(title, dataSet, subtitle, xLabel, yLabel);
+        chart.pack();
+        //configura jDialog
+        if (relativeTo != null) {
+            chart.setLocationRelativeTo(relativeTo);
+        } else {
+            UIUtils.centerFrameOnScreen(chart);
+        }
+        chart.setVisible(true);
+        return chart;
     }
 
     public JLabelGradient getLabelGradient() {

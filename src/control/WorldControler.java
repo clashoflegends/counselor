@@ -20,7 +20,6 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
-import gui.charts.ChartPie;
 import gui.accessories.DialogHexView;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
@@ -1393,6 +1392,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         final Set<String> teams = new TreeSet<>();
         final SortedMap<String, Nacao> mapNations = new TreeMap<>();
         List<Nacao> nations = doPrepNations(mapNations, teams);
+        List<DataSetForChart> dataSet = new ArrayList<>();
         //data header
         String dataBody = String.format("%s\t%s\t%s\n", labels.getString("PONTOS.VITORIA"), labels.getString("NACAO"), labels.getString("TEAM"));
 
@@ -1403,16 +1403,20 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     continue;
                 }
                 dataBody += String.format("%s\t%s\t%s\n", nation.getPontosVitoria(), nation.getNome(), nation.getTeamFlag());
+                dataSet.add(new DataSetForChart(nation.getNome(), nation.getPontosVitoria(), nation.getTeamFlag(), nation.getFillColor()));
             }
         }
 
-        DialogHexView hexView = null;
-        //create on first time
-        if (hexView == null) {
-            hexView = ComponentFactory.showDialogHexView(this.gui);
-        }
-        hexView.setText(dataBody);
-        hexView.setTitle(labels.getString(title));
+        //copy para o clipboard
+        SysApoio.setClipboardContents(dataBody);
+        this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
+
+        //create and display chart
+        final Partida partida = WorldManager.getInstance().getPartida();
+        final String subtitle = String.format(labels.getString("GAME.TURN"), partida.getId(), partida.getTurno());
+        ComponentFactory.showChartBar(labels.getString(title), dataSet, subtitle, labels.getString("NACAO") + " / " + labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), this.gui
+        );
+
     }
 
     private void doDataPointsPerTeam() {
@@ -1486,16 +1490,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         for (String nmTeam : totalCount.getKeys()) {
             final double value = totalCount.getValue(nmTeam);
             dataBody += String.format("%.0f\t%.1f%%\t%s\n", value, (value / total * 100d), nmTeam);
-            dataSet.add(new DataSetForChart(nmTeam, value, SysApoio.getColorFromName(nmTeam)));
+            dataSet.add(new DataSetForChart(nmTeam, value, "", SysApoio.getColorFromName(nmTeam)));
         }
         //copy para o clipboard
         SysApoio.setClipboardContents(dataBody);
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
         //create and display chart
-        Partida partida = WorldManager.getInstance().getPartida();
+        final Partida partida = WorldManager.getInstance().getPartida();
         final String subtitle = String.format(labels.getString("GAME.TURN"), partida.getId(), partida.getTurno());
-        ChartPie hexView = ComponentFactory.showChartPie(labels.getString(title), dataSet, subtitle, this.gui);
+        ComponentFactory.showChartPie(labels.getString(title), dataSet, subtitle, this.gui);
     }
 
     private void doDataVictoryOverview() {

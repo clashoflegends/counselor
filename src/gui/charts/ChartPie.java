@@ -49,7 +49,7 @@ public class ChartPie extends JFrame {
         this.dataSet = dataSet;
         this.subtitle = subtitle;
         GroupLayout parLayout = (GroupLayout) jpQuadro.getLayout();
-        parLayout.replace(jPanel1, createDemoPanel());
+        parLayout.replace(jPanel1, createPanel());
     }
 
     /**
@@ -207,11 +207,11 @@ public class ChartPie extends JFrame {
     }
 
     /**
-     * Creates a panel for the demo (used by SuperDemo.java).
+     * Creates a panel
      *
      * @return A panel.
      */
-    final public JPanel createDemoPanel() {
+    final public JPanel createPanel() {
         JFreeChart chart = createChart(createDataset());
         chart.setPadding(new RectangleInsets(4, 8, 2, 2));
         ChartPanel panel = new ChartPanel(chart, false);

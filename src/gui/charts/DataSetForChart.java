@@ -16,11 +16,13 @@ public class DataSetForChart implements Serializable {
 
     private final String key;
     private final double value;
+    private final String grouping;
     private Color color = Color.MAGENTA;
 
-    public DataSetForChart(String key, double value, Color color) {
+    public DataSetForChart(String key, double value, String grouping, Color color) {
         this.key = key;
         this.value = value;
+        this.grouping = grouping;
         if (color != null) {
             this.color = color;
         }
@@ -38,6 +40,13 @@ public class DataSetForChart implements Serializable {
      */
     public double getValue() {
         return value;
+    }
+
+    /**
+     * @return the value
+     */
+    public String getGrouping() {
+        return grouping;
     }
 
     /**
