@@ -81,6 +81,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         toggleShowCityCap.addActionListener(wc);
         toggleScouts.addActionListener(wc);
         togglePathArmy.addActionListener(wc);
+        togglePathResources.addActionListener(wc);
         toggleDisplayPortrait.addActionListener(wc);
         wc.doAutoLoad(autoLoad);
     }
@@ -125,6 +126,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathPj = new javax.swing.JToggleButton();
         togglePathPjFuture = new javax.swing.JToggleButton();
         togglePathArmy = new javax.swing.JToggleButton();
+        togglePathResources = new javax.swing.JToggleButton();
         toggleShowCityCap = new javax.swing.JToggleButton();
         toggleFogWar = new javax.swing.JToggleButton();
         toggleScouts = new javax.swing.JToggleButton();
@@ -351,6 +353,16 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathArmy.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         togglePathArmy.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar2.add(togglePathArmy);
+
+        togglePathResources.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png"))); // NOI18N
+        togglePathResources.setSelected(isResourcePathSelected());
+        togglePathResources.setToolTipText(bundle.getString("SETTINGS.MAP.PCPATH.TOOLTIP")); // NOI18N
+        togglePathResources.setActionCommand("drawPathResources");
+        togglePathResources.setEnabled(false);
+        togglePathResources.setFocusable(false);
+        togglePathResources.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        togglePathResources.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar2.add(togglePathResources);
 
         toggleShowCityCap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_redfog.png"))); // NOI18N
         toggleShowCityCap.setSelected(isShowCityCapSelected());
@@ -579,6 +591,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JToggleButton togglePathArmy;
     private javax.swing.JToggleButton togglePathPj;
     private javax.swing.JToggleButton togglePathPjFuture;
+    private javax.swing.JToggleButton togglePathResources;
     private javax.swing.JToggleButton toggleScouts;
     private javax.swing.JToggleButton toggleShowCityCap;
     // End of variables declaration//GEN-END:variables
@@ -667,6 +680,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathPj.setEnabled(true);
         togglePathPjFuture.setEnabled(true);
         togglePathArmy.setEnabled(true);
+        togglePathResources.setEnabled(true);
         toggleFogWar.setEnabled(true);
         toggleShowCityCap.setEnabled(true);
         toggleScouts.setEnabled(true);
@@ -762,8 +776,17 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         return drawPcPath == 1 || drawPcPath == 2;
     }
 
+    public boolean isResourcePathSelected() {
+        int drawPath = settingsManager.getConfigAsInt("drawResourcePath", "1");
+        return drawPath > 0;
+    }
+
     public JToggleButton getPcPath() {
         return this.togglePathPj;
+    }
+
+    public JToggleButton getResourcePath() {
+        return this.togglePathResources;
     }
 
     public boolean isPcPathFutureSelected() {

@@ -156,6 +156,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             case "drawPathArmy":
                 doDrawArmyPaths(jbTemp);
                 break;
+            case "drawPathResources":
+                doDrawResourcePaths(jbTemp);
+                break;
             case "drawScoutTargets":
                 doScoutTargets(jbTemp);
                 break;
@@ -1240,6 +1243,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
 
+    private void doDrawResourcePaths(JToggleButton jbTemp) {
+        int settingValue = jbTemp.isSelected() ? 1 : 0;
+        SettingsManager.getInstance().setConfig("drawResourcePath", String.valueOf(settingValue));
+        SettingsManager.getInstance().doConfigSave("drawResourcePath");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
+
     private void doDrawArmyPaths(JToggleButton jbTemp) {
         int settingValue = jbTemp.isSelected() ? 1 : 0;
         SettingsManager.getInstance().setConfig("drawArmyMovPath", String.valueOf(settingValue));
@@ -1278,9 +1289,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             progressMonitor = new ProgressMonitor(gui, "Downloading file...", "", 0, 100);
             progressMonitor.setProgress(0);
             displayPortraitsManager.downloadPortraits(gui, this);
-            
+
         } else {
-        	doDisplayPortraits(button);
+            doDisplayPortraits(button);
         }
     }
 
