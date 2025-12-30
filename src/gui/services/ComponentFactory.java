@@ -11,6 +11,8 @@ import control.MapaControler;
 import control.OrdemControler;
 import control.support.ActorInterface;
 import gui.accessories.DialogHexView;
+import gui.charts.ChartPie;
+import gui.charts.DataSetForChart;
 import gui.components.DialogTextArea;
 import gui.components.JLabelGradient;
 import gui.subtabs.SubTabCoordenadas;
@@ -38,6 +40,7 @@ import model.Ordem;
 import msgs.BaseMsgs;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jfree.chart.ui.UIUtils;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
@@ -1029,6 +1032,19 @@ public class ComponentFactory implements Serializable {
         hexViewDialog.pack();
         hexViewDialog.setVisible(true);
         return hexViewDialog;
+    }
+
+    public static ChartPie showChartPie(String title, List<DataSetForChart> dataSet, Component relativeTo) {
+        ChartPie pie = new ChartPie(title, dataSet);
+        pie.pack();
+        //configura jDialog
+        if (relativeTo != null) {
+            pie.setLocationRelativeTo(relativeTo);
+        } else {
+            UIUtils.centerFrameOnScreen(pie);
+        }
+        pie.setVisible(true);
+        return pie;
     }
 
     public JLabelGradient getLabelGradient() {

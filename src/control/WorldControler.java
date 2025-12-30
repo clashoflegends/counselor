@@ -20,9 +20,11 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
+import gui.charts.ChartPie;
 import gui.accessories.DialogHexView;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
+import gui.charts.DataSetForChart;
 import gui.services.ComponentFactory;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -1476,7 +1478,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 WorldFacadeCounselor.getInstance().getLocais().values(),
                 WorldFacadeCounselor.getInstance().getNacaoNeutra());
         final double total = totalCount.getTotal();
-
+        List<DataSetForChart> dataSet = new ArrayList<>();
         //data header
         String dataBody = String.format("%s\t%s\t%s\n", labels.getString("TEAM"), labels.getString("PONTOS.KEYCITY.TEAM"), labels.getString("PERCENTAGE"));
 
@@ -1484,15 +1486,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         for (String nmTeam : totalCount.getKeys()) {
             final double value = totalCount.getValue(nmTeam);
             dataBody += String.format("%.0f\t%.1f%%\t%s\n", value, (value / total * 100d), nmTeam);
+            dataSet.add(new DataSetForChart(nmTeam, value, SysApoio.getColorFromName(nmTeam)));
         }
+        //copy para o clipboard
+        SysApoio.setClipboardContents(dataBody);
+        this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
-        DialogHexView hexView = null;
-        //create on first time
-        if (hexView == null) {
-            hexView = ComponentFactory.showDialogHexView(this.gui);
-        }
-        hexView.setText(dataBody);
-        hexView.setTitle(labels.getString(title));
+        //create and display chart
+        ChartPie hexView = ComponentFactory.showChartPie(labels.getString(title), dataSet, this.gui);
     }
 
     private void doDataVictoryOverview() {
