@@ -25,6 +25,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.chart.ui.HorizontalAlignment;
+import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
@@ -40,11 +41,13 @@ public class ChartPie extends JFrame {
     private static final Log log = LogFactory.getLog(ChartPie.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final List<DataSetForChart> dataSet;
+    private String subtitle = null;
 
-    public ChartPie(String title, List<DataSetForChart> dataSet) {
+    public ChartPie(String title, List<DataSetForChart> dataSet, String subtitle) {
         initComponents();
         configUi(title);
         this.dataSet = dataSet;
+        this.subtitle = subtitle;
         GroupLayout parLayout = (GroupLayout) jpQuadro.getLayout();
         parLayout.replace(jPanel1, createDemoPanel());
     }
@@ -106,7 +109,7 @@ public class ChartPie extends JFrame {
 
     private void configUi(String title) {
         setTitle(title);
-        this.setIconImage(ImageManager.getInstance().getCaravanIcon());
+        this.setIconImage(ImageManager.getInstance().getPieChartIcon());
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
@@ -175,6 +178,15 @@ public class ChartPie extends JFrame {
         plot.setLabelPaint(Color.WHITE);
         plot.setLabelBackgroundPaint(null);
 
+        if (this.subtitle != null) {
+            // add a subtitle giving the data source
+            TextTitle source = new TextTitle(this.subtitle,
+                    new Font("Courier New", Font.PLAIN, 12));
+            source.setPaint(Color.WHITE);
+            source.setPosition(RectangleEdge.BOTTOM);
+            source.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+            chart.addSubtitle(source);
+        }
         return chart;
 
     }

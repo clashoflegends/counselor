@@ -1493,7 +1493,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
         //create and display chart
-        ChartPie hexView = ComponentFactory.showChartPie(labels.getString(title), dataSet, this.gui);
+        Partida partida = WorldManager.getInstance().getPartida();
+        final String subtitle = String.format(labels.getString("GAME.TURN"), partida.getId(), partida.getTurno());
+        ChartPie hexView = ComponentFactory.showChartPie(labels.getString(title), dataSet, subtitle, this.gui);
     }
 
     private void doDataVictoryOverview() {

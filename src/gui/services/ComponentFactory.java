@@ -1035,7 +1035,15 @@ public class ComponentFactory implements Serializable {
     }
 
     public static ChartPie showChartPie(String title, List<DataSetForChart> dataSet, Component relativeTo) {
-        ChartPie pie = new ChartPie(title, dataSet);
+        return showChartPie(title, dataSet, null, relativeTo);
+    }
+
+    public static ChartPie showChartPie(String title, List<DataSetForChart> dataSet, String subtitle) {
+        return showChartPie(title, dataSet, subtitle, null);
+    }
+
+    public static ChartPie showChartPie(String title, List<DataSetForChart> dataSet, String subtitle, Component relativeTo) {
+        ChartPie pie = new ChartPie(title, dataSet, subtitle);
         pie.pack();
         //configura jDialog
         if (relativeTo != null) {
