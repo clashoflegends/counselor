@@ -1411,12 +1411,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         SysApoio.setClipboardContents(dataBody);
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
+        ComponentFactory.showChartBar(labels.getString(title), dataSet, getPartidaTagName(), labels.getString("NACAO") + " / " + labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), this.gui
+        );
+
+    }
+
+    private String getPartidaTagName() {
         //create and display chart
         final Partida partida = WorldManager.getInstance().getPartida();
         final String subtitle = String.format(labels.getString("GAME.TURN"), partida.getId(), partida.getTurno());
-        ComponentFactory.showChartBar(labels.getString(title), dataSet, subtitle, labels.getString("NACAO") + " / " + labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), this.gui
-        );
-
+        return subtitle;
     }
 
     private void doDataPointsPerTeam() {
@@ -1497,9 +1501,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
         //create and display chart
-        final Partida partida = WorldManager.getInstance().getPartida();
-        final String subtitle = String.format(labels.getString("GAME.TURN"), partida.getId(), partida.getTurno());
-        ComponentFactory.showChartPie(labels.getString(title), dataSet, subtitle, this.gui);
+        ComponentFactory.showChartPie(labels.getString(title), dataSet, getPartidaTagName(), this.gui);
     }
 
     private void doDataVictoryOverview() {
