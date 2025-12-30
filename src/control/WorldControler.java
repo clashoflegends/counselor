@@ -12,14 +12,18 @@ import business.facade.CidadeFacade;
 import business.facade.NacaoFacade;
 import business.facade.OrdemFacade;
 import business.facade.PersonagemFacade;
+import business.facade.PointsFacade;
+import business.services.ComparatorFactory;
 import control.facade.WorldFacadeCounselor;
 import control.services.NacaoConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
+import gui.accessories.DialogHexView;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
+import gui.services.ComponentFactory;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
@@ -60,6 +64,7 @@ import model.Ordem;
 import model.Partida;
 import model.Personagem;
 import model.PersonagemOrdem;
+import model.VictoryPointsGame;
 import model.World;
 import modelWeb.PartidaJogadorWebInfo;
 import org.apache.commons.logging.Log;
@@ -73,6 +78,7 @@ import persistenceCommons.SysApoio;
 import persistenceCommons.WebCounselorManager;
 import persistenceCommons.XmlManager;
 import persistenceLocal.PathFactory;
+import utils.CounterStringInt;
 
 /**
  *
@@ -215,6 +221,29 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 break;
             case "jbLoad":
                 doLoad(jbTemp);
+                break;
+            case "joao":
+                break;
+            case "jbScoreGraph":
+                doDataPointsPerNation();
+                break;
+            case "jbGraphSingleTurn":
+                doDataPointsPerTeam();
+                break;
+            case "jbGraphAllTurns":
+                doDataPointAllTurns();
+                break;
+            case "jbGraphKeyCityPerTeam":
+                doDataKeyCityPerTeam();
+                break;
+            case "jbGraphKeyCityPerNation":
+                doDataKeyCityPerNation();
+                break;
+            case "jbGraphVictoryOverview":
+                doDataVictoryOverview();
+                break;
+            case "jbGraphDomination":
+                doGraphDominationPerTeam();
                 break;
             default:
                 log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
@@ -1343,5 +1372,288 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     public boolean isVictoryPointsExists() {
         return !(WFC.getVictoryPoints() == null || WFC.getVictoryPoints().isEmpty());
+    }
+
+    private List<Nacao> doPrepNations(SortedMap<String, Nacao> mapNations, Set<String> teams) {
+        List<Nacao> nations = new ArrayList<>(WorldFacadeCounselor.getInstance().getNacoes().values());
+        //sort by points
+        ComparatorFactory.getComparatorNationVictoryPointsSorter(nations);
+        for (Nacao nation : nations) {
+            //collect information
+            teams.add(nation.getTeamFlag());
+            mapNations.put(nation.getNome(), nation);
+        }
+        return nations;
+    }
+
+    private void doDataPointsPerNation() {
+        final String title = "PONTOS.VITORIA.NATION";
+        final Set<String> teams = new TreeSet<>();
+        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
+        List<Nacao> nations = doPrepNations(mapNations, teams);
+        //data header
+        String dataBody = String.format("%s\t%s\t%s\n", labels.getString("PONTOS.VITORIA"), labels.getString("NACAO"), labels.getString("TEAM"));
+
+        //data body
+        for (String teamName : teams) {
+            for (Nacao nation : nations) {
+                if (!teamName.equals(nation.getTeamFlag())) {
+                    continue;
+                }
+                dataBody += String.format("%s\t%s\t%s\n", nation.getPontosVitoria(), nation.getNome(), nation.getTeamFlag());
+            }
+        }
+
+        DialogHexView hexView = null;
+        //create on first time
+        if (hexView == null) {
+            hexView = ComponentFactory.showDialogHexView(this.gui);
+        }
+        hexView.setText(dataBody);
+        hexView.setTitle(labels.getString(title));
+    }
+
+    private void doDataPointsPerTeam() {
+        final String title = "PONTOS.VITORIA.TEAM";
+        final Set<String> teams = new TreeSet<>();
+        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
+        List<Nacao> nations = doPrepNations(mapNations, teams);
+        //data header
+        String dataBody = String.format("%s\t%s\t%s\n", labels.getString("PONTOS.VITORIA"), labels.getString("NACAO"), labels.getString("TEAM"));
+
+        //data body
+        for (Nacao nation : nations) {
+            dataBody += String.format("%s\t%s\t%s\n", nation.getPontosVitoria(), nation.getNome(), nation.getTeamFlag());
+        }
+
+        DialogHexView hexView = null;
+        //create on first time
+        if (hexView == null) {
+            hexView = ComponentFactory.showDialogHexView(this.gui);
+        }
+        hexView.setText(dataBody);
+        hexView.setTitle(labels.getString(title));
+    }
+
+    private void doDataPointAllTurns() {
+        final String title = "PONTOS.VITORIA.HISTORY";
+        final List<Nacao> nationsList = new ArrayList<>(WorldFacadeCounselor.getInstance().getNacoes().values());
+        //sort by points
+        ComparatorFactory.getComparatorNationVictoryPointsSorter(nationsList);
+
+        VictoryPointsGame victoryPoints = WFC.getVictoryPoints();
+
+        //data header
+        String dataBody = String.format("%s / %s of ", labels.getString("NACAO"), labels.getString("PONTOS.VITORIA"), labels.getString("TURN"));
+        for (Integer turn : victoryPoints.getTurnList()) {
+            dataBody += String.format("\t%s", turn);
+        }
+        dataBody += "\n";
+
+        //data body
+        for (Nacao nation : nationsList) {
+            dataBody += nation.getNome();
+            SortedMap<Integer, Integer> nationPoints = victoryPoints.getNationPoints(nation);
+            for (Integer turn : victoryPoints.getTurnList()) {
+                dataBody += String.format("\t%s", nationPoints.get(turn));
+            }
+            dataBody += "\n";
+        }
+
+        DialogHexView hexView = null;
+        //create on first time
+        if (hexView == null) {
+            hexView = ComponentFactory.showDialogHexView(this.gui);
+        }
+        hexView.setText(dataBody);
+        hexView.setTitle(labels.getString(title));
+    }
+
+    private void doDataKeyCityPerTeam() {
+        final String title = "PONTOS.KEYCITY.TEAM";
+        final PointsFacade pf = new PointsFacade();
+        final CounterStringInt totalCount = pf.doVictoryDominationTeam(
+                WorldFacadeCounselor.getInstance().getLocais().values(),
+                WorldFacadeCounselor.getInstance().getNacaoNeutra());
+        final double total = totalCount.getTotal();
+
+        //data header
+        String dataBody = String.format("%s\t%s\t%s\n", labels.getString("TEAM"), labels.getString("PONTOS.KEYCITY.TEAM"), labels.getString("PERCENTAGE"));
+
+        //data body
+        for (String nmTeam : totalCount.getKeys()) {
+            final double value = totalCount.getValue(nmTeam);
+            dataBody += String.format("%.0f\t%.1f%%\t%s\n", value, (value / total * 100d), nmTeam);
+        }
+
+        DialogHexView hexView = null;
+        //create on first time
+        if (hexView == null) {
+            hexView = ComponentFactory.showDialogHexView(this.gui);
+        }
+        hexView.setText(dataBody);
+        hexView.setTitle(labels.getString(title));
+    }
+
+    private void doDataVictoryOverview() {
+        final String title = "PONTOS.VITORIA.OVERVIEW";
+        final Set<String> teams = new TreeSet<>();
+        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
+        PointsFacade pf = new PointsFacade();
+        CounterStringInt pointsCount;
+        String seriesName;
+        List<Nacao> nations = doPrepNations(mapNations, teams);
+
+        //data header
+        //run once for the titles.
+        pointsCount = pf.doVictoryScoreUsThem(WorldFacadeCounselor.getInstance().getNacoes().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
+        String dataBody = "";
+        for (String flagTeam : pointsCount.getKeys()) {
+            dataBody += String.format("%s\t", flagTeam);
+        }
+        dataBody += String.format("%s\n", labels.getString("VICTORY.CONDITION"));
+
+        seriesName = getHabilidateName(";VSK;");
+        if (seriesName != null) {
+            pointsCount = pf.doVictoryDominationUsThem(WorldFacadeCounselor.getInstance().getLocais().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
+            dataBody += doSeries(pointsCount, seriesName);
+        }
+
+        //DB.POWER.VSP=Victory goal: Score, game ends when one nation has more victory points than all opponents combined starting on %s turn. Or 3:1 for teams
+        seriesName = getHabilidateName(";VSP;");
+        if (seriesName != null) {
+            pointsCount = pf.doVictoryScoreUsThem(WorldFacadeCounselor.getInstance().getNacoes().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
+            dataBody += doSeries(pointsCount, seriesName);
+        }
+
+        //DB.POWER.VSC=Victory goal: Conquest, game ends when one nation has more burghs and metropolis than all opponents combined starting on %s turn.  Or 3:1 for teams
+        seriesName = getHabilidateName(";VSC;");
+        if (seriesName != null) {
+            pointsCount = pf.doVictoryConquestUsThem(WorldFacadeCounselor.getInstance().getCidades(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
+            dataBody += doSeries(pointsCount, seriesName);
+        }
+
+        //DB.POWER.VSS=Victory goal: Supremacy, game ends when a team has twice as many nations as the other teams starting on %s turn. Or 3:1 for teams
+        seriesName = getHabilidateName(";VSS;");
+        if (seriesName != null) {
+            pointsCount = pf.doVictorySupremacyUsThem(WorldFacadeCounselor.getInstance().getNacoes().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
+            dataBody += doSeries(pointsCount, seriesName);
+        }
+
+        //DB.POWER.VCP=Victory goal: Battle Royale, game ends when one nation has more key cities points than all opponents combined starting on %s turn.  Or 3:1 for teams
+        seriesName = getHabilidateName(";VCP;");
+        if (seriesName != null) {
+            pointsCount = pf.doDominationBattleRoyaleUsThem(WorldFacadeCounselor.getInstance().getLocais().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
+            dataBody += doSeries(pointsCount, seriesName);
+        }
+
+        DialogHexView hexView = null;
+        //create on first time
+        if (hexView == null) {
+            hexView = ComponentFactory.showDialogHexView(this.gui);
+        }
+        hexView.setText(dataBody);
+        hexView.setTitle(labels.getString(title));
+
+    }
+
+    private String doSeries(CounterStringInt pointsCount, String seriesName) {
+        String body = "";
+        for (String flagTeam : pointsCount.getKeys()) {
+            body += String.format("%.1f%%\t", pointsCount.getValuePercent(flagTeam));
+        }
+        body += String.format("%s\n", seriesName);
+        return body;
+    }
+
+    private String getHabilidateName(String cdAbility) {
+        //Partida obverrides Scenario
+        Habilidade hab1 = WorldFacadeCounselor.getInstance().getPartida().getHabilidades().get(cdAbility);
+        if (hab1 != null) {
+            return hab1.getNome();
+        }
+        Habilidade hab2 = WorldFacadeCounselor.getInstance().getCenario().getHabilidades().get(cdAbility);
+        if (hab2 != null) {
+            return hab2.getNome();
+        } else {
+            return null;
+        }
+    }
+
+    private void doGraphDominationPerTeam() {
+        PointsFacade pf = new PointsFacade();
+        final String title = "PONTOS.DOMINATION.BATTLEROYAL.TEAM";
+        final Set<String> teams = new TreeSet<>();
+        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
+        List<Nacao> nations = doPrepNations(mapNations, teams);
+        CounterStringInt pointsCount;
+
+        String dataBody = "";
+
+        pointsCount = pf.doDominationBattleRoyaleUsThem(
+                WorldFacadeCounselor.getInstance().getLocais().values(),
+                WorldFacadeCounselor.getInstance().getJogadorAtivo());
+        final double total = pointsCount.getTotal();
+
+        //data header
+        dataBody += String.format("%s\t%s\t%s\n", labels.getString("TEAM"), labels.getString("PONTOS.DOMINATION"), labels.getString("PERCENTAGE"));
+
+        //data body
+        for (String nmTeam : pointsCount.getKeys()) {
+            final double value = pointsCount.getValue(nmTeam);
+            dataBody += String.format("%s\t%.0f\t%.1f%%\n", nmTeam, value, (value / total * 100d));
+        }
+
+        dataBody += "\n\n";
+
+        pointsCount = pf.doDominationBattleRoyale(
+                WorldFacadeCounselor.getInstance().getLocais().values(),
+                WorldFacadeCounselor.getInstance().getNacaoNeutra());
+        //data header
+        dataBody += String.format("%s\t%s\t%s\t%s\n", labels.getString("PONTOS.DOMINATION"), labels.getString("PERCENTAGE"), labels.getString("NACAO"), labels.getString("TEAM"));
+
+        //data body
+        for (String nmNation : pointsCount.getKeys()) {
+            final double value = pointsCount.getValue(nmNation);
+            dataBody += String.format("%.0f\t%.1f%%\t%s\t%s\n", value, (value / total * 100d), nmNation, mapNations.get(nmNation).getTeamFlag());
+        }
+
+        DialogHexView hexView = null;
+        //create on first time
+        if (hexView == null) {
+            hexView = ComponentFactory.showDialogHexView(this.gui);
+        }
+        hexView.setText(dataBody);
+        hexView.setTitle(labels.getString(title));
+
+    }
+
+    private void doDataKeyCityPerNation() {
+        log.info("clicked GraphPopupKeyCityPerNation");
+        PointsFacade pf = new PointsFacade();
+        final String title = "PONTOS.KEYCITY.NATION";
+        final Set<String> teams = new TreeSet<>();
+        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
+        List<Nacao> nations = doPrepNations(mapNations, teams);
+
+        CounterStringInt pointsCount = pf.doVictoryDomination(
+                WorldFacadeCounselor.getInstance().getLocais().values(),
+                WorldFacadeCounselor.getInstance().getNacaoNeutra());
+
+        //data header
+        String dataBody = String.format("%s\t%s\n", labels.getString("PONTOS.KEYCITY.NATION"), labels.getString("TEAM"));
+
+        //data body
+        for (String nmNation : pointsCount.getKeys()) {
+            dataBody += String.format("%s\t%s\t%s\n", pointsCount.getValue(nmNation), nmNation, mapNations.get(nmNation).getTeamFlag());
+        }
+
+        DialogHexView hexView = null;
+        //create on first time
+        if (hexView == null) {
+            hexView = ComponentFactory.showDialogHexView(this.gui);
+        }
+        hexView.setText(dataBody);
+        hexView.setTitle(labels.getString(title));
     }
 }

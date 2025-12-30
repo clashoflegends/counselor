@@ -662,13 +662,13 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             jbSaveWorld.setVisible(false);
         }
         jbMap.setEnabled(true);
-        jbScoreGraph.setEnabled(false);
-        jbScoreGraph1.setEnabled(false);
-        jbScoreGraph2.setEnabled(false);
-        jbScoreGraph3.setEnabled(false);
-        jbScoreGraph4.setEnabled(false);
-        jbScoreGraph5.setEnabled(false);
-        jbScoreGraph6.setEnabled(false);
+        jbScoreGraph.setEnabled(true);
+        jbScoreGraph1.setEnabled(true);
+        jbScoreGraph2.setEnabled(true);
+        jbScoreGraph3.setEnabled(true);
+        jbScoreGraph4.setEnabled(true);
+        jbScoreGraph5.setEnabled(true);
+        jbScoreGraph6.setEnabled(true);
         jbHexview.setEnabled(true);
         jbCopy.setEnabled(true);
         jbEmailList.setEnabled(true);

@@ -69,7 +69,6 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
         if (SettingsManager.getInstance().isConfig("GuiShowLocationsTab", "1", "0")) {
             this.addTabBase(new TabOrdensGui("Ordens", labels.getString("ORDENS.SAVED")));
         }
-        log.fatal("MainDadosGui");
     }
 
     //** Adiciona uma Tab ao painel principal de exibição */
