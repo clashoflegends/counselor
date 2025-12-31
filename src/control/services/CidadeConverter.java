@@ -162,7 +162,7 @@ public class CidadeConverter implements Serializable {
 
         cArray[ii++] = cidadeFacade.getArrecadacaoImpostos(cidade);
         cArray[ii++] = cidadeFacade.getProducao(cidade, WorldFacadeCounselor.getInstance().getCenario().getMoney(), WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getTurno());
-        cArray[ii++] = cidadeFacade.getUpkeepMoney(cidade);
+        cArray[ii++] = cidadeFacade.getUpkeepMoney(cidade, WorldFacadeCounselor.getInstance().getCenario());
         cArray[ii++] = cidadeFacade.getLealdade(cidade);
         cArray[ii++] = cidadeFacade.getLealdadeDelta(cidade);
         cArray[ii++] = localFacade.getPersonagens(cidadeFacade.getLocal(cidade)).size();
@@ -511,7 +511,7 @@ public class CidadeConverter implements Serializable {
 //        if (!WorldFacadeCounselor.getInstance().hasOrdensCidade()) {
 //            return info;
 //        } else {
-            return ordemFacade.getResultado(cidade) + "\n\n" + info;
+        return ordemFacade.getResultado(cidade) + "\n\n" + info;
 //        }
     }
 }

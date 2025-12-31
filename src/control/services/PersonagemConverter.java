@@ -160,7 +160,7 @@ public class PersonagemConverter implements Serializable {
         cArray[ii++] = personagem.getDuelo();
         cArray[ii++] = personagem.getVida();
         cArray[ii++] = personagemFacade.getNacaoNome(personagem);
-        cArray[ii++] = personagemFacade.getUpkeepMoney(personagem);
+        cArray[ii++] = personagemFacade.getUpkeepMoney(personagem, WorldFacadeCounselor.getInstance().getCenario());
         cArray[ii++] = personagemFacade.getArtefatos(personagem).size();
         cArray[ii++] = localFacade.getClima(local);
         cArray[ii++] = localFacade.getTerrenoNome(local);
