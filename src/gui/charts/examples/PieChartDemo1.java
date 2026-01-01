@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package gui.charts;
+package gui.charts.examples;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

@@ -48,8 +48,6 @@ public class ChartPie extends JFrame {
         configUi(title);
         this.dataSet = dataSet;
         this.subtitle = subtitle;
-        GroupLayout parLayout = (GroupLayout) jpQuadro.getLayout();
-        parLayout.replace(jPanel1, createPanel());
     }
 
     /**
@@ -211,12 +209,17 @@ public class ChartPie extends JFrame {
      *
      * @return A panel.
      */
-    final public JPanel createPanel() {
+    private JPanel createPanel() {
         JFreeChart chart = createChart(createDataset());
         chart.setPadding(new RectangleInsets(4, 8, 2, 2));
         ChartPanel panel = new ChartPanel(chart, false);
         panel.setMouseWheelEnabled(true);
         panel.setPreferredSize(new Dimension(600, 300));
         return panel;
+    }
+
+    public void doStart() {
+        GroupLayout parLayout = (GroupLayout) jpQuadro.getLayout();
+        parLayout.replace(jPanel1, createPanel());
     }
 }

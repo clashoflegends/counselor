@@ -25,6 +25,7 @@ import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
 import gui.charts.DataSetForChart;
 import gui.services.ComponentFactory;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
@@ -226,16 +227,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             case "joao":
                 break;
             case "jbScoreGraph":
-                doDataPointsPerNation();
+                doDataVictoryPointsPerNation();
                 break;
             case "jbGraphSingleTurn":
-                doDataPointsPerTeam();
+                //disabled: doDataVictoryPointsPerTeam();
                 break;
             case "jbGraphAllTurns":
-                doDataPointAllTurns();
+                doDataVictoryPointHistoryAllTurns();
                 break;
             case "jbGraphKeyCityPerTeam":
-                doDataKeyCityPerTeam();
+                //disable Consolidated: doDataKeyCityPerTeam();
                 break;
             case "jbGraphKeyCityPerNation":
                 doDataKeyCityPerNation();
@@ -244,7 +245,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doDataVictoryOverview();
                 break;
             case "jbGraphDomination":
-                doGraphDominationPerTeam();
+                doGraphBattleRoyale();
                 break;
             default:
                 log.info(labels.getString("NOT.IMPLEMENTED") + jbTemp.getActionCommand());
@@ -1351,7 +1352,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         SettingsManager.getInstance().setConfig("ShowCharacterPortraits", String.valueOf(selected));
         SettingsManager.getInstance().doConfigSave("ShowCharacterPortraits");
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(selected));
-
     }
 
     @Override
@@ -1365,9 +1365,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
             if (progress == 100) {
                 //      settingsGui.checkDisplayPortraitCheckBox();
-
             }
-
         }
     }
 
@@ -1375,20 +1373,23 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return !(WFC.getVictoryPoints() == null || WFC.getVictoryPoints().isEmpty());
     }
 
+    public boolean isBattleRoyal() {
+        return WFC.isBattleRoyal();
+    }
+
     private void doDataKeyCityPerTeam() {
-        final String title = "PONTOS.KEYCITY.TEAM";
+        List<DataSetForChart> dataSet = new ArrayList<>();
         final PointsFacade pf = new PointsFacade();
-        final CounterStringInt totalCount = pf.doVictoryDominationTeam(
+        final CounterStringInt cityCount = pf.doVictoryDominationTeam(
                 WorldFacadeCounselor.getInstance().getLocais().values(),
                 WorldFacadeCounselor.getInstance().getNacaoNeutra());
-        final double total = totalCount.getTotal();
-        List<DataSetForChart> dataSet = new ArrayList<>();
+        final double total = cityCount.getTotal();
         //data header
         String dataBody = String.format("%s\t%s\t%s\n", labels.getString("TEAM"), labels.getString("PONTOS.KEYCITY.TEAM"), labels.getString("PERCENTAGE"));
 
         //data body
-        for (String nmTeam : totalCount.getKeys()) {
-            final double value = totalCount.getValue(nmTeam);
+        for (String nmTeam : cityCount.getKeys()) {
+            final double value = cityCount.getValue(nmTeam);
             dataBody += String.format("%.0f\t%.1f%%\t%s\n", value, (value / total * 100d), nmTeam);
             dataSet.add(new DataSetForChart(nmTeam, value, "", SysApoio.getColorFromName(nmTeam)));
         }
@@ -1397,15 +1398,112 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
         //create and display chart
-        ComponentFactory.showChartPie(labels.getString(title), dataSet, getPartidaTagName(), this.gui);
+        ComponentFactory.showChartPie(labels.getString("PONTOS.KEYCITY.TEAM"), dataSet, getPartidaTagName(), this.gui);
+        ComponentFactory.showChartBar(labels.getString("PONTOS.KEYCITY.TEAM"), dataSet, getPartidaTagName(), labels.getString("TEAM"), labels.getString("PONTOS.KEYCITY"), this.gui);
     }
 
-    private void doDataPointsPerNation() {
-        final String title = "PONTOS.VITORIA.NATION";
+    private void doDataKeyCityPerNation() {
+        List<DataSetForChart> dataSet = new ArrayList<>();
+        final PointsFacade pf = new PointsFacade();
         final Set<String> teams = new TreeSet<>();
         final SortedMap<String, Nacao> mapNations = new TreeMap<>();
         List<Nacao> nations = doPrepNations(mapNations, teams);
+        final CounterStringInt pointsCount = pf.doVictoryDomination(
+                WorldFacadeCounselor.getInstance().getLocais().values(),
+                WorldFacadeCounselor.getInstance().getNacaoNeutra());
+
+        //data header
+        String dataBody = String.format("%s\t%s\n", labels.getString("PONTOS.KEYCITY.NATION"), labels.getString("TEAM"));
+
+        //data body
+        for (String teamName : teams) {
+            for (Nacao nation : nations) {
+                if (!teamName.equals(nation.getTeamFlag())) {
+                    continue;
+                }
+                final String nmNation = nation.getNome();
+                dataBody += String.format("%s\t%s\t%s\n", pointsCount.getValue(nmNation), nmNation, mapNations.get(nmNation).getTeamFlag());
+                dataSet.add(new DataSetForChart(nation.getNome(), pointsCount.getValue(nmNation), nation.getTeamFlag(), nation.getFillColor()));
+            }
+        }
+
+        //copy para o clipboard
+        SysApoio.setClipboardContents(dataBody);
+        this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
+
+        //create and display chart
+        ComponentFactory.showChartPie(labels.getString("PONTOS.KEYCITY.NATION"), dataSet, getPartidaTagName(), this.gui);
+        ComponentFactory.showChartBar(labels.getString("PONTOS.KEYCITY.NATION"), dataSet, getPartidaTagName(), labels.getString("TEAM"), labels.getString("PONTOS.KEYCITY"), this.gui);
+        ComponentFactory.showChartStackedBar(labels.getString("PONTOS.KEYCITY.TEAM"), dataSet, getPartidaTagName(), labels.getString("TEAM"), labels.getString("PONTOS.KEYCITY"), this.gui);
+        doDataKeyCityPerTeam();
+    }
+
+    private void doGraphBattleRoyale() {
         List<DataSetForChart> dataSet = new ArrayList<>();
+        final PointsFacade pf = new PointsFacade();
+        final Set<String> teams = new TreeSet<>();
+        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
+        List<Nacao> nations = doPrepNations(mapNations, teams);
+        final CounterStringInt pointsCount = pf.doDominationBattleRoyale(
+                WorldFacadeCounselor.getInstance().getLocais().values(),
+                WorldFacadeCounselor.getInstance().getNacaoNeutra());
+
+        //data header
+        String dataBody = String.format("%s\t%s\t%s\t%s\n", labels.getString("PONTOS.BATTLEROYAL"), labels.getString("PERCENTAGE"), labels.getString("NACAO"), labels.getString("TEAM"));
+
+        //data body
+        for (String teamName : teams) {
+            for (Nacao nation : nations) {
+                if (!teamName.equals(nation.getTeamFlag())) {
+                    continue;
+                }
+                final String nmNation = nation.getNome();
+                dataBody += String.format("%s\t%s\t%s\n", pointsCount.getValue(nmNation), nmNation, mapNations.get(nmNation).getTeamFlag());
+                dataSet.add(new DataSetForChart(nation.getNome(), pointsCount.getValue(nmNation), nation.getTeamFlag(), nation.getFillColor()));
+            }
+        }
+
+        //copy para o clipboard
+        SysApoio.setClipboardContents(dataBody);
+        this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
+
+        //create and display chart
+        ComponentFactory.showChartPie(labels.getString("PONTOS.BATTLEROYAL.TEAM"), dataSet, getPartidaTagName(), this.gui);
+        ComponentFactory.showChartBar(labels.getString("PONTOS.BATTLEROYAL.NATION"), dataSet, getPartidaTagName(), labels.getString("TEAM"), labels.getString("PONTOS.BATTLEROYAL"), this.gui);
+        ComponentFactory.showChartStackedBar(labels.getString("PONTOS.BATTLEROYAL.TEAM"), dataSet, getPartidaTagName(), labels.getString("TEAM"), labels.getString("PONTOS.BATTLEROYAL"), this.gui);
+        doGraphBattleRoyalePerTeam();
+    }
+
+    private void doGraphBattleRoyalePerTeam() {
+        List<DataSetForChart> dataSet = new ArrayList<>();
+        final PointsFacade pf = new PointsFacade();
+        CounterStringInt pointsCount = pf.doDominationBattleRoyaleUsThem(
+                WorldFacadeCounselor.getInstance().getLocais().values(),
+                WorldFacadeCounselor.getInstance().getJogadorAtivo());
+        final double total = pointsCount.getTotal();
+        //data header
+        String dataBody = String.format("%s\t%s\t%s\n", labels.getString("TEAM"), labels.getString("PONTOS.KEYCITY.TEAM"), labels.getString("PERCENTAGE"));
+
+        //data body
+        for (String nmTeam : pointsCount.getKeys()) {
+            final double value = pointsCount.getValue(nmTeam);
+            dataBody += String.format("%.0f\t%.1f%%\t%s\n", value, (value / total * 100d), nmTeam);
+            dataSet.add(new DataSetForChart(nmTeam, value, "", getColorForTeam(nmTeam)));
+        }
+        //copy para o clipboard
+        SysApoio.setClipboardContents(dataBody);
+        this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
+
+        //create and display chart
+        ComponentFactory.showChartPie(labels.getString("PONTOS.BATTLEROYAL.TEAM"), dataSet, getPartidaTagName(), this.gui);
+    }
+
+    private void doDataVictoryPointsPerNation() {
+        List<DataSetForChart> dataSet = new ArrayList<>();
+        final Set<String> teams = new TreeSet<>();
+        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
+        List<Nacao> nations = doPrepNations(mapNations, teams);
+
         //data header
         String dataBody = String.format("%s\t%s\t%s\n", labels.getString("PONTOS.VITORIA"), labels.getString("NACAO"), labels.getString("TEAM"));
 
@@ -1423,45 +1521,21 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         //copy para o clipboard
         SysApoio.setClipboardContents(dataBody);
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
+        ComponentFactory.showChartPie(labels.getString("PONTOS.VITORIA.NATION"), dataSet, getPartidaTagName(), this.gui);
 
-        ComponentFactory.showChartBar(labels.getString(title), dataSet, getPartidaTagName(), labels.getString("NACAO") + " / " + labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), this.gui);
-
-    }
-
-    private String getPartidaTagName() {
-        //create and display chart
-        final Partida partida = WorldManager.getInstance().getPartida();
-        final String subtitle = String.format(labels.getString("GAME.TURN"), partida.getId(), partida.getTurno());
-        return subtitle;
-    }
-
-    private void doDataPointsPerTeam() {
-        final String title = "PONTOS.VITORIA.TEAM";
-        final Set<String> teams = new TreeSet<>();
-        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
-        List<Nacao> nations = doPrepNations(mapNations, teams);
-        //data header
-        String dataBody = String.format("%s\t%s\t%s\n", labels.getString("PONTOS.VITORIA"), labels.getString("NACAO"), labels.getString("TEAM"));
-
-        //data body
-        for (Nacao nation : nations) {
-            dataBody += String.format("%s\t%s\t%s\n", nation.getPontosVitoria(), nation.getNome(), nation.getTeamFlag());
-        }
-
-        DialogHexView hexView = null;
-        //create on first time
-        if (hexView == null) {
-            hexView = ComponentFactory.showDialogHexView(this.gui);
-        }
-        hexView.setText(dataBody);
-        hexView.setTitle(labels.getString(title));
+        ComponentFactory.showChartBar(labels.getString("PONTOS.VITORIA.NATION"), dataSet, getPartidaTagName(), labels.getString("NACAO") + " / " + labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), this.gui);
+        //ComponentFactory.showChartBar(labels.getString("PONTOS.VITORIA.NATION"), dataSet, getPartidaTagName(), labels.getString("NACAO") + " / " + labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), false, this.gui);
+        //ComponentFactory.showChartStackedBar(labels.getString("PONTOS.VITORIA.TEAM"), dataSet, getPartidaTagName(), labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), true, this.gui);
+        ComponentFactory.showChartStackedBar(labels.getString("PONTOS.VITORIA.TEAM"), dataSet, getPartidaTagName(), labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), this.gui);
     }
 
     private void doDataVictoryOverview() {
+        List<DataSetForChart> dataSet = new ArrayList<>();
+        final PointsFacade pf = new PointsFacade();
+
         final String title = "PONTOS.VITORIA.OVERVIEW";
         final Set<String> teams = new TreeSet<>();
         final SortedMap<String, Nacao> mapNations = new TreeMap<>();
-        PointsFacade pf = new PointsFacade();
         CounterStringInt pointsCount;
         String seriesName;
         List<Nacao> nations = doPrepNations(mapNations, teams);
@@ -1475,57 +1549,132 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
         dataBody += String.format("%s\n", labels.getString("VICTORY.CONDITION"));
 
+        //data body
         seriesName = getHabilidateName(";VSK;");
         if (seriesName != null) {
             pointsCount = pf.doVictoryDominationUsThem(WorldFacadeCounselor.getInstance().getLocais().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-            dataBody += doSeries(pointsCount, seriesName);
+            dataBody += doSeries(pointsCount, seriesName, dataSet);
         }
 
         //DB.POWER.VSP=Victory goal: Score, game ends when one nation has more victory points than all opponents combined starting on %s turn. Or 3:1 for teams
         seriesName = getHabilidateName(";VSP;");
         if (seriesName != null) {
             pointsCount = pf.doVictoryScoreUsThem(WorldFacadeCounselor.getInstance().getNacoes().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-            dataBody += doSeries(pointsCount, seriesName);
+            dataBody += doSeries(pointsCount, seriesName, dataSet);
         }
 
         //DB.POWER.VSC=Victory goal: Conquest, game ends when one nation has more burghs and metropolis than all opponents combined starting on %s turn.  Or 3:1 for teams
         seriesName = getHabilidateName(";VSC;");
         if (seriesName != null) {
             pointsCount = pf.doVictoryConquestUsThem(WorldFacadeCounselor.getInstance().getCidades(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-            dataBody += doSeries(pointsCount, seriesName);
+            dataBody += doSeries(pointsCount, seriesName, dataSet);
         }
 
         //DB.POWER.VSS=Victory goal: Supremacy, game ends when a team has twice as many nations as the other teams starting on %s turn. Or 3:1 for teams
         seriesName = getHabilidateName(";VSS;");
         if (seriesName != null) {
             pointsCount = pf.doVictorySupremacyUsThem(WorldFacadeCounselor.getInstance().getNacoes().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-            dataBody += doSeries(pointsCount, seriesName);
+            dataBody += doSeries(pointsCount, seriesName, dataSet);
         }
 
         //DB.POWER.VCP=Victory goal: Battle Royale, game ends when one nation has more key cities points than all opponents combined starting on %s turn.  Or 3:1 for teams
         seriesName = getHabilidateName(";VCP;");
         if (seriesName != null) {
             pointsCount = pf.doDominationBattleRoyaleUsThem(WorldFacadeCounselor.getInstance().getLocais().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-            dataBody += doSeries(pointsCount, seriesName);
+            dataBody += doSeries(pointsCount, seriesName, dataSet);
         }
 
-        DialogHexView hexView = null;
-        //create on first time
-        if (hexView == null) {
-            hexView = ComponentFactory.showDialogHexView(this.gui);
-        }
-        hexView.setText(dataBody);
-        hexView.setTitle(labels.getString(title));
+        //copy para o clipboard
+        SysApoio.setClipboardContents(dataBody);
+        this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
+        //create and display chart
+        ComponentFactory.showChartBar(labels.getString("PONTOS.VITORIA.OVERVIEW"), dataSet, getPartidaTagName(), labels.getString("NACAO") + " / " + labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), this.gui);
+        ComponentFactory.showChartStackedBar(labels.getString("PONTOS.VITORIA.OVERVIEW"), dataSet, getPartidaTagName(), labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), this.gui);
+        for (DataSetForChart item : dataSet) {
+            if (!item.getKey().equalsIgnoreCase("US")) {
+                continue;
+            }
+            ComponentFactory.showChartGauge(labels.getString("PONTOS.VITORIA.OVERVIEW"), item, this.gui);
+        }
     }
 
-    private String doSeries(CounterStringInt pointsCount, String seriesName) {
+    private String doSeries(CounterStringInt pointsCount, String seriesName, List<DataSetForChart> dataSet) {
         String body = "";
         for (String flagTeam : pointsCount.getKeys()) {
             body += String.format("%.1f%%\t", pointsCount.getValuePercent(flagTeam));
+            final double value = pointsCount.getValuePercent(flagTeam);
+            dataSet.add(new DataSetForChart(flagTeam, value, seriesName, getColorForTeam(flagTeam)));
         }
         body += String.format("%s\n", seriesName);
         return body;
+    }
+
+    private void doDataVictoryPointHistoryAllTurns() {
+        List<DataSetForChart> dataSet = new ArrayList<>();
+        final Set<String> teams = new TreeSet<>();
+        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
+        List<Nacao> nations = doPrepNations(mapNations, teams);
+//        final List<Nacao> nationsList = new ArrayList<>(WorldFacadeCounselor.getInstance().getNacoes().values());
+//        //sort by points
+//        ComparatorFactory.getComparatorNationVictoryPointsSorter(nationsList);
+        final VictoryPointsGame victoryPoints = WFC.getVictoryPoints();
+
+        //data header with cariable columns as a functions of how many turns so far
+        String dataBody = String.format("%s / %s of ", labels.getString("NACAO"), labels.getString("PONTOS.VITORIA"), labels.getString("TURN"));
+        for (Integer turn : victoryPoints.getTurnList()) {
+            dataBody += String.format("\t%s", turn);
+        }
+        dataBody += "\n";
+
+        //data body
+//        for (Nacao nation : nationsList) {
+//            dataBody += nation.getNome();
+//            SortedMap<Integer, Integer> nationPoints = victoryPoints.getNationPoints(nation);
+//            for (Integer turn : victoryPoints.getTurnList()) {
+//                dataBody += String.format("\t%s", nationPoints.get(turn));
+//            }
+//            dataBody += "\n";
+//        }
+        for (String teamName : teams) {
+            for (Nacao nation : nations) {
+                if (!teamName.equals(nation.getTeamFlag())) {
+                    continue;
+                }
+                dataBody += nation.getNome();
+                SortedMap<Integer, Integer> nationPoints = victoryPoints.getNationPoints(nation);
+                for (Integer turn : victoryPoints.getTurnList()) {
+                    dataBody += String.format("\t%s", nationPoints.get(turn));
+                    dataSet.add(new DataSetForChart(nation.getNome(), nationPoints.get(turn), String.format("T %s", turn), nation.getFillColor()));
+                }
+                dataBody += "\n";
+            }
+        }
+
+        //copy para o clipboard
+        SysApoio.setClipboardContents(dataBody);
+        this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
+
+        ComponentFactory.showChartLine(labels.getString("PONTOS.VITORIA.HISTORY"), dataSet, getPartidaTagName(), labels.getString("TURNO"), labels.getString("PONTOS.VITORIA"), true, this.gui);
+    }
+
+    private List<Nacao> doPrepNations(SortedMap<String, Nacao> mapNations, Set<String> teams) {
+        List<Nacao> nations = new ArrayList<>(WorldFacadeCounselor.getInstance().getNacoes().values());
+        //sort by points
+        ComparatorFactory.getComparatorNationVictoryPointsSorter(nations);
+        for (Nacao nation : nations) {
+            //collect information
+            teams.add(nation.getTeamFlag());
+            mapNations.put(nation.getNome(), nation);
+        }
+        return nations;
+    }
+
+    private String getPartidaTagName() {
+        //create and display chart
+        final Partida partida = WorldManager.getInstance().getPartida();
+        final String subtitle = String.format(labels.getString("GAME.TURN"), partida.getId(), partida.getTurno());
+        return subtitle;
     }
 
     private String getHabilidateName(String cdAbility) {
@@ -1542,126 +1691,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private void doGraphDominationPerTeam() {
-        PointsFacade pf = new PointsFacade();
-        final String title = "PONTOS.DOMINATION.BATTLEROYAL.TEAM";
-        final Set<String> teams = new TreeSet<>();
-        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
-        List<Nacao> nations = doPrepNations(mapNations, teams);
-        CounterStringInt pointsCount;
-
-        String dataBody = "";
-
-        pointsCount = pf.doDominationBattleRoyaleUsThem(
-                WorldFacadeCounselor.getInstance().getLocais().values(),
-                WorldFacadeCounselor.getInstance().getJogadorAtivo());
-        final double total = pointsCount.getTotal();
-
-        //data header
-        dataBody += String.format("%s\t%s\t%s\n", labels.getString("TEAM"), labels.getString("PONTOS.DOMINATION"), labels.getString("PERCENTAGE"));
-
-        //data body
-        for (String nmTeam : pointsCount.getKeys()) {
-            final double value = pointsCount.getValue(nmTeam);
-            dataBody += String.format("%s\t%.0f\t%.1f%%\n", nmTeam, value, (value / total * 100d));
-        }
-
-        dataBody += "\n\n";
-
-        pointsCount = pf.doDominationBattleRoyale(
-                WorldFacadeCounselor.getInstance().getLocais().values(),
-                WorldFacadeCounselor.getInstance().getNacaoNeutra());
-        //data header
-        dataBody += String.format("%s\t%s\t%s\t%s\n", labels.getString("PONTOS.DOMINATION"), labels.getString("PERCENTAGE"), labels.getString("NACAO"), labels.getString("TEAM"));
-
-        //data body
-        for (String nmNation : pointsCount.getKeys()) {
-            final double value = pointsCount.getValue(nmNation);
-            dataBody += String.format("%.0f\t%.1f%%\t%s\t%s\n", value, (value / total * 100d), nmNation, mapNations.get(nmNation).getTeamFlag());
-        }
-
-        DialogHexView hexView = null;
-        //create on first time
-        if (hexView == null) {
-            hexView = ComponentFactory.showDialogHexView(this.gui);
-        }
-        hexView.setText(dataBody);
-        hexView.setTitle(labels.getString(title));
-
-    }
-
-    private void doDataKeyCityPerNation() {
-        log.info("clicked GraphPopupKeyCityPerNation");
-        PointsFacade pf = new PointsFacade();
-        final String title = "PONTOS.KEYCITY.NATION";
-        final Set<String> teams = new TreeSet<>();
-        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
-        List<Nacao> nations = doPrepNations(mapNations, teams);
-
-        CounterStringInt pointsCount = pf.doVictoryDomination(
-                WorldFacadeCounselor.getInstance().getLocais().values(),
-                WorldFacadeCounselor.getInstance().getNacaoNeutra());
-
-        //data header
-        String dataBody = String.format("%s\t%s\n", labels.getString("PONTOS.KEYCITY.NATION"), labels.getString("TEAM"));
-
-        //data body
-        for (String nmNation : pointsCount.getKeys()) {
-            dataBody += String.format("%s\t%s\t%s\n", pointsCount.getValue(nmNation), nmNation, mapNations.get(nmNation).getTeamFlag());
-        }
-
-        DialogHexView hexView = null;
-        //create on first time
-        if (hexView == null) {
-            hexView = ComponentFactory.showDialogHexView(this.gui);
-        }
-        hexView.setText(dataBody);
-        hexView.setTitle(labels.getString(title));
-    }
-
-    private void doDataPointAllTurns() {
-        final String title = "PONTOS.VITORIA.HISTORY";
-        final List<Nacao> nationsList = new ArrayList<>(WorldFacadeCounselor.getInstance().getNacoes().values());
-        //sort by points
-        ComparatorFactory.getComparatorNationVictoryPointsSorter(nationsList);
-
-        VictoryPointsGame victoryPoints = WFC.getVictoryPoints();
-
-        //data header
-        String dataBody = String.format("%s / %s of ", labels.getString("NACAO"), labels.getString("PONTOS.VITORIA"), labels.getString("TURN"));
-        for (Integer turn : victoryPoints.getTurnList()) {
-            dataBody += String.format("\t%s", turn);
-        }
-        dataBody += "\n";
-
-        //data body
-        for (Nacao nation : nationsList) {
-            dataBody += nation.getNome();
-            SortedMap<Integer, Integer> nationPoints = victoryPoints.getNationPoints(nation);
-            for (Integer turn : victoryPoints.getTurnList()) {
-                dataBody += String.format("\t%s", nationPoints.get(turn));
+    private Color getColorForTeam(String nmTeam) {
+        Color colorTeam;
+        colorTeam = SysApoio.getColorFromNameNoDefault(nmTeam);
+        if (colorTeam == null && nmTeam.equalsIgnoreCase("Us")) {
+            try {
+                colorTeam = SysApoio.getColorFromName(WorldFacadeCounselor.getInstance().getNacoesJogadorAtivo().get(0).getTeamFlag());
+            } catch (NullPointerException e) {
+                //Player has no active nations? Eliminated this turn? Just carry on.
             }
-            dataBody += "\n";
         }
-
-        DialogHexView hexView = null;
-        //create on first time
-        if (hexView == null) {
-            hexView = ComponentFactory.showDialogHexView(this.gui);
-        }
-        hexView.setText(dataBody);
-        hexView.setTitle(labels.getString(title));
+        return colorTeam;
     }
-    private List<Nacao> doPrepNations(SortedMap<String, Nacao> mapNations, Set<String> teams) {
-        List<Nacao> nations = new ArrayList<>(WorldFacadeCounselor.getInstance().getNacoes().values());
-        //sort by points
-        ComparatorFactory.getComparatorNationVictoryPointsSorter(nations);
-        for (Nacao nation : nations) {
-            //collect information
-            teams.add(nation.getTeamFlag());
-            mapNations.put(nation.getNome(), nation);
-        }
-        return nations;
-    }
-
 }

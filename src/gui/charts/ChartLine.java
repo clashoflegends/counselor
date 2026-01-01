@@ -5,9 +5,12 @@
 package gui.charts;
 
 import business.ImageManager;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.RadialGradientPaint;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.List;
 import javax.swing.GroupLayout;
@@ -17,13 +20,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.title.TextTitle;
+import org.jfree.chart.ui.HorizontalAlignment;
+import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
@@ -31,18 +36,17 @@ import org.jfree.data.category.DefaultCategoryDataset;
  *
  * @author jmoura
  */
-public class ChartBar extends JFrame {
-
-    private static final Log log = LogFactory.getLog(ChartBar.class);
+public class ChartLine extends JFrame {
+    
+    private static final Log log = LogFactory.getLog(ChartLine.class);
     private final List<DataSetForChart> dataSet;
     private String subtitle = null;
     private String xLabel;
     private String yLabel;
     private PlotOrientation orientation = PlotOrientation.VERTICAL;
     private boolean legendDisplay = true;
-    private boolean stackedBar = false;
-
-    public ChartBar(String title, List<DataSetForChart> dataSet, String subtitle) {
+    
+    public ChartLine(String title, List<DataSetForChart> dataSet, String subtitle) {
         initComponents();
         configUi(title);
         this.dataSet = dataSet;
@@ -131,9 +135,19 @@ public class ChartBar extends JFrame {
     private CategoryDataset createDataset() {
         DefaultCategoryDataset chartDataset = new DefaultCategoryDataset();
         for (DataSetForChart item : dataSet) {
+            //value; series; x-axis (i.e. turns)
             chartDataset.addValue(item.getValue(), item.getKey(), item.getGrouping());
         }
         return chartDataset;
+        /*
+        dataset.addValue(212, "Classes", "JDK 1.0");
+        dataset.addValue(504, "Classes", "JDK 1.1");
+        dataset.addValue(1520, "Classes", "JDK 1.2");
+        dataset.addValue(1842, "Classes", "JDK 1.3");
+        dataset.addValue(2991, "Classes", "JDK 1.4");
+        dataset.addValue(3500, "Classes", "JDK 1.5");
+
+         */
     }
 
     /**
@@ -144,48 +158,47 @@ public class ChartBar extends JFrame {
      * @return The chart.
      */
     private JFreeChart createChart(CategoryDataset dataset) {
-        JFreeChart chart;
-        if (!this.isStackedBar()) {
-            chart = ChartFactory.createBarChart(
-                    getTitle(),
-                    this.getxLabel(), this.getyLabel(),
-                    dataset,
-                    this.getOrientation(),// Plot orientation 
-                    this.isLegendDisplay(), // include legend
-                    true, // include tooltips
-                    false // include URLs
-            );
-        } else {
-            chart = ChartFactory.createStackedBarChart(
-                    getTitle(),
-                    this.getxLabel(), this.getyLabel(),
-                    dataset,
-                    this.getOrientation(),// Plot orientation 
-                    this.isLegendDisplay(), // include legend
-                    true, // include tooltips
-                    false // include URLs
-            );
-        }
+        JFreeChart chart = ChartFactory.createLineChart(
+                getTitle(),
+                this.getxLabel(), this.getyLabel(),
+                dataset,
+                this.getOrientation(),// Plot orientation 
+                this.isLegendDisplay(), // include legend
+                true, // include tooltips
+                false // include URLs
+        );
         if (subtitle != null) {
-            chart.addSubtitle(new TextTitle(this.subtitle));
+            TextTitle source = new TextTitle(this.subtitle);
+            source.setFont(new Font("SansSerif", Font.PLAIN, 10));
+            source.setPosition(RectangleEdge.BOTTOM);
+            source.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+            chart.addSubtitle(source);
         }
         chart.setBackgroundPaint(Color.WHITE);
         CategoryPlot plot = (CategoryPlot) chart.getPlot();
-
+        plot.setRangePannable(true);
+        plot.setRangeGridlinesVisible(false);
+        // customise the range axis...
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-        BarRenderer renderer = (BarRenderer) plot.getRenderer();
-        // use gradients and white borders for the section colours
-        int nn = 0;
-        for (DataSetForChart ds : dataSet) {
-            renderer.setSeriesPaint(nn++,
-                    createGradientPaint(new Color(200, 200, 255), ds.getColor()));
+        
+        ChartUtils.applyCurrentTheme(chart);
 
-        }
-        renderer.setDrawBarOutline(false);
-        if (this.isLegendDisplay()) {
-            chart.getLegend().setFrame(BlockBorder.NONE);
-        }
+        // customise the renderer...
+        LineAndShapeRenderer renderer = (LineAndShapeRenderer) plot.getRenderer();
+//        // use gradients and white borders for the section colours
+//        int nn = 0;
+//        for (DataSetForChart ds : dataSet) {
+//            renderer.setSeriesPaint(nn++,
+//                    createGradientPaint(new Color(200, 200, 255), ds.getColor()));
+//        }
+        renderer.setDefaultLinesVisible(true);
+        renderer.setDrawOutlines(true);
+        renderer.setUseFillPaint(true);
+        renderer.setDefaultFillPaint(Color.white);
+        renderer.setSeriesStroke(0, new BasicStroke(1.0f));
+        renderer.setSeriesOutlineStroke(0, new BasicStroke(5.0f));
+        renderer.setSeriesShape(0, new Ellipse2D.Double(-5.0, -5.0, 10.0, 10.0));
         return chart;
     }
 
@@ -253,7 +266,7 @@ public class ChartBar extends JFrame {
     public void setOrientation(PlotOrientation orientation) {
         this.orientation = orientation;
     }
-
+    
     public void setOrientation(boolean vertical) {
         if (vertical) {
             this.orientation = PlotOrientation.VERTICAL;
@@ -274,19 +287,5 @@ public class ChartBar extends JFrame {
      */
     public void setLegendDisplay(boolean legendDisplay) {
         this.legendDisplay = legendDisplay;
-    }
-
-    /**
-     * @return the stackedBar
-     */
-    public boolean isStackedBar() {
-        return stackedBar;
-    }
-
-    /**
-     * @param stackedBar the stackedBar to set
-     */
-    public void setStackedBar(boolean stackedBar) {
-        this.stackedBar = stackedBar;
     }
 }

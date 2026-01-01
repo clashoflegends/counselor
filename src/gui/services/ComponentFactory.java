@@ -12,6 +12,8 @@ import control.OrdemControler;
 import control.support.ActorInterface;
 import gui.accessories.DialogHexView;
 import gui.charts.ChartBar;
+import gui.charts.ChartGauge;
+import gui.charts.ChartLine;
 import gui.charts.ChartPie;
 import gui.charts.DataSetForChart;
 import gui.components.DialogTextArea;
@@ -1035,16 +1037,9 @@ public class ComponentFactory implements Serializable {
         return hexViewDialog;
     }
 
-    public static ChartPie showChartPie(String title, List<DataSetForChart> dataSet, Component relativeTo) {
-        return showChartPie(title, dataSet, null, relativeTo);
-    }
-
-    public static ChartPie showChartPie(String title, List<DataSetForChart> dataSet, String subtitle) {
-        return showChartPie(title, dataSet, subtitle, null);
-    }
-
     public static ChartPie showChartPie(String title, List<DataSetForChart> dataSet, String subtitle, Component relativeTo) {
         ChartPie chart = new ChartPie(title, dataSet, subtitle);
+        chart.doStart();
         chart.pack();
         //configura jDialog
         if (relativeTo != null) {
@@ -1056,16 +1051,52 @@ public class ComponentFactory implements Serializable {
         return chart;
     }
 
-    public static ChartBar showChartBar(String title, List<DataSetForChart> dataSet, String xLabel, String yLabel, Component relativeTo) {
-        return showChartBar(title, dataSet, null, xLabel, yLabel, relativeTo);
-    }
-
-    public static ChartBar showChartBar(String title, List<DataSetForChart> dataSet, String subtitle, String xLabel, String yLabel) {
-        return showChartBar(title, dataSet, subtitle, xLabel, yLabel, null);
+    public static ChartGauge showChartGauge(String title, DataSetForChart dataItem, Component relativeTo) {
+        ChartGauge chart = new ChartGauge(title, dataItem.getGrouping(), dataItem.getValue());
+        chart.doStart();
+        chart.pack();
+        //configura jDialog
+        if (relativeTo != null) {
+            chart.setLocationRelativeTo(relativeTo);
+        } else {
+            UIUtils.centerFrameOnScreen(chart);
+        }
+        chart.setVisible(true);
+        return chart;
     }
 
     public static ChartBar showChartBar(String title, List<DataSetForChart> dataSet, String subtitle, String xLabel, String yLabel, Component relativeTo) {
-        ChartBar chart = new ChartBar(title, dataSet, subtitle, xLabel, yLabel);
+        return showChartBarFinal(title, dataSet, subtitle, xLabel, yLabel, true, false, relativeTo);
+    }
+
+    public static ChartBar showChartStackedBar(String title, List<DataSetForChart> dataSet, String subtitle, String xLabel, String yLabel, Component relativeTo) {
+        return showChartBarFinal(title, dataSet, subtitle, xLabel, yLabel, false, true, relativeTo);
+    }
+
+    private static ChartBar showChartBarFinal(String title, List<DataSetForChart> dataSet, String subtitle, String xLabel, String yLabel, boolean vertical, boolean stackedBar, Component relativeTo) {
+        ChartBar chart = new ChartBar(title, dataSet, subtitle);
+        chart.setyLabel(yLabel);
+        chart.setxLabel(xLabel);
+        chart.setOrientation(vertical);
+        chart.setStackedBar(stackedBar);
+        chart.doStart();
+        chart.pack();
+        //configura jDialog
+        if (relativeTo != null) {
+            chart.setLocationRelativeTo(relativeTo);
+        } else {
+            UIUtils.centerFrameOnScreen(chart);
+        }
+        chart.setVisible(true);
+        return chart;
+    }
+
+    public static ChartLine showChartLine(String title, List<DataSetForChart> dataSet, String subtitle, String xLabel, String yLabel, boolean vertical, Component relativeTo) {
+        ChartLine chart = new ChartLine(title, dataSet, subtitle);
+        chart.setyLabel(yLabel);
+        chart.setxLabel(xLabel);
+        chart.setOrientation(vertical);
+        chart.doStart();
         chart.pack();
         //configura jDialog
         if (relativeTo != null) {
@@ -1085,11 +1116,11 @@ public class ComponentFactory implements Serializable {
                 Color colorFinal = Color.RED;
                 Color colorStart = Color.BLUE;
 
-//                Point2D start = new Point2D.Float(0, 0);
+//                Point2D doStart = new Point2D.Float(0, 0);
 //                Point2D end = new Point2D.Float(50, 50);
 //                float[] dist = {0.0f, 0.2f, 1.0f};
 //                Color[] colors = {Color.RED, Color.WHITE, Color.BLUE};
-//                LinearGradientPaint p = new LinearGradientPaint(start, end, dist, colors);
+//                LinearGradientPaint p = new LinearGradientPaint(doStart, end, dist, colors);
                 LinearGradientPaint linearGradientPaintOriginal = new LinearGradientPaint(
                         new Point(0, 25), new Point(0, getHeight()),
                         new float[]{0.240f, 0.250f}, new Color[]{
