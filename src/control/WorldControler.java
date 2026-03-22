@@ -20,7 +20,6 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
-import gui.accessories.DialogHexView;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
 import gui.charts.DataSetForChart;
