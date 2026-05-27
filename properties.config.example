@@ -1,0 +1,47 @@
+# Counselor configuration template.
+# Copy this file to properties.config and fill in your values.
+# properties.config is gitignored — do not commit it.
+
+#language = en/pt/it
+#autoLoad=/path/to/game_xxx.egf
+#loadDir=/path/to/folder
+#saveDir=/path/to/folder
+#mail.smtp.server=smtp.example.com
+#mail.smtp.port=587
+#mail.smtp.user=youruser
+#mail.smtp.passwd=yourpassword
+#MyEmail=you@example.com
+#SendOrderConfirmationPopUp=1
+#SendOrderReceiptRequest=0
+#OverrideElimination=0
+#LookAndFeelTheme=0
+#LookAndFeelFontSize=0
+#TableRowAdjust=0
+#ActionListHeight=107
+#splitSize=300
+#TableColumnAdjust=0
+#TableActionColumnAdjust=0
+#filtro.default=0
+#SortAllCombos=0
+#fogOfWarType=0
+#showCityCap=0
+#maximizeWindowOnStart=0
+#minimizeMapOnStart=0
+#ActionsMissingPopup=0
+#AutoSaveActions=0
+#AutoMoveNextAction=0
+#CopyActionsPopUp=0
+#CopyActionsOrder=0
+#LoadActionsBehavior=clean
+#LoadActionsOtherNations=deny
+#HexTagStyle=0
+#HexTagFrame=0
+#MapTiles=2b
+#ShowArmyMovPath=0
+#drawArmyMovPath=0
+#drawScoutOnMap=0
+#drawPcPath=0
+#KeepPopupOpen=0
+#MoveTagTransparency=0
+#ShowCharacterPortraits=1
+#PortraitsFolder=/path/to/portraits

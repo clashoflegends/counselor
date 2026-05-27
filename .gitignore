@@ -4,4 +4,6 @@ counselor.log
 /build/
 /out/
 /.idea/
-/nbproject/
+/nbproject/private/
+properties.config
+*.egf

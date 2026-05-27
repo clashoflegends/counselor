@@ -13,7 +13,7 @@
 
     <!-- Autoincrement version number -->
     <target name="-pre-jar" >
-        <propertyfile file="${src.dir}\version_counselor.properties">
+        <propertyfile file="${src.dir}/version_counselor.properties">
             <entry key="BUILD" value="1" type="int" operation="+"/>
         </propertyfile>
     </target>
