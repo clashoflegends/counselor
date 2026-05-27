@@ -15,4 +15,4 @@ jobs:
           java-version: '8'
           distribution: 'temurin'
       - name: Build JAR
-        run: ant jar
+        run: ant jar -Dreference.PbmCommons.jar=lib/PbmCommons.jar -Dreference.PbmPersistenceCommons.jar=lib/PbmPersistenceCommons.jar
