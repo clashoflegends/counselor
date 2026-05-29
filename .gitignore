@@ -3,6 +3,7 @@ counselor.log
 /dist/
 /build/
 /out/
+/target/
 /.idea/
 /nbproject/private/
 properties.config
