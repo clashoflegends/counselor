@@ -6,6 +6,8 @@
 #autoLoad=/path/to/game_xxx.egf
 #loadDir=/path/to/folder
 #saveDir=/path/to/folder
+# Token provided by the game admin when you join a game. Required to upload orders.
+#counselorToken=<token provided by admin>
 #mail.smtp.server=smtp.example.com
 #mail.smtp.port=587
 #mail.smtp.user=youruser
