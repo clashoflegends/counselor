@@ -1225,6 +1225,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         info.setPlayerId(jogador.getId());
         info.setPlayerLogin(jogador.getLogin());
         info.setPlayerEmail(jogador.getEmail());
+        List<Nacao> nacoes = WFC.getNacoesJogadorAtivo();
+        if (!nacoes.isEmpty()) {
+            info.setCdToken(nacoes.get(0).getCdToken());
+        }
         return info;
     }
 
