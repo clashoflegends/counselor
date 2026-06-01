@@ -1,0 +1,133 @@
+name: Build Installers
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            pkg-type: msi
+          - os: macos-latest
+            pkg-type: dmg
+          - os: ubuntu-latest
+            pkg-type: deb
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Install Ant (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ant
+
+      - name: Install Ant (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: choco install ant --no-progress -y
+
+      - name: Add WiX to PATH (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: echo "C:/Program Files (x86)/WiX Toolset v3.14/bin" >> "$GITHUB_PATH"
+
+      - name: Build JAR
+        shell: bash
+        run: |
+          ant jar \
+            -Dreference.PbmCommons.jar=lib/PbmCommons.jar \
+            -Dreference.PbmPersistenceCommons.jar=lib/PbmPersistenceCommons.jar \
+            -Dplatforms.JDK_21_Temurin.home="$JAVA_HOME"
+
+      - name: Derive version
+        shell: bash
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          [[ "$VER" =~ ^[0-9] ]] || VER="0.0.0"
+          echo "APP_VERSION=$VER" >> "$GITHUB_ENV"
+
+      - name: Run jpackage (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p installer
+          jpackage \
+            --input dist \
+            --dest installer \
+            --name Counselor \
+            --main-jar PbmCounselor.jar \
+            --main-class client.Main \
+            --type msi \
+            --app-version "$APP_VERSION" \
+            --vendor "Clash of Legends" \
+            --java-options -Xmx512M \
+            --java-options "-Dsun.java2d.d3d=false" \
+            --java-options "--add-opens=java.base/java.util=ALL-UNNAMED" \
+            --java-options "--add-opens=java.base/java.lang=ALL-UNNAMED" \
+            --java-options "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" \
+            --java-options "--add-opens=java.base/java.text=ALL-UNNAMED" \
+            --java-options "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED" \
+            --win-dir-chooser \
+            --win-shortcut
+
+      - name: Run jpackage (macOS / Linux)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p installer
+          jpackage \
+            --input dist \
+            --dest installer \
+            --name Counselor \
+            --main-jar PbmCounselor.jar \
+            --main-class client.Main \
+            --type ${{ matrix.pkg-type }} \
+            --app-version "$APP_VERSION" \
+            --vendor "Clash of Legends" \
+            --java-options -Xmx512M \
+            --java-options "--add-opens=java.base/java.util=ALL-UNNAMED" \
+            --java-options "--add-opens=java.base/java.lang=ALL-UNNAMED" \
+            --java-options "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" \
+            --java-options "--add-opens=java.base/java.text=ALL-UNNAMED" \
+            --java-options "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.os }}
+          path: installer/
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: installers
+          merge-multiple: true
+
+      - name: Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            installers/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Counselor $GITHUB_REF_NAME"
