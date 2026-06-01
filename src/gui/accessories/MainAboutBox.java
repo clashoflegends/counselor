@@ -246,7 +246,7 @@ public class MainAboutBox extends TabBase implements Serializable {
 
     private void config() {
         log.info(System.getProperties().toString());
-        lClient.setText("1." + SysApoio.getVersionClash("version_counselor"));
+        lClient.setText("2." + SysApoio.getVersionClash("version_counselor"));
         lCommons.setText("1." + SysApoio.getVersionClash("version_commons"));
         lJava.setText(SysApoio.getVersionJava());
         lOs.setText(SysApoio.getVersionOs());
