@@ -53,6 +53,10 @@ jobs:
             -Dreference.PbmPersistenceCommons.jar=lib/PbmPersistenceCommons.jar \
             -Dplatforms.JDK_21_Temurin.home="$JAVA_HOME"
 
+      - name: Copy dependency JARs into dist
+        shell: bash
+        run: cp lib/*.jar dist/
+
       - name: Derive version
         shell: bash
         run: |
