@@ -24,6 +24,7 @@ public class Main implements Serializable {
      */
     @SuppressWarnings("static-access")
     public static void main(String[] args) {
+        reconfigureLogForInstaller();
         // Invokes Gui to display turn results
         log.info(String.format("Starting... %s ...", SysApoio.getPidOs()));
         log.info("Counselor version: " + SysApoio.getVersionClash("version_counselor"));
@@ -49,5 +50,17 @@ public class Main implements Serializable {
         sm.setRadialMenu(sm.getConfig("newUi", "1").equalsIgnoreCase("1"));
         //load application
         new PbmApplication(autoload).start(); //filename to autoload results file
+    }
+
+    private static void reconfigureLogForInstaller() {
+        String dataDir = SysApoio.getInstallerDataDir();
+        if (dataDir == null) return;
+        new java.io.File(dataDir).mkdirs();
+        org.apache.log4j.Appender a = org.apache.log4j.Logger.getRootLogger().getAppender("logfile");
+        if (a instanceof org.apache.log4j.FileAppender) {
+            org.apache.log4j.FileAppender fa = (org.apache.log4j.FileAppender) a;
+            fa.setFile(dataDir + java.io.File.separator + "counselor.log");
+            fa.activateOptions();
+        }
     }
 }
