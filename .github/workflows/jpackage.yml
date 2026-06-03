@@ -60,6 +60,16 @@ jobs:
         shell: bash
         run: cp lib/*.jar dist/
 
+      - name: Package portable ZIP (Linux only — platform-independent)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mkdir -p Counselor/dist
+          cp dist/*.jar Counselor/dist/
+          cp run.bat run.sh Counselor/
+          mkdir -p installer
+          zip -r installer/Counselor-portable.zip Counselor/
+
       - name: Generate ICO (Windows)
         if: runner.os == 'Windows'
         shell: bash
