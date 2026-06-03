@@ -11,6 +11,29 @@
     <description>Builds, tests, and runs the project PbmCounselor.</description>
     <import file="nbproject/build-impl.xml"/>
 
+    <!-- Re-copy test resources from test/resources/ to the classpath root,
+         matching Maven layout so /egf/... resource paths resolve correctly. -->
+    <target name="-post-compile-test">
+        <copy todir="${build.test.classes.dir}">
+            <fileset dir="test/resources"/>
+        </copy>
+    </target>
+
+    <!-- JUnit 5 Platform Launcher: replaces the JUnit 4 junit task which
+         cannot discover Jupiter tests. Reuses run.jvmargs for add-opens flags. -->
+    <target name="-do-test-run" depends="init,compile-test,-pre-test-run">
+        <junitlauncher haltOnFailure="false" printSummary="true">
+            <classpath path="${run.test.classpath}"/>
+            <testclasses outputdir="${build.test.results.dir}">
+                <fileset dir="${build.test.classes.dir}" includes="**/*Test.class"/>
+                <fork dir="${basedir}">
+                    <jvmarg line="${run.jvmargs}"/>
+                </fork>
+                <listener type="legacy-xml" sendSysOut="true" sendSysErr="true"/>
+            </testclasses>
+        </junitlauncher>
+    </target>
+
     <!-- Autoincrement version number -->
     <target name="-pre-jar" >
         <propertyfile file="${src.dir}/version_counselor.properties">
