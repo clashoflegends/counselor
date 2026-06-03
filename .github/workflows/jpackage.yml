@@ -116,6 +116,7 @@ jobs:
             --java-options "--add-opens=java.base/java.text=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED" \
             --icon icon/icon.${{ matrix.icon-ext }} \
+            --file-associations jpackage/file-associations.properties \
             --win-dir-chooser \
             --win-shortcut
 
@@ -140,7 +141,8 @@ jobs:
             --java-options "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.text=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED" \
-            --icon icon/icon.${{ matrix.icon-ext }}
+            --icon icon/icon.${{ matrix.icon-ext }} \
+            --file-associations jpackage/file-associations.properties
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
