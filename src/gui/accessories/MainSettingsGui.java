@@ -43,7 +43,6 @@ public class MainSettingsGui extends JPanel {
         overEliminCheckBox.addActionListener(settingsControler);
         overEliminCheckBox1.addActionListener(settingsControler);
         overEliminCheckBox2.addActionListener(settingsControler);
-        myEmailTextField.addActionListener(settingsControler);
         sendConfirmPopUpCheckBox.addActionListener(settingsControler);
         sendOrderRequestCheckBox.addActionListener(settingsControler);
 
@@ -116,10 +115,8 @@ public class MainSettingsGui extends JPanel {
         autoLoadActionCheck = new javax.swing.JCheckBox();
         autoSaveOrdersCheck = new javax.swing.JCheckBox();
         playerPanel = new javax.swing.JPanel();
-        myEmailLabel = new javax.swing.JLabel();
         sendConfirmPopUpCheckBox = new javax.swing.JCheckBox();
         sendOrderRequestCheckBox = new javax.swing.JCheckBox();
-        myEmailTextField = new javax.swing.JTextField();
         mountainColorButton = new javax.swing.JButton();
         displayPanel = new javax.swing.JPanel();
         filtroLabel = new javax.swing.JLabel();
@@ -336,8 +333,6 @@ public class MainSettingsGui extends JPanel {
         playerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.PLAYER"))); // NOI18N
         playerPanel.setPreferredSize(new java.awt.Dimension(500, 351));
 
-        myEmailLabel.setText(bundle.getString("SETTINGS.PLAYER.EMAIL")); // NOI18N
-
         sendConfirmPopUpCheckBox.setSelected(isConfirmOrderSelected());
         sendConfirmPopUpCheckBox.setText(bundle.getString("SETTINGS.PLAYER.SENDORDERCONFIRM")); // NOI18N
         sendConfirmPopUpCheckBox.setToolTipText(bundle.getString("SETTINGS.PLAYER.SENDORDERCONFIRM.TOOLTIP")); // NOI18N
@@ -348,13 +343,6 @@ public class MainSettingsGui extends JPanel {
         sendOrderRequestCheckBox.setToolTipText(bundle.getString("SETTINGS.PLAYER.SENDORDERRECEIPT.TOOLTIP")); // NOI18N
         sendOrderRequestCheckBox.setActionCommand("recieveConfirm");
 
-        myEmailTextField.setText(settingsManager.getConfig("MyEmail"));
-        myEmailTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                myEmailTextFieldFocusLost(evt);
-            }
-        });
-
         mountainColorButton.setText("MountainColor");
         mountainColorButton.setActionCommand("MountainColorButton");
 
@@ -364,24 +352,16 @@ public class MainSettingsGui extends JPanel {
             playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(playerPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(sendOrderRequestCheckBox, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(sendConfirmPopUpCheckBox, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, playerPanelLayout.createSequentialGroup()
-                        .addComponent(myEmailLabel)
-                        .addGap(50, 50, 50)
-                        .addComponent(myEmailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(mountainColorButton, javax.swing.GroupLayout.Alignment.LEADING))
+                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(sendOrderRequestCheckBox)
+                    .addComponent(sendConfirmPopUpCheckBox)
+                    .addComponent(mountainColorButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         playerPanelLayout.setVerticalGroup(
             playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(playerPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(myEmailLabel)
-                    .addComponent(myEmailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(sendConfirmPopUpCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(sendOrderRequestCheckBox)
@@ -679,14 +659,6 @@ public class MainSettingsGui extends JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void myEmailTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_myEmailTextFieldFocusLost
-        // TODO add your handling code here:
-        String playerEmail = myEmailTextField.getText();
-        if (playerEmail != null && !playerEmail.isEmpty()) {
-            SettingsManager.getInstance().setConfig("MyEmail", playerEmail);
-        }
-    }//GEN-LAST:event_myEmailTextFieldFocusLost
-
     private void autoLoadCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoLoadCheckActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_autoLoadCheckActionPerformed
@@ -737,8 +709,6 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JCheckBox maximizeWindowCheckBox;
     private javax.swing.JCheckBox minimizeWindowCheckBox;
     private javax.swing.JButton mountainColorButton;
-    private javax.swing.JLabel myEmailLabel;
-    private javax.swing.JTextField myEmailTextField;
     private javax.swing.JButton openSaveDir;
     private javax.swing.ButtonGroup ordersSortButtonGroup;
     private javax.swing.JCheckBox overEliminCheckBox;
