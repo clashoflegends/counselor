@@ -130,6 +130,35 @@ jobs:
             --win-dir-chooser \
             --win-shortcut
 
+      - name: Run jpackage app-image (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          mkdir -p appimage
+          jpackage \
+            --input dist \
+            --dest appimage \
+            --name Counselor \
+            --main-jar PbmCounselor.jar \
+            --main-class client.Main \
+            --type app-image \
+            --app-version "$APP_VERSION" \
+            --vendor "Clash of Legends" \
+            --add-modules java.desktop,java.sql,java.xml,java.naming,java.logging,java.management,jdk.unsupported \
+            --java-options -Xmx512M \
+            --java-options "-Dsun.java2d.d3d=false" \
+            --java-options "--add-opens=java.base/java.util=ALL-UNNAMED" \
+            --java-options "--add-opens=java.base/java.lang=ALL-UNNAMED" \
+            --java-options "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" \
+            --java-options "--add-opens=java.base/java.text=ALL-UNNAMED" \
+            --java-options "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED" \
+            --icon icon/icon.ico
+
+      - name: ZIP app-image (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path appimage/Counselor -DestinationPath installer/Counselor-windows-portable.zip
+
       - name: Run jpackage (macOS / Linux)
         if: runner.os != 'Windows'
         shell: bash
