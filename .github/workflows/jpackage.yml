@@ -16,10 +16,13 @@ jobs:
         include:
           - os: windows-latest
             pkg-type: msi
+            icon-ext: ico
           - os: macos-latest
             pkg-type: dmg
+            icon-ext: icns
           - os: ubuntu-latest
             pkg-type: deb
+            icon-ext: png
 
     runs-on: ${{ matrix.os }}
 
@@ -57,6 +60,32 @@ jobs:
         shell: bash
         run: cp lib/*.jar dist/
 
+      - name: Generate ICO (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          pip install pillow -q
+          python -c "
+          from PIL import Image
+          img = Image.open('icon/icon.png').convert('RGBA')
+          img.save('icon/icon.ico', format='ICO', sizes=[(16,16),(32,32),(48,48),(64,64),(128,128),(256,256)])
+          "
+
+      - name: Generate ICNS (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          mkdir -p iconset.iconset
+          for sz in 16 32 128 256 512; do
+            sips -z $sz $sz icon/icon.png --out iconset.iconset/icon_${sz}x${sz}.png
+          done
+          sips -z 32   32   icon/icon.png --out iconset.iconset/icon_16x16@2x.png
+          sips -z 64   64   icon/icon.png --out iconset.iconset/icon_32x32@2x.png
+          sips -z 256  256  icon/icon.png --out iconset.iconset/icon_128x128@2x.png
+          sips -z 512  512  icon/icon.png --out iconset.iconset/icon_256x256@2x.png
+          sips -z 1024 1024 icon/icon.png --out iconset.iconset/icon_512x512@2x.png
+          iconutil -c icns iconset.iconset -o icon/icon.icns
+
       - name: Derive version
         shell: bash
         run: |
@@ -86,6 +115,7 @@ jobs:
             --java-options "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.text=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED" \
+            --icon icon/icon.${{ matrix.icon-ext }} \
             --win-dir-chooser \
             --win-shortcut
 
@@ -109,7 +139,8 @@ jobs:
             --java-options "--add-opens=java.base/java.lang=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.text=ALL-UNNAMED" \
-            --java-options "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
+            --java-options "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED" \
+            --icon icon/icon.${{ matrix.icon-ext }}
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
