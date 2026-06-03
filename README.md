@@ -6,15 +6,19 @@ The Counselor is the player client for *Clash of Legends*, a computer-moderated 
 
 ## Download and run (players)
 
-Pre-built installers are available on the [Releases](../../releases/latest) page:
+Pre-built packages are available on the [Releases](../../releases/latest) page:
 
-| Platform | File |
-|---|---|
-| Windows | `Counselor-x.y.z.msi` |
-| macOS | `Counselor-x.y.z.dmg` |
-| Linux | `counselor_x.y.z_amd64.deb` |
+| Platform | File | Notes |
+|---|---|---|
+| Windows | `Counselor-x.y.z.msi` | Standard installer, requires admin rights |
+| Windows | `Counselor-windows-portable.zip` | No install, no admin rights — extract and run |
+| Windows | `Counselor-portable.zip` | JAR + launchers, requires Java 21 on PATH |
+| macOS | `Counselor-x.y.z.dmg` | Standard installer |
+| Linux | `counselor_x.y.z_amd64.deb` | Standard package |
 
-Each installer bundles a Java 21 runtime — no separate JDK install required.
+The `.msi`, `.dmg`, and `.deb` installers bundle a Java 21 runtime — no separate JDK required. The Windows portable ZIP also bundles the runtime. The `Counselor-portable.zip` (JAR only) requires Java 21 already installed.
+
+**Corporate/restricted laptops:** use `Counselor-windows-portable.zip` — extract anywhere, run `Counselor\Counselor.exe`, no admin rights needed.
 
 **First run:** copy `properties.config.example` to `properties.config` and fill in your `counselorToken` (provided by the game admin when you join).
 
