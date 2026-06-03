@@ -117,17 +117,9 @@ public class MainSettingsGui extends JPanel {
         autoSaveOrdersCheck = new javax.swing.JCheckBox();
         playerPanel = new javax.swing.JPanel();
         myEmailLabel = new javax.swing.JLabel();
-        serverSmtpLabel = new javax.swing.JLabel();
-        serverPortLabel = new javax.swing.JLabel();
-        serverUserLabel = new javax.swing.JLabel();
-        serverPassLabel = new javax.swing.JLabel();
         sendConfirmPopUpCheckBox = new javax.swing.JCheckBox();
         sendOrderRequestCheckBox = new javax.swing.JCheckBox();
-        serverSMTPTextField = new javax.swing.JTextField();
-        serverUserTextField = new javax.swing.JTextField();
         myEmailTextField = new javax.swing.JTextField();
-        serverPortTextField = new javax.swing.JFormattedTextField();
-        serverPasswordField = new javax.swing.JPasswordField();
         mountainColorButton = new javax.swing.JButton();
         displayPanel = new javax.swing.JPanel();
         filtroLabel = new javax.swing.JLabel();
@@ -346,14 +338,6 @@ public class MainSettingsGui extends JPanel {
 
         myEmailLabel.setText(bundle.getString("SETTINGS.PLAYER.EMAIL")); // NOI18N
 
-        serverSmtpLabel.setText(bundle.getString("SETTINGS.PLAYER.SMTP.SERVER")); // NOI18N
-
-        serverPortLabel.setText(bundle.getString("SETTINGS.PLAYER.SMTP.PORT")); // NOI18N
-
-        serverUserLabel.setText(bundle.getString("SETTINGS.PLAYER.SMTP.USER")); // NOI18N
-
-        serverPassLabel.setText(bundle.getString("SETTINGS.PLAYER.SMTP.PASS")); // NOI18N
-
         sendConfirmPopUpCheckBox.setSelected(isConfirmOrderSelected());
         sendConfirmPopUpCheckBox.setText(bundle.getString("SETTINGS.PLAYER.SENDORDERCONFIRM")); // NOI18N
         sendConfirmPopUpCheckBox.setToolTipText(bundle.getString("SETTINGS.PLAYER.SENDORDERCONFIRM.TOOLTIP")); // NOI18N
@@ -364,39 +348,10 @@ public class MainSettingsGui extends JPanel {
         sendOrderRequestCheckBox.setToolTipText(bundle.getString("SETTINGS.PLAYER.SENDORDERRECEIPT.TOOLTIP")); // NOI18N
         sendOrderRequestCheckBox.setActionCommand("recieveConfirm");
 
-        serverSMTPTextField.setText(settingsManager.getConfig("mail.smtp.server"));
-        serverSMTPTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                serverSMTPTextFieldFocusLost(evt);
-            }
-        });
-
-        serverUserTextField.setText(settingsManager.getConfig("mail.smtp.user"));
-        serverUserTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                serverUserTextFieldFocusLost(evt);
-            }
-        });
-
         myEmailTextField.setText(settingsManager.getConfig("MyEmail"));
         myEmailTextField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 myEmailTextFieldFocusLost(evt);
-            }
-        });
-
-        serverPortTextField.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
-        serverPortTextField.setText(settingsManager.getConfig("mail.smpt.port"));
-        serverPortTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                serverPortTextFieldFocusLost(evt);
-            }
-        });
-
-        serverPasswordField.setText(settingsManager.getConfig("mail.smtp.passwd"));
-        serverPasswordField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                serverPasswordFieldFocusLost(evt);
             }
         });
 
@@ -410,29 +365,13 @@ public class MainSettingsGui extends JPanel {
             .addGroup(playerPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(sendOrderRequestCheckBox, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(sendConfirmPopUpCheckBox, javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, playerPanelLayout.createSequentialGroup()
-                        .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(sendOrderRequestCheckBox, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(sendConfirmPopUpCheckBox, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, playerPanelLayout.createSequentialGroup()
-                                .addComponent(myEmailLabel)
-                                .addGap(50, 50, 50)
-                                .addComponent(myEmailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, playerPanelLayout.createSequentialGroup()
-                        .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(serverPassLabel)
-                            .addComponent(serverUserLabel)
-                            .addComponent(serverPortLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(serverSmtpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(serverSMTPTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(serverUserTextField)
-                                .addComponent(serverPortTextField)
-                                .addComponent(serverPasswordField, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE))
-                            .addComponent(mountainColorButton))))
+                        .addComponent(myEmailLabel)
+                        .addGap(50, 50, 50)
+                        .addComponent(myEmailTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(mountainColorButton, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         playerPanelLayout.setVerticalGroup(
@@ -446,25 +385,9 @@ public class MainSettingsGui extends JPanel {
                 .addComponent(sendConfirmPopUpCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(sendOrderRequestCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(serverSmtpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(serverSMTPTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(serverPortLabel)
-                    .addComponent(serverPortTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(serverUserLabel)
-                    .addComponent(serverUserTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(serverPassLabel)
-                    .addComponent(serverPasswordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(mountainColorButton)
-                .addGap(91, 91, 91))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         displayPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.DISPLAY"))); // NOI18N
@@ -764,29 +687,6 @@ public class MainSettingsGui extends JPanel {
         }
     }//GEN-LAST:event_myEmailTextFieldFocusLost
 
-    private void serverPortTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverPortTextFieldFocusLost
-        // TODO add your handling code here:
-        String port = serverPortTextField.getText();
-        if (port != null) {
-            SettingsManager.getInstance().setConfig("mail.smpt.port", port);
-        }
-    }//GEN-LAST:event_serverPortTextFieldFocusLost
-
-    private void serverUserTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverUserTextFieldFocusLost
-        // TODO add your handling code here:
-        String user = serverUserTextField.getText();
-        if (user != null) {
-            SettingsManager.getInstance().setConfig("mail.smpt.user", user);
-        }
-    }//GEN-LAST:event_serverUserTextFieldFocusLost
-
-    private void serverPasswordFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverPasswordFieldFocusLost
-        // TODO add your handling code here:
-        String pass = new String(serverPasswordField.getPassword());
-        SettingsManager.getInstance().setConfig("mail.smtp.passwd", pass);
-
-    }//GEN-LAST:event_serverPasswordFieldFocusLost
-
     private void autoLoadCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoLoadCheckActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_autoLoadCheckActionPerformed
@@ -798,15 +698,6 @@ public class MainSettingsGui extends JPanel {
     private void portraitFolderNameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portraitFolderNameTextFieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_portraitFolderNameTextFieldActionPerformed
-
-    private void serverSMTPTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_serverSMTPTextFieldFocusLost
-        // TODO add your handling code here:
-        String serverName = serverSMTPTextField.getText();
-        if (serverName != null) {
-            SettingsManager.getInstance().setConfig("mail.smtp.server", serverName);
-        }
-    }//GEN-LAST:event_serverSMTPTextFieldFocusLost
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton allFiltroRadioButton;
@@ -865,14 +756,6 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JCheckBox sendConfirmPopUpCheckBox;
     private javax.swing.JCheckBox sendOrderRequestCheckBox;
     private javax.swing.JRadioButton sequenceRadioButton;
-    private javax.swing.JLabel serverPassLabel;
-    private javax.swing.JPasswordField serverPasswordField;
-    private javax.swing.JLabel serverPortLabel;
-    private javax.swing.JFormattedTextField serverPortTextField;
-    private javax.swing.JTextField serverSMTPTextField;
-    private javax.swing.JLabel serverSmtpLabel;
-    private javax.swing.JLabel serverUserLabel;
-    private javax.swing.JTextField serverUserTextField;
     private javax.swing.JLabel sortOrdersLabel;
     private javax.swing.JLabel splitSizeLabel;
     private javax.swing.JSpinner splitSizeSpinner;

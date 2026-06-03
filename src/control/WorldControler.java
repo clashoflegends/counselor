@@ -621,15 +621,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private String listaOrdensEmailBody(String msg) {
-        String ret = String.format("%s\n%s: \n%s\n\n",
-                labels.getString("ENVIAR.FAILREASON.HINT"),
-                labels.getString("ENVIAR.FAILREASON.TITLE"),
-                msg);
-        ret += listaOrdens();
-        return ret;
-    }
-
     private String listaEmails() {
         Set<String> emailList = new TreeSet<>();
         //find allied nations
