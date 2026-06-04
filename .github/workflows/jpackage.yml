@@ -56,16 +56,17 @@ jobs:
             -Dreference.PbmPersistenceCommons.jar=lib/PbmPersistenceCommons.jar \
             -Dplatforms.JDK_21_Temurin.home="$JAVA_HOME"
 
-      - name: Copy dependency JARs into dist
+      - name: Copy dependency JARs into dist/lib
         shell: bash
-        run: cp lib/*.jar dist/
+        run: mkdir -p dist/lib && cp lib/*.jar dist/lib/
 
       - name: Package portable ZIP (Linux only — platform-independent)
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          mkdir -p Counselor/dist
-          cp dist/*.jar Counselor/dist/
+          mkdir -p Counselor/dist/lib
+          cp dist/PbmCounselor.jar Counselor/dist/
+          cp dist/lib/*.jar Counselor/dist/lib/
           cp run.bat run.sh Counselor/
           mkdir -p installer
           zip -r installer/Counselor-portable.zip Counselor/
