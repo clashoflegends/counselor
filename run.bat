@@ -5,4 +5,4 @@ java ^
   --add-opens java.base/java.lang.reflect=ALL-UNNAMED ^
   --add-opens java.base/java.text=ALL-UNNAMED ^
   --add-opens java.base/java.util.concurrent=ALL-UNNAMED ^
-  -jar "%~dp0dist\PbmCounselor.jar" %*
+  -cp "%~dp0dist\*;%~dp0dist\lib\*" client.Main %*
