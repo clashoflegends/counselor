@@ -31,9 +31,20 @@ public class EgfDropHandler extends TransferHandler {
             for (File f : files) {
                 String name = f.getName();
                 if (name.endsWith(".egf")) {
-                    final File target = name.endsWith(".rc.egf")
-                            ? new File(f.getParent(), name.substring(0, name.length() - 7) + ".rr.egf")
-                            : f;
+                    final File target;
+                    if (name.endsWith(".rc.egf")) {
+                        java.util.regex.Matcher m = java.util.regex.Pattern
+                                .compile("^orders_(\\d+)_(\\d+)\\.(.+)\\.rc\\.egf$")
+                                .matcher(name);
+                        if (m.matches()) {
+                            int turn = Integer.parseInt(m.group(2)) - 1;
+                            target = new File(f.getParent(), "game_" + m.group(1) + "_" + turn + "." + m.group(3) + ".rr.egf");
+                        } else {
+                            target = new File(f.getParent(), name.substring(0, name.length() - 7) + ".rr.egf");
+                        }
+                    } else {
+                        target = f;
+                    }
                     SwingUtilities.invokeLater(() -> gui.openEgfFile(target));
                     return true;
                 }

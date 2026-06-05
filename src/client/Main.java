@@ -47,7 +47,15 @@ public class Main implements Serializable {
             autoload = sm.getConfig("autoLoad");
         }
         if (autoload != null && autoload.endsWith(".rc.egf")) {
-            autoload = autoload.substring(0, autoload.length() - 7) + ".rr.egf";
+            java.util.regex.Matcher m = java.util.regex.Pattern
+                    .compile("^(.*[/\\\\])?orders_(\\d+)_(\\d+)\\.(.+)\\.rc\\.egf$")
+                    .matcher(autoload);
+            if (m.matches()) {
+                int turn = Integer.parseInt(m.group(3)) - 1;
+                autoload = (m.group(1) != null ? m.group(1) : "") + "game_" + m.group(2) + "_" + turn + "." + m.group(4) + ".rr.egf";
+            } else {
+                autoload = autoload.substring(0, autoload.length() - 7) + ".rr.egf";
+            }
         }
         sm.setWorldBuilder(sm.getConfig("worldBuilder", "0").equalsIgnoreCase("1"));
         sm.setRadialMenu(sm.getConfig("newUi", "1").equalsIgnoreCase("1"));
