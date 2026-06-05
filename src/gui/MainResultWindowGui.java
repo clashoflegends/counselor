@@ -11,12 +11,14 @@ import control.WorldControler;
 import control.facade.WorldFacadeCounselor;
 import gui.components.JLabelGradient;
 import gui.services.ComponentFactory;
+import gui.services.EgfDropHandler;
 import gui.tabs.TabPersonagensGui;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.io.File;
 import java.io.Serializable;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
@@ -84,6 +86,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathResources.addActionListener(wc);
         toggleDisplayPortrait.addActionListener(wc);
         wc.doAutoLoad(autoLoad);
+        setTransferHandler(new EgfDropHandler(this));
     }
 
     /**
@@ -824,6 +827,10 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
     public void setSplitPaneValue(int value) {
         this.splitMainPanel.setDividerLocation(value);
+    }
+
+    public void openEgfFile(File f) {
+        wc.doOpenFile(f);
     }
 
 }

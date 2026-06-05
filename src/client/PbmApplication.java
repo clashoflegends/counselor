@@ -9,6 +9,7 @@ import baseLib.JgFrame;
 import business.ImageManager;
 import control.support.DispatchManager;
 import gui.MainResultWindowGui;
+import gui.services.EgfDropHandler;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
@@ -64,6 +65,7 @@ public class PbmApplication extends Application implements Serializable {
             //contentMainPane.setOpaque(true); //content panes must be opaque
             MainResultWindowGui mainWin = new MainResultWindowGui(this.autoStart);
             frame.setContentPane(mainWin);
+            frame.setTransferHandler(new EgfDropHandler(mainWin));
             //set icon
             frame.setIconImage(ImageManager.getInstance().getIconApp());
             if (posX != -1) {

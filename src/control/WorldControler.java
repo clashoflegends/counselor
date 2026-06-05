@@ -537,6 +537,30 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @param jbTemp
      * @throws HeadlessException
      */
+    public void doOpenFile(File resultsFile) {
+        try {
+            log.info(labels.getString("OPENING: ") + resultsFile.getName() + String.format(" [%s]", SysApoio.getPidOs()));
+            WFC.doStart(resultsFile);
+            this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
+            log.info(labels.getString("INICIALIZANDO.GUI"));
+            getGui().iniciaConfig();
+            this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
+            this.msgSubmitReady = false;
+            this.saved = false;
+            this.savedWorld = false;
+            doAutoLoadCommands(resultsFile);
+            File dir = resultsFile.getParentFile();
+            fcResults.setCurrentDirectory(dir);
+            fcOrders.setCurrentDirectory(dir);
+            fcWorld.setCurrentDirectory(dir);
+            fcMapImage.setCurrentDirectory(dir);
+        } catch (BusinessException ex) {
+            SysApoio.showDialogError(ex.getMessage(), this.getGui());
+            this.getGui().setStatusMsg(ex.getMessage());
+            log.error(ex);
+        }
+    }
+
     private void doOpen(JButton jbTemp) throws HeadlessException {
         //Create a file chooser
         if (SettingsManager.getInstance().isWorldBuilder()) {
@@ -544,26 +568,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
         int returnVal = fcResults.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            try {
-                final File resultsFile = fcResults.getSelectedFile();
-                log.info(labels.getString("OPENING: ") + resultsFile.getName() + String.format(" [%s]", SysApoio.getPidOs()));
-                WFC.doStart(resultsFile);
-                this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
-                log.info(labels.getString("INICIALIZANDO.GUI"));
-                getGui().iniciaConfig();
-                this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
-                this.msgSubmitReady = false;
-                this.saved = false;
-                this.savedWorld = false;
-                doAutoLoadCommands(resultsFile);
-                fcOrders.setCurrentDirectory(fcResults.getCurrentDirectory());
-                fcWorld.setCurrentDirectory(fcResults.getCurrentDirectory());
-                fcMapImage.setCurrentDirectory(fcResults.getCurrentDirectory());
-            } catch (BusinessException ex) {
-                SysApoio.showDialogError(ex.getMessage(), this.getGui());
-                this.getGui().setStatusMsg(ex.getMessage());
-                log.error(ex);
-            }
+            doOpenFile(fcResults.getSelectedFile());
         } else {
             log.info(labels.getString("OPEN.CANCELLED") + String.format(" [%s]", SysApoio.getPidOs()));
         }
