@@ -43,13 +43,7 @@ The map now draws the routes and icons for resources being transported between c
 
 - **Supremacy victory condition** - the victory points graph no longer counts Barbarians and White Walkers as enemies, which was inflating the score incorrectly.
 - **Scenario-aware upkeep** - city and character upkeep costs are no longer shown in scenarios that do not use them, such as War of Dwarves and Orcs. The panel now shows only what is relevant to your game.
-- **Statistics restored** - the statistics panel is back.
-
----
-
-### Order timestamps
-
-Orders saved to file now include a timestamp, so you can tell at a glance when each order was last written.
+- **Graphs restored** - the victory condition graphs are back.
 
 ---
 
@@ -70,7 +64,7 @@ Names with accents, cedillas, and other special characters now show correctly th
 - Fixed several crashes that some players experienced in specific game situations.
 - Player portraits now download and display reliably.
 - Fixed a layout issue in the main data panel where content was cut off or misaligned.
-- Counselor now runs on Java 21, which is faster and more stable on modern systems. The installer bundles Java, so you do not need to install anything separately.
+- Counselor now runs on Java 21, which is faster and more stable on modern systems. The installer bundles Java, so you do not need to install anything separately unless you want to.
 
 ---
 
@@ -97,21 +91,14 @@ The installation now includes a set of sample turn files from real past games. O
 
 ### Website improvements
 
-- Players can now set their nation's flag on the game website.
-- Game statistics are now available on the website.
+- Players can now select their country, and a small flag is displayed next to their name throughout the site — in the Hall of Fame, Leaderboard, and other pages.
+- Some game statistics are now available on the website.
 
 ---
 
 ### Security improvements
 
 Orders are now submitted with an additional per-turn security token, making it harder for anyone to tamper with your uploads. This happens automatically. No action required on your part.
-
----
-
-### Coming soon
-
-- **Color theme picker** - choose your preferred color scheme for the Counselor interface. This feature is in progress and will be available in an upcoming release.
-- **Statistics charts** - graphical charts for the statistics panel are being added.
 
 ---
 
