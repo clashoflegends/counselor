@@ -8,3 +8,4 @@ counselor.log
 /nbproject/private/
 properties.config
 *.egf
+!examples/*.egf

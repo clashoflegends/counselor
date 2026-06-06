@@ -58,7 +58,10 @@ jobs:
 
       - name: Copy dependency JARs into dist/lib
         shell: bash
-        run: mkdir -p dist/lib && cp lib/*.jar dist/lib/
+        run: |
+          mkdir -p dist/lib dist/examples
+          cp lib/*.jar dist/lib/
+          cp examples/*.egf dist/examples/ 2>/dev/null || true
 
       - name: Derive version
         shell: bash
@@ -71,9 +74,10 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          mkdir -p Counselor/dist/lib
+          mkdir -p Counselor/dist/lib Counselor/dist/examples
           cp dist/PbmCounselor.jar Counselor/dist/
           cp dist/lib/*.jar Counselor/dist/lib/
+          cp dist/examples/*.egf Counselor/dist/examples/ 2>/dev/null || true
           cp run.bat run.sh Counselor/
           mkdir -p installer
           zip -r installer/Counselor-portable-${APP_VERSION}.zip Counselor/
