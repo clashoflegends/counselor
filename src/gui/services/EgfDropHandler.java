@@ -1,13 +1,33 @@
 package gui.services;
 
 import gui.MainResultWindowGui;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.datatransfer.DataFlavor;
 import java.io.File;
 import java.util.List;
+import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
 public class EgfDropHandler extends TransferHandler {
+
+    /** Registers this handler on every JComponent in the tree so drops work regardless of which child is under the cursor. */
+    public static void install(Container root, MainResultWindowGui gui) {
+        EgfDropHandler handler = new EgfDropHandler(gui);
+        installOn(root, handler);
+    }
+
+    private static void installOn(Component c, EgfDropHandler handler) {
+        if (c instanceof JComponent) {
+            ((JComponent) c).setTransferHandler(handler);
+        }
+        if (c instanceof Container) {
+            for (Component child : ((Container) c).getComponents()) {
+                installOn(child, handler);
+            }
+        }
+    }
 
     private final MainResultWindowGui gui;
 

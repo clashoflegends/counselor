@@ -86,7 +86,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathResources.addActionListener(wc);
         toggleDisplayPortrait.addActionListener(wc);
         wc.doAutoLoad(autoLoad);
-        setTransferHandler(new EgfDropHandler(this));
+        EgfDropHandler.install(this, this);
     }
 
     /**
