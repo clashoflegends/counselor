@@ -71,6 +71,13 @@ jobs:
           mkdir -p installer
           zip -r installer/Counselor-portable.zip Counselor/
 
+      - name: Write Counselor version file (Linux only)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          BUILD=$(grep '^BUILD=' src/version_counselor.properties | cut -d= -f2 | tr -d '[:space:]')
+          echo "2.${BUILD}" > installer/counselor_version.txt
+
       - name: Generate ICO (Windows)
         if: runner.os == 'Windows'
         shell: bash
@@ -206,7 +213,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          COUNSELOR_VER=$(cat installers/counselor_version.txt 2>/dev/null || echo "$GITHUB_REF_NAME")
+          rm -f installers/counselor_version.txt
           gh release create "$GITHUB_REF_NAME" \
             installers/* \
             --repo "$GITHUB_REPOSITORY" \
-            --title "Counselor $GITHUB_REF_NAME"
+            --title "Counselor $COUNSELOR_VER"
