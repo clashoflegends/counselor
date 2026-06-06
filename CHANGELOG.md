@@ -61,7 +61,7 @@ Names with accents, cedillas, and other special characters now show correctly th
 
 ### Stability improvements
 
-- Fixed several crashes that some players experienced in specific game situations.
+- Fixed several crashes that some players experienced in specific game situations. Thom, you should not see crashes anymore.
 - Player portraits now download and display reliably.
 - Fixed a layout issue in the main data panel where content was cut off or misaligned.
 - Counselor now runs on Java 21, which is faster and more stable on modern systems. The installer bundles Java, so you do not need to install anything separately unless you want to.
