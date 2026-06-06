@@ -390,13 +390,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private void doAbout() throws HeadlessException {
-        JDialog dAbout = new JDialog(new JFrame(), true);
+        java.awt.Window owner = javax.swing.SwingUtilities.getWindowAncestor(this.getGui());
+        JDialog dAbout = new JDialog(owner, java.awt.Dialog.ModalityType.MODELESS);
         MainAboutBox stAbout = new MainAboutBox();
-        //configura jDialog
         dAbout.add(stAbout);
         dAbout.setTitle(labels.getString("MENU.ABOUT"));
-        dAbout.setAlwaysOnTop(true);
-        //dAbout.setPreferredSize(new Dimension(400, 400));
         dAbout.setLocationRelativeTo(this.getGui());
         dAbout.pack();
         dAbout.setVisible(true);

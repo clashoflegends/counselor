@@ -10,10 +10,26 @@
  */
 package gui.accessories;
 
+import business.ImageManager;
 import gui.TabBase;
 import gui.components.ButtonLink;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Desktop;
+import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.Serializable;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -272,11 +288,77 @@ public class MainAboutBox extends TabBase implements Serializable {
             parLayout.replace(lModeratorLink, moderatorLink);
             ButtonLink facebookLink = new ButtonLink(labels.getString("ABOUT.FACEBOOK.LINK"), labels.getString("ABOUT.FACEBOOK.LINK"));
             parLayout.replace(lFacebookLink, facebookLink);
+
+            // Icon above title
+            Image img = ImageManager.getInstance().getIconApp();
+            if (img != null) {
+                JLabel iconLabel = new JLabel(new ImageIcon(img.getScaledInstance(48, 48, Image.SCALE_SMOOTH)));
+                iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                JLabel titleCopy = new JLabel(lAboutTitle.getText(), SwingConstants.CENTER);
+                titleCopy.setFont(lAboutTitle.getFont());
+                titleCopy.setAlignmentX(Component.CENTER_ALIGNMENT);
+                JPanel iconTitlePanel = new JPanel();
+                iconTitlePanel.setOpaque(false);
+                iconTitlePanel.setLayout(new BoxLayout(iconTitlePanel, BoxLayout.Y_AXIS));
+                iconTitlePanel.add(iconLabel);
+                iconTitlePanel.add(Box.createVerticalStrut(4));
+                iconTitlePanel.add(titleCopy);
+                parLayout.replace(lAboutTitle, iconTitlePanel);
+            }
         } catch (Exception e) {
             lMaillistLink.setText(labels.getString("ABOUT.MAIL.LINK"));
             lWebAdminLink.setText(labels.getString("ABOUT.WEBADMIN.LINK"));
             lWebsiteLink.setText(labels.getString("ABOUT.WEB.LINK"));
             lModeratorLink.setText(labels.getString("ABOUT.MODERATOR.LINK"));
         }
+
+        // Path rows — appended below jPanel1 via BorderLayout
+        String dataDir = SysApoio.getInstallerDataDir();
+        if (dataDir == null) {
+            dataDir = new File("").getAbsolutePath();
+        }
+        final String configPath = dataDir + File.separator + "properties.config";
+        final String logDirPath = dataDir;
+
+        JPanel pathPanel = new JPanel();
+        pathPanel.setLayout(new BoxLayout(pathPanel, BoxLayout.Y_AXIS));
+        pathPanel.setBorder(BorderFactory.createEmptyBorder(2, 10, 8, 10));
+        pathPanel.add(makePathRow("Config file:", configPath, new File(configPath), false));
+        pathPanel.add(Box.createVerticalStrut(4));
+        pathPanel.add(makePathRow("Logs folder:", logDirPath, new File(logDirPath), true));
+
+        this.setLayout(new BorderLayout());
+        this.add(jPanel1, BorderLayout.CENTER);
+        this.add(pathPanel, BorderLayout.SOUTH);
+    }
+
+    private JPanel makePathRow(String labelText, String pathText, File target, boolean openDir) {
+        JPanel row = new JPanel();
+        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        row.setOpaque(false);
+        JLabel label = new JLabel(labelText);
+        label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 8));
+        row.add(label);
+        JLabel link = new JLabel("<html><a href=''>" + pathText + "</a></html>");
+        link.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        link.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    if (openDir || !target.exists()) {
+                        File dir = openDir ? target : target.getParentFile();
+                        Desktop.getDesktop().open(dir);
+                    } else {
+                        Desktop.getDesktop().open(target);
+                    }
+                } catch (Exception ex) {
+                    log.warn("Cannot open: " + target);
+                }
+            }
+        });
+        row.add(link);
+        return row;
     }
 }
