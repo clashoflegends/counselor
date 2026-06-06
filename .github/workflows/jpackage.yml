@@ -60,6 +60,13 @@ jobs:
         shell: bash
         run: mkdir -p dist/lib && cp lib/*.jar dist/lib/
 
+      - name: Derive version
+        shell: bash
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          [[ "$VER" =~ ^[0-9] ]] || VER="0.0.0"
+          echo "APP_VERSION=$VER" >> "$GITHUB_ENV"
+
       - name: Package portable ZIP (Linux only — platform-independent)
         if: runner.os == 'Linux'
         shell: bash
@@ -69,7 +76,7 @@ jobs:
           cp dist/lib/*.jar Counselor/dist/lib/
           cp run.bat run.sh Counselor/
           mkdir -p installer
-          zip -r installer/Counselor-portable.zip Counselor/
+          zip -r installer/Counselor-portable-${APP_VERSION}.zip Counselor/
 
       - name: Write Counselor version file (Linux only)
         if: runner.os == 'Linux'
@@ -103,13 +110,6 @@ jobs:
           sips -z 512  512  icon/icon.png --out iconset.iconset/icon_256x256@2x.png
           sips -z 1024 1024 icon/icon.png --out iconset.iconset/icon_512x512@2x.png
           iconutil -c icns iconset.iconset -o icon/icon.icns
-
-      - name: Derive version
-        shell: bash
-        run: |
-          VER="${GITHUB_REF_NAME#v}"
-          [[ "$VER" =~ ^[0-9] ]] || VER="0.0.0"
-          echo "APP_VERSION=$VER" >> "$GITHUB_ENV"
 
       - name: Run jpackage (Windows)
         if: runner.os == 'Windows'
@@ -165,7 +165,7 @@ jobs:
       - name: ZIP app-image (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: Compress-Archive -Path appimage/Counselor -DestinationPath installer/Counselor-windows-portable.zip
+        run: Compress-Archive -Path appimage/Counselor -DestinationPath "installer/Counselor-windows-portable-$env:APP_VERSION.zip"
 
       - name: Run jpackage (macOS / Linux)
         if: runner.os != 'Windows'
