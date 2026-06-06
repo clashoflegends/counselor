@@ -21,7 +21,11 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
+              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -31,62 +35,57 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="lWebAdminLink" min="-2" max="-2" attributes="0"/>
-                      <Component id="lWebsiteLink" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-              </Group>
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
-                          <Component id="lFacebookLink" min="-2" pref="208" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      </Group>
                       <Component id="lAboutTitle" alignment="0" max="32767" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="lCounselorTitle" alignment="0" min="-2" max="-2" attributes="1"/>
-                              <Component id="lCommonsTitle" max="32767" attributes="1"/>
-                              <Component id="lJavaTitle" max="32767" attributes="1"/>
-                              <Component id="lScreenTitle" max="32767" attributes="1"/>
-                              <Component id="lOsTitle" max="32767" attributes="1"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="lCounselorTitle" alignment="0" min="-2" max="-2" attributes="1"/>
+                                      <Component id="lCommonsTitle" max="32767" attributes="1"/>
+                                      <Component id="lJavaTitle" max="32767" attributes="1"/>
+                                      <Component id="lScreenTitle" max="32767" attributes="1"/>
+                                      <Component id="lOsTitle" max="32767" attributes="1"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="lCommons" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lClient" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lJava" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lScreen" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lOs" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <Component id="lFacebookLink1" alignment="1" max="32767" attributes="0"/>
+                              <Component id="lModeratorLink1" alignment="1" max="32767" attributes="0"/>
+                              <Component id="lFacebookLink" alignment="1" max="32767" attributes="0"/>
+                              <Component id="lModeratorLink" alignment="1" max="32767" attributes="0"/>
+                              <Component id="lMaillistLink" alignment="1" pref="346" max="32767" attributes="0"/>
+                              <Component id="lWebsiteLink" alignment="1" max="32767" attributes="0"/>
+                              <Component id="lWebAdminLink" alignment="1" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="lCommons" min="-2" max="-2" attributes="0"/>
-                              <Component id="lClient" min="-2" max="-2" attributes="0"/>
-                              <Component id="lJava" min="-2" max="-2" attributes="0"/>
-                              <Component id="lScreen" min="-2" max="-2" attributes="0"/>
-                              <Component id="lOs" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="lFacebookTitle1" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="lModeratorTitle1" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="lFacebookTitle" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="lWebadminTitle" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="lMaillistTitle" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="lModeratorTitle" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" attributes="0">
-                                  <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="lModeratorLink" alignment="0" min="-2" pref="208" max="-2" attributes="0"/>
-                                      <Component id="lMaillistLink" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
                               <Component id="lWebsiteTitle" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="82" max="32767" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="lFacebookTitle" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="277" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
+              </Group>
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace min="-2" pref="142" max="-2" attributes="0"/>
+                  <Component id="lIconLabel" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -94,7 +93,9 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <Component id="lAboutTitle" min="-2" pref="26" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="lIconLabel" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="lWebadminTitle" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="lWebAdminLink" min="-2" max="-2" attributes="0"/>
@@ -114,7 +115,15 @@
                   <Component id="lFacebookTitle" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="lFacebookLink" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="lModeratorTitle1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="lModeratorLink1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="lFacebookTitle1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="lFacebookLink1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="lCounselorTitle" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="lClient" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -139,7 +148,7 @@
                       <Component id="lOs" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="lOsTitle" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -264,6 +273,43 @@
         <Component class="javax.swing.JLabel" name="lOs">
           <Properties>
             <Property name="text" type="java.lang.String" value="1.999"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lIconLabel">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="iconLabel"/>
+            <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[48, 48]"/>
+            </Property>
+            <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[48, 48]"/>
+            </Property>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[48, 48]"/>
+            </Property>
+          </Properties>
+          <AccessibilityProperties>
+            <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="iconLabel"/>
+          </AccessibilityProperties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lFacebookTitle1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Facebook"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lModeratorTitle1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Moderator&apos;s email"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lModeratorLink1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="ClashOfLegends.theGame@gmail.com"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lFacebookLink1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="http://www.facebook.com/ClashOfLegends"/>
           </Properties>
         </Component>
       </SubComponents>
