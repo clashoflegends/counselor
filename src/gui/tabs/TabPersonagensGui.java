@@ -295,7 +295,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         //configura grid de personagens
         comboFiltro.setName("comboFiltro");
         comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 2));
-        comboFiltro.setSelectedIndex(this.getFiltroDefault());
+        this.applyFiltroDefault(comboFiltro);
         jtMainLista.setAutoCreateColumnsFromModel(true);
         jtMainLista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jtMainLista.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);

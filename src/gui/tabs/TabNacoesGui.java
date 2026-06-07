@@ -285,7 +285,7 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         comboFiltro.setName("comboFiltro");
         comboFiltro.setActionCommand("comboFiltro");
         comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 6));
-        comboFiltro.setSelectedIndex(this.getFiltroDefault());
+        this.applyFiltroDefault(comboFiltro);
 
         //Cria o Controle da lista 
         nacaoControl = new NacaoControler(this);

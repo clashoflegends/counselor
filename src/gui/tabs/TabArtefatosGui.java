@@ -53,7 +53,7 @@ public class TabArtefatosGui extends TabBase implements Serializable {
         jtMainLista.setAutoCreateRowSorter(true);
         comboFiltro.setName("comboFiltro");
         comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 4));
-        comboFiltro.setSelectedIndex(this.getFiltroDefault());
+        this.applyFiltroDefault(comboFiltro);
         //Cria o Controle da lista de artefatos
         artefatoControl = new ArtefatoControler(this);
 

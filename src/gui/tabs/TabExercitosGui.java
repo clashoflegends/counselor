@@ -65,7 +65,7 @@ public class TabExercitosGui extends TabBase implements Serializable {
 
         comboFiltro.setName("comboFiltro");
         comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 1));
-        comboFiltro.setSelectedIndex(this.getFiltroDefault());
+        this.applyFiltroDefault(comboFiltro);
         //Cria o Controle da lista de exercitos
         exercitoControl = new ExercitoControler(this);
 

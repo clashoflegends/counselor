@@ -244,7 +244,7 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
         jtMainLista.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         comboFiltro.setName("comboFiltro");
         comboFiltro.setModel(FiltroConverter.getFiltroComboModelAll());
-        comboFiltro.setSelectedIndex(this.getFiltroDefault());
+        this.applyFiltroDefault(comboFiltro);
 
         //create hexes control
         locationControl = new LocationControler(this);

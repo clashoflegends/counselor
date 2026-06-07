@@ -65,12 +65,28 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
         this.setFiltroDefault(SettingsManager.getInstance().getConfigAsInt(keyFilterProperty, "-9999"));
     }
 
+    /**
+     * Applies the default filter to the combo, clamping the index to the combo's actual model size so a
+     * misconfigured filtro.default (or stale per-tab filter key) can never throw setSelectedIndex out of bounds.
+     */
+    protected final void applyFiltroDefault(javax.swing.JComboBox comboFiltro) {
+        final int size = comboFiltro.getModel().getSize();
+        if (size == 0) {
+            return; //nothing to select
+        }
+        int idx = getFiltroDefault();
+        if (idx < 0 || idx >= size) {
+            idx = 0; //fall back to "All"
+        }
+        comboFiltro.setSelectedIndex(idx);
+    }
+
     public final int getFiltroDefault() {
         if (filtroDefault == -9999 || this.getComboFiltroSize() <= filtroDefault) {
             //load default
             int vlFiltro = SettingsManager.getInstance().getConfigAsInt("filtro.default");
             //se diferente de 0,provavelmente eh um valor invalido, ou chave nao encontrada.
-            if (vlFiltro != 1 || this.getComboFiltroSize() <= filtroDefault) {
+            if (vlFiltro != 1 || this.getComboFiltroSize() <= vlFiltro) {
                 vlFiltro = 0;
             }
             this.setFiltroDefault(vlFiltro);

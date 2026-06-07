@@ -44,7 +44,7 @@ public class TabWorldBuilderGui extends TabBase implements Serializable {
         //config filters
         comboFiltro.setName("comboFiltro");
         comboFiltro.setModel(FiltroConverter.getFiltroComboModelByJogador(WorldManager.getInstance().getPartida().getJogadorAtivo(), 4));
-        comboFiltro.setSelectedIndex(this.getFiltroDefault());
+        this.applyFiltroDefault(comboFiltro);
         //adiciona listeners
         jcbTerrain.setActionCommand("jcbTerrain");
 
