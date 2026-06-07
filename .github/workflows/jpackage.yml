@@ -223,3 +223,28 @@ jobs:
             installers/* \
             --repo "$GITHUB_REPOSITORY" \
             --title "Counselor $COUNSELOR_VER"
+
+  # Persist the shipped build number so the next release gets a fresh one.
+  # The Ant build increments the workspace copy of version_counselor.properties (+1 over the
+  # committed value) but never pushes it back; without this job two releases cut from the same
+  # committed base ship with identical build numbers (e.g. v2.0.6 and v2.0.7 both as 2.860).
+  bump-build:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - name: Commit shipped build number to master
+        run: |
+          OLD=$(grep '^BUILD=' src/version_counselor.properties | cut -d= -f2 | tr -d '[:space:]')
+          NEW=$((OLD + 1))
+          sed -i "s/^BUILD=.*/BUILD=${NEW}/" src/version_counselor.properties
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -am "Build 2.${NEW} shipped in ${GITHUB_REF_NAME} [skip ci]"
+          git push
