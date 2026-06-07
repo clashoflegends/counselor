@@ -560,6 +560,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         } catch (RuntimeException ex) {
             //GUI-build or otherwise unexpected failure: keep the app alive, show a friendly message, log the stack trace
             log.error("Unexpected error opening results file: " + resultsFile.getName(), ex);
+            persistenceCommons.CrashReporter.report(ex, "egf-open:" + resultsFile.getName());
             SysApoio.showDialogError(labels.getString("OPEN.ERRO.INESPERADO"), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
             this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + resultsFile.getName());
         }
@@ -629,6 +630,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + autoLoad);
         } catch (RuntimeException ex) {
             log.error("Unexpected error autoloading results file: " + autoLoad, ex);
+            persistenceCommons.CrashReporter.report(ex, "egf-autoload");
             SysApoio.showDialogError(labels.getString("OPEN.ERRO.INESPERADO"), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
             this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + autoLoad);
         }
