@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -44,7 +45,7 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
         
         
         try {
-            final URL url = new URL(PROTOCOL_HOST + CLASH_HOST);
+            final URL url = URI.create(PROTOCOL_HOST + CLASH_HOST).toURL();
             final URLConnection conn = url.openConnection();
             conn.connect();
             networkAvalaible = true;
@@ -76,7 +77,7 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
 
         try {
             propFile = new Properties();
-            URL website = new URL(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + PROPERTIES_FILENAME);
+            URL website = URI.create(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + PROPERTIES_FILENAME).toURL();
 
             InputStream is = website.openStream();
             propFile.load(is);
@@ -92,7 +93,7 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
     public File downloadPortraisFile(String portraitsFileName, String portraitsFolderName) throws FileNotFoundException {
         File file = null;
         try {
-            URL website = new URL(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + portraitsFileName);
+            URL website = URI.create(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + portraitsFileName).toURL();
             //https://www.colorado.edu/conflict/peace/download/peace.zip
             // speedtest.ftp.otenet.gr/files/test10Mb.db
           //  URL website = new URL("https://www.colorado.edu/conflict/peace/download/peace.zip");
@@ -117,7 +118,7 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
         URL website;
         URLConnection conn = null;
         try {            
-            website = new URL(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + portraitsFileName);
+            website = URI.create(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + portraitsFileName).toURL();
          //   website = new URL("https://www.colorado.edu/conflict/peace/download/peace.zip");
             
             conn = website.openConnection();

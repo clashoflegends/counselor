@@ -65,8 +65,8 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         setTag();
         getJlTag().setVisible(false);
 
-        jLayeredPane1.add(getJlActionsOnMap(), new Integer(20));
-        jLayeredPane1.add(getJlTag(), new Integer(100));
+        jLayeredPane1.add(getJlActionsOnMap(), Integer.valueOf(20));
+        jLayeredPane1.add(getJlTag(), Integer.valueOf(100));
     }
 
     /**
@@ -171,7 +171,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         tagMovement.setBounds(rectangle);
         tagMovement.setVisible(true);
         movTags.add(tagMovement);
-        jLayeredPane1.add(tagMovement, new Integer(99 + counter));
+        jLayeredPane1.add(tagMovement, Integer.valueOf(99 + counter));
         JViewport vp = jScrollPane1.getViewport();
         Rectangle viewRect = vp.getViewRect();
         boolean contains = viewRect.contains(rectangle);
@@ -320,7 +320,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         if (this.radialMenu != null) {
             jLayeredPane1.remove(this.radialMenu);
         }
-        jLayeredPane1.add(aRadialMenu, new Integer(400));
+        jLayeredPane1.add(aRadialMenu, Integer.valueOf(400));
     }
 
     private JLabel getJlTag() {
