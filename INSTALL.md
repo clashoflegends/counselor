@@ -1,4 +1,4 @@
-# Counselor — Installation Guide
+# Counselor Installation Guide
 
 Counselor is the client application for Clash of Legends players. It lets you open your turn results, review what happened on the map, compose your orders, and submit them to the game server (Judge).
 
@@ -10,11 +10,11 @@ Go to the [Releases page](https://github.com/clashoflegends/counselor/releases) 
 
 | File | Best for |
 |---|---|
-| `Counselor-X.X.X.msi` | Windows — standard install with Java included |
-| `Counselor-portable-X.X.X.zip` | macOS / Linux / Windows for players that already have Java. Loads faster! |
-| `Counselor-windows-portable-X.X.X.zip` | Windows — with Java included and no admin rights (for company laptop) |
-| `Counselor-X.X.X.dmg` | macOS — standard install with Java included |
-| `Counselor-X.X.X.deb` | Linux — standard install with Java included |
+| `Counselor-X.X.X.msi` | Windows - standard install with Java included |
+| `Counselor-portable-X.X.X.zip` | macOS / Linux / Windows for players who already have Java. Loads faster! |
+| `Counselor-windows-portable-X.X.X.zip` | Windows - with Java included and no admin rights (for company laptops) |
+| `Counselor-X.X.X.dmg` | macOS - standard install with Java included |
+| `Counselor-X.X.X.deb` | Linux - standard install with Java included |
 
 ---
 
@@ -46,18 +46,18 @@ Go to the [Releases page](https://github.com/clashoflegends/counselor/releases) 
    - **Windows:** double-click `run.bat`
    - **macOS / Linux:** open a terminal in the folder and run `bash run.sh`
 
-**Config file location:** `dist\properties.config` (next to the JAR, inside the extracted folder)
+**Config file location:** `dist/properties.config` (next to the JAR, inside the extracted folder)
 
-**Log file location:** `dist\counselor.log`
+**Log file location:** `dist/counselor.log`
 
 ---
 
-## Windows portable ZIP — no admin rights (Counselor-windows-portable-X.X.X.zip)
+## Windows portable ZIP - no admin rights (Counselor-windows-portable-X.X.X.zip)
 
-**Best for:** players on a company or managed Windows laptop where you cannot install software. Bundled with its own Java runtime — no Java installation needed.
+**Best for:** players on a company or managed Windows laptop where you cannot install software. Bundled with its own Java runtime, so no Java installation is needed.
 
 1. Download `Counselor-windows-portable-X.X.X.zip`.
-2. Extract all files anywhere you have write access — your Documents folder, a USB drive, etc.
+2. Extract all files anywhere you have write access: your Documents folder, a USB drive, etc.
 3. Open the extracted `Counselor` folder and double-click `Counselor.exe`.
 
 No installation, no admin rights, no registry changes. Delete the folder to uninstall.
