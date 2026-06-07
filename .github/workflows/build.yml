@@ -16,3 +16,12 @@ jobs:
           distribution: 'temurin'
       - name: Build JAR
         run: ant jar -Dreference.PbmCommons.jar=lib/PbmCommons.jar -Dreference.PbmPersistenceCommons.jar=lib/PbmPersistenceCommons.jar -Dplatforms.JDK_21_Temurin.home=$JAVA_HOME
+      - name: Run tests
+        run: ant test -Dtest.haltonfailure=true -Dreference.PbmCommons.jar=lib/PbmCommons.jar -Dreference.PbmPersistenceCommons.jar=lib/PbmPersistenceCommons.jar -Dplatforms.JDK_21_Temurin.home=$JAVA_HOME
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/test/results/
+          if-no-files-found: ignore

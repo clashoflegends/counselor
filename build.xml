@@ -19,10 +19,14 @@
         </copy>
     </target>
 
+    <!-- Default: do not abort on test failure, so NB30 interactive runs show all results.
+         CI passes -Dtest.haltonfailure=true so a failing test fails the build. -->
+    <property name="test.haltonfailure" value="false"/>
+
     <!-- JUnit 5 Platform Launcher: replaces the JUnit 4 junit task which
          cannot discover Jupiter tests. Reuses run.jvmargs for add-opens flags. -->
     <target name="-do-test-run" depends="init,compile-test,-pre-test-run">
-        <junitlauncher haltOnFailure="false" printSummary="true">
+        <junitlauncher haltOnFailure="${test.haltonfailure}" printSummary="true">
             <classpath path="${run.test.classpath}"/>
             <testclasses outputdir="${build.test.results.dir}">
                 <fileset dir="${build.test.classes.dir}" includes="**/*Test.class"/>
