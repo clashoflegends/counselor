@@ -553,9 +553,15 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             fcWorld.setCurrentDirectory(dir);
             fcMapImage.setCurrentDirectory(dir);
         } catch (BusinessException ex) {
-            SysApoio.showDialogError(ex.getMessage(), this.getGui());
-            this.getGui().setStatusMsg(ex.getMessage());
-            log.error(ex);
+            //parse-time failure: file not found, corrupted, or incompatible version (already a player-readable message)
+            log.error("Failed to open results file: " + resultsFile.getName(), ex);
+            SysApoio.showDialogError(ex.getMessage(), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
+            this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + resultsFile.getName());
+        } catch (RuntimeException ex) {
+            //GUI-build or otherwise unexpected failure: keep the app alive, show a friendly message, log the stack trace
+            log.error("Unexpected error opening results file: " + resultsFile.getName(), ex);
+            SysApoio.showDialogError(labels.getString("OPEN.ERRO.INESPERADO"), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
+            this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + resultsFile.getName());
         }
     }
 
@@ -618,9 +624,13 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             fcOrders.setSelectedFile(resultsFile);
             this.saved = false;
         } catch (BusinessException ex) {
-            SysApoio.showDialogError(ex.getMessage(), this.getGui());
-            this.getGui().setStatusMsg(ex.getMessage());
-            log.error(ex);
+            log.error("Failed to autoload results file: " + autoLoad, ex);
+            SysApoio.showDialogError(ex.getMessage(), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
+            this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + autoLoad);
+        } catch (RuntimeException ex) {
+            log.error("Unexpected error autoloading results file: " + autoLoad, ex);
+            SysApoio.showDialogError(labels.getString("OPEN.ERRO.INESPERADO"), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
+            this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + autoLoad);
         }
     }
 
