@@ -23,6 +23,7 @@ import gui.MainResultWindowGui;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
 import gui.charts.DataSetForChart;
+import gui.services.BusyGlass;
 import gui.services.ComponentFactory;
 import java.awt.Color;
 import java.awt.Component;
@@ -51,6 +52,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.SwingWorker;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.ProgressMonitor;
@@ -518,15 +520,38 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             return;
         }
         /*
-         * Try to post
-         * if fail, then alternate message
+         * Try to post. The HTTP upload can take several seconds, so run it on a SwingWorker with a
+         * busy overlay instead of blocking (freezing) the EDT. doPrepPost reads the model, so keep it
+         * on the EDT; the worker only does the network call.
          */
         this.getGui().setStatusMsg(labels.getString("ENVIAR.POST.JUDGE"));
-        if (!doSendPost(attachment)) {
-            //nao deu post 
-            this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO"));
-            SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), this.getGui());
-        }
+        final PartidaJogadorWebInfo info = doPrepPost(attachment);
+        final BusyGlass busy = BusyGlass.show(this.getGui(), labels.getString("ENVIAR.POST.JUDGE"));
+        new SwingWorker<Integer, Void>() {
+            @Override
+            protected Integer doInBackground() throws Exception {
+                return WebCounselorManager.getInstance().doSendViaPost(info);
+            }
+
+            @Override
+            protected void done() {
+                if (busy != null) {
+                    busy.hide();
+                }
+                boolean ok;
+                try {
+                    ok = handleSendResult(get(), attachment);
+                } catch (Exception ex) {
+                    // network failure / PersistenceException
+                    WorldControler.this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
+                    ok = false;
+                }
+                if (!ok) {
+                    WorldControler.this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO"));
+                    SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), WorldControler.this.getGui());
+                }
+            }
+        }.execute();
     }
 
     /**
@@ -1179,42 +1204,39 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private boolean doSendPost(File attachment) {
-        try {
-            //int ret = WebCounselorManager.getInstance().doSendViaPost(attachment, partida, listaOrdens());
-            PartidaJogadorWebInfo info = doPrepPost(attachment);
-            int ret = WebCounselorManager.getInstance().doSendViaPost(info);
-            switch (ret) {
-                case WebCounselorManager.OK:
-                    final String msg = String.format(labels.getString("POST.DONE"), attachment.getName());
-                    log.info(msg);
-                    if (SettingsManager.getInstance().isConfig("DebugWebpostTime", "1", "0")) {
-                        log.info(WebCounselorManager.getInstance().getLastResponseString());
-                    }
-                    this.getGui().setStatusMsg(msg);
-                    if (SettingsManager.getInstance().getConfig("SendOrderConfirmationPopUp", "1").equals("1")) {
-                        SysApoio.showDialogInfo(labels.getString("POST.DONE.TITLE"), labels.getString("POST.DONE.TITLE"), this.getGui());
-                    }
-                    return true;
-                case WebCounselorManager.ERROR_GAMECLOSED:
-                    //display alert!
-                    SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"), this.getGui());
-                    this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
-                    return true; //dont try email
-                case WebCounselorManager.ERROR_TURN:
-                    final String expectedTurn = String.format(labels.getString("ENVIAR.ERRO.WRONGTURN"), WebCounselorManager.getInstance().getLastResponseString());
-                    //display alert!
-                    SysApoio.showDialogError(expectedTurn, labels.getString("ENVIAR.ERRO"), this.getGui());
-                    this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
-                    return true; //dont try email
-                default:
-                    SysApoio.showDialogError(labels.getString("ERROR"), labels.getString("ENVIAR.ERRO"), this.getGui());
-                    this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
-                    return false;
-            }
-        } catch (PersistenceException ex) {
-            this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
-            return false;
+    /**
+     * Handles the upload result on the EDT (status messages + dialogs). The network call itself runs
+     * on a SwingWorker in doSend(); this is invoked from its done(). Returns true when no further
+     * error handling is needed, false to trigger the generic "ENVIAR.ERRO.INSTRUCTIONS" dialog.
+     */
+    private boolean handleSendResult(int ret, File attachment) {
+        switch (ret) {
+            case WebCounselorManager.OK:
+                final String msg = String.format(labels.getString("POST.DONE"), attachment.getName());
+                log.info(msg);
+                if (SettingsManager.getInstance().isConfig("DebugWebpostTime", "1", "0")) {
+                    log.info(WebCounselorManager.getInstance().getLastResponseString());
+                }
+                this.getGui().setStatusMsg(msg);
+                if (SettingsManager.getInstance().getConfig("SendOrderConfirmationPopUp", "1").equals("1")) {
+                    SysApoio.showDialogInfo(labels.getString("POST.DONE.TITLE"), labels.getString("POST.DONE.TITLE"), this.getGui());
+                }
+                return true;
+            case WebCounselorManager.ERROR_GAMECLOSED:
+                //display alert!
+                SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"), this.getGui());
+                this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
+                return true; //dont try email
+            case WebCounselorManager.ERROR_TURN:
+                final String expectedTurn = String.format(labels.getString("ENVIAR.ERRO.WRONGTURN"), WebCounselorManager.getInstance().getLastResponseString());
+                //display alert!
+                SysApoio.showDialogError(expectedTurn, labels.getString("ENVIAR.ERRO"), this.getGui());
+                this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
+                return true; //dont try email
+            default:
+                SysApoio.showDialogError(labels.getString("ERROR"), labels.getString("ENVIAR.ERRO"), this.getGui());
+                this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
+                return false;
         }
     }
 
