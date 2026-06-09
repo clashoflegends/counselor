@@ -19,6 +19,9 @@
 #MyEmail=you@example.com
 #SendOrderConfirmationPopUp=1
 #SendOrderReceiptRequest=0
+# Save orders without prompting: skip the Save dialog and write the orders (.rc.egf) straight to the
+# standard filename in the same folder as the results (.rr.egf) file. Set to 1 to enable.
+#SaveOrdersNoPrompt=0
 #OverrideElimination=0
 #LookAndFeelTheme=0
 #LookAndFeelFontSize=0

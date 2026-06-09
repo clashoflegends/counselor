@@ -330,8 +330,15 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             //monta o dialogo
             //define default
             fcOrders.setSelectedFile(new File(fileName));
-            //exibe dialogo
-            if (fcOrders.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
+            if (SettingsManager.getInstance().isConfig("SaveOrdersNoPrompt", "1", "0")) {
+                //accept the default name + folder (same folder as the rr.egf) without prompting
+                fcOrders.setSelectedFile(new File(fcOrders.getCurrentDirectory(), fileName));
+                ret = doFileSave(comando, missingActionMsg);
+                if (ret != null) {
+                    log.info(String.format("Auto-saved Server file[%s]: %s", SysApoio.getPidOs(), ret.getAbsolutePath()));
+                }
+            } else if (fcOrders.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
+                //exibe dialogo
                 ret = doFileSave(comando, missingActionMsg);
                 log.info(String.format("Saved Server file[%s]: %s", SysApoio.getPidOs(), ret.getAbsolutePath()));
             } else {
