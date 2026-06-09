@@ -40,6 +40,7 @@ public class MainSettingsGui extends JPanel {
         autoLoadButton.addActionListener(settingsControler);
         autoLoadActionButton.addActionListener(settingsControler);
         autoSaveOrdersCheck.addActionListener(settingsControler);
+        saveOrdersNoPromptCheck.addActionListener(settingsControler);
         overEliminCheckBox.addActionListener(settingsControler);
         overEliminCheckBox1.addActionListener(settingsControler);
         overEliminCheckBox2.addActionListener(settingsControler);
@@ -114,6 +115,7 @@ public class MainSettingsGui extends JPanel {
         autoLoadCheck = new javax.swing.JCheckBox();
         autoLoadActionCheck = new javax.swing.JCheckBox();
         autoSaveOrdersCheck = new javax.swing.JCheckBox();
+        saveOrdersNoPromptCheck = new javax.swing.JCheckBox();
         playerPanel = new javax.swing.JPanel();
         sendConfirmPopUpCheckBox = new javax.swing.JCheckBox();
         sendOrderRequestCheckBox = new javax.swing.JCheckBox();
@@ -231,6 +233,11 @@ public class MainSettingsGui extends JPanel {
         autoSaveOrdersCheck.setToolTipText(bundle.getString("SETTINGS.GAME.AUTOSAVEORDERS.TOOLTIP")); // NOI18N
         autoSaveOrdersCheck.setActionCommand("autoSaveOrders");
 
+        saveOrdersNoPromptCheck.setSelected(isSaveOrdersNoPromptSelected());
+        saveOrdersNoPromptCheck.setText(bundle.getString("SETTINGS.GAME.SAVEORDERSNOPROMPT")); // NOI18N
+        saveOrdersNoPromptCheck.setToolTipText(bundle.getString("SETTINGS.GAME.SAVEORDERSNOPROMPT.TOOLTIP")); // NOI18N
+        saveOrdersNoPromptCheck.setActionCommand("saveOrdersNoPrompt");
+
         javax.swing.GroupLayout gamePanelLayout = new javax.swing.GroupLayout(gamePanel);
         gamePanel.setLayout(gamePanelLayout);
         gamePanelLayout.setHorizontalGroup(
@@ -238,9 +245,6 @@ public class MainSettingsGui extends JPanel {
             .addGroup(gamePanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(gamePanelLayout.createSequentialGroup()
-                        .addComponent(saveDirLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(gamePanelLayout.createSequentialGroup()
                         .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(gamePanelLayout.createSequentialGroup()
@@ -284,7 +288,12 @@ public class MainSettingsGui extends JPanel {
                         .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(overEliminCheckBox2)
                             .addComponent(overEliminCheckBox))
-                        .addGap(34, 34, 34))))
+                        .addGap(34, 34, 34))
+                    .addGroup(gamePanelLayout.createSequentialGroup()
+                        .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(saveDirLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(saveOrdersNoPromptCheck))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         gamePanelLayout.setVerticalGroup(
             gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -327,7 +336,9 @@ public class MainSettingsGui extends JPanel {
                 .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(overEliminCheckBox2)
                     .addComponent(autoSaveOrdersCheck))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(saveOrdersNoPromptCheck)
+                .addGap(0, 75, Short.MAX_VALUE))
         );
 
         playerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.PLAYER"))); // NOI18N
@@ -474,7 +485,7 @@ public class MainSettingsGui extends JPanel {
                             .addComponent(tableColumnCheckBox)
                             .addComponent(copyOrdersCheckBox)
                             .addComponent(autoMoveCheckBox))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 56, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(minimizeWindowCheckBox)
                             .addComponent(copyActionsPopUpCheckBox)
@@ -489,9 +500,9 @@ public class MainSettingsGui extends JPanel {
                             .addComponent(portraitsFolderLabel))
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(displayPanelLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 144, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(splitSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(157, Short.MAX_VALUE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(displayPanelLayout.createSequentialGroup()
                                 .addGap(26, 26, 26)
                                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -548,7 +559,7 @@ public class MainSettingsGui extends JPanel {
                     .addComponent(portraitFolderNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(6, 6, 6)
                 .addComponent(displayPortraitCheckBox)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
 
         mapPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.MAP"))); // NOI18N
@@ -644,7 +655,7 @@ public class MainSettingsGui extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(playerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
-                    .addComponent(mapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)))
+                    .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 533, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -655,7 +666,7 @@ public class MainSettingsGui extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(displayPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
-                    .addComponent(mapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)))
+                    .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 337, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -723,6 +734,7 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JButton saveDirButton;
     private javax.swing.JLabel saveDirLabel;
     private javax.swing.JTextField saveDirTextField;
+    private javax.swing.JCheckBox saveOrdersNoPromptCheck;
     private javax.swing.JCheckBox sendConfirmPopUpCheckBox;
     private javax.swing.JCheckBox sendOrderRequestCheckBox;
     private javax.swing.JRadioButton sequenceRadioButton;

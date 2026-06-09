@@ -73,10 +73,6 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <Component id="saveDirLabel" min="-2" pref="135" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="languageLabel" min="-2" pref="146" max="-2" attributes="0"/>
@@ -136,6 +132,13 @@
                           </Group>
                           <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
                       </Group>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="saveDirLabel" min="-2" pref="135" max="-2" attributes="0"/>
+                              <Component id="saveOrdersNoPromptCheck" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      </Group>
                   </Group>
               </Group>
           </Group>
@@ -192,7 +195,9 @@
                       <Component id="overEliminCheckBox2" min="-2" max="-2" attributes="0"/>
                       <Component id="autoSaveOrdersCheck" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="saveOrdersNoPromptCheck" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="0" pref="75" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -391,6 +396,20 @@
             <Property name="actionCommand" type="java.lang.String" value="autoSaveOrders"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JCheckBox" name="saveOrdersNoPromptCheck">
+          <Properties>
+            <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="isSaveOrdersNoPromptSelected()" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.GAME.SAVEORDERSNOPROMPT" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.GAME.SAVEORDERSNOPROMPT.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="saveOrdersNoPrompt"/>
+          </Properties>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="playerPanel">
@@ -499,7 +518,7 @@
                               <Component id="copyOrdersCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="autoMoveCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="56" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="minimizeWindowCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="copyActionsPopUpCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -517,9 +536,9 @@
                           </Group>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
-                                  <EmptySpace pref="144" max="32767" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                                   <Component id="splitSizeSpinner" min="-2" pref="72" max="-2" attributes="0"/>
-                                  <EmptySpace pref="157" max="32767" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
@@ -594,7 +613,7 @@
                   </Group>
                   <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                   <Component id="displayPortraitCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="34" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
