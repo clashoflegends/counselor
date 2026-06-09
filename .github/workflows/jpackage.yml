@@ -62,6 +62,7 @@ jobs:
           mkdir -p dist/lib dist/examples
           cp lib/*.jar dist/lib/
           cp examples/*.egf dist/examples/ 2>/dev/null || true
+          cp splash/teaser_whs01.png dist/
 
       - name: Derive version
         shell: bash
@@ -78,6 +79,7 @@ jobs:
           cp dist/PbmCounselor.jar Counselor/dist/
           cp dist/lib/*.jar Counselor/dist/lib/
           cp dist/examples/*.egf Counselor/dist/examples/ 2>/dev/null || true
+          cp dist/teaser_whs01.png Counselor/dist/
           cp run.bat run.sh Counselor/
           mkdir -p installer
           zip -r installer/Counselor-portable-${APP_VERSION}.zip Counselor/
@@ -130,6 +132,7 @@ jobs:
             --app-version "$APP_VERSION" \
             --vendor "Clash of Legends" \
             --add-modules java.desktop,java.sql,java.xml,java.naming,java.logging,java.management,jdk.unsupported \
+            --java-options '-splash:$APPDIR/teaser_whs01.png' \
             --java-options -Xmx512M \
             --java-options "-Dsun.java2d.d3d=false" \
             --java-options "--add-opens=java.base/java.util=ALL-UNNAMED" \
@@ -157,6 +160,7 @@ jobs:
             --app-version "$APP_VERSION" \
             --vendor "Clash of Legends" \
             --add-modules java.desktop,java.sql,java.xml,java.naming,java.logging,java.management,jdk.unsupported \
+            --java-options '-splash:$APPDIR/teaser_whs01.png' \
             --java-options -Xmx512M \
             --java-options "-Dsun.java2d.d3d=false" \
             --java-options "--add-opens=java.base/java.util=ALL-UNNAMED" \
@@ -186,6 +190,7 @@ jobs:
             --app-version "$APP_VERSION" \
             --vendor "Clash of Legends" \
             --add-modules java.desktop,java.sql,java.xml,java.naming,java.logging,java.management,jdk.unsupported \
+            --java-options '-splash:$APPDIR/teaser_whs01.png' \
             --java-options -Xmx512M \
             --java-options "--add-opens=java.base/java.util=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.lang=ALL-UNNAMED" \
