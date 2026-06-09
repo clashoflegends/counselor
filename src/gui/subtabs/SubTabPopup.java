@@ -97,6 +97,7 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, IDispatchRecei
     private void iniciaConfig() {
         //monta a floating window para ordens
         final OrdemControlerFloater ordemControlFloater = new OrdemControlerFloater(this);
+        gui.services.AppIcon.applyTo(dPopup);
         dPopup.setTitle(labels.getString("INFORMATION.TITLE"));
         dPopup.setAlwaysOnTop(true);
         dPopup.addComponentListener(ordemControlFloater);

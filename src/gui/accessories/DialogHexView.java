@@ -34,6 +34,7 @@ public class DialogHexView extends javax.swing.JDialog implements IDispatchRecei
 
     public DialogHexView(boolean modal) {
         super(new JFrame(), modal);
+        gui.services.AppIcon.applyTo(this);
         this.setAlwaysOnTop(true);
         initComponents();
     }

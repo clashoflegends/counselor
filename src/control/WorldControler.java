@@ -23,6 +23,7 @@ import gui.MainResultWindowGui;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
 import gui.charts.DataSetForChart;
+import gui.services.AppIcon;
 import gui.services.BusyGlass;
 import gui.services.ComponentFactory;
 import java.awt.Color;
@@ -401,6 +402,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private void doAbout() throws HeadlessException {
         java.awt.Window owner = javax.swing.SwingUtilities.getWindowAncestor(this.getGui());
         JDialog dAbout = new JDialog(owner, java.awt.Dialog.ModalityType.MODELESS);
+        AppIcon.applyTo(dAbout);
         MainAboutBox stAbout = new MainAboutBox();
         dAbout.add(stAbout);
         dAbout.setTitle(labels.getString("MENU.ABOUT"));
@@ -470,6 +472,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             JScrollPane jsp = new javax.swing.JScrollPane(jtaResultado);
             //configura jDialog
             JDialog dAbout = new JDialog(new JFrame(), true);
+            AppIcon.applyTo(dAbout);
             dAbout.setTitle(labels.getString("COPIAR.ACOES"));
             dAbout.setAlwaysOnTop(true);
             dAbout.setPreferredSize(new Dimension(600, 400));
@@ -498,6 +501,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             JScrollPane jsp = new javax.swing.JScrollPane(jtaResultado);
             //configura jDialog
             JDialog dAbout = new JDialog(new JFrame(), true);
+            AppIcon.applyTo(dAbout);
             dAbout.setTitle(labels.getString("COPIAR.EMAILS"));
             dAbout.setAlwaysOnTop(true);
             dAbout.setPreferredSize(new Dimension(600, 400));

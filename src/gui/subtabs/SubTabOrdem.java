@@ -411,11 +411,13 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         //configura jDialog
         stAjuda.setFontMonospaced();
         dAjuda.add(stAjuda);
+        gui.services.AppIcon.applyTo(dAjuda);
         dAjuda.setTitle(labels.getString("AJUDA"));
         dAjuda.setAlwaysOnTop(true);
         dAjuda.setPreferredSize(new Dimension(300, 600));
         dAjuda.setLocationRelativeTo(this.jtListaOrdens);
         //monta a floating window para ordens
+        gui.services.AppIcon.applyTo(dOrdem);
         dOrdem.setTitle(labels.getString("ACOES.DISPONIVEL"));
         dOrdem.setAlwaysOnTop(true);
         dOrdem.setPreferredSize(new Dimension(400, 500));
