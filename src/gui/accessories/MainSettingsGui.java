@@ -769,6 +769,10 @@ public class MainSettingsGui extends JPanel {
         return settingsManager.getConfig("AutoSaveActions", "1").equals("1");
     }
 
+    private boolean isSaveOrdersNoPromptSelected() {
+        return settingsManager.getConfig("SaveOrdersNoPrompt", "0").equals("1");
+    }
+
     private boolean isLoadActionsBehaviorSelected() {
         return settingsManager.getConfig("LoadActionsBehavior", "append").equals("append");
     }

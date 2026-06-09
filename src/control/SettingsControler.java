@@ -113,6 +113,12 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 SettingsManager.getInstance().setConfig("AutoSaveActions", String.valueOf(selected));
                 break;
             }
+            case "saveOrdersNoPrompt": {
+                JCheckBox noPromptCheck = (JCheckBox) e.getSource();
+                int selected = (noPromptCheck.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("SaveOrdersNoPrompt", String.valueOf(selected));
+                break;
+            }
             case "showPopUp": {
                 JCheckBox popUpCheck = (JCheckBox) e.getSource();
                 int selected = (popUpCheck.isSelected()) ? 1 : 0;
