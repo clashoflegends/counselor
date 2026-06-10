@@ -96,7 +96,6 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
 
         qtHexes.setText("999");
 
-        jSplitPane1.setBorder(null);
         jSplitPane1.setDividerLocation(SysApoio.parseInt(SettingsManager.getInstance().getConfig("localSplitSize", "200")));
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
@@ -140,7 +139,6 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
         });
         jtMainLista.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         jtMainLista.setName(""); // NOI18N
-        jtMainLista.setShowVerticalLines(false);
         jScrollPane3.setViewportView(jtMainLista);
 
         jSplitPane1.setLeftComponent(jScrollPane3);
@@ -150,7 +148,7 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
         toggleShowCampRestrictions.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_redfog.png"))); // NOI18N
         toggleShowCampRestrictions.setSelected(isCampRestrictionSelected());
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
-        toggleShowCampRestrictions.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SHOWCITYCAP")); // NOI18N
+        toggleShowCampRestrictions.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SHOWCAMP.BATLEROYALE")); // NOI18N
         toggleShowCampRestrictions.setActionCommand("showCampRestriction");
         toggleShowCampRestrictions.setFocusable(false);
         toggleShowCampRestrictions.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
