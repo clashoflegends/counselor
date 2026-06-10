@@ -88,7 +88,11 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          BUILD=$(grep '^BUILD=' src/version_counselor.properties | cut -d= -f2 | tr -d '[:space:]')
+          # Read BUILD from the built JAR (what the app actually reports), NOT from src/. The Ant
+          # -pre-jar target bumps src/version_counselor.properties AFTER the resource was already
+          # copied into the JAR at compile time, so src is one ahead of the shipped JAR. Reading src
+          # here made the release title (e.g. 2.861) disagree with the installed app's About box (2.860).
+          BUILD=$(unzip -p dist/PbmCounselor.jar version_counselor.properties | grep '^BUILD=' | cut -d= -f2 | tr -d '[:space:]')
           echo "2.${BUILD}" > installer/counselor_version.txt
 
       - name: Generate ICO (Windows)
