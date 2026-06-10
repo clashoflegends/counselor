@@ -738,6 +738,35 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         statusLabel.setText(txt);
     }
 
+    private String openFileName = "";
+    private String updateVersion = "";
+
+    /** Sets the currently open game file shown in the window title. */
+    public void setOpenFileName(String fileName) {
+        this.openFileName = (fileName == null) ? "" : fileName;
+        refreshWindowTitle();
+    }
+
+    /** Flags that a newer Counselor release is available (version like "2.865"); shown in title + status bar. */
+    public void setUpdateAvailable(String version) {
+        this.updateVersion = (version == null) ? "" : version;
+        if (!this.updateVersion.isEmpty()) {
+            setStatusMsg(String.format(labels.getString("UPDATE.AVAILABLE"), this.updateVersion));
+        }
+        refreshWindowTitle();
+    }
+
+    private void refreshWindowTitle() {
+        java.awt.Window w = javax.swing.SwingUtilities.getWindowAncestor(this);
+        if (!(w instanceof java.awt.Frame)) {
+            return;
+        }
+        String base = updateVersion.isEmpty()
+                ? "Counselor"
+                : String.format(labels.getString("UPDATE.AVAILABLE"), updateVersion);
+        ((java.awt.Frame) w).setTitle(openFileName.isEmpty() ? base : base + " - " + openFileName);
+    }
+
     public void setLabelMoney(String txt) {
         if (SysApoio.parseInt(txt) > 0) {
             this.labelMoney.setForeground(Color.black);

@@ -579,6 +579,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             log.info(labels.getString("INICIALIZANDO.GUI"));
             getGui().iniciaConfig();
             this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
+            this.getGui().setOpenFileName(resultsFile.getName());
             this.msgSubmitReady = false;
             this.saved = false;
             this.savedWorld = false;
@@ -650,6 +651,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             WFC.doStart(resultsFile);
             this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
             getGui().iniciaConfig();
+            this.getGui().setOpenFileName(resultsFile.getName());
             String autoLoadActions = SettingsManager.getInstance().getConfig("autoLoadActions", "none");
             if (!autoLoadActions.equals("none") && !autoLoadActions.isEmpty()) {
                 //check if there's a defined orders file to be loaded

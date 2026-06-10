@@ -60,10 +60,11 @@ public class PbmApplication extends Application implements Serializable {
         int posX = SettingsManager.getInstance().getConfigAsInt(configName + "PositionX", "-1");
         int posY = SettingsManager.getInstance().getConfigAsInt(configName + "PositionY", "-1");
 
+        MainResultWindowGui mainWin = null;
         try {
             //Create and set up the main content pane.
             //contentMainPane.setOpaque(true); //content panes must be opaque
-            MainResultWindowGui mainWin = new MainResultWindowGui(this.autoStart);
+            mainWin = new MainResultWindowGui(this.autoStart);
             frame.setContentPane(mainWin);
             frame.setTransferHandler(new EgfDropHandler(mainWin));
             //set icon
@@ -91,6 +92,8 @@ public class PbmApplication extends Application implements Serializable {
         //centerWindow(frame);
         frame.setVisible(true);
         setListeners(frame);
+        //check GitHub for a newer release (async, daemon thread; notifies title + status bar if found)
+        control.services.UpdateChecker.checkAsync(mainWin);
         log.info("Interface carregada and exibida.");
     }
 
