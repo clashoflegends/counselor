@@ -844,7 +844,7 @@ public class MainSettingsGui extends JPanel {
     }
 
     private ComboItem[] getLanguageComboModel() {
-        String languages[] = new String[]{"PT", "ES", "EN", "IT"};
+        String languages[] = new String[]{"PT", "ES", "EN", "IT", "CA"};
         ComboItem[] combo = new ComboItem[languages.length];
 
         for (int i = 0; i < languages.length; i++) {
