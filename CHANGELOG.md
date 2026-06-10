@@ -1,5 +1,36 @@
 # What's New in Counselor
 
+## 09-JUN-2026 - v2.0.8
+
+### Faster, smoother submitting
+- Submitting your orders no longer freezes the window. A spinner shows while it uploads (it can take a few seconds), and the app stays responsive.
+- New option to save orders without the file dialog: turn on "Save orders without asking" in Settings and Counselor writes the orders file with the standard name, right next to your results file.
+
+### Stay up to date
+- Counselor now checks for a newer release on startup and tells you in the status bar and title bar when one is available.
+- The window title now shows the game file you have open, so it's easy to tell windows apart.
+
+### Nicer to look at and to run
+- The splash screen is back on every download type (installer and portable), so you get feedback during the (sometimes slow) first load.
+- The hex icon now appears on every window, including Hex View, About, and the floating order/help windows (no more generic Java cup).
+
+### More reliable
+- Opening a damaged or incompatible turn file now shows a clear message instead of crashing, and the details are saved to the log so the GM can help.
+- A crash when opening certain files (with the "Owned" default filter) is fixed.
+
+### Better language support
+- All on-screen text was spell-checked and proofread.
+- Portuguese, Spanish, and Italian translations are now complete (many previously-untranslated screens are now in your language).
+- Catalan is now available. Pick it in Settings under Language.
+
+### Website (clashlegends.com)
+- Request your own game: supporters and seasoned players can now request a new game from a form: pick a base game, adjust the settings, and submit. The GM team is notified and reviews it. You can even choose your own password!
+- Multi-nation games: games can now let a player run more than one nation, with a sign-up field for how many you intend to play.
+- More statistics: new player and community charts, plus a refreshed stats area.
+- Behind the scenes: faster, safer order uploads and better crash diagnostics so issues get spotted and fixed quicker. Nothing you need to do.
+
+---
+
 ## 07-JUN-2026 - Major Update
 
 This is the biggest update to Counselor in many years. Here is what changed for you as a player.
