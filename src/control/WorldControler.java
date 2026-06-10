@@ -547,7 +547,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             @Override
             protected void done() {
                 if (busy != null) {
-                    busy.hide();
+                    busy.dismiss();
                 }
                 boolean ok;
                 try {

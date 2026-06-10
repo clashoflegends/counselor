@@ -86,8 +86,13 @@ public class BusyGlass extends JComponent {
         return glass;
     }
 
-    /** Restores the previous glass pane. Safe to call from the EDT; tolerates a null instance. */
-    public void hide() {
+    /**
+     * Removes the overlay and restores the previous glass pane. Call from the EDT.
+     *
+     * NOTE: do NOT name this hide(): that overrides the deprecated java.awt.Component.hide(),
+     * which setVisible(false) delegates to, causing infinite recursion (StackOverflowError).
+     */
+    public void dismiss() {
         setVisible(false);
         if (previousGlass != null) {
             rootPane.setGlassPane(previousGlass);
