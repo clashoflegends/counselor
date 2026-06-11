@@ -139,6 +139,7 @@ jobs:
             --java-options '-splash:$APPDIR/teaser_whs01.png' \
             --java-options -Xmx512M \
             --java-options "-Dsun.java2d.d3d=false" \
+            --java-options "-Dsun.java2d.noddraw=true" \
             --java-options "--add-opens=java.base/java.util=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.lang=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" \
@@ -167,6 +168,7 @@ jobs:
             --java-options '-splash:$APPDIR/teaser_whs01.png' \
             --java-options -Xmx512M \
             --java-options "-Dsun.java2d.d3d=false" \
+            --java-options "-Dsun.java2d.noddraw=true" \
             --java-options "--add-opens=java.base/java.util=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.lang=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" \

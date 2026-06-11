@@ -1,6 +1,8 @@
 @echo off
 start "" javaw ^
   -splash:"%~dp0dist\teaser_whs01.png" ^
+  -Dsun.java2d.d3d=false ^
+  -Dsun.java2d.noddraw=true ^
   --add-opens java.base/java.util=ALL-UNNAMED ^
   --add-opens java.base/java.lang=ALL-UNNAMED ^
   --add-opens java.base/java.lang.reflect=ALL-UNNAMED ^
