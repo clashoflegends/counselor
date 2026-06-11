@@ -175,6 +175,12 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 SettingsManager.getInstance().setConfig("TableColumnAdjust", String.valueOf(selected));
                 break;
             }
+            case "colorDifficulty": {
+                JCheckBox colorDiff = (JCheckBox) e.getSource();
+                int selected = (colorDiff.isSelected()) ? 1 : 0;
+                SettingsManager.getInstance().setConfig("ColorDifficulty", String.valueOf(selected));
+                break;
+            }
             case "copyActions": {
                 JCheckBox copyActions = (JCheckBox) e.getSource();
                 int selected = (copyActions.isSelected()) ? 1 : 0;

@@ -13,6 +13,7 @@ import control.support.ActorInterface;
 import control.support.ActorInterfaceFactory;
 import gui.TabBase;
 import gui.services.ComponentFactory;
+import gui.services.DifficultyColorTableCellRenderer;
 import gui.services.IAcaoGui;
 import gui.services.IPopupTabGui;
 import java.awt.Component;
@@ -475,6 +476,22 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         } else {
             this.jtListaOrdens.setModel(model);
             doConfigTableColumns(jtListaOrdens);
+            applyDifficultyColor(jtListaOrdens);
+        }
+    }
+
+    /**
+     * Tints the Difficulty column (index 3) by level when the ColorDifficulty
+     * config is on (default on). Re-evaluated on every model rebuild, so a
+     * Settings toggle takes effect the next time the actor/orders are loaded.
+     */
+    private void applyDifficultyColor(JTable table) {
+        if (!SettingsManager.getInstance().isConfig("ColorDifficulty", "1", "1")) {
+            return;
+        }
+        final int difficultyCol = 3;
+        if (table.getColumnModel().getColumnCount() > difficultyCol) {
+            table.getColumnModel().getColumn(difficultyCol).setCellRenderer(new DifficultyColorTableCellRenderer());
         }
     }
 
@@ -720,6 +737,10 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         //write display to remove brackets
         this.jtListaOrdens.getModel().setValueAt(action.getOrdemParameters(), ordIndex, 1);
         this.jtListaOrdens.getModel().setValueAt(TitleFactory.getTipoOrdem(action.getOrdem()), ordIndex, 2);
+        //keep the difficulty column in sync so its color updates on edit (4-col model only)
+        if (this.jtListaOrdens.getModel().getColumnCount() > 3) {
+            this.jtListaOrdens.getModel().setValueAt(TitleFactory.getDificuldade(action.getOrdem()), ordIndex, 3);
+        }
         //update main table. PersonagemTab is the only one that contains orders.
         final int ordensOpenSlots = this.getActor().getOrdensOpenSlots();
         parentTab.setValueAt(action, ordIndex, ordensOpenSlots);

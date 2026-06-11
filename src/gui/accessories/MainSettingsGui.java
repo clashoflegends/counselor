@@ -71,6 +71,11 @@ public class MainSettingsGui extends JPanel {
         displayPortraitCheckBox.addActionListener(settingsControler);
         downloadPortraitsButton.addActionListener(settingsControler);
         mountainColorButton.addActionListener(settingsControler);
+        colorDifficultyCheckBox.setText(settingsManager.getBundleManager().getString("SETTINGS.DISPLAY.COLORDIFFICULTY"));
+        colorDifficultyCheckBox.setToolTipText(settingsManager.getBundleManager().getString("SETTINGS.DISPLAY.COLORDIFFICULTY.TOOLTIP"));
+        colorDifficultyCheckBox.setActionCommand("colorDifficulty");
+        colorDifficultyCheckBox.setSelected(isColorDifficultySelected());
+        colorDifficultyCheckBox.addActionListener(settingsControler);
 
         //Hiding controls here until they are tested. Set ShowCharacterPortraitsBeta=1 to test.
         if (SettingsManager.getInstance().isConfig("ShowCharacterPortraitsBeta", "1", "1")) {
@@ -141,6 +146,7 @@ public class MainSettingsGui extends JPanel {
         portraitsFolderLabel = new javax.swing.JLabel();
         downloadPortraitsButton = new javax.swing.JButton();
         portraitFolderNameTextField = new javax.swing.JTextField();
+        colorDifficultyCheckBox = new javax.swing.JCheckBox();
         mapPanel = new javax.swing.JPanel();
         hexTagStyleLabel = new javax.swing.JLabel();
         armyPathLabel = new javax.swing.JLabel();
@@ -333,7 +339,7 @@ public class MainSettingsGui extends JPanel {
                     .addComponent(overEliminCheckBox)
                     .addComponent(overEliminCheckBox1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(overEliminCheckBox2)
                     .addComponent(autoSaveOrdersCheck))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -472,6 +478,8 @@ public class MainSettingsGui extends JPanel {
             }
         });
 
+        colorDifficultyCheckBox.setText("Collor dificulty");
+
         javax.swing.GroupLayout displayPanelLayout = new javax.swing.GroupLayout(displayPanel);
         displayPanel.setLayout(displayPanelLayout);
         displayPanelLayout.setHorizontalGroup(
@@ -487,11 +495,14 @@ public class MainSettingsGui extends JPanel {
                             .addComponent(autoMoveCheckBox))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(minimizeWindowCheckBox)
                             .addComponent(copyActionsPopUpCheckBox)
                             .addComponent(keepPopUpCheckBox)
-                            .addComponent(fogOfWarCheckBox))
-                        .addGap(167, 167, 167))
+                            .addComponent(fogOfWarCheckBox)
+                            .addGroup(displayPanelLayout.createSequentialGroup()
+                                .addComponent(minimizeWindowCheckBox)
+                                .addGap(18, 18, 18)
+                                .addComponent(colorDifficultyCheckBox)))
+                        .addGap(59, 59, 59))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, displayPanelLayout.createSequentialGroup()
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(sortOrdersLabel)
@@ -539,7 +550,8 @@ public class MainSettingsGui extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(maximizeWindowCheckBox)
-                    .addComponent(minimizeWindowCheckBox))
+                    .addComponent(minimizeWindowCheckBox)
+                    .addComponent(colorDifficultyCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(tableColumnCheckBox)
@@ -697,6 +709,7 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JTextField autoLoadTextField;
     private javax.swing.JCheckBox autoMoveCheckBox;
     private javax.swing.JCheckBox autoSaveOrdersCheck;
+    private javax.swing.JCheckBox colorDifficultyCheckBox;
     private javax.swing.JCheckBox copyActionsPopUpCheckBox;
     private javax.swing.JCheckBox copyOrdersCheckBox;
     private javax.swing.JPanel displayPanel;
@@ -807,6 +820,10 @@ public class MainSettingsGui extends JPanel {
 
     private boolean isTableColumnAdjustSelected() {
         return settingsManager.getConfig("TableColumnAdjust", "0").equals("1");
+    }
+
+    private boolean isColorDifficultySelected() {
+        return settingsManager.getConfig("ColorDifficulty", "1").equals("1");
     }
 
     private boolean isCopyActionsPopUpSelected() {
