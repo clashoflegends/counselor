@@ -1,5 +1,20 @@
 # What's New in Counselor
 
+## 10-JUN-2026 - v2.1.1
+
+### Export any list in one click
+- Right-click any list (characters, armies, cities, orders, and the rest) to **copy it to the clipboard with column headers** - paste straight into a spreadsheet or email.
+- Or choose **Export to CSV...** to save the list as a file you can open in Excel. Counselor suggests a filename (based on your game) and lets you pick the folder. Accented names come through correctly, in any language.
+
+### See how hard each order is
+- Saved orders now have a **Difficulty** column, color-coded by level: red = hard, yellow = average, green = easy or automatic, blue = varies. A quick way for newer players to learn which orders are reliable.
+- Don't want the colors? Turn them off under Settings.
+
+### Smoother on Windows
+- Fixed a Windows display glitch where panels could smear, go blank, or appear doubled after opening and closing a dialog. The screen now redraws cleanly.
+
+---
+
 ## 09-JUN-2026 - v2.0.8
 
 ### Faster, smoother submitting
