@@ -747,6 +747,11 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         refreshWindowTitle();
     }
 
+    /** The currently open game file name (e.g. "game_884_13.gurgel.rr.egf"), or "" if none. */
+    public String getOpenFileName() {
+        return openFileName;
+    }
+
     /** Flags that a newer Counselor release is available (version like "2.865"); shown in title + status bar. */
     public void setUpdateAvailable(String version) {
         this.updateVersion = (version == null) ? "" : version;
