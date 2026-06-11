@@ -218,7 +218,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
                             .addComponent(cbPar11, 0, 1, Short.MAX_VALUE)))
                     .addGroup(jpOrdensLayout.createSequentialGroup()
                         .addGap(9, 9, 9)
-                        .addComponent(cbOrdem, 0, 370, Short.MAX_VALUE)))
+                        .addComponent(cbOrdem, 0, 390, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jbOk)
@@ -301,7 +301,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         jpDetOrdensLayout.setHorizontalGroup(
             jpDetOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jpOrdens, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jspListaOrdens, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+            .addComponent(jspListaOrdens, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
         );
         jpDetOrdensLayout.setVerticalGroup(
             jpDetOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -319,13 +319,13 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
             jpMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpMasterLayout.createSequentialGroup()
                 .addGap(2, 2, 2)
-                .addComponent(detOrdens, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
+                .addComponent(detOrdens, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
                 .addGap(3, 3, 3))
         );
         jpMasterLayout.setVerticalGroup(
             jpMasterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpMasterLayout.createSequentialGroup()
-                .addComponent(detOrdens, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+                .addComponent(detOrdens, javax.swing.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE)
                 .addGap(0, 0, 0))
         );
 

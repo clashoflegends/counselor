@@ -69,7 +69,8 @@ public abstract class ActorInterface extends ControlBase implements Serializable
     }
 
     /**
-     * 0 = Personagens 1 = Personagem-Comandante-Ex 2 = Personagem-Local 3 = Personagem-Nacao-Local 4 = Personagem-Local-NoNacao 5 = Personagem-Nacao
+     * 0 = Personagens 1 = Personagem-Comandante-Ex 2 = Personagem-Local 3 =
+     * Personagem-Nacao-Local 4 = Personagem-Local-NoNacao 5 = Personagem-Nacao
      * 5 = Personagem-local_self
      *
      * @param tipo
@@ -125,17 +126,17 @@ public abstract class ActorInterface extends ControlBase implements Serializable
 
     public GenericoTableModel getOrdemModel() {
         GenericoTableModel model = new GenericoTableModel(
-                new String[]{labels.getString("ACAO"), labels.getString("PARAMETRO"), labels.getString("TIPO")},
+                new String[]{labels.getString("ACAO"), labels.getString("PARAMETRO"), labels.getString("TIPO"), labels.getString("DIFICULDADE")},
                 getOrdemAsArray(),
                 new Class[]{
-                    java.lang.String.class, java.lang.String.class, java.lang.String.class
+                    java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
                 });
         return model;
     }
 
     private String[][] getOrdemAsArray() {
         int ii = 0;
-        String[][] ret = new String[getAcaoMax()][3];
+        String[][] ret = new String[getAcaoMax()][4];
         for (ii = 0; ii < ret.length; ii++) {
             ret[ii] = getOrdemDisplay(ii);
             ret[ii][1] = ret[ii][1].replace('[', ' ').replace(']', ' ').trim();
