@@ -20,6 +20,9 @@ jobs:
           - os: macos-latest
             pkg-type: dmg
             icon-ext: icns
+          - os: macos-13          # Intel runner — produces an x86_64 DMG for Intel Macs
+            pkg-type: dmg
+            icon-ext: icns
           - os: ubuntu-latest
             pkg-type: deb
             icon-ext: png
@@ -67,9 +70,15 @@ jobs:
       - name: Derive version
         shell: bash
         run: |
-          VER="${GITHUB_REF_NAME#v}"
-          [[ "$VER" =~ ^[0-9] ]] || VER="0.0.0"
-          echo "APP_VERSION=$VER" >> "$GITHUB_ENV"
+          # Installer version is derived from the build number, NOT the marketing tag, so it increases
+          # on every release and every re-cut. Windows Installer only performs a major upgrade when
+          # ProductVersion strictly increases; a tag-based version (e.g. "2.0.8") repeats across re-cuts
+          # and never triggers an upgrade, leaving players stuck on stale binaries. 2.1.<build> stays
+          # monotonic (build only grows via the bump-build job). Applies to all platforms.
+          # NOTE: MSI ProductVersion micro field caps at 65535; revisit the scheme well before then.
+          BUILD=$(unzip -p dist/PbmCounselor.jar version_counselor.properties | grep '^BUILD=' | cut -d= -f2 | tr -d '[:space:]')
+          [ -n "$BUILD" ] || { echo "BUILD not found in built JAR"; exit 1; }
+          echo "APP_VERSION=2.1.${BUILD}" >> "$GITHUB_ENV"
 
       - name: Package portable ZIP (Linux only — platform-independent)
         if: runner.os == 'Linux'
@@ -80,7 +89,8 @@ jobs:
           cp dist/lib/*.jar Counselor/dist/lib/
           cp dist/examples/*.egf Counselor/dist/examples/ 2>/dev/null || true
           cp dist/teaser_whs01.png Counselor/dist/
-          cp run.bat run.sh Counselor/
+          cp run.bat run.sh Counselor.command Counselor/
+          chmod +x Counselor/run.sh Counselor/Counselor.command
           mkdir -p installer
           zip -r installer/Counselor-portable-${APP_VERSION}.zip Counselor/
 
@@ -205,6 +215,15 @@ jobs:
             --java-options "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED" \
             --icon icon/icon.${{ matrix.icon-ext }} \
             --file-associations jpackage/file-associations.properties
+
+      - name: Label macOS DMG by architecture
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          # Both the Apple-Silicon (macos-latest) and Intel (macos-13) runners emit
+          # Counselor-${APP_VERSION}.dmg. Rename by arch so the release assets don't collide.
+          if [ "$(uname -m)" = "arm64" ]; then LABEL=apple-silicon; else LABEL=intel; fi
+          mv "installer/Counselor-${APP_VERSION}.dmg" "installer/Counselor-${APP_VERSION}-${LABEL}.dmg"
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
