@@ -772,6 +772,19 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         ((java.awt.Frame) w).setTitle(openFileName.isEmpty() ? base : base + " - " + openFileName);
     }
 
+    /**
+     * Re-apply the window title once this panel is attached to its frame. Autoload (file-association /
+     * properties.config) opens the EGF inside the constructor, before PbmApplication calls
+     * setContentPane()/setVisible(), so refreshWindowTitle() there finds no frame ancestor and no-ops.
+     * addNotify() fires during frame.pack(), when getWindowAncestor() resolves, so the stored
+     * openFileName is applied then.
+     */
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        refreshWindowTitle();
+    }
+
     public void setLabelMoney(String txt) {
         if (SysApoio.parseInt(txt) > 0) {
             this.labelMoney.setForeground(Color.black);
