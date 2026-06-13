@@ -1,5 +1,23 @@
 # What's New in Counselor
 
+## 12-JUN-2026 - v2.1.877
+
+### Make the map easier to read
+- You can now **choose your own colors** for the Barbarian and Unknown nations on the map. Their default white and grey can be hard to tell apart - especially for colorblind players - so set whatever stands out for you. It's under **Settings** (Barbarian Color / Unknown Color), and the map updates right away.
+
+### Updating is smoother
+- Installing a new version now reliably replaces the old one, instead of sometimes leaving you on the previous build.
+- **Mac:** there's now a dedicated build for Intel Macs, plus a double-click launcher for the portable version (no Terminal needed).
+- The installation guide now spells out what each download needs - and the right Java to grab for your Mac.
+
+### Little things
+- The window title always shows which turn file you have open, even when you open it by double-clicking the file.
+
+### Website (clashlegends.com)
+- The Statistics page now shows the **share of players by nationality** across the community.
+
+---
+
 ## 10-JUN-2026 - v2.1.1
 
 ### Export any list in one click
