@@ -4,6 +4,20 @@ Counselor is the client application for Clash of Legends players. It lets you op
 
 ---
 
+## System requirements
+
+Counselor runs on Java 21, which sets the minimum operating system:
+
+| Platform | Minimum |
+|---|---|
+| Windows | 64-bit Windows 10 or later |
+| macOS | macOS 11 (Big Sur) or later - **older Macs (e.g. 10.15 Catalina) cannot run Counselor, on any download** |
+| Linux | 64-bit, modern distribution (e.g. Ubuntu 20.04+) |
+
+The `.msi`, `.dmg`, `.deb`, and Windows portable downloads **include Java**, so you don't install anything separately. Only the **portable ZIP** needs Java 21 installed yourself - see [Installing Java](#installing-java-for-the-portable-zip).
+
+---
+
 ## Choose your download
 
 Go to the [Releases page](https://github.com/clashoflegends/counselor/releases) and pick the file that fits your situation:
@@ -38,17 +52,36 @@ Go to the [Releases page](https://github.com/clashoflegends/counselor/releases) 
 
 **Best for:** Windows, macOS, and Linux players who already have Java 21 installed and want the fastest startup time.
 
-**Requires:** Java 21 or later installed and on your PATH. Download from [Adoptium](https://adoptium.net) if needed.
+**Requires:** Java 21 (64-bit) installed and on your PATH. **It must match your computer's processor** - see [Installing Java](#installing-java-for-the-portable-zip) below for the right download (this is the #1 cause of "it won't start" on Macs).
 
 1. Download `Counselor-portable-X.X.X.zip`.
 2. Extract all files anywhere.
 3. Run:
    - **Windows:** double-click `run.bat`
-   - **macOS / Linux:** open a terminal in the folder and run `bash run.sh`
+   - **macOS / Linux:** open a terminal in the extracted folder and run `bash run.sh`
 
 **Config file location:** `dist/properties.config` (next to the JAR, inside the extracted folder)
 
 **Log file location:** `dist/counselor.log`
+
+---
+
+## Installing Java (for the portable ZIP)
+
+Only the `Counselor-portable` ZIP needs this - every other download already includes Java.
+
+Install **Java 21 (64-bit)** from Adoptium, choosing the build that matches your computer's processor. Picking the wrong one (most often an Apple Silicon build on an Intel Mac) makes Counselor fail to start:
+
+| Your computer | Download |
+|---|---|
+| Windows (64-bit) | [Temurin 21 - Windows x64](https://adoptium.net/temurin/releases/?version=21&os=windows&arch=x64) |
+| Mac with Apple Silicon (M1/M2/M3/M4) | [Temurin 21 - macOS aarch64](https://adoptium.net/temurin/releases/?version=21&os=mac&arch=aarch64) |
+| Mac with Intel processor | [Temurin 21 - macOS x64](https://adoptium.net/temurin/releases/?version=21&os=mac&arch=x64) |
+| Linux (64-bit) | [Temurin 21 - Linux x64](https://adoptium.net/temurin/releases/?version=21&os=linux&arch=x64) |
+
+**Not sure which Mac you have?** Click the Apple menu → **About This Mac**. A **Chip** named "Apple M1/M2/M3..." means Apple Silicon; an **Intel** processor means Intel. (Any Mac that cannot update past macOS 10.15 is an Intel Mac - and cannot run Counselor at all; see [System requirements](#system-requirements).)
+
+On Windows, keep the **"Add to PATH"** option checked during the Java install so the launcher can find it.
 
 ---
 
@@ -70,7 +103,9 @@ No installation, no admin rights, no registry changes. Delete the folder to unin
 
 ## macOS installer (.dmg)
 
-**Best for:** Mac players who want a standard application install.
+**Best for:** Mac players who want a standard application install. **Requires macOS 11 (Big Sur) or later.**
+
+> The current `.dmg` is built for **Apple Silicon (M1/M2/M3...) Macs**. On an **Intel** Mac (macOS 11+), use the [portable ZIP](#jar--launcher-zip-counselor-portable-xxxzip) with the Intel Java build instead. Macs on macOS 10.15 or older cannot run Counselor.
 
 1. Download `Counselor-X.X.X.dmg`.
 2. Open the `.dmg` file. Drag **Counselor** to your **Applications** folder.
@@ -119,5 +154,8 @@ Open Counselor and go to **Help → About**. The **Counselor Version** line (e.g
 ## Troubleshooting
 
 - **Counselor won't start:** check the log file at the path listed above for your install type.
+- **"Failed to launch JVM" (Windows):** usually third-party antivirus blocking the installed launcher. Add an exclusion for `C:\Program Files\Counselor` in your antivirus, or use the [portable ZIP](#jar--launcher-zip-counselor-portable-xxxzip) with your own Java 21 (which antivirus generally trusts).
+- **"Failed to launch JVM" or the app silently won't open (portable ZIP):** the Java you installed doesn't match your processor, or isn't on your PATH. Reinstall the right build from [Installing Java](#installing-java-for-the-portable-zip).
+- **macOS says the version is too old / requires macOS 11:** your Mac is below the minimum. Counselor needs macOS 11+; there is no workaround on macOS 10.15 or earlier (see [System requirements](#system-requirements)).
 - **Old turn file won't open:** files from games that ran before 2026 may use an older format. Counselor handles these automatically. If you see an error, send the log file to the game admin.
 - **Questions or problems:** email the game admin or post to the [mailing list](http://groups.google.com/group/clashoflegends).
