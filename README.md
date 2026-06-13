@@ -78,3 +78,41 @@ These scripts pass the required `--add-opens` flags for XStream under Java 21.
 Clash of Legends is a play-by-mail strategy game with strong wargame and economic elements, and a small RPG component. Each turn you receive a result file with all available information, spend some time planning, then submit your orders. The Judge processes all orders and distributes the next result. One turn per week is typical.
 
 The Counselor shows you the full map, your generals, wizards, and rogues, enemy movements, city status, and everything else you need to make your decisions — then uploads your orders directly to the server.
+
+---
+
+## License
+
+Counselor is released under the [MIT License](LICENSE). © 2014-2026 Clash of Legends.
+
+---
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+**Team roles:**
+
+- **Committers and reviewers:** [@clashGM01](https://github.com/clashGM01) and approved contributors (each pull request from a non-committer is reviewed before merge).
+- **Approvers:** [@clashGM01](https://github.com/clashGM01) — sole signing approver.
+
+**Privacy policy:** This program does not transfer any information to other networked systems unless specifically requested by the user. Network interactions are limited to: loading turn-result files from local disk, submitting orders to the configured game server (`clashlegends.com`), and downloading player portraits from the same server when the user opts in. No telemetry, no analytics, no automatic updates beyond what the user explicitly invokes.
+
+---
+
+## License
+
+Counselor is released under the [MIT License](LICENSE). © 2014-2026 Clash of Legends.
+
+---
+
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+
+**Team roles:**
+
+- **Committers and reviewers:** [@clashGM01](https://github.com/clashGM01) and approved contributors (each pull request from a non-committer is reviewed before merge).
+- **Approvers:** [@clashGM01](https://github.com/clashGM01) — sole signing approver.
+
+**Privacy policy:** This program does not transfer any information to other networked systems unless specifically requested by the user. Network interactions are limited to: loading turn-result files from local disk, submitting orders to the configured game server (`clashlegends.com`), and downloading player portraits from the same server when the user opts in. No telemetry, no analytics, no automatic updates beyond what the user explicitly invokes.
