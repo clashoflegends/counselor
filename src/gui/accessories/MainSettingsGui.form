@@ -435,6 +435,8 @@
                       <Component id="sendOrderRequestCheckBox" min="-2" max="-2" attributes="0"/>
                       <Component id="sendConfirmPopUpCheckBox" min="-2" max="-2" attributes="0"/>
                       <Component id="mountainColorButton" min="-2" max="-2" attributes="0"/>
+                      <Component id="barbarianColorButton" min="-2" max="-2" attributes="0"/>
+                      <Component id="unknownColorButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -449,6 +451,10 @@
                   <Component id="sendOrderRequestCheckBox" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="mountainColorButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="barbarianColorButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="unknownColorButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -485,8 +491,26 @@
         </Component>
         <Component class="javax.swing.JButton" name="mountainColorButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="MountainColor"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.MAP.MOUNTAINCOLOR" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
             <Property name="actionCommand" type="java.lang.String" value="MountainColorButton"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="barbarianColorButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.MAP.COLORBARBARIAN" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="BarbarianColorButton"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="unknownColorButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.MAP.COLORUNKNOWN" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="UnknownColorButton"/>
           </Properties>
         </Component>
       </SubComponents>

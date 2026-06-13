@@ -326,6 +326,28 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 source.setBackground(c);
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
                 break;
+            case "BarbarianColorButton": {
+                Color before = ColorFactory.getColorBd(SettingsManager.getInstance().getConfig("ColorBarbarian", "FFFFFF"));
+                Color picked = JColorChooser.showDialog(this.settingsGui, "Choose", before);
+                if (picked == null) {
+                    break;
+                }
+                SettingsManager.getInstance().setConfigAndSaveToFile("ColorBarbarian", ColorFactory.getColorBd(picked));
+                ((JButton) e.getSource()).setBackground(picked);
+                DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+                break;
+            }
+            case "UnknownColorButton": {
+                Color before = ColorFactory.getColorBd(SettingsManager.getInstance().getConfig("ColorUnknown", "AAAAAA"));
+                Color picked = JColorChooser.showDialog(this.settingsGui, "Choose", before);
+                if (picked == null) {
+                    break;
+                }
+                SettingsManager.getInstance().setConfigAndSaveToFile("ColorUnknown", ColorFactory.getColorBd(picked));
+                ((JButton) e.getSource()).setBackground(picked);
+                DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+                break;
+            }
             default:
                 break;
         }

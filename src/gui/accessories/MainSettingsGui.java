@@ -71,6 +71,8 @@ public class MainSettingsGui extends JPanel {
         displayPortraitCheckBox.addActionListener(settingsControler);
         downloadPortraitsButton.addActionListener(settingsControler);
         mountainColorButton.addActionListener(settingsControler);
+        barbarianColorButton.addActionListener(settingsControler);
+        unknownColorButton.addActionListener(settingsControler);
         colorDifficultyCheckBox.setText(settingsManager.getBundleManager().getString("SETTINGS.DISPLAY.COLORDIFFICULTY"));
         colorDifficultyCheckBox.setToolTipText(settingsManager.getBundleManager().getString("SETTINGS.DISPLAY.COLORDIFFICULTY.TOOLTIP"));
         colorDifficultyCheckBox.setActionCommand("colorDifficulty");
@@ -125,6 +127,8 @@ public class MainSettingsGui extends JPanel {
         sendConfirmPopUpCheckBox = new javax.swing.JCheckBox();
         sendOrderRequestCheckBox = new javax.swing.JCheckBox();
         mountainColorButton = new javax.swing.JButton();
+        barbarianColorButton = new javax.swing.JButton();
+        unknownColorButton = new javax.swing.JButton();
         displayPanel = new javax.swing.JPanel();
         filtroLabel = new javax.swing.JLabel();
         allFiltroRadioButton = new javax.swing.JRadioButton();
@@ -360,8 +364,14 @@ public class MainSettingsGui extends JPanel {
         sendOrderRequestCheckBox.setToolTipText(bundle.getString("SETTINGS.PLAYER.SENDORDERRECEIPT.TOOLTIP")); // NOI18N
         sendOrderRequestCheckBox.setActionCommand("recieveConfirm");
 
-        mountainColorButton.setText("MountainColor");
+        mountainColorButton.setText(bundle.getString("SETTINGS.MAP.MOUNTAINCOLOR")); // NOI18N
         mountainColorButton.setActionCommand("MountainColorButton");
+
+        barbarianColorButton.setText(bundle.getString("SETTINGS.MAP.COLORBARBARIAN")); // NOI18N
+        barbarianColorButton.setActionCommand("BarbarianColorButton");
+
+        unknownColorButton.setText(bundle.getString("SETTINGS.MAP.COLORUNKNOWN")); // NOI18N
+        unknownColorButton.setActionCommand("UnknownColorButton");
 
         javax.swing.GroupLayout playerPanelLayout = new javax.swing.GroupLayout(playerPanel);
         playerPanel.setLayout(playerPanelLayout);
@@ -372,7 +382,9 @@ public class MainSettingsGui extends JPanel {
                 .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(sendOrderRequestCheckBox)
                     .addComponent(sendConfirmPopUpCheckBox)
-                    .addComponent(mountainColorButton))
+                    .addComponent(mountainColorButton)
+                    .addComponent(barbarianColorButton)
+                    .addComponent(unknownColorButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         playerPanelLayout.setVerticalGroup(
@@ -384,6 +396,10 @@ public class MainSettingsGui extends JPanel {
                 .addComponent(sendOrderRequestCheckBox)
                 .addGap(18, 18, 18)
                 .addComponent(mountainColorButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(barbarianColorButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(unknownColorButton)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -733,6 +749,8 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JCheckBox maximizeWindowCheckBox;
     private javax.swing.JCheckBox minimizeWindowCheckBox;
     private javax.swing.JButton mountainColorButton;
+    private javax.swing.JButton barbarianColorButton;
+    private javax.swing.JButton unknownColorButton;
     private javax.swing.JButton openSaveDir;
     private javax.swing.ButtonGroup ordersSortButtonGroup;
     private javax.swing.JCheckBox overEliminCheckBox;
