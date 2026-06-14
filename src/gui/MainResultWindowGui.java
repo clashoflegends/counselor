@@ -42,6 +42,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private final WorldControler wc = new WorldControler(this);
     private TabPersonagensGui tabPersonagem;
     private JLabelGradient jlActionCounter;
+    private javax.swing.JButton jbRecent; // recent-files dropdown, built in code (not the .form)
 
     private final SettingsManager settingsManager;
 
@@ -85,8 +86,44 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         togglePathArmy.addActionListener(wc);
         togglePathResources.addActionListener(wc);
         toggleDisplayPortrait.addActionListener(wc);
+
+        // Recent-files dropdown, inserted right after "Open Results" (index 1 of jToolBar1).
+        // Built in code rather than the Matisse .form because its menu is populated at runtime.
+        jbRecent = new javax.swing.JButton();
+        jbRecent.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/open results.png")));
+        jbRecent.setText(labels.getString("RECENT.TURNO"));
+        jbRecent.setToolTipText(labels.getString("RECENT.TURNO.TOOLTIP"));
+        jbRecent.setFocusable(false);
+        jbRecent.addActionListener(e -> showRecentMenu());
+        jToolBar1.add(jbRecent, 1);
+        jToolBar1.revalidate();
+        jToolBar1.repaint();
+
         wc.doAutoLoad(autoLoad);
         EgfDropHandler.install(this, this);
+    }
+
+    /** Build and show the recently-opened-files popup below the Recent toolbar button. */
+    private void showRecentMenu() {
+        javax.swing.JPopupMenu popup = new javax.swing.JPopupMenu();
+        java.util.List<java.io.File> files = client.RecentFiles.list();
+        if (files.isEmpty()) {
+            javax.swing.JMenuItem empty = new javax.swing.JMenuItem(labels.getString("RECENT.EMPTY"));
+            empty.setEnabled(false);
+            popup.add(empty);
+        } else {
+            for (final java.io.File f : files) {
+                javax.swing.JMenuItem item = new javax.swing.JMenuItem(f.getName());
+                item.setToolTipText(f.getAbsolutePath());
+                item.addActionListener(e -> wc.doOpenFile(f));
+                popup.add(item);
+            }
+            popup.addSeparator();
+            javax.swing.JMenuItem clear = new javax.swing.JMenuItem(labels.getString("RECENT.CLEAR"));
+            clear.addActionListener(e -> client.RecentFiles.clear());
+            popup.add(clear);
+        }
+        popup.show(jbRecent, 0, jbRecent.getHeight());
     }
 
     /**

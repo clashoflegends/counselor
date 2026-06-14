@@ -589,6 +589,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             fcOrders.setCurrentDirectory(dir);
             fcWorld.setCurrentDirectory(dir);
             fcMapImage.setCurrentDirectory(dir);
+            client.RecentFiles.add(resultsFile); // record only successful opens (covers menu, drag-drop, recent-menu)
         } catch (BusinessException ex) {
             //parse-time failure: file not found, corrupted, or incompatible version (already a player-readable message)
             log.error("Failed to open results file: " + resultsFile.getName(), ex);
