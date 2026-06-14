@@ -20,9 +20,9 @@ jobs:
           - os: macos-latest
             pkg-type: dmg
             icon-ext: icns
-          - os: macos-13          # Intel runner — produces an x86_64 DMG for Intel Macs
-            pkg-type: dmg
-            icon-ext: icns
+          # macos-13 (Intel) leg removed 2026-06-14: GitHub is retiring Intel macOS runners, so the
+          # job sat awaiting a runner for 24h and wedged the v2.1.877 release (release/bump-build
+          # never ran). Intel-Mac users on macOS 11+ use the cross-platform portable JAR ZIP + Temurin 21.
           - os: ubuntu-latest
             pkg-type: deb
             icon-ext: png
