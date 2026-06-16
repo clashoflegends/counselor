@@ -100,6 +100,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private boolean saved = false;
     private boolean savedWorld = false;
     private boolean msgSubmitReady = false;
+    private boolean loadingEgf = false; // EDT-confined guard: blocks a concurrent open while one is in progress
     private int actionsSlots = 0;
     private int actionsCount = 0;
     private MainResultWindowGui gui = null;
@@ -578,37 +579,54 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @param jbTemp
      * @throws HeadlessException
      */
-    public void doOpenFile(File resultsFile) {
-        try {
-            log.info(labels.getString("OPENING: ") + resultsFile.getName() + String.format(" [%s]", SysApoio.getPidOs()));
-            WFC.doStart(resultsFile);
-            this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
-            log.info(labels.getString("INICIALIZANDO.GUI"));
-            getGui().iniciaConfig();
-            this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
-            this.getGui().setOpenFileName(resultsFile.getName());
-            this.msgSubmitReady = false;
-            this.saved = false;
-            this.savedWorld = false;
-            doAutoLoadCommands(resultsFile);
-            File dir = resultsFile.getParentFile();
-            fcResults.setCurrentDirectory(dir);
-            fcOrders.setCurrentDirectory(dir);
-            fcWorld.setCurrentDirectory(dir);
-            fcMapImage.setCurrentDirectory(dir);
-            client.RecentFiles.add(resultsFile); // record only successful opens (covers menu, drag-drop, recent-menu)
-        } catch (BusinessException ex) {
-            //parse-time failure: file not found, corrupted, or incompatible version (already a player-readable message)
-            log.error("Failed to open results file: " + resultsFile.getName(), ex);
-            SysApoio.showDialogError(ex.getMessage(), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
-            this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + resultsFile.getName());
-        } catch (RuntimeException ex) {
-            //GUI-build or otherwise unexpected failure: keep the app alive, show a friendly message, log the stack trace
-            log.error("Unexpected error opening results file: " + resultsFile.getName(), ex);
-            persistenceCommons.CrashReporter.report(ex, "egf-open:" + resultsFile.getName());
-            SysApoio.showDialogError(labels.getString("OPEN.ERRO.INESPERADO"), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
-            this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + resultsFile.getName());
+    public void doOpenFile(final File resultsFile) {
+        if (loadingEgf) {
+            return; // an open is already in progress; ignore re-entrant menu clicks / drops
         }
+        // Show a static dim overlay (no spinner: the EDT-bound rebuild below would freeze any animation)
+        // so the player sees the app is busy during the ~1-3s open. Then run the actual open on the NEXT
+        // EDT cycle via invokeLater, so the overlay gets painted before this same EDT thread is blocked
+        // by the parse + GUI rebuild. The work stays entirely on the EDT (no threading) - the overlay is
+        // pure visual feedback, removed when done. doAutoLoad (startup) is unaffected; the splash covers it.
+        final BusyGlass busy = BusyGlass.show(this.getGui(), labels.getString("OPENING: ") + resultsFile.getName(), false);
+        loadingEgf = true; // set after show() so a show() failure can't wedge opening for the session
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            try {
+                log.info(labels.getString("OPENING: ") + resultsFile.getName() + String.format(" [%s]", SysApoio.getPidOs()));
+                WFC.doStart(resultsFile);
+                this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
+                log.info(labels.getString("INICIALIZANDO.GUI"));
+                getGui().iniciaConfig();
+                this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
+                this.getGui().setOpenFileName(resultsFile.getName());
+                this.msgSubmitReady = false;
+                this.saved = false;
+                this.savedWorld = false;
+                doAutoLoadCommands(resultsFile);
+                File dir = resultsFile.getParentFile();
+                fcResults.setCurrentDirectory(dir);
+                fcOrders.setCurrentDirectory(dir);
+                fcWorld.setCurrentDirectory(dir);
+                fcMapImage.setCurrentDirectory(dir);
+                client.RecentFiles.add(resultsFile); // record only successful opens (covers menu, drag-drop, recent-menu)
+            } catch (BusinessException ex) {
+                //parse-time failure: file not found, corrupted, or incompatible version (already a player-readable message)
+                log.error("Failed to open results file: " + resultsFile.getName(), ex);
+                SysApoio.showDialogError(ex.getMessage(), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
+                this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + resultsFile.getName());
+            } catch (RuntimeException ex) {
+                //GUI-build or otherwise unexpected failure: keep the app alive, show a friendly message, log the stack trace
+                log.error("Unexpected error opening results file: " + resultsFile.getName(), ex);
+                persistenceCommons.CrashReporter.report(ex, "egf-open:" + resultsFile.getName());
+                SysApoio.showDialogError(labels.getString("OPEN.ERRO.INESPERADO"), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
+                this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + resultsFile.getName());
+            } finally {
+                loadingEgf = false;
+                if (busy != null) {
+                    busy.dismiss();
+                }
+            }
+        });
     }
 
     private void doOpen(JButton jbTemp) throws HeadlessException {

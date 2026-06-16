@@ -32,7 +32,7 @@ public class BusyGlass extends JComponent {
     private final JRootPane rootPane;
     private final Component previousGlass;
 
-    private BusyGlass(JRootPane rootPane, String message) {
+    private BusyGlass(JRootPane rootPane, String message, boolean showProgress) {
         this.rootPane = rootPane;
         this.previousGlass = rootPane.getGlassPane();
 
@@ -41,13 +41,15 @@ public class BusyGlass extends JComponent {
 
         JPanel box = new JPanel(new BorderLayout(0, 8));
         box.setOpaque(false);
-        JProgressBar bar = new JProgressBar();
-        bar.setIndeterminate(true);
         JLabel label = new JLabel(message, SwingConstants.CENTER);
         label.setForeground(Color.WHITE);
         box.add(label, BorderLayout.NORTH);
-        box.add(bar, BorderLayout.CENTER);
-        box.setPreferredSize(new Dimension(260, 48));
+        if (showProgress) {
+            JProgressBar bar = new JProgressBar();
+            bar.setIndeterminate(true);
+            box.add(bar, BorderLayout.CENTER);
+        }
+        box.setPreferredSize(new Dimension(260, showProgress ? 48 : 28));
         add(box);
 
         // Swallow input while visible so nothing underneath can be clicked or typed.
@@ -75,11 +77,20 @@ public class BusyGlass extends JComponent {
      * hide() does nothing) if no root pane is found.
      */
     public static BusyGlass show(Component anchor, String message) {
+        return show(anchor, message, true);
+    }
+
+    /**
+     * As {@link #show(Component, String)} but {@code showProgress=false} shows only the dim + message
+     * (no progress bar). Use when the work blocks the EDT, where an indeterminate bar would just
+     * freeze mid-animation and look broken.
+     */
+    public static BusyGlass show(Component anchor, String message, boolean showProgress) {
         JRootPane rp = SwingUtilities.getRootPane(anchor);
         if (rp == null) {
             return null;
         }
-        BusyGlass glass = new BusyGlass(rp, message);
+        BusyGlass glass = new BusyGlass(rp, message, showProgress);
         rp.setGlassPane(glass);
         glass.setVisible(true);
         glass.requestFocusInWindow();
