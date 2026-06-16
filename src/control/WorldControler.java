@@ -20,6 +20,7 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
+import gui.services.Toast;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
 import gui.charts.DataSetForChart;
@@ -307,18 +308,24 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         comando.setInfos(partida);
         String missingActionMsg = doSaveActorActions(jogadorAtivo, comando);
         if (comando.size() == 0) {
-            SysApoio.showDialogAlert(labels.getString("NONE.ORDERS"), this.getGui());
+            Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this.getGui()),
+                    labels.getString("NONE.ORDERS"),
+                    javax.swing.UIManager.getIcon("OptionPane.informationIcon"));
             this.getGui().setStatusMsg(labels.getString("NONE.ORDERS"));
             //we're done here, nothing to save
             return null;
         }
         if (!missingActionMsg.equalsIgnoreCase("") && SettingsManager.getInstance().isConfig("ActionsMissingPopup", "1", "0")) {
             if (forceMissingPopup || !SettingsManager.getInstance().isAutoSaveActions()) {
-                SysApoio.showDialogAlert(missingActionMsg, this.getGui());
+                Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this.getGui()),
+                        missingActionMsg,
+                        javax.swing.UIManager.getIcon("OptionPane.warningIcon"));
             }
         }
         if (missingActionMsg.equalsIgnoreCase("") && !this.msgSubmitReady) {
-            SysApoio.showDialogAlert(labels.getString("ORDERS.READY.SUBMIT"), this.getGui());
+            Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this.getGui()),
+                    labels.getString("ORDERS.READY.SUBMIT"),
+                    javax.swing.UIManager.getIcon("OptionPane.warningIcon"));
             this.msgSubmitReady = true;
         }
 
@@ -1233,7 +1240,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 }
                 this.getGui().setStatusMsg(msg);
                 if (SettingsManager.getInstance().getConfig("SendOrderConfirmationPopUp", "1").equals("1")) {
-                    SysApoio.showDialogInfo(labels.getString("POST.DONE.TITLE"), labels.getString("POST.DONE.TITLE"), this.getGui());
+                    // Non-modal toast instead of a blocking dialog: confirms the post without interrupting work.
+                    Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this.getGui()), msg);
                 }
                 return true;
             case WebCounselorManager.ERROR_GAMECLOSED:

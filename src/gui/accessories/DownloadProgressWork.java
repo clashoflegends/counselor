@@ -66,7 +66,7 @@ public class DownloadProgressWork extends SwingWorker<Void, Void> {
         }
         if (succeeded) {
             String successLabel = "Successful download and uncompress process. A total of " + filesCount + " portraits have been obtained.";
-            JOptionPane.showMessageDialog(null, successLabel);
+            gui.services.Toast.show(successLabel, javax.swing.UIManager.getIcon("OptionPane.informationIcon"));
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(1));
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_RELOAD, "");
         } else {

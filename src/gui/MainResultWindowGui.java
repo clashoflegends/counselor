@@ -793,7 +793,9 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     public void setUpdateAvailable(String version) {
         this.updateVersion = (version == null) ? "" : version;
         if (!this.updateVersion.isEmpty()) {
-            setStatusMsg(String.format(labels.getString("UPDATE.AVAILABLE"), this.updateVersion));
+            String msg = String.format(labels.getString("UPDATE.AVAILABLE"), this.updateVersion);
+            setStatusMsg(msg);
+            gui.services.Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this), msg);
         }
         refreshWindowTitle();
     }
