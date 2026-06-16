@@ -94,7 +94,7 @@ public class DisplayPortraitsManager {
             if (returnVal == JOptionPane.OK_OPTION) {
                 String portraitFolder = SettingsManager.getInstance().getConfig("PortraitsFolder");
 
-                final DownloadProgressWork dpw = new DownloadProgressWork(portraitsFileName, portraitFolder, (int) fileSizeByte);
+                final DownloadProgressWork dpw = new DownloadProgressWork(portraitsFileName, portraitFolder);
                 dpw.addPropertyChangeListener(propertyChangeListener);
 
                 dpw.execute();

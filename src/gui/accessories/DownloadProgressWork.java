@@ -10,7 +10,6 @@ import control.services.DownloadPortraitsHttpServiceImpl;
 import control.support.DispatchManager;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,58 +35,51 @@ public class DownloadProgressWork extends SwingWorker<Void, Void> {
     private final String portraitsFolder;
     private File downloadFile = null;
     private int filesCount = 0;
-    private final int fileSize;
+    private boolean succeeded = false;
 
     @Override
-    public Void doInBackground() throws FileNotFoundException {
+    protected Void doInBackground() {
+        // Download then uncompress, both on this SwingWorker's own background thread. The previous
+        // version spawned a nested Thread and busy-polled downloadFile.length() in a no-sleep
+        // while-loop, which raced on downloadFile/filesCount, pinned a CPU core, and could throw from
+        // setProgress(>100). Sequential work + milestone progress (0/70/100) is deterministic and safe.
         setProgress(0);
+        // Set the path up front so done() can clean up a partial file even if the download throws.
+        downloadFile = new File(new File(portraitsFolder), portraitsFileName);
         try {
-            Thread.sleep(1000);
-            downloadFile = new File(new File(portraitsFolder), portraitsFileName);
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        downloadFile = portraitsService.downloadPortraisFile(portraitsFileName, portraitsFolder);
-                        filesCount = doUncompressZip(downloadFile);
-                    } catch (FileNotFoundException ex) {
-                        LOG.error("Qué mal todo. " + ex.getMessage());
-                    } catch (ZipException ex) {
-                        LOG.error("Qué mal todo descomprimiendo. " + ex.getMessage());
-                    }
-                }
-            });
-            t.start();
-            while (t.isAlive()) {
-                Float progreso = downloadFile.length() / (float) fileSize;
-                progreso *= 100;
-                int progress = progreso.intValue();
-
-                setProgress(progress);
-            }
-
-        } catch (InterruptedException ignore) {
+            downloadFile = portraitsService.downloadPortraisFile(portraitsFileName, portraitsFolder);
+            setProgress(70); // downloaded; uncompressing next
+            filesCount = doUncompressZip(downloadFile);
+            succeeded = true;
+        } catch (Throwable ex) {
+            // Catch broadly: done() does not call get(), so an uncaught throwable would be swallowed.
+            LOG.error("Portrait download/uncompress failed: " + ex, ex);
         }
         return null;
     }
 
     @Override
-    public void done() {
+    protected void done() {
         setProgress(100);
-        downloadFile.delete();
-        String successLabel = "Successful download and uncompress process. A total of " + filesCount + " portraits have been obtained.";
-        JOptionPane.showMessageDialog(null, successLabel);
-        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(1));
-        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_RELOAD, "");        
-
+        if (downloadFile != null) {
+            downloadFile.delete(); // remove the temp zip (fully downloaded, or a partial on failure)
+        }
+        if (succeeded) {
+            String successLabel = "Successful download and uncompress process. A total of " + filesCount + " portraits have been obtained.";
+            JOptionPane.showMessageDialog(null, successLabel);
+            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(1));
+            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_RELOAD, "");
+        } else {
+            JOptionPane.showMessageDialog(null,
+                    persistenceCommons.SettingsManager.getInstance().getBundleManager().getString("CONFIG.ERROR.ZIP"),
+                    "Portraits", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    public DownloadProgressWork(String portraitsFileName, String portraitsFolder, int fileSize) {
+    public DownloadProgressWork(String portraitsFileName, String portraitsFolder) {
         portraitsService = new DownloadPortraitsHttpServiceImpl();
         this.portraitsFileName = portraitsFileName;
         this.portraitsFolder = portraitsFolder;
-        this.fileSize = fileSize;
-
     }
 
     /**
