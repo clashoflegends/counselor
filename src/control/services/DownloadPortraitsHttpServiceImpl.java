@@ -37,16 +37,19 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
     private static final String PORTRAITS_PATH = "/portraits/";
     private static final String PROPERTIES_FILENAME = "portraits.config";
 
+    // Connect/read timeout for every portrait HTTP call. These calls run on the EDT (see EDT_AUDIT.md);
+    // without a timeout an unreachable server froze the UI until the OS TCP timeout (tens of seconds).
+    private static final int NET_TIMEOUT_MS = 5000;
+
     @Override
     public void checkNetworkConnection() throws ConnectException {
         boolean networkAvalaible = false;
-        int timeout = 2000;
-        
-        
-        
+
         try {
             final URL url = URI.create(PROTOCOL_HOST + CLASH_HOST).toURL();
             final URLConnection conn = url.openConnection();
+            conn.setConnectTimeout(NET_TIMEOUT_MS);
+            conn.setReadTimeout(NET_TIMEOUT_MS);
             conn.connect();
             networkAvalaible = true;
            
@@ -79,7 +82,10 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
             propFile = new Properties();
             URL website = URI.create(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + PROPERTIES_FILENAME).toURL();
 
-            InputStream is = website.openStream();
+            URLConnection conn = website.openConnection();
+            conn.setConnectTimeout(NET_TIMEOUT_MS);
+            conn.setReadTimeout(NET_TIMEOUT_MS);
+            InputStream is = conn.getInputStream();
             propFile.load(is);
             is.close();
         } catch (MalformedURLException ex) {
@@ -98,7 +104,10 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
             // speedtest.ftp.otenet.gr/files/test10Mb.db
           //  URL website = new URL("https://www.colorado.edu/conflict/peace/download/peace.zip");
             file = new File(portraitsFolderName + File.separator + portraitsFileName);
-            ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+            URLConnection dlConn = website.openConnection();
+            dlConn.setConnectTimeout(NET_TIMEOUT_MS);
+            dlConn.setReadTimeout(NET_TIMEOUT_MS);
+            ReadableByteChannel rbc = Channels.newChannel(dlConn.getInputStream());
 
             FileOutputStream fos = new FileOutputStream(file);
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
@@ -122,6 +131,8 @@ public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsServic
          //   website = new URL("https://www.colorado.edu/conflict/peace/download/peace.zip");
             
             conn = website.openConnection();
+            conn.setConnectTimeout(NET_TIMEOUT_MS);
+            conn.setReadTimeout(NET_TIMEOUT_MS);
             if (conn instanceof HttpURLConnection) {
                 ((HttpURLConnection) conn).setRequestMethod("HEAD");
             }
