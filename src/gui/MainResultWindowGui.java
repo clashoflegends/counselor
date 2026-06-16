@@ -822,6 +822,17 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         refreshWindowTitle();
     }
 
+    /**
+     * Re-apply the window title after the frame is fully realized and visible. addNotify() during
+     * frame.pack() proved unreliable for the autoload / file-association (double-click) path: the
+     * title set re-entrantly while the frame's native peer is still being created did not stick, so
+     * a double-clicked EGF stayed "Counselor" instead of "Counselor - filename". PbmApplication calls
+     * this once after frame.setVisible(true), where the ancestor resolves and nothing re-titles after.
+     */
+    public void applyWindowTitle() {
+        refreshWindowTitle();
+    }
+
     public void setLabelMoney(String txt) {
         if (SysApoio.parseInt(txt) > 0) {
             this.labelMoney.setForeground(Color.black);

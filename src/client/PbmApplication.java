@@ -91,6 +91,11 @@ public class PbmApplication extends Application implements Serializable {
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.GUI_STATUS_PERSIST);
         //centerWindow(frame);
         frame.setVisible(true);
+        if (mainWin != null) {
+            // Re-apply the title now that the frame is realized + visible. addNotify() during pack()
+            // is unreliable for the autoload/double-click path, leaving the title as bare "Counselor".
+            mainWin.applyWindowTitle();
+        }
         setListeners(frame);
         //check GitHub for a newer release (async, daemon thread; notifies title + status bar if found)
         control.services.UpdateChecker.checkAsync(mainWin);
