@@ -1,5 +1,30 @@
 # What's New in Counselor
 
+## 15-JUN-2026 - v2.1.878
+
+### Less interrupting, more informative
+- Confirmations no longer pop up a window you have to click away. Messages like **orders submitted**, **a new version is available**, and **your actions are ready to send** now slide up as a brief notification at the **bottom-left** and fade on their own - nothing blocks what you're doing. (Errors still stop you, as they should.)
+
+### Reopen a recent turn faster
+- New **Recent** button beside Open Results: drop down your **recently opened turn files** and reopen one in a click - no more digging through folders every turn.
+
+### Feedback while a turn loads
+- Opening a big turn file used to look frozen for a second or two. Now an **"Opening…" overlay** shows while it loads, so you can see it's working.
+
+### Smoother and more reliable
+- The character-portrait download is more robust - it no longer hangs if the server is slow or unreachable.
+- Counselor's log now **rotates daily**: if the GM ever needs your log to track down an issue, today's is a single, easy-to-find file.
+
+### Website (clashlegends.com)
+- **Play again in one click:** finished games now have a **Rematch** button on your My Games page.
+- **Final standings** for every finished game - ranking by victory points, winner flagged.
+- **Get notified when a game opens:** opt in (My Config) to email alerts when a public game opens, hits 50% full, or needs just one more player.
+- **Team up with invitations** - no more shared team passwords; invite teammates from the player list and they accept with one click.
+- **Deadline reminders** are now opt-out per player (My Config), and deadlines and the My Games countdown are clearly shown in **GMT**.
+- The order-punctuality chart is cleaner - paused games no longer skew it.
+
+---
+
 ## 12-JUN-2026 - v2.1.877
 
 ### Make the map easier to read
