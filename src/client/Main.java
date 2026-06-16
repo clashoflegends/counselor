@@ -25,6 +25,7 @@ public class Main implements Serializable {
     @SuppressWarnings("static-access")
     public static void main(String[] args) {
         reconfigureLogForInstaller();
+        pruneOldDailyLogs();
         // Invokes Gui to display turn results
         log.info(String.format("Starting... %s ...", SysApoio.getPidOs()));
         log.info("Counselor version: " + SysApoio.getVersionClash("version_counselor"));
@@ -72,6 +73,43 @@ public class Main implements Serializable {
             org.apache.log4j.FileAppender fa = (org.apache.log4j.FileAppender) a;
             fa.setFile(dataDir + java.io.File.separator + "counselor.log");
             fa.activateOptions();
+        }
+    }
+
+    /**
+     * Bound the daily logs. The log uses DailyRollingFileAppender (one counselor.log per day; all of
+     * a day's launches share it), but log4j 1.x ignores MaxBackupIndex on it, so old daily files
+     * would pile up forever - which is why a prior change had switched away from it. Prune rotated
+     * daily logs older than KEEP_DAYS at startup to keep retention bounded. Runs after
+     * reconfigureLogForInstaller() so it prunes in the active log directory (the installer's data
+     * dir when running from the MSI). Never touches the active counselor.log itself.
+     */
+    private static void pruneOldDailyLogs() {
+        final int keepDays = 30;
+        org.apache.log4j.Appender a = org.apache.log4j.Logger.getRootLogger().getAppender("logfile");
+        if (!(a instanceof org.apache.log4j.FileAppender)) {
+            return;
+        }
+        String active = ((org.apache.log4j.FileAppender) a).getFile();
+        if (active == null) {
+            return;
+        }
+        java.io.File logFile = new java.io.File(active);
+        java.io.File dir = logFile.getParentFile();
+        if (dir == null) {
+            return;
+        }
+        // Rotated daily files are "counselor.log.<yyyy-MM-dd>"; the trailing dot excludes the active log.
+        final String rotatedPrefix = logFile.getName() + ".";
+        final long cutoff = System.currentTimeMillis() - keepDays * 24L * 60 * 60 * 1000;
+        java.io.File[] rotated = dir.listFiles((d, name) -> name.startsWith(rotatedPrefix));
+        if (rotated == null) {
+            return;
+        }
+        for (java.io.File f : rotated) {
+            if (f.lastModified() < cutoff) {
+                f.delete();
+            }
         }
     }
 }
