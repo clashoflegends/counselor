@@ -45,15 +45,17 @@ public final class UpdateChecker {
         try {
             int localBuild = parseInt(SysApoio.getVersionClash("version_counselor"));
             int latestBuild = fetchLatestBuild();
+            // Always log the outcome so the check is diagnosable (a latest of 2.-1 means the API
+            // response did not match the expected "Counselor 2.NNN" release name).
+            log.info(String.format("Update check: current 2.%d, latest on GitHub 2.%d", localBuild, latestBuild));
             if (latestBuild > localBuild) {
                 final String version = "2." + latestBuild;
-                log.info(String.format("Newer Counselor available: %s (current 2.%d)", version, localBuild));
+                log.warn(String.format("A newer Counselor is available: %s (you are on 2.%d) - update from the releases page.", version, localBuild));
                 SwingUtilities.invokeLater(() -> gui.setUpdateAvailable(version));
-            } else {
-                log.debug(String.format("Counselor is current (local 2.%d, latest 2.%d)", localBuild, latestBuild));
             }
         } catch (Throwable ex) {
-            log.debug("Update check failed (ignored): " + ex);
+            // WARN (not debug) so a failed check is visible in counselor.log instead of silently swallowed.
+            log.warn("Update check failed (ignored): " + ex);
         }
     }
 
