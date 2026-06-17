@@ -68,6 +68,12 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 SettingsManager.getInstance().setConfig("language", value);
                 break;
             }
+            case "themeCombo": {
+                JComboBox themeCombo = (JComboBox) e.getSource();
+                // Saved now; the look-and-feel is installed at startup, so it takes effect on next launch.
+                SettingsManager.getInstance().setConfig("LookAndFeelTheme", ((ComboItem) themeCombo.getSelectedItem()).getValue());
+                break;
+            }
             case "fLoad": {
                 JFileChooser fc = new JFileChooser();
                 fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
