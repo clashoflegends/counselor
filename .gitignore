@@ -1,5 +1,6 @@
 *.log
 counselor.log
+counselor.log.*
 /dist/
 /build/
 /out/
