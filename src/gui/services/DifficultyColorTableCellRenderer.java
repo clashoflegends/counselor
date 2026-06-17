@@ -34,6 +34,13 @@ public class DifficultyColorTableCellRenderer extends DefaultTableCellRenderer i
     private static final Color EASY = new Color(200, 235, 200);    // light green
     private static final Color OTHER = new Color(197, 220, 247);   // light blue
 
+    // Dark-theme variants (used under a FlatLaf dark L&F) so difficulty tints aren't light islands.
+    private static final Color HARD_DARK = new Color(95, 38, 42);
+    private static final Color MEDIUM_DARK = new Color(92, 78, 30);
+    private static final Color EASY_DARK = new Color(38, 74, 44);
+    private static final Color OTHER_DARK = new Color(38, 60, 92);
+    private static final Color DARK_TEXT = new Color(0xE6E6E6);
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -41,8 +48,13 @@ public class DifficultyColorTableCellRenderer extends DefaultTableCellRenderer i
         if (!isSelected) {
             Color bg = colorFor(value);
             if (bg != null) {
-                c.setBackground(bg);
-                c.setForeground(Color.BLACK);
+                if (com.formdev.flatlaf.FlatLaf.isLafDark()) {
+                    c.setBackground(darkTint(bg));
+                    c.setForeground(DARK_TEXT);
+                } else {
+                    c.setBackground(bg);
+                    c.setForeground(Color.BLACK);
+                }
             }
             // Unmatched cells: leave the colors super already set for the
             // unselected state (table default, or a striping LaF's row color),
@@ -50,6 +62,19 @@ public class DifficultyColorTableCellRenderer extends DefaultTableCellRenderer i
             // on every call, so no tint leaks from a previously colored cell.
         }
         return c;
+    }
+
+    private static Color darkTint(Color lightTint) {
+        if (lightTint == HARD) {
+            return HARD_DARK;
+        }
+        if (lightTint == MEDIUM) {
+            return MEDIUM_DARK;
+        }
+        if (lightTint == EASY) {
+            return EASY_DARK;
+        }
+        return OTHER_DARK;
     }
 
     private Color colorFor(Object value) {

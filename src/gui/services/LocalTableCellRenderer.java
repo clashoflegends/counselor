@@ -25,8 +25,8 @@ public class LocalTableCellRenderer extends DefaultTableCellRenderer implements 
     private static final Log log = LogFactory.getLog(LocalTableCellRenderer.class);
     private MapaControler mapaControler;
     private final LocalFacade localFacade = new LocalFacade();
-    private final Color colorBgSelected = new Color(46, 106, 197), colorBgNotSelected = Color.WHITE;
-    private final Color colorFgSelected = Color.WHITE, colorFgNotSelected = Color.BLACK;
+    private final Color colorBgSelected = new Color(46, 106, 197);
+    private final Color colorFgSelected = Color.WHITE;
 //    private Font fontSelected, fontNotSelected;
 
     public LocalTableCellRenderer(MapaControler aMapaControler, JTable table) {
@@ -42,8 +42,8 @@ public class LocalTableCellRenderer extends DefaultTableCellRenderer implements 
             c.setBackground(colorBgSelected);
             c.setForeground(colorFgSelected);
         } else {
-            c.setBackground(colorBgNotSelected);
-            c.setForeground(colorFgNotSelected);
+            c.setBackground(table.getBackground());
+            c.setForeground(table.getForeground());
         }
         final boolean highlight = mapaControler.getLocal() == value || localFacade.getCoordenadas(mapaControler.getLocal()).equals(value);
         if (highlight) {

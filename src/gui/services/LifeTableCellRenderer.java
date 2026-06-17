@@ -20,8 +20,8 @@ import org.apache.commons.logging.LogFactory;
 public class LifeTableCellRenderer extends DefaultTableCellRenderer implements Serializable {
 
     private static final Log log = LogFactory.getLog(LifeTableCellRenderer.class);
-    private final Color colorBgSelected = new Color(46, 106, 197), colorBgNotSelected = Color.WHITE;
-    private final Color colorFgSelected = Color.WHITE, colorFgNotSelected = Color.BLACK;
+    private final Color colorBgSelected = new Color(46, 106, 197);
+    private final Color colorFgSelected = Color.WHITE;
     private int limitRed = 20;
     private int limitAmber = 60;
 
@@ -50,11 +50,13 @@ public class LifeTableCellRenderer extends DefaultTableCellRenderer implements S
             c.setForeground(colorFgSelected);
         } else if (current <= limitRed) {
             c.setBackground(Color.RED);
+            c.setForeground(Color.WHITE);
         } else if (current <= limitAmber) {
             c.setBackground(Color.ORANGE);
+            c.setForeground(Color.BLACK);
         } else {
-            c.setBackground(colorBgNotSelected);
-            c.setForeground(colorFgNotSelected);
+            c.setBackground(table.getBackground());
+            c.setForeground(table.getForeground());
         }
         this.setHorizontalAlignment(SwingConstants.RIGHT);
         return c;

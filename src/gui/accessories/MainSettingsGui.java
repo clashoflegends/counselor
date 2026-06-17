@@ -37,6 +37,7 @@ public class MainSettingsGui extends JPanel {
         openSaveDir.addActionListener(settingsControler);
         saveDirButton.addActionListener(settingsControler);
         languageComboBox.addActionListener(settingsControler);
+        themeLabel.setText(LABELS.getString("SETTINGS.LABEL.THEME")); // i18n (overrides the .form placeholder text)
         themeComboBox.setModel(getThemeModel());
         themeComboBox.setActionCommand("themeCombo");
         themeComboBox.addActionListener(settingsControler);
@@ -369,8 +370,6 @@ public class MainSettingsGui extends JPanel {
         languageComboBox.setActionCommand("languageCombo");
 
         themeLabel.setText("Theme (restart to apply):");
-
-        themeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         javax.swing.GroupLayout playerPanelLayout = new javax.swing.GroupLayout(playerPanel);
         playerPanel.setLayout(playerPanelLayout);
@@ -929,10 +928,11 @@ public class MainSettingsGui extends JPanel {
      */
     public final ComboBoxModel getThemeModel() {
         ComboItem[] items = new ComboItem[]{
-            new ComboItem("FlatLight", "Modern (light)"),
-            new ComboItem("0", "System default"),
-            new ComboItem("Cross", "Cross-platform"),
-            new ComboItem("Metal", "Metal"),
+            new ComboItem("FlatLight", LABELS.getString("SETTINGS.THEME.MODERNLIGHT")),
+            new ComboItem("FlatDark", LABELS.getString("SETTINGS.THEME.MODERNDARK")),
+            new ComboItem("0", LABELS.getString("SETTINGS.THEME.SYSTEM")),
+            new ComboItem("Cross", LABELS.getString("SETTINGS.THEME.CROSS")),
+            new ComboItem("Metal", "Metal"),   // L&F proper names - not translated
             new ComboItem("Nimbus", "Nimbus")
         };
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel(items);

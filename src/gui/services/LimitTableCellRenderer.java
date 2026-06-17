@@ -20,8 +20,8 @@ import org.apache.commons.logging.LogFactory;
 public class LimitTableCellRenderer extends DefaultTableCellRenderer implements Serializable {
 
     private static final Log log = LogFactory.getLog(LimitTableCellRenderer.class);
-    private final Color colorBgSelected = new Color(46, 106, 197), colorBgNotSelected = Color.WHITE;
-    private final Color colorFgSelected = Color.WHITE, colorFgNotSelected = Color.BLACK;
+    private final Color colorBgSelected = new Color(46, 106, 197);
+    private final Color colorFgSelected = Color.WHITE;
     private int limit = 0;
 
     public LimitTableCellRenderer(int limit) {
@@ -48,9 +48,10 @@ public class LimitTableCellRenderer extends DefaultTableCellRenderer implements 
             c.setForeground(colorFgSelected);
         } else if (current > limit) {
             c.setBackground(Color.RED);
+            c.setForeground(Color.WHITE);
         } else {
-            c.setBackground(colorBgNotSelected);
-            c.setForeground(colorFgNotSelected);
+            c.setBackground(table.getBackground());
+            c.setForeground(table.getForeground());
         }
         this.setHorizontalAlignment(SwingConstants.RIGHT);
         return c;

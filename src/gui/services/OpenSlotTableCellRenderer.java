@@ -21,8 +21,8 @@ import utils.OpenSlotCounter;
 public class OpenSlotTableCellRenderer extends DefaultTableCellRenderer implements Serializable {
 
     private static final Log log = LogFactory.getLog(OpenSlotTableCellRenderer.class);
-    private final Color colorBgSelected = new Color(128, 128, 255), colorBgNotSelected = Color.WHITE;
-    private final Color colorFgSelected = Color.WHITE, colorFgNotSelected = Color.BLACK;
+    private final Color colorBgSelected = new Color(128, 128, 255);
+    private final Color colorFgSelected = Color.WHITE;
     private final Color colorBgMissing = new Color(255, 230, 230), colorFgDisable = Color.LIGHT_GRAY;
 
     public OpenSlotTableCellRenderer(JTable table) {
@@ -38,12 +38,13 @@ public class OpenSlotTableCellRenderer extends DefaultTableCellRenderer implemen
             c.setBackground(colorBgSelected);
             c.setForeground(colorFgSelected);
         } else {
-            c.setBackground(colorBgNotSelected);
-            c.setForeground(colorFgNotSelected);
+            c.setBackground(table.getBackground());
+            c.setForeground(table.getForeground());
             try {
                 OpenSlotCounter counter = (OpenSlotCounter) value;
                 if (counter.isEditable()) {
                     c.setBackground(colorBgMissing);
+                    c.setForeground(Color.BLACK); // missing highlight is light pink -> needs dark text on any theme
                 }
                 if (counter.isDisabled()) {
                     c.setForeground(colorFgDisable);

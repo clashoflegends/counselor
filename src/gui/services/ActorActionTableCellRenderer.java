@@ -22,8 +22,8 @@ import persistenceCommons.SettingsManager;
 public class ActorActionTableCellRenderer extends DefaultTableCellRenderer implements Serializable {
 
     private static final Log log = LogFactory.getLog(ActorActionTableCellRenderer.class);
-    private final Color colorBgSelected = new Color(128, 128, 255), colorBgNotSelected = Color.WHITE;
-    private final Color colorFgSelected = Color.WHITE, colorFgNotSelected = Color.BLACK;
+    private final Color colorBgSelected = new Color(128, 128, 255);
+    private final Color colorFgSelected = Color.WHITE;
     private final Color colorBgMissing = new Color(255, 230, 230), colorBgMissingAlly = new Color(255, 250, 250);
     private final Color colorFgDisable = Color.LIGHT_GRAY, colorFgReadOnly = Color.LIGHT_GRAY;
 
@@ -36,8 +36,8 @@ public class ActorActionTableCellRenderer extends DefaultTableCellRenderer imple
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         //set defaults
         int alignment = SwingConstants.LEFT;
-        Color foreground = colorFgNotSelected;
-        Color background = colorBgNotSelected;
+        Color foreground = table.getForeground();
+        Color background = table.getBackground();
 
         //select custom settings
         if (isSelected) {
@@ -51,11 +51,13 @@ public class ActorActionTableCellRenderer extends DefaultTableCellRenderer imple
             }
             if (actorAction.isBlank()) {
                 background = colorBgMissing;
+                foreground = Color.BLACK; // light pink highlight -> needs dark text on any theme
             }
             if (actorAction.isBlankAlly()) {
                 //if it does not paint, then it is ok to leave ally the same as enemy
                 if (SettingsManager.getInstance().isConfig("GuiAllyMissingOrdersPaint", "1", "1")) {
                     background = colorBgMissingAlly;
+                    foreground = Color.BLACK; // near-white highlight -> needs dark text on any theme
                 }
                 alignment = SwingConstants.CENTER;
             }

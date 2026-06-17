@@ -55,6 +55,12 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         this.settingsManager = SettingsManager.getInstance();
         initComponents();
         doConfigStatusBar();
+        // Repaint the lavender info/status surfaces theme-aware: dark on a FlatLaf dark theme so they
+        // are not light islands (the .form sets lavender at design time; this overrides at runtime).
+        // The deadline state later re-sets infoPanel per urgency (lavender/orange via infoNormalBg()).
+        infoPanel.setBackground(infoNormalBg());
+        statusBar.setBackground(infoNormalBg());
+        jlActionCountPlaceholder.setBackground(infoNormalBg());
         //load teaser
         doLoadTeaser();
 
@@ -642,23 +648,16 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         this.labelCenario.setText(String.format("%s: %s", labels.getString("CENARIO"), wc.getCenarioNome()));
         if (wc.isGameOver()) {
             this.labelDeadline.setText(String.format(labels.getString("GAMEOVER"), wc.getTurno()));
-            this.labelDeadline.setForeground(Color.white);
-            this.infoPanel.setBackground(Color.orange);
+            applyInfoBar(true);
         } else if (wc.isJogadorAtivoEliminado()) {
             this.labelDeadline.setText(String.format(labels.getString("GAMEOVER.PLAYER"), wc.getTurno()));
-            this.labelDeadline.setForeground(Color.white);
-            this.infoPanel.setBackground(Color.orange);
+            applyInfoBar(true);
+        } else if (wc.getDeadlineDaysRemaining() > 0) {
+            this.labelDeadline.setText(String.format(labels.getString("PARTIDA.LABEL.DEADLINE"), wc.getDeadlineDaysRemaining(), wc.getDeadline()));
+            applyInfoBar(false);
         } else {
-            if (wc.getDeadlineDaysRemaining() > 0) {
-                this.labelDeadline.setText(String.format(labels.getString("PARTIDA.LABEL.DEADLINE"), wc.getDeadlineDaysRemaining(), wc.getDeadline()));
-                this.labelDeadline.setForeground(Color.black);
-                this.infoPanel.setBackground(new Color(204, 204, 255));
-            } else {
-                this.labelDeadline.setText(String.format(labels.getString("PARTIDA.LABEL.DEADLINE.NOW"), wc.getDeadline()));
-                this.labelDeadline.setForeground(Color.white);
-                this.infoPanel.setBackground(Color.orange);
-            }
-            this.infoPanel.repaint();
+            this.labelDeadline.setText(String.format(labels.getString("PARTIDA.LABEL.DEADLINE.NOW"), wc.getDeadline()));
+            applyInfoBar(true);
         }
         this.labelTurno.setText(String.format("%s: %s / %s", labels.getString("TURNO"), wc.getTurno(), wc.getTurnoMax()));
         this.labelJogador.setText(String.format("%s: %s", labels.getString("JOGADOR"), wc.getJogadorAtivoNome()));
@@ -835,12 +834,50 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         refreshWindowTitle();
     }
 
+    // The info bar uses lavender on light themes and dark slate on a FlatLaf dark theme; the urgent
+    // (deadline-due / game-over) state uses orange on light and dark amber on dark. Whatever the
+    // background, applyInfoBar() sets EVERY bar label's foreground to match, so nothing turns
+    // invisible - the previous bug was FlatDark's light default text on the bright orange urgent bar.
+    private static final Color INFO_BG_LIGHT = new Color(204, 204, 255);
+    private static final Color INFO_BG_DARK = new Color(0x2b3a55);
+    private static final Color INFO_URGENT_LIGHT = Color.orange;
+    private static final Color INFO_URGENT_DARK = new Color(0x7a4a12);
+    private static final Color INFO_MONEY_NEG_DARK = new Color(0xFF6B6B); // brighter red, legible on dark bars
+
+    private Color infoBarFg = Color.black; // current info-bar text color, kept in sync by applyInfoBar
+
+    static Color infoNormalBg() {
+        return com.formdev.flatlaf.FlatLaf.isLafDark() ? INFO_BG_DARK : INFO_BG_LIGHT;
+    }
+
+    static Color infoNormalFg() {
+        return com.formdev.flatlaf.FlatLaf.isLafDark() ? Color.WHITE : Color.black;
+    }
+
+    /**
+     * Set the info-bar background and every label's foreground together so the bar stays readable on
+     * any theme. urgent=true for the deadline-due / game-over warning colors.
+     */
+    private void applyInfoBar(boolean urgent) {
+        boolean dark = com.formdev.flatlaf.FlatLaf.isLafDark();
+        Color bg = urgent ? (dark ? INFO_URGENT_DARK : INFO_URGENT_LIGHT) : infoNormalBg();
+        infoBarFg = urgent ? (dark ? Color.WHITE : Color.black) : infoNormalFg();
+        infoPanel.setBackground(bg);
+        labelNacao.setForeground(infoBarFg);
+        labelTurno.setForeground(infoBarFg);
+        labelCenario.setForeground(infoBarFg);
+        labelJogador.setForeground(infoBarFg);
+        labelJogo.setForeground(infoBarFg);
+        labelDeadline.setForeground(infoBarFg);
+        setLabelMoney(labelMoney.getText()); // re-apply money color against the new bar foreground
+        infoPanel.repaint();
+    }
+
     public void setLabelMoney(String txt) {
-        if (SysApoio.parseInt(txt) > 0) {
-            this.labelMoney.setForeground(Color.black);
-        } else {
-            this.labelMoney.setForeground(Color.red);
-        }
+        // Positive cost in the bar's normal text color; negative (over budget) in red - brightened on
+        // dark themes so it stays legible over the dark slate / amber bar instead of muddy deep red.
+        Color neg = com.formdev.flatlaf.FlatLaf.isLafDark() ? INFO_MONEY_NEG_DARK : Color.red;
+        this.labelMoney.setForeground(SysApoio.parseInt(txt) > 0 ? infoBarFg : neg);
         this.labelMoney.setText(txt);
     }
 

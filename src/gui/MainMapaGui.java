@@ -57,6 +57,9 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
      */
     public MainMapaGui() {
         initComponents();
+        // Render the map on a transparent base so the themed canvas behind it (set below) shows in the
+        // jagged margins instead of white. Counselor-only; Judge/Distiler keep the white base.
+        business.MapaManager.setMapaBaseColor(new Color(0, 0, 0, 0));
         MapaControler mapaControl = WorldFacadeCounselor.getInstance().getMapaControler();
         mapaControl.setTabGui(this);
         doMapa(mapaControl.printMapaGeral());
@@ -67,6 +70,17 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
 
         jLayeredPane1.add(getJlActionsOnMap(), Integer.valueOf(20));
         jLayeredPane1.add(getJlTag(), Integer.valueOf(100));
+
+        // Match the Swing theme so the canvas behind/around the map reads as the app background
+        // instead of a white slab (before the map paints, or in the margins when it is smaller than
+        // the viewport). Counselor-only - the shared map image rendering in PbmCommons is untouched.
+        final java.awt.Color panelBg = javax.swing.UIManager.getColor("Panel.background");
+        if (panelBg != null) {
+            setBackground(panelBg);
+            jScrollPane1.getViewport().setBackground(panelBg);
+            jLayeredPane1.setOpaque(true);
+            jLayeredPane1.setBackground(panelBg);
+        }
     }
 
     /**
