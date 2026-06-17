@@ -1,5 +1,20 @@
 # What's New in Counselor
 
+## 16-JUN-2026 - v2.1.879
+
+### A fresh new look
+- Counselor got a **modern visual makeover** - cleaner, flatter, and easier on the eyes, while everything stays exactly where you expect it.
+
+### Pick your theme - including Dark mode
+- New **Theme** picker in **Settings**: choose **Modern (light)**, **Modern (dark)**, your **System default**, or the classic **Cross-platform** look. **Dark mode** is now fully supported end to end - the info bar, character tables, map, and action counter all adapt so everything stays readable. (Pick a theme, then restart Counselor to apply it.)
+
+### Title bar that matches Windows
+- Counselor's **window title bar** now follows your **Windows light/dark setting**, just like your other apps - no more lone light title bar when the rest of your desktop is dark.
+
+### Website (clashlegends.com)
+- **See when you sent your orders:** your **My Games** cards now show the **date and time of your last order upload** (in GMT), right next to the status light.
+- **Friendlier emails:** deadline reminders, order receipts, and invites got a warmer, clearer rewrite.
+
 ## 15-JUN-2026 - v2.1.878
 
 ### Less interrupting, more informative
