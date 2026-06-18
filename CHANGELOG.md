@@ -1,5 +1,17 @@
 # What's New in Counselor
 
+## 17-JUN-2026 - v2.1.880
+
+### Zoom the map
+- The map can now be **zoomed**: hold **Ctrl** and scroll the mouse wheel to zoom in and out, and **Ctrl+0** snaps back to the default. A small badge shows the current zoom level while you adjust it.
+- On **large / high-resolution screens** the map now starts at a comfortable size automatically (and remembers your choice) instead of looking tiny and hard to read.
+
+### Update notifier fixed
+- Counselor again **reliably checks for new versions** and lets you know when one is available.
+
+### Website (clashlegends.com)
+- **Manage your game requests:** the **Request a Game** page now lists **your pending requests** with **Edit** and **Cancel** buttons, so you can tweak or withdraw a request before a moderator approves it.
+
 ## 16-JUN-2026 - v2.1.879
 
 ### A fresh new look
