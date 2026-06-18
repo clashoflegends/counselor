@@ -62,6 +62,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     private final gui.services.ScaledMapIcon mapIcon = new gui.services.ScaledMapIcon();
     private ImageIcon baseTagIcon; // 1x focus-tag glyph, scaled to `zoom` when placed
     private static final String ZOOM_KEY = "MapZoom";
+    private final gui.services.ZoomOverlay zoomOverlay = new gui.services.ZoomOverlay(); // transient "150%" badge
 
     /**
      * Creates new form MainMapaGui
@@ -83,6 +84,8 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
 
         jLayeredPane1.add(getJlActionsOnMap(), Integer.valueOf(20));
         jLayeredPane1.add(getJlTag(), Integer.valueOf(100));
+        jLayeredPane1.add(zoomOverlay, Integer.valueOf(500)); // above the radial menu (400)
+        zoomOverlay.setVisible(false);
 
         // Match the Swing theme so the canvas behind/around the map reads as the app background
         // instead of a white slab (before the map paints, or in the margins when it is smaller than
@@ -188,6 +191,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         mapaLabel.addMouseWheelListener((java.awt.event.MouseWheelEvent e) -> {
             if (e.isControlDown()) {
                 setZoom(zoom * (e.getWheelRotation() < 0 ? 1.1 : 1.0 / 1.1));
+                showZoomOverlay();
                 e.consume();
             } else {
                 jScrollPane1.dispatchEvent(new java.awt.event.MouseWheelEvent(
@@ -202,8 +206,20 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 setZoom(computeDefaultZoom());
+                showZoomOverlay();
             }
         });
+    }
+
+    /** Flash the transient "150%" badge centered near the top of the visible map and (re)start its
+     *  5s hold-then-fade. Positioned in viewport coordinates so it sits over the visible area. */
+    private void showZoomOverlay() {
+        zoomOverlay.show(Math.round(zoom * 100) + "%");
+        Dimension bs = zoomOverlay.badgeSize();
+        Rectangle vr = jScrollPane1.getViewport().getViewRect();
+        int x = vr.x + Math.max(0, (vr.width - bs.width) / 2);
+        int y = vr.y + 16;
+        zoomOverlay.setBounds(x, y, bs.width, bs.height);
     }
 
     /**
