@@ -52,6 +52,17 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     private int dx = 0, dy = 0;
     private RadialMenu radialMenu;
 
+    // --- High-DPI map zoom (Phase 10) ---
+    // The shared MapaManager renders the map and reports hex pixel positions at 1x; Counselor scales
+    // the map image and overlay placement at the display layer by `zoom`. Default derives from the
+    // monitor's logical width (getScreenSize is post-OS-scale: a 4K@200% panel reports 1920 -> 1.0,
+    // while 4K@100% reports 3840 -> 2.0 - the "map tiny on a hi-res screen" case). Persisted on change.
+    private double zoom = 1.0;
+    private boolean autoZoomPending = false; // compute the screen-derived default in addNotify (logical GC)
+    private final gui.services.ScaledMapIcon mapIcon = new gui.services.ScaledMapIcon();
+    private ImageIcon baseTagIcon; // 1x focus-tag glyph, scaled to `zoom` when placed
+    private static final String ZOOM_KEY = "MapZoom";
+
     /**
      * Creates new form MainMapaGui
      */
@@ -62,9 +73,11 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         business.MapaManager.setMapaBaseColor(new Color(0, 0, 0, 0));
         MapaControler mapaControl = WorldFacadeCounselor.getInstance().getMapaControler();
         mapaControl.setTabGui(this);
+        initZoom();
         doMapa(mapaControl.printMapaGeral());
         this.mapaLabel.addMouseMotionListener(new MapaDragListener(this));
         this.mapaLabel.addMouseListener(mapaControl);
+        installZoomControls();
         setTag();
         getJlTag().setVisible(false);
 
@@ -81,6 +94,116 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
             jLayeredPane1.setOpaque(true);
             jLayeredPane1.setBackground(panelBg);
         }
+    }
+
+    // ----- High-DPI map zoom -----
+
+    /** Pick the starting zoom: a persisted user choice if present, else the screen-derived default
+     *  (which we persist so player_stats telemetry and the config reflect what is actually shown). */
+    private void initZoom() {
+        String saved = SettingsManager.getInstance().getConfig(ZOOM_KEY, "");
+        if (!saved.isEmpty()) {
+            try {
+                zoom = clampZoom(Double.parseDouble(saved));
+                return;
+            } catch (NumberFormatException ignore) {
+                // fall through to the deferred default
+            }
+        }
+        // No saved choice: defer the screen-derived default to addNotify(), where the panel is
+        // displayable and getGraphicsConfiguration() reliably reports the monitor's LOGICAL width
+        // (Toolkit.getScreenSize() at construction can report native px on a scaled display -> double-scale).
+        autoZoomPending = true;
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        if (autoZoomPending) {
+            autoZoomPending = false;
+            java.awt.GraphicsConfiguration gc = getGraphicsConfiguration();
+            if (gc != null) {
+                zoom = clampZoom(gc.getBounds().width / 1920.0); // logical width, post-OS-scale
+                SettingsManager.getInstance().setConfig(ZOOM_KEY, String.valueOf(zoom));
+                applyMapZoom();
+            }
+        }
+    }
+
+    /** Screen-derived default for the Ctrl+0 reset (window is shown, so the GC is available). */
+    private double computeDefaultZoom() {
+        java.awt.GraphicsConfiguration gc = getGraphicsConfiguration();
+        int width = (gc != null) ? gc.getBounds().width
+                : java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
+        // Logical width is post-OS-scale, so this only enlarges on hi-res / low-scale panels.
+        return clampZoom(width / 1920.0);
+    }
+
+    private static double clampZoom(double z) {
+        return Math.max(1.0, Math.min(2.5, z));
+    }
+
+    public double getZoom() {
+        return zoom;
+    }
+
+    /** Apply a new zoom: rescale the map, drop now-stale overlays, log, persist, relayout. */
+    public void setZoom(double newZoom) {
+        double z = clampZoom(newZoom);
+        if (z == zoom) {
+            return;
+        }
+        log.info(String.format("Map zoom %.2f -> %.2f", zoom, z));
+        zoom = z;
+        SettingsManager.getInstance().setConfig(ZOOM_KEY, String.valueOf(zoom));
+        clearMovementTags();
+        hidefocusTag();
+        applyMapZoom();
+    }
+
+    /** Resize the map view to the current zoom (the JLabel already shares mapIcon). */
+    private void applyMapZoom() {
+        mapIcon.setZoom(zoom);
+        int w = mapIcon.getIconWidth();
+        int h = mapIcon.getIconHeight();
+        this.jLayeredPane1.setPreferredSize(new Dimension(w, h));
+        this.mapaLabel.setBounds(0, 0, w, h);
+        this.jLayeredPane1.revalidate();
+        this.mapaLabel.repaint();
+    }
+
+    /** Scale a small overlay glyph to the current zoom (cheap; glyphs are hex-sized). */
+    private ImageIcon scaleGlyph(ImageIcon icon) {
+        if (icon == null || zoom == 1.0) {
+            return icon;
+        }
+        int w = Math.max(1, (int) Math.round(icon.getIconWidth() * zoom));
+        int h = Math.max(1, (int) Math.round(icon.getIconHeight() * zoom));
+        return new ImageIcon(icon.getImage().getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH));
+    }
+
+    /** Ctrl+mouse-wheel zooms; Ctrl+0 resets to the screen-derived default. A plain wheel still
+     *  scrolls - the event is re-dispatched to the scroll pane (a child listener otherwise swallows it). */
+    private void installZoomControls() {
+        mapaLabel.addMouseWheelListener((java.awt.event.MouseWheelEvent e) -> {
+            if (e.isControlDown()) {
+                setZoom(zoom * (e.getWheelRotation() < 0 ? 1.1 : 1.0 / 1.1));
+                e.consume();
+            } else {
+                jScrollPane1.dispatchEvent(new java.awt.event.MouseWheelEvent(
+                        jScrollPane1, e.getID(), e.getWhen(), e.getModifiersEx(),
+                        e.getX(), e.getY(), e.getClickCount(), e.isPopupTrigger(),
+                        e.getScrollType(), e.getScrollAmount(), e.getWheelRotation()));
+            }
+        });
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(javax.swing.KeyStroke.getKeyStroke(
+                java.awt.event.KeyEvent.VK_0, java.awt.event.InputEvent.CTRL_DOWN_MASK), "mapZoomReset");
+        getActionMap().put("mapZoomReset", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                setZoom(computeDefaultZoom());
+            }
+        });
     }
 
     /**
@@ -143,7 +266,12 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
      * Display hex tag on map and bring it into viewport
      */
     public void setFocusTag(int x, int y) {
-        final Rectangle tagRectangle = new Rectangle(x - dx, y - dy, ImageManager.HEX_SIZE + 2 * dx, ImageManager.HEX_SIZE + 2 * dy);
+        // x,y are 1x hex pixel coords from MapaManager.doCoordToPosition - scale position + glyph by zoom.
+        final Rectangle tagRectangle = new Rectangle(
+                (int) Math.round((x - dx) * zoom), (int) Math.round((y - dy) * zoom),
+                (int) Math.round((ImageManager.HEX_SIZE + 2 * dx) * zoom),
+                (int) Math.round((ImageManager.HEX_SIZE + 2 * dy) * zoom));
+        getJlTag().setIcon(scaleGlyph(baseTagIcon));
         getJlTag().setBounds(tagRectangle);
         getJlTag().setVisible(true);
         final JViewport vp = jScrollPane1.getViewport();
@@ -179,9 +307,10 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
 
     private void addMovementTag(int x, int y, int custoMov, int limitMov, MovimentoExercito move, boolean cumulativeCounter) {
         //prepara tag, chamar depois do printMapaGeral, pois ele carrega todas as imagens.
-        JLabel tagMovement = new JLabel(this.getMovementTagIcon(custoMov, limitMov, move, cumulativeCounter));
+        JLabel tagMovement = new JLabel(scaleGlyph(this.getMovementTagIcon(custoMov, limitMov, move, cumulativeCounter)));
         tagMovement.setOpaque(false);
-        final Rectangle rectangle = new Rectangle(x, y, ImageManager.HEX_SIZE, ImageManager.HEX_SIZE);
+        final Rectangle rectangle = new Rectangle((int) Math.round(x * zoom), (int) Math.round(y * zoom),
+                (int) Math.round(ImageManager.HEX_SIZE * zoom), (int) Math.round(ImageManager.HEX_SIZE * zoom));
         tagMovement.setBounds(rectangle);
         tagMovement.setVisible(true);
         movTags.add(tagMovement);
@@ -312,22 +441,22 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     }
 
     public void doMapa(ImageIcon mapa) {
-        //Gera o mapa
-        Dimension tamanho = new Dimension(mapa.getIconWidth(), mapa.getIconHeight());
-        this.jLayeredPane1.setPreferredSize(tamanho);
-        this.mapaLabel.setSize(tamanho);
-        this.mapaLabel.setIcon(mapa);
+        //Gera o mapa - rendered at 1x by MapaManager; ScaledMapIcon paints it at the current zoom.
+        mapIcon.setBase(mapa.getImage());
+        this.mapaLabel.setIcon(mapIcon);
+        applyMapZoom();
     }
 
     public void doActionsOnMap(ImageIcon actionsMap) {
-        getJlActionsOnMap().setIcon(actionsMap);
-        final Rectangle tagRectangle = new Rectangle(0, 0, actionsMap.getIconWidth(), actionsMap.getIconHeight());
-        getJlActionsOnMap().setBounds(tagRectangle);
-        getJlActionsOnMap().setVisible(true);
+        // Full-map overlay - folded into the scaled map icon so it zooms with the map (and we don't
+        // hold a second pre-scaled full-map bitmap). Drawn above the map, below the tag/radial layers.
+        mapIcon.setActions(actionsMap.getImage());
+        this.mapaLabel.repaint();
     }
 
     public void doActionsOnMapHide() {
-        getJlActionsOnMap().setVisible(false);
+        mapIcon.setActions(null);
+        this.mapaLabel.repaint();
     }
 
     public void addRadialMenu(RadialMenu aRadialMenu) {
@@ -342,6 +471,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     }
 
     private void setTagLabel(ImageIcon tagIcon) {
+        this.baseTagIcon = tagIcon; // keep the 1x glyph; setFocusTag scales it to the current zoom
         if (this.jlTag == null) {
             this.jlTag = new JLabel(tagIcon);
         } else {

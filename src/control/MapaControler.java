@@ -145,6 +145,16 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         this.getTabGui().clearMovementTags();
     }
 
+    /** Map a click in the (zoomed) display space back to 1x map coords for hex lookup. Drag-to-scroll
+     *  stays in display space and must NOT use this. */
+    private Point scaleClick(Point p) {
+        double z = getTabGui().getZoom();
+        if (z == 1.0) {
+            return p;
+        }
+        return new Point((int) (p.x / z), (int) (p.y / z));
+    }
+
     public void addMovementTag(MovimentoExercito movimento) {
         //calcula posicao no grafico a partir da coordenada do local
         int[] pos = mapaManager.doCoordToPosition(movimento.getDestino());
@@ -218,7 +228,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     @Override
     public void mouseClicked(MouseEvent event) {
         try {
-            final Local local = mapaManager.doPositionToCoord(event.getPoint());
+            final Local local = mapaManager.doPositionToCoord(scaleClick(event.getPoint()));
             if (SwingUtilities.isRightMouseButton(event) && !SettingsManager.getInstance().isRadialMenu()) {
                 showLocalInfo(local);
             } else if (SwingUtilities.isRightMouseButton(event) && SettingsManager.getInstance().isRadialMenu()) {
@@ -369,7 +379,8 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         tabGui.addRadialMenu(rmActive);
         rmActive.setLocalMenu(local);
         int[] pos = mapaManager.doCoordToPosition(local);
-        rmActive.doActivate(new Point(pos[0], pos[1]));
+        double z = getTabGui().getZoom(); // place the menu over the hex in the zoomed display space
+        rmActive.doActivate(new Point((int) Math.round(pos[0] * z), (int) Math.round(pos[1] * z)));
     }
 
     public void showDirectionsCentreMenu(Local local, WorldBuilderRadialActions action) {

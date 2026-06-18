@@ -147,7 +147,7 @@ jobs:
             --vendor "Clash of Legends" \
             --add-modules java.desktop,java.sql,java.xml,java.naming,java.logging,java.management,jdk.unsupported,jdk.crypto.ec \
             --java-options '-splash:$APPDIR/teaser_whs01.png' \
-            --java-options -Xmx512M \
+            --java-options -Xmx1024M \
             --java-options "-Dsun.java2d.d3d=false" \
             --java-options "-Dsun.java2d.noddraw=true" \
             --java-options "--add-opens=java.base/java.util=ALL-UNNAMED" \
@@ -176,7 +176,7 @@ jobs:
             --vendor "Clash of Legends" \
             --add-modules java.desktop,java.sql,java.xml,java.naming,java.logging,java.management,jdk.unsupported,jdk.crypto.ec \
             --java-options '-splash:$APPDIR/teaser_whs01.png' \
-            --java-options -Xmx512M \
+            --java-options -Xmx1024M \
             --java-options "-Dsun.java2d.d3d=false" \
             --java-options "-Dsun.java2d.noddraw=true" \
             --java-options "--add-opens=java.base/java.util=ALL-UNNAMED" \
@@ -207,7 +207,7 @@ jobs:
             --vendor "Clash of Legends" \
             --add-modules java.desktop,java.sql,java.xml,java.naming,java.logging,java.management,jdk.unsupported,jdk.crypto.ec \
             --java-options '-splash:$APPDIR/teaser_whs01.png' \
-            --java-options -Xmx512M \
+            --java-options -Xmx1024M \
             --java-options "--add-opens=java.base/java.util=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.lang=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" \
