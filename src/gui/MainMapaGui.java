@@ -346,7 +346,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
 
     private void addMovementTag(int x, int y, int custoMov, int limitMov, MovimentoExercito move, boolean cumulativeCounter) {
         //prepara tag, chamar depois do printMapaGeral, pois ele carrega todas as imagens.
-        JLabel tagMovement = new JLabel(scaleGlyph(this.getMovementTagIcon(custoMov, limitMov, move, cumulativeCounter)));
+        JLabel tagMovement = new JLabel(this.getMovementTagIcon(custoMov, limitMov, move, cumulativeCounter));
         tagMovement.setOpaque(false);
         final Rectangle rectangle = new Rectangle((int) Math.round(x * zoom), (int) Math.round(y * zoom),
                 (int) Math.round(ImageManager.HEX_SIZE * zoom), (int) Math.round(ImageManager.HEX_SIZE * zoom));
@@ -354,22 +354,23 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         tagMovement.setVisible(true);
         movTags.add(tagMovement);
         jLayeredPane1.add(tagMovement, Integer.valueOf(99 + counter));
-        JViewport vp = jScrollPane1.getViewport();
-        Rectangle viewRect = vp.getViewRect();
-        boolean contains = viewRect.contains(rectangle);
-        if (!contains) {
-            vp.setViewPosition(new Point(0, 0));
-            vp.scrollRectToVisible(rectangle);
-        }
+        // Mark just this tag's area dirty (NOT scrollRectToVisible, which previously scrolled +
+        // repainted the whole zoomed map once per hex - slow at high zoom and made the view jump).
+        // repaint() is coalesced by Swing, so a whole range/sim batch collapses to a single paint.
+        jLayeredPane1.repaint(rectangle);
     }
 
     public void clearMovementTags() {
+        boolean had = !movTags.isEmpty();
         for (JLabel tag : movTags) {
             tag.setVisible(false);
             jLayeredPane1.remove(tag);
         }
         movTags.clear();
         this.counter = 0;
+        if (had) {
+            jLayeredPane1.repaint(); // clear the removed tags (coalesced with any subsequent re-adds)
+        }
     }
 
     private ImageIcon getMovementTagIcon(int custoMov, int limitMov, MovimentoExercito move, boolean cumulativeCounter) {
@@ -381,8 +382,16 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
             counter++;
             points = custoMov;
         }
-        BufferedImage img = new BufferedImage(60, 60, BufferedImage.TRANSLUCENT);
+        // Render the bubble at the current map zoom (was a fixed 60px image upscaled -> pixelated).
+        // Antialiasing on so the circle/number are smooth even at 100%. The 60-unit geometry below is
+        // unchanged - g.scale draws it crisp at any zoom; the font scales with the transform too.
+        final int sz = Math.max(1, (int) Math.round(60 * zoom));
+        BufferedImage img = new BufferedImage(sz, sz, BufferedImage.TRANSLUCENT);
         Graphics2D g = img.createGraphics();
+        g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING, java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING, java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g.scale(zoom, zoom);
 
         if (move != null) {
             ImageManager.getInstance().doDrawRastro(g, ConverterFactory.getDirecao(move.getDirecao() + 3), Color.BLUE);
