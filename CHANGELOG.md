@@ -1,5 +1,15 @@
 # What's New in Counselor
 
+## 18-JUN-2026 - v2.1.881
+
+### Zoom fixes & polish
+- Fixed the **right-click action menu while zoomed in**: the bubbles now scale and sit correctly over the surrounding hexes at any zoom, their labels are bolder and easier to read, and they clear properly when you zoom again.
+- The **selected-hex outline** now stays **sharp** when zoomed instead of looking pixelated.
+
+### Website (clashlegends.com)
+- **Set your preferred language** in **My Config** (English, Portuguese, Spanish, Italian, Catalan), shown with a flag - and Counselor sets it for you automatically on your next upload.
+- **Game-request notifications:** opt in to an email when a moderator **approves** or **cancels** your game request (or it auto-expires). Off by default; toggle it on **My Config** or **Request a Game**.
+
 ## 17-JUN-2026 - v2.1.880
 
 ### Zoom the map
