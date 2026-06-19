@@ -259,7 +259,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        jbOpen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/open actions.png"))); // NOI18N
         jbOpen.setText(labels.getString("ABRIR.TURNO")); // NOI18N
         jbOpen.setToolTipText(labels.getString("ABRIR.TURNO.TOOLTIP")); // NOI18N
         jbOpen.setActionCommand("jbOpen");
@@ -267,7 +266,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbOpen.setName("jbOpen"); // NOI18N
         jToolBar1.add(jbOpen);
 
-        jbLoad.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/open results.png"))); // NOI18N
         jbLoad.setText(labels.getString("CARREGAR.ACOES")); // NOI18N
         jbLoad.setToolTipText(labels.getString("CARREGAR.ACOES.TOOLTIP")); // NOI18N
         jbLoad.setActionCommand("jbLoad");
@@ -276,7 +274,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbLoad.setName("jbLoad"); // NOI18N
         jToolBar1.add(jbLoad);
 
-        jbSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save.png"))); // NOI18N
         jbSave.setText(labels.getString("SALVAR.ACOES")); // NOI18N
         jbSave.setToolTipText(labels.getString("SALVAR.ACOES.TOOLTIP")); // NOI18N
         jbSave.setActionCommand("jbSave");
@@ -285,7 +282,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbSave.setName("jbSave"); // NOI18N
         jToolBar1.add(jbSave);
 
-        jbSend.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/submit.png"))); // NOI18N
         jbSend.setText(labels.getString("ENVIAR.ACOES")); // NOI18N
         jbSend.setToolTipText(labels.getString("ENVIAR.ACOES.TOOLTIP")); // NOI18N
         jbSend.setActionCommand("jbSend");
@@ -295,7 +291,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar1.add(jbSend);
         jToolBar1.add(filler2);
 
-        jbSaveWorld.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/disk icon.png"))); // NOI18N
         jbSaveWorld.setText(labels.getString("SALVAR.WORLD")); // NOI18N
         jbSaveWorld.setToolTipText(labels.getString("SALVAR.WORLD.TOOLTIP")); // NOI18N
         jbSaveWorld.setActionCommand("jbSaveWorld");
@@ -304,7 +299,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbSaveWorld.setName("jbSaveWorld"); // NOI18N
         jToolBar1.add(jbSaveWorld);
 
-        jbCopy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/copy.png"))); // NOI18N
         jbCopy.setText(labels.getString("COPIAR.ACOES")); // NOI18N
         jbCopy.setToolTipText(labels.getString("COPIAR.ACOES.TOOLTIP")); // NOI18N
         jbCopy.setActionCommand("jbCopy");
@@ -313,7 +307,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbCopy.setName("jbCopy"); // NOI18N
         jToolBar1.add(jbCopy);
 
-        jbEmailList.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/email.png"))); // NOI18N
         jbEmailList.setToolTipText(labels.getString("COPIAR.EMAILS.TOOLTIP")); // NOI18N
         jbEmailList.setActionCommand("jbEmailList");
         jbEmailList.setEnabled(false);
@@ -323,7 +316,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbEmailList.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(jbEmailList);
 
-        jbMap.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/save map.png"))); // NOI18N
         jbMap.setText(labels.getString("SALVAR.MAPA")); // NOI18N
         jbMap.setToolTipText(labels.getString("SALVAR.MAPA.TOOLTIP")); // NOI18N
         jbMap.setActionCommand("jbExportMap");
@@ -335,7 +327,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
         jToolBar3.setRollover(true);
 
-        jbScoreGraph.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/bargraph icon.png"))); // NOI18N
         jbScoreGraph.setToolTipText(labels.getString("PONTOS.VITORIA")); // NOI18N
         jbScoreGraph.setActionCommand("jbScoreGraph");
         jbScoreGraph.setFocusable(false);
@@ -344,7 +335,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar3.add(jbScoreGraph);
 
-        jbScoreGraph4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/bargraph icon.png"))); // NOI18N
         jbScoreGraph4.setToolTipText(labels.getString("PONTOS.KEYCITY")); // NOI18N
         jbScoreGraph4.setActionCommand("jbGraphKeyCityPerNation");
         jbScoreGraph4.setEnabled(false);
@@ -354,7 +344,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar3.add(jbScoreGraph4);
 
-        jbScoreGraph6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/bargraph icon.png"))); // NOI18N
         jbScoreGraph6.setToolTipText(labels.getString("PONTOS.VITORIA.OVERVIEW")); // NOI18N
         jbScoreGraph6.setActionCommand("jbGraphVictoryOverview");
         jbScoreGraph6.setEnabled(false);
@@ -364,7 +353,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph6.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar3.add(jbScoreGraph6);
 
-        jbScoreGraph2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/areagraph icon.png"))); // NOI18N
         jbScoreGraph2.setToolTipText(labels.getString("PONTOS.VITORIA.GAME")); // NOI18N
         jbScoreGraph2.setActionCommand("jbGraphAllTurns");
         jbScoreGraph2.setEnabled(false);
@@ -374,7 +362,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar3.add(jbScoreGraph2);
 
-        jbScoreGraph3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/bargraph icon.png"))); // NOI18N
         jbScoreGraph3.setToolTipText(labels.getString("PONTOS.DOMINATION.BATTLEROYAL.TEAM")); // NOI18N
         jbScoreGraph3.setActionCommand("jbGraphDomination");
         jbScoreGraph3.setEnabled(false);
@@ -384,7 +371,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar3.add(jbScoreGraph3);
 
-        jbScoreGraph1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/bargraph icon.png"))); // NOI18N
         jbScoreGraph1.setToolTipText(labels.getString("PONTOS.VITORIA.TEAM")); // NOI18N
         jbScoreGraph1.setActionCommand("jbGraphSingleTurn");
         jbScoreGraph1.setEnabled(false);
@@ -394,7 +380,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar3.add(jbScoreGraph1);
 
-        jbScoreGraph5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/pie-chart-icon.png"))); // NOI18N
         jbScoreGraph5.setToolTipText(labels.getString("PONTOS.KEYCITY.TEAM")); // NOI18N
         jbScoreGraph5.setActionCommand("jbGraphKeyCityPerTeam");
         jbScoreGraph5.setEnabled(false);
@@ -493,7 +478,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar1.add(jToolBar2);
         jToolBar1.add(filler3);
 
-        jbHexview.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_icon.png"))); // NOI18N
         jbHexview.setText(bundle.getString("MENU.HEXVIEW")); // NOI18N
         jbHexview.setToolTipText(bundle.getString("MENU.HEXVIEW.TOOLTIP")); // NOI18N
         jbHexview.setActionCommand("jbHexview");
@@ -502,7 +486,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbHexview.setName("jbConfig"); // NOI18N
         jToolBar1.add(jbHexview);
 
-        jbConfigs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icon_customize.gif"))); // NOI18N
         jbConfigs.setText(bundle.getString("MENU.CONFIG")); // NOI18N
         jbConfigs.setToolTipText(bundle.getString("MENU.CONFIG.TOOLTIP")); // NOI18N
         jbConfigs.setActionCommand("jbConfig");
@@ -510,7 +493,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbConfigs.setName("jbConfig"); // NOI18N
         jToolBar1.add(jbConfigs);
 
-        jbAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/about.png"))); // NOI18N
         jbAbout.setText(labels.getString("MENU.ABOUT")); // NOI18N
         jbAbout.setToolTipText(labels.getString("MENU.ABOUT.TOOLTIP")); // NOI18N
         jbAbout.setActionCommand("jbAbout");
