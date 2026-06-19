@@ -25,6 +25,7 @@ public class RadialMenu extends javax.swing.JPanel {
     private static final Log log = LogFactory.getLog(RadialMenu.class);
     private final List<RadialButton> rootMenu = new ArrayList<RadialButton>();
     private double initAngle = 120;
+    private double zoom = 1.0; // map zoom: scales the bubble ring radius + bubble size to match the hexes
     private Local local;
     private boolean direction;
     private RmActionListener optionListener;
@@ -75,9 +76,15 @@ public class RadialMenu extends javax.swing.JPanel {
     }
 
     public void doActivate(Point initialPosition) {
-        //set buttons position and visible 
+        //set buttons position and visible
         updateButtons(initialPosition);
         this.setVisible(true);
+    }
+
+    /** Map zoom factor; the bubble ring radius and bubble size scale with it so the menu tracks the
+     *  (zoomed) hexes. 1.0 = 100% (unchanged). */
+    public void setZoom(double zoom) {
+        this.zoom = zoom;
     }
 
     private void updateButtons(Point position) {
@@ -86,20 +93,24 @@ public class RadialMenu extends javax.swing.JPanel {
         //TODO: falta tratamento quando menu eh direcao (nao colocar os invalidos)
         final int startAngle;
         final int totalArc;
+        // Ring radius and bubble size scale with the map zoom so each bubble sits over its neighbour
+        // hex at the same scale (at zoom=1 identical to the original HEX_SIZE layout). The edge margin
+        // scales too so the partial-arc near a map border triggers over the right (scaled) distance.
+        final int hexZ = Math.max(1, (int) Math.round(ImageManager.HEX_SIZE * zoom));
         //check for map boundaries
         if (position.x <= 0 && position.y <= 0) {
             //upper left corner
             totalArc = 120;
             startAngle = 0;
-        } else if (position.x >= this.getWidth() - ImageManager.HEX_SIZE * 2 && position.y <= 0) {
+        } else if (position.x >= this.getWidth() - hexZ * 2 && position.y <= 0) {
             //upper right corner
             totalArc = 120;
             startAngle = 270;
-        } else if (position.x <= 0 && position.y >= this.getHeight() - ImageManager.HEX_SIZE * 2) {
+        } else if (position.x <= 0 && position.y >= this.getHeight() - hexZ * 2) {
             //bottom left corner
             totalArc = 120;
             startAngle = 90;
-        } else if (position.x >= this.getWidth() - ImageManager.HEX_SIZE * 2 && position.y >= this.getHeight() - ImageManager.HEX_SIZE * 2) {
+        } else if (position.x >= this.getWidth() - hexZ * 2 && position.y >= this.getHeight() - hexZ * 2) {
             //bottom right corner
             totalArc = 120;
             startAngle = 180;
@@ -107,11 +118,11 @@ public class RadialMenu extends javax.swing.JPanel {
             //upper border
             totalArc = 180;
             startAngle = 0;
-        } else if (position.y >= this.getHeight() - ImageManager.HEX_SIZE * 2) {
+        } else if (position.y >= this.getHeight() - hexZ * 2) {
             //lower border
             totalArc = 180;
             startAngle = 180;
-        } else if (position.x >= this.getWidth() - ImageManager.HEX_SIZE * 2) {
+        } else if (position.x >= this.getWidth() - hexZ * 2) {
             //right border
             totalArc = 180;
             startAngle = 270;
@@ -137,14 +148,15 @@ public class RadialMenu extends javax.swing.JPanel {
             // Get current angles (in radians)
             double currentXAngle = Math.cos(Math.toRadians(getInitAngle()));
             double currentYAngle = Math.sin(Math.toRadians(getInitAngle()));
-            // Get current offset coordinates
-            double currentXCoordinate = ImageManager.HEX_SIZE * currentXAngle;
-            double currentYCoordinate = ImageManager.HEX_SIZE * currentYAngle;
+            // Get current offset coordinates (scaled by zoom)
+            double currentXCoordinate = ImageManager.HEX_SIZE * zoom * currentXAngle;
+            double currentYCoordinate = ImageManager.HEX_SIZE * zoom * currentYAngle;
             // Position buttons around circle
             menu.setPosition(position);
             menu.setBounds(position.x + (int) currentXCoordinate,
                     position.y - (int) currentYCoordinate,
-                    ImageManager.HEX_SIZE, ImageManager.HEX_SIZE);
+                    hexZ, hexZ);
+            menu.applyZoom(zoom);
             menu.setInitAngle(getInitAngle() - angularSpacing);
             menu.setVisible(true);
             menu.closeSubMenu();

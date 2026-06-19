@@ -61,6 +61,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     private boolean autoZoomPending = false; // compute the screen-derived default in addNotify (logical GC)
     private final gui.services.ScaledMapIcon mapIcon = new gui.services.ScaledMapIcon();
     private ImageIcon baseTagIcon; // 1x focus-tag glyph, scaled to `zoom` when placed
+    private String hexTagStyle = "0"; // selected HexTagStyle, so the focus tag can be re-drawn at zoom
     private static final String ZOOM_KEY = "MapZoom";
     private final gui.services.ZoomOverlay zoomOverlay = new gui.services.ZoomOverlay(); // transient "150%" badge
 
@@ -161,6 +162,9 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         SettingsManager.getInstance().setConfig(ZOOM_KEY, String.valueOf(zoom));
         clearMovementTags();
         hidefocusTag();
+        if (this.radialMenu != null) {
+            this.radialMenu.doHide(); // dismiss the bubbles too, else they persist mislaid after rescale
+        }
         applyMapZoom();
     }
 
@@ -185,13 +189,32 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         return new ImageIcon(icon.getImage().getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH));
     }
 
+    /** Re-draw the focus tag at the given scale: the drawn-hexagon styles render vector-crisp at the
+     *  zoom (no pixelation); the legacy raster gif style (HexTagStyle=1) falls back to a smoothed upscale. */
+    private ImageIcon buildScaledTag(double scale) {
+        switch (hexTagStyle) {
+            case "1":
+                return scaleGlyph(baseTagIcon); // legacy raster gif - can only be upscaled
+            case "2":
+                return TagManager.getInstance().drawTagStyle2(dx, dy, scale);
+            default: // "3" and the unset/default style both use the drawn style-3 hexagon
+                return TagManager.getInstance().drawTagStyle3(dx, dy, scale);
+        }
+    }
+
     /** Ctrl+mouse-wheel zooms; Ctrl+0 resets to the screen-derived default. A plain wheel still
      *  scrolls - the event is re-dispatched to the scroll pane (a child listener otherwise swallows it). */
     private void installZoomControls() {
         mapaLabel.addMouseWheelListener((java.awt.event.MouseWheelEvent e) -> {
             if (e.isControlDown()) {
-                setZoom(zoom * (e.getWheelRotation() < 0 ? 1.1 : 1.0 / 1.1));
-                showZoomOverlay();
+                // Use precise rotation: getWheelRotation() is an int that is often 0 on precision
+                // touchpads / hi-res wheels (so its sign would wrongly read as zoom-out). The double
+                // getPreciseWheelRotation() carries a reliable sign there.
+                double rot = e.getPreciseWheelRotation();
+                if (rot != 0) {
+                    setZoom(zoom * (rot < 0 ? 1.1 : 1.0 / 1.1));
+                    showZoomOverlay();
+                }
                 e.consume();
             } else {
                 jScrollPane1.dispatchEvent(new java.awt.event.MouseWheelEvent(
@@ -287,7 +310,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
                 (int) Math.round((x - dx) * zoom), (int) Math.round((y - dy) * zoom),
                 (int) Math.round((ImageManager.HEX_SIZE + 2 * dx) * zoom),
                 (int) Math.round((ImageManager.HEX_SIZE + 2 * dy) * zoom));
-        getJlTag().setIcon(scaleGlyph(baseTagIcon));
+        getJlTag().setIcon(buildScaledTag(zoom));
         getJlTag().setBounds(tagRectangle);
         getJlTag().setVisible(true);
         final JViewport vp = jScrollPane1.getViewport();
@@ -413,6 +436,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
      */
     public void setTag() {
         final String tagStyle = SettingsManager.getInstance().getConfig("HexTagStyle", "0");
+        this.hexTagStyle = tagStyle; // remembered so setFocusTag can re-draw the tag vector-crisp at zoom
         //prepara tag, chamar depois do printMapaGeral, pois ele carrega todas as imagens.
         switch (tagStyle) {
             case "1":
@@ -479,7 +503,18 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         if (this.radialMenu != null) {
             jLayeredPane1.remove(this.radialMenu);
         }
+        // The menu positions its buttons in the SCALED map space (showActiveRadialMenu passes pos*zoom).
+        // Size the menu panel to the scaled map so buttons past the original 1x extent aren't clipped,
+        // and update each button's mapSize so the edge/border arc detection matches the scaled space.
+        // (Bug: at zoom > 100% the bubbles clipped away / mislaid toward the south-east.)
+        int w = mapIcon.getIconWidth(), h = mapIcon.getIconHeight();
+        aRadialMenu.setBounds(0, 0, w, h);
+        aRadialMenu.setZoom(zoom); // scale the bubble ring radius + bubble size to the map zoom
+        for (radialMenu.RadialButton rb : aRadialMenu.getRootMenu()) {
+            rb.setMapSize(new Point(w, h));
+        }
         jLayeredPane1.add(aRadialMenu, Integer.valueOf(400));
+        this.radialMenu = aRadialMenu; // keep the handle so zoom (and future dismissals) can hide it
     }
 
     private JLabel getJlTag() {
