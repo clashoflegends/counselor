@@ -54,6 +54,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     public MainResultWindowGui(String autoLoad) {
         this.settingsManager = SettingsManager.getInstance();
         initComponents();
+        applyToolbarIcons(); // swap the .form raster toolbar icons for crisp, theme-aware SVG icons
         doConfigStatusBar();
         // Repaint the lavender info/status surfaces theme-aware: dark on a FlatLaf dark theme so they
         // are not light islands (the .form sets lavender at design time; this overrides at runtime).
@@ -96,7 +97,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         // Recent-files dropdown, inserted right after "Open Results" (index 1 of jToolBar1).
         // Built in code rather than the Matisse .form because its menu is populated at runtime.
         jbRecent = new javax.swing.JButton();
-        jbRecent.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/open results.png")));
+        jbRecent.setIcon(svgIcon("history"));
         jbRecent.setText(labels.getString("RECENT.TURNO"));
         jbRecent.setToolTipText(labels.getString("RECENT.TURNO.TOOLTIP"));
         jbRecent.setFocusable(false);
@@ -107,6 +108,44 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
         wc.doAutoLoad(autoLoad);
         EgfDropHandler.install(this, this);
+    }
+
+    private static final int TOOLBAR_ICON_SIZE = 20;
+
+    /**
+     * Load a crisp, theme-aware toolbar icon from the bundled Tabler (MIT) SVG set. The monochrome
+     * stroke icon is painted in the current theme's button text colour, so it adapts light/dark
+     * (icons are built once at startup; the theme is fixed per session).
+     */
+    private static javax.swing.Icon svgIcon(String name) {
+        com.formdev.flatlaf.extras.FlatSVGIcon icon = new com.formdev.flatlaf.extras.FlatSVGIcon(
+                "images/icons/" + name + ".svg", TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE);
+        icon.setColorFilter(new com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter(
+                c -> javax.swing.UIManager.getColor("Button.foreground")));
+        return icon;
+    }
+
+    /** Replace the Matisse-generated raster toolbar icons with vector SVG icons (called after
+     *  initComponents so it doesn't fight the .form). Score-graph buttons keep the bar/area/pie split. */
+    private void applyToolbarIcons() {
+        jbOpen.setIcon(svgIcon("folder-open"));
+        jbLoad.setIcon(svgIcon("file-import"));
+        jbSave.setIcon(svgIcon("device-floppy"));
+        jbSend.setIcon(svgIcon("cloud-upload"));
+        jbSaveWorld.setIcon(svgIcon("world-download"));
+        jbCopy.setIcon(svgIcon("copy"));
+        jbEmailList.setIcon(svgIcon("mail"));
+        jbMap.setIcon(svgIcon("map"));
+        jbScoreGraph.setIcon(svgIcon("chart-bar"));
+        jbScoreGraph1.setIcon(svgIcon("chart-bar"));
+        jbScoreGraph2.setIcon(svgIcon("chart-area"));
+        jbScoreGraph3.setIcon(svgIcon("chart-bar"));
+        jbScoreGraph4.setIcon(svgIcon("chart-bar"));
+        jbScoreGraph5.setIcon(svgIcon("chart-pie"));
+        jbScoreGraph6.setIcon(svgIcon("chart-bar"));
+        jbHexview.setIcon(svgIcon("hexagon"));
+        jbConfigs.setIcon(svgIcon("settings"));
+        jbAbout.setIcon(svgIcon("info-circle"));
     }
 
     /** Build and show the recently-opened-files popup below the Recent toolbar button. */
