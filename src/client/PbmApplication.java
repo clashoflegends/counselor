@@ -105,6 +105,8 @@ public class PbmApplication extends Application implements Serializable {
         }
         setListeners(frame);
         final long tShown = System.currentTimeMillis();
+        // Expose cold-start time for upload telemetry (player_stats.vl_startup_ms).
+        SysApoio.setStartupTimeMs(tShown - client.Main.launchMs);
         //check GitHub for a newer release (async, daemon thread; notifies title + status bar if found)
         control.services.UpdateChecker.checkAsync(mainWin);
         log.info(String.format(
