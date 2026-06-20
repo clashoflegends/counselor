@@ -49,8 +49,10 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
         if (SettingsManager.getInstance().isWorldBuilder()) {
 //            this.addTabBase(new TabWorldBuilderGui(labels.getString("WB.TAB.TITLE"), labels.getString("WB.TAB.HINT"), mapaControl));
         }
+        final long t0 = System.currentTimeMillis();
         this.tabPersonagem = new TabPersonagensGui(labels.getString("PERSONAGENS"), labels.getString("PERSONAGENS.DISPONIVEL"), mapaControl);
         this.addTabBase(this.tabPersonagem);
+        final long tPersonagem = System.currentTimeMillis();
         this.addTabBase(new TabCidadesGui(labels.getString("CIDADES"), labels.getString("CIDADES.DISPONIVEL"), mapaControl));
         this.addTabBase(new TabExercitosGui(labels.getString("EXERCITOS"), labels.getString("EXERCITOS.DISPONIVEL"), mapaControl));
         this.addTabBase(new TabArtefatosGui(labels.getString("ARTEFATOS"), labels.getString("ARTEFATOS.DISPONIVEL"), mapaControl));
@@ -69,6 +71,8 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
         if (SettingsManager.getInstance().isConfig("GuiShowLocationsTab", "1", "0")) {
             this.addTabBase(new TabOrdensGui("Ordens", labels.getString("ORDENS.SAVED")));
         }
+        log.info(String.format("STARTUP TIMING tabs: personagens=%dms others(%d)=%dms",
+                tPersonagem - t0, this.jTabbedPane1.getTabCount() - 1, System.currentTimeMillis() - tPersonagem));
     }
 
     //** Adiciona uma Tab ao painel principal de exibição */
