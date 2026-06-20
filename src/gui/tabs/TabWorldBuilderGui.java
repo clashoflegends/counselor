@@ -47,6 +47,8 @@ public class TabWorldBuilderGui extends TabBase implements Serializable {
         this.applyFiltroDefault(comboFiltro);
         //adiciona listeners
         jcbTerrain.setActionCommand("jcbTerrain");
+        //right-click copy / export-to-CSV, same as every other data table
+        gui.services.TableExportMenu.install(jtListaInfos, getTitle());
 
 //        this.setMainModel(model);
     }

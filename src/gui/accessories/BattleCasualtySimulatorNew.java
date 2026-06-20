@@ -54,6 +54,9 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         battleSimControler.setCasualtyControler(platoonControler);
         setLocal(local);
         configUI(local);
+        //right-click copy / export-to-CSV on both battle-sim tables, same as the data tabs
+        gui.services.TableExportMenu.install(jtArmyList, "battlesim-armies");
+        gui.services.TableExportMenu.install(jtPlatoonList, "battlesim-platoons");
         /*
         re-layout: Move terrain to city box; rename city box to local, adjust title;
         better messages https://stackoverflow.com/questions/3240415/how-to-create-a-notification-in-swing  https://stackoverflow.com/questions/23841518/how-to-pop-up-a-text-boxor-tooltip-via-script-in-java
