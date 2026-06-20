@@ -88,6 +88,7 @@ public class MainAboutBox extends TabBase implements Serializable {
         lModeratorTitle1 = new javax.swing.JLabel();
         lModeratorLink1 = new javax.swing.JLabel();
         lFacebookLink1 = new javax.swing.JLabel();
+        lNewVersion = new javax.swing.JLabel();
 
         lAboutTitle.setFont(new java.awt.Font("Verdana", 0, 18)); // NOI18N
         lAboutTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -146,6 +147,8 @@ public class MainAboutBox extends TabBase implements Serializable {
 
         lFacebookLink1.setText("http://www.facebook.com/ClashOfLegends");
 
+        lNewVersion.setText("jLabel1");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -158,7 +161,10 @@ public class MainAboutBox extends TabBase implements Serializable {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lCounselorTitle)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(lCounselorTitle)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lNewVersion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                     .addComponent(lCommonsTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(lJavaTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(lScreenTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -230,7 +236,8 @@ public class MainAboutBox extends TabBase implements Serializable {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lCounselorTitle)
-                    .addComponent(lClient))
+                    .addComponent(lClient)
+                    .addComponent(lNewVersion))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lCommonsTitle)
@@ -249,8 +256,6 @@ public class MainAboutBox extends TabBase implements Serializable {
                     .addComponent(lOsTitle))
                 .addContainerGap())
         );
-
-        lIconLabel.getAccessibleContext().setAccessibleName("iconLabel");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -286,6 +291,7 @@ public class MainAboutBox extends TabBase implements Serializable {
     private javax.swing.JLabel lModeratorLink1;
     private javax.swing.JLabel lModeratorTitle;
     private javax.swing.JLabel lModeratorTitle1;
+    private javax.swing.JLabel lNewVersion;
     private javax.swing.JLabel lOs;
     private javax.swing.JLabel lOsTitle;
     private javax.swing.JLabel lScreen;
@@ -312,6 +318,7 @@ public class MainAboutBox extends TabBase implements Serializable {
         lModeratorTitle.setText(labels.getString("ABOUT.MODERATOR.TITLE"));
         lFacebookTitle.setText(labels.getString("ABOUT.FACEBOOK.TITLE"));
 
+        lNewVersion.setVisible(false); // shown only if the update check found a newer version (below)
         try {
             GroupLayout parLayout = (GroupLayout) jPanel1.getLayout();
             ButtonLink webAdmin = new ButtonLink(labels.getString("ABOUT.WEBADMIN.LINK"), labels.getString("ABOUT.WEBADMIN.LINK"));
@@ -324,6 +331,17 @@ public class MainAboutBox extends TabBase implements Serializable {
             parLayout.replace(lModeratorLink, moderatorLink);
             ButtonLink facebookLink = new ButtonLink(labels.getString("ABOUT.FACEBOOK.LINK"), labels.getString("ABOUT.FACEBOOK.LINK"));
             parLayout.replace(lFacebookLink, facebookLink);
+
+            // New-version indicator: clickable "download" link to the latest release, shown only when
+            // the update check found a newer version; the placeholder stays hidden otherwise.
+            final String newVer = control.services.UpdateChecker.getAvailableVersion();
+            if (newVer != null) {
+                ButtonLink update = new ButtonLink(
+                        String.format(labels.getString("ABOUT.UPDATE.LINK"), newVer),
+                        control.services.UpdateChecker.getLatestReleaseUrl());
+                update.setIcon(updateIcon());
+                parLayout.replace(lNewVersion, update);
+            }
 
             // Icon above title
             Image img = ImageManager.getInstance().getIconApp();
@@ -355,6 +373,14 @@ public class MainAboutBox extends TabBase implements Serializable {
         this.setLayout(new BorderLayout());
         this.add(jPanel1, BorderLayout.CENTER);
         this.add(pathPanel, BorderLayout.SOUTH);
+    }
+
+    /** Theme-aware "download" icon for the new-version link (bundled Tabler SVG). */
+    private static javax.swing.Icon updateIcon() {
+        com.formdev.flatlaf.extras.FlatSVGIcon icon = new com.formdev.flatlaf.extras.FlatSVGIcon("images/icons/download.svg", 16, 16);
+        icon.setColorFilter(new com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter(
+                c -> javax.swing.UIManager.getColor("Label.foreground")));
+        return icon;
     }
 
     private JPanel makePathRow(String labelText, String pathText, File target, boolean openDir) {

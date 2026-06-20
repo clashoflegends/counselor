@@ -26,8 +26,23 @@ public final class UpdateChecker {
 
     private static final Log log = LogFactory.getLog(UpdateChecker.class);
     private static final String LATEST_RELEASE_API = "https://api.github.com/repos/clashoflegends/counselor/releases/latest";
+    private static final String LATEST_RELEASE_URL = "https://github.com/clashoflegends/counselor/releases/latest";
     private static final Pattern RELEASE_BUILD = Pattern.compile("Counselor 2\\.(\\d+)");
     private static final int TIMEOUT_MS = 5000;
+
+    /** Newer version found by the last check (e.g. "2.882"), or null if none / not yet checked.
+     *  Set on the checker thread, read on the EDT (About box) - hence volatile. */
+    private static volatile String availableVersion = null;
+
+    /** Newer Counselor version available ("2.NNN"), or null if up to date / the check hasn't completed. */
+    public static String getAvailableVersion() {
+        return availableVersion;
+    }
+
+    /** GitHub "latest release" page (redirects to the newest tag) - where to send the player to update. */
+    public static String getLatestReleaseUrl() {
+        return LATEST_RELEASE_URL;
+    }
 
     private UpdateChecker() {
     }
@@ -50,6 +65,7 @@ public final class UpdateChecker {
             log.info(String.format("Update check: current 2.%d, latest on GitHub 2.%d", localBuild, latestBuild));
             if (latestBuild > localBuild) {
                 final String version = "2." + latestBuild;
+                availableVersion = version; // exposed to the About box (getAvailableVersion)
                 log.warn(String.format("A newer Counselor is available: %s (you are on 2.%d) - update from the releases page.", version, localBuild));
                 SwingUtilities.invokeLater(() -> gui.setUpdateAvailable(version));
             }
