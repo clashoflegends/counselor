@@ -670,6 +670,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
     public void iniciaConfig() {
         LOG.info(labels.getString("INICIALIZANDO.GUI"));
+        final long t0 = System.currentTimeMillis();
         //infopanel
         this.labelCenario.setText(String.format("%s: %s", labels.getString("CENARIO"), wc.getCenarioNome()));
         if (wc.isGameOver()) {
@@ -698,6 +699,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             this.labelNacao.setText(String.format("%s: %s", labels.getString("NACAO"), wc.getNacoesJogadorAtivoQtd() + " ... "));
         }
 
+        final long tLabels = System.currentTimeMillis();
         MapaControler mapaControl = WorldFacadeCounselor.getInstance().getMapaControler();//new MapaControler(this); //
         if (mapaControl == null) {
             mapaControl = new MapaControler(this);
@@ -710,10 +712,14 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         MainMapaGui mapaGui = new MainMapaGui();
         //Monta área do mapa
         this.splitMainPanel.setRightComponent(mapaGui);
+        final long tMap = System.currentTimeMillis();
         // Monta tabbed panel para dados
         MainDadosGui dadosGui = new MainDadosGui();
         this.splitMainPanel.setLeftComponent(dadosGui);
         this.tabPersonagem = dadosGui.getTabPersonagem();
+        final long tDados = System.currentTimeMillis();
+        LOG.info(String.format("STARTUP TIMING iniciaConfig: labels=%dms map=%dms dados-tabs=%dms",
+                tLabels - t0, tMap - tLabels, tDados - tMap));
 
         //habilita o toolbar
         jbLoad.setEnabled(true);
