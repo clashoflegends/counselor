@@ -61,18 +61,14 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
      * Creates new form TabPersonagensGui
      */
     public TabPersonagensGui(String titulo, String dica, MapaControler mapaControl) {
-        final long c0 = System.currentTimeMillis();
         initComponents();
-        final long c1 = System.currentTimeMillis();
         //Basico do constructor
         this.portraitControler = new PortraitControler(this.portraitPanel);
-        final long c2 = System.currentTimeMillis();
         this.setMapaControler(mapaControl);
         setIcone("/images/hex_personagem.gif");
         setTitle(titulo);
         setDica(dica);
         this.setKeyFilterProperty("GuiFilterChars");
-        LOG.info(String.format("STARTUP TIMING char-ctor: initComponents=%dms portrait=%dms", c1 - c0, c2 - c1));
 
         iniciaConfig();
     }
@@ -291,14 +287,10 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     // FIM das Constantes para busca das chaves no banco.
 
     private void iniciaConfig() {
-        final long i0 = System.currentTimeMillis();
         //Cria o Controle da lista de Personagem
         personagemControl = new PersonagemControler(this);
-        final long i1 = System.currentTimeMillis();
 
         stOrdens = new SubTabOrdem(this, getMapaControler());
-        final long i2 = System.currentTimeMillis();
-        LOG.info(String.format("STARTUP TIMING char-iniciaConfig: control=%dms subTabOrdem=%dms", i1 - i0, i2 - i1));
 
         //configura grid de personagens
         comboFiltro.setName("comboFiltro");
@@ -317,11 +309,8 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
                 SettingsManager.getInstance().getConfigAsInt("LifeLimitRed", "25"),
                 SettingsManager.getInstance().getConfigAsInt("LifeLimitAmber", "60")
         );
-        final long i3 = System.currentTimeMillis();
         doAddTabs();
-        final long i4 = System.currentTimeMillis();
         doLoadChars();
-        LOG.info(String.format("STARTUP TIMING char-iniciaConfig: comboSetup=%dms doAddTabs=%dms", i3 - i2, i4 - i3));
     }
 
     public Personagem getPersonagem() {
@@ -370,12 +359,8 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
 
     public void doLoadChars() {
         //carrega a lista de personagens
-        final long t0 = System.currentTimeMillis();
         TableModel model = personagemControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
-        final long t1 = System.currentTimeMillis();
         this.setMainModel(model);
-        LOG.info(String.format("STARTUP TIMING chars: model-build=%dms setMainModel(cols+select)=%dms rows=%d cols=%d",
-                t1 - t0, System.currentTimeMillis() - t1, model.getRowCount(), model.getColumnCount()));
     }
 
     public void doPersonagemClear() {

@@ -36,7 +36,9 @@ public class PortraitControler extends ControlBase implements Serializable {
     public PortraitControler(JPanel aPortraitPanel) {
         this.portraitPanel = aPortraitPanel;
         registerDispatchManagerForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL);
-        ImageManager.getInstance().doLoadPortraits();
+        // Portraits are loaded lazily, one at a time, when a character is selected
+        // (see showPortrait -> ImageManager.getPortrait). The old eager doLoadPortraits()
+        // bulk-loaded the entire folder here at startup, even when portraits were disabled.
     }
 
     @Override
