@@ -19,11 +19,15 @@ public class Main implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(Main.class);
 
+    /** Wall-clock at main() entry; PbmApplication uses it to log total startup time. */
+    static long launchMs;
+
     /**
      * @param args the command line arguments
      */
     @SuppressWarnings("static-access")
     public static void main(String[] args) {
+        launchMs = System.currentTimeMillis();
         reconfigureLogForInstaller();
         pruneOldDailyLogs();
         // Invokes Gui to display turn results

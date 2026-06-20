@@ -54,11 +54,17 @@ public class PbmApplication extends Application implements Serializable {
     }
 
     private void createAndShowGUI() {
+        final long tStart = System.currentTimeMillis();
         //load configs
         int width = SettingsManager.getInstance().getConfigAsInt(configName + "SizeWidth", "-1");
         int height = SettingsManager.getInstance().getConfigAsInt(configName + "SizeHeight", "-1");
         int posX = SettingsManager.getInstance().getConfigAsInt(configName + "PositionX", "-1");
         int posY = SettingsManager.getInstance().getConfigAsInt(configName + "PositionY", "-1");
+        final long tConfig = System.currentTimeMillis();
+        // Pre-warm the shared image cache (idempotent singleton) so its eager load
+        // is timed separately from the GUI build below instead of hiding inside it.
+        ImageManager.getInstance();
+        final long tImages = System.currentTimeMillis();
 
         MainResultWindowGui mainWin = null;
         try {
@@ -78,6 +84,7 @@ public class PbmApplication extends Application implements Serializable {
         } catch (MissingResourceException e) {
             log.fatal(e);
         }
+        final long tGui = System.currentTimeMillis();
         //default
         frame.pack();
         if (SettingsManager.getInstance().getConfig("maximizeWindowOnStart", "0").equals("1")) {
@@ -97,8 +104,13 @@ public class PbmApplication extends Application implements Serializable {
             mainWin.applyWindowTitle();
         }
         setListeners(frame);
+        final long tShown = System.currentTimeMillis();
         //check GitHub for a newer release (async, daemon thread; notifies title + status bar if found)
         control.services.UpdateChecker.checkAsync(mainWin);
+        log.info(String.format(
+                "STARTUP TIMING: jvm+preInit=%dms config=%dms images=%dms gui+autoload=%dms pack+show=%dms | total-since-launch=%dms",
+                tStart - client.Main.launchMs, tConfig - tStart, tImages - tConfig,
+                tGui - tImages, tShown - tGui, tShown - client.Main.launchMs));
         log.info("Interface carregada and exibida.");
     }
 

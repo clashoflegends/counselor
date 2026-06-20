@@ -52,6 +52,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
      * @param autoLoad
      */
     public MainResultWindowGui(String autoLoad) {
+        final long tCtor = System.currentTimeMillis();
         this.settingsManager = SettingsManager.getInstance();
         initComponents();
         applyToolbarIcons(); // swap the .form raster toolbar icons for crisp, theme-aware SVG icons
@@ -106,8 +107,12 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar1.revalidate();
         jToolBar1.repaint();
 
+        final long tBuilt = System.currentTimeMillis();
         wc.doAutoLoad(autoLoad);
+        final long tLoaded = System.currentTimeMillis();
         EgfDropHandler.install(this, this);
+        LOG.info(String.format("STARTUP TIMING: gui-build=%dms autoload(%s)=%dms",
+                tBuilt - tCtor, (autoLoad == null ? "none" : "egf"), tLoaded - tBuilt));
     }
 
     private static final int TOOLBAR_ICON_SIZE = 20;
