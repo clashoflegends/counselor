@@ -62,7 +62,9 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     private final gui.services.ScaledMapIcon mapIcon = new gui.services.ScaledMapIcon();
     private ImageIcon baseTagIcon; // 1x focus-tag glyph, scaled to `zoom` when placed
     private String hexTagStyle = "0"; // selected HexTagStyle, so the focus tag can be re-drawn at zoom
+    private int tagX1x = -1, tagY1x = -1; // 1x coords of the current focus tag, so it can be re-placed when zoom changes
     private static final String ZOOM_KEY = "MapZoom";
+    private static final String ZOOM_MIGRATED_KEY = "MapZoomPerScreen"; // one-time per-screen migration flag
     private final gui.services.ZoomOverlay zoomOverlay = new gui.services.ZoomOverlay(); // transient "150%" badge
 
     /**
@@ -102,21 +104,12 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
 
     // ----- High-DPI map zoom -----
 
-    /** Pick the starting zoom: a persisted user choice if present, else the screen-derived default
-     *  (which we persist so player_stats telemetry and the config reflect what is actually shown). */
+    /** Zoom is per-screen (KI-004): it's resolved in addNotify(), where getGraphicsConfiguration()
+     *  reliably reports the current monitor's LOGICAL, post-OS-scale bounds. Deferred from the
+     *  constructor because the GC is not reliable there (Toolkit.getScreenSize() can report native px
+     *  on a scaled display -> double-scale), and so a docked/undocked/resized screen each gets its own
+     *  remembered zoom on launch. */
     private void initZoom() {
-        String saved = SettingsManager.getInstance().getConfig(ZOOM_KEY, "");
-        if (!saved.isEmpty()) {
-            try {
-                zoom = clampZoom(Double.parseDouble(saved));
-                return;
-            } catch (NumberFormatException ignore) {
-                // fall through to the deferred default
-            }
-        }
-        // No saved choice: defer the screen-derived default to addNotify(), where the panel is
-        // displayable and getGraphicsConfiguration() reliably reports the monitor's LOGICAL width
-        // (Toolkit.getScreenSize() at construction can report native px on a scaled display -> double-scale).
         autoZoomPending = true;
     }
 
@@ -125,26 +118,77 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         super.addNotify();
         if (autoZoomPending) {
             autoZoomPending = false;
-            java.awt.GraphicsConfiguration gc = getGraphicsConfiguration();
-            if (gc != null) {
-                zoom = clampZoom(gc.getBounds().width / 1920.0); // logical width, post-OS-scale
-                SettingsManager.getInstance().setConfig(ZOOM_KEY, String.valueOf(zoom));
-                applyMapZoom();
-            }
+            resolveScreenZoom();
+            applyMapZoom();
+            // The startup auto-select places the focus tag during the EGF load, before zoom is resolved
+            // here (so it lands at 1x). Re-place it at the resolved zoom once layout settles.
+            javax.swing.SwingUtilities.invokeLater(this::refreshFocusTag);
         }
     }
 
-    /** Screen-derived default for the Ctrl+0 reset (window is shown, so the GC is available). */
-    private double computeDefaultZoom() {
-        java.awt.GraphicsConfiguration gc = getGraphicsConfiguration();
-        int width = (gc != null) ? gc.getBounds().width
-                : java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
-        // Logical width is post-OS-scale, so this only enlarges on hi-res / low-scale panels.
-        return clampZoom(width / 1920.0);
+    /** Re-place the current focus tag at the active zoom (no-op if none is shown). Used after the
+     *  startup zoom resolves, since the initial tag was placed before the screen zoom was known. */
+    private void refreshFocusTag() {
+        if (tagX1x >= 0 && getJlTag().isVisible()) {
+            setFocusTag(tagX1x, tagY1x);
+        }
     }
 
+    /** Per-screen config key so each monitor/resolution remembers its own zoom (survives docking,
+     *  resolution changes, and copied configs). E.g. "MapZoom.2560x1440". */
+    private String zoomKeyForScreen() {
+        final java.awt.GraphicsConfiguration gc = getGraphicsConfiguration();
+        final java.awt.Rectangle b = (gc != null) ? gc.getBounds()
+                : new java.awt.Rectangle(java.awt.Toolkit.getDefaultToolkit().getScreenSize());
+        return ZOOM_KEY + "." + b.width + "x" + b.height;
+    }
+
+    /** Resolve the zoom for the current screen: its remembered value if present, else this screen's
+     *  derived default. A pre-2.882 single MapZoom value is migrated onto the first screen seen, once. */
+    private void resolveScreenZoom() {
+        final SettingsManager sm = SettingsManager.getInstance();
+        final java.awt.GraphicsConfiguration gc = getGraphicsConfiguration();
+        final int width = (gc != null) ? gc.getBounds().width
+                : java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
+        String saved = sm.getConfig(zoomKeyForScreen(), "");
+        if (saved.isEmpty() && !sm.isConfig(ZOOM_MIGRATED_KEY, "1", "0")) {
+            // one-time carry-over of the old single value onto the first screen; other screens default
+            saved = sm.getConfig(ZOOM_KEY, "");
+        }
+        double z;
+        try {
+            z = saved.isEmpty() ? clampAutoDefault(width / 1920.0) : clampZoom(Double.parseDouble(saved));
+        } catch (NumberFormatException ignore) {
+            z = clampAutoDefault(width / 1920.0);
+        }
+        zoom = z;
+        persistZoom(z);
+    }
+
+    /** Persist the active zoom under the per-screen key (for restore) AND the legacy ZOOM_KEY (kept as
+     *  the "current zoom" mirror that upload telemetry / pMapZoom reads), and mark migration done. */
+    private void persistZoom(double z) {
+        final SettingsManager sm = SettingsManager.getInstance();
+        sm.setConfig(zoomKeyForScreen(), String.valueOf(z));
+        sm.setConfig(ZOOM_KEY, String.valueOf(z));
+        sm.setConfig(ZOOM_MIGRATED_KEY, "1");
+    }
+
+    // Manual/persisted zoom range. The 0.5 floor lets a player on a small screen zoom OUT to fit a
+    // whole large map (KI-004); the screen-derived auto-default still never drops below 1.0
+    // (clampAutoDefault), so an existing small-screen user's default map is not silently shrunk.
+    private static final double MIN_ZOOM = 0.5;
+    private static final double MAX_ZOOM = 2.5;
+    private static final double AUTO_MIN_ZOOM = 1.0;
+
     private static double clampZoom(double z) {
-        return Math.max(1.0, Math.min(2.5, z));
+        return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z));
+    }
+
+    /** Clamp for the screen-derived default only: enlarge on hi-res/low-scale panels but never
+     *  auto-shrink below 1.0. Manual zoom-out below 1.0 stays available via clampZoom. */
+    private static double clampAutoDefault(double z) {
+        return Math.max(AUTO_MIN_ZOOM, Math.min(MAX_ZOOM, z));
     }
 
     public double getZoom() {
@@ -159,7 +203,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         }
         log.info(String.format("Map zoom %.2f -> %.2f", zoom, z));
         zoom = z;
-        SettingsManager.getInstance().setConfig(ZOOM_KEY, String.valueOf(zoom));
+        persistZoom(z);
         clearMovementTags();
         hidefocusTag();
         if (this.radialMenu != null) {
@@ -202,7 +246,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         }
     }
 
-    /** Ctrl+mouse-wheel zooms; Ctrl+0 resets to the screen-derived default. A plain wheel still
+    /** Ctrl+mouse-wheel zooms; Ctrl+0 resets to 100%. A plain wheel still
      *  scrolls - the event is re-dispatched to the scroll pane (a child listener otherwise swallows it). */
     private void installZoomControls() {
         mapaLabel.addMouseWheelListener((java.awt.event.MouseWheelEvent e) -> {
@@ -228,7 +272,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         getActionMap().put("mapZoomReset", new javax.swing.AbstractAction() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                setZoom(computeDefaultZoom());
+                setZoom(1.0); // Ctrl+0 = predictable reset to 100%; first launch still auto-sizes to the screen
                 showZoomOverlay();
             }
         });
@@ -306,6 +350,8 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
      */
     public void setFocusTag(int x, int y) {
         // x,y are 1x hex pixel coords from MapaManager.doCoordToPosition - scale position + glyph by zoom.
+        tagX1x = x; // remember 1x coords so the tag can be re-placed when zoom resolves/changes
+        tagY1x = y;
         final Rectangle tagRectangle = new Rectangle(
                 (int) Math.round((x - dx) * zoom), (int) Math.round((y - dy) * zoom),
                 (int) Math.round((ImageManager.HEX_SIZE + 2 * dx) * zoom),
@@ -324,6 +370,8 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
 
     public void hidefocusTag() {
         getJlTag().setVisible(false);
+        tagX1x = -1; // no tag to re-place on the next zoom change
+        tagY1x = -1;
     }
 
     /*
