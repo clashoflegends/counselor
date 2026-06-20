@@ -1,5 +1,28 @@
 # What's New in Counselor
 
+## 20-JUN-2026 - v2.1.882
+
+### Much faster startup
+- Counselor now **opens your game about 3x faster**. We removed a slow image-loading step at launch, so you reach your turn in a few seconds instead of waiting.
+
+### Zoom out to see the whole map
+- The map can now **zoom out below 100%** (hold **Ctrl** and scroll down), so you can fit a whole large map on screen instead of only zooming in. **Ctrl+0** snaps back to **100%**.
+- Counselor now **remembers your zoom for each screen**, so docking a laptop, switching monitors, or changing resolution keeps the right zoom on every display.
+
+### Cleaner toolbar and map
+- The **toolbar icons** are now crisp and adapt to light and dark mode.
+- The **distance bubbles** on the map (range, march, sail) are sharp at any zoom and repaint faster.
+
+### Copy and export from any table
+- Right-click **Copy** and **Export to CSV** are now available on **every table** in Counselor, including the World Builder and the Battle Simulator.
+
+### Easier updates
+- When a newer version is available, the **About box** now shows a **download link** so you can grab it in one click.
+
+### Website (clashlegends.com)
+- **The site now speaks your language (Beta):** Portuguese, Spanish, Italian and Catalan across the menus and player pages, including the Statistics charts. Turn it on with the new **Update channel** setting in **My Config** (choose Beta), and pick your **language** there too. On the Beta channel your email notifications arrive translated as well.
+- **Clearer team set-up:** the **Sign Up** page now walks teams through joining in four quick steps (everyone signs up, one player names the team, invites teammates, and they Accept right on the page), and **Request a Game** explains how teaming works.
+
 ## 18-JUN-2026 - v2.1.881
 
 ### Zoom fixes & polish
