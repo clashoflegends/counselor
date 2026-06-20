@@ -47,11 +47,22 @@ public final class UpdateChecker {
     private UpdateChecker() {
     }
 
+    /** Wait this long after startup before the network check, so it doesn't compete with the EGF
+     *  autoload + first render for CPU/network while the app is settling. */
+    private static final int STARTUP_DELAY_MS = 20_000;
+
     public static void checkAsync(final MainResultWindowGui gui) {
         if (gui == null || "false".equalsIgnoreCase(SettingsManager.getInstance().getConfig("checkForUpdates", "true"))) {
             return;
         }
-        Thread t = new Thread(() -> check(gui), "update-checker");
+        Thread t = new Thread(() -> {
+            try {
+                Thread.sleep(STARTUP_DELAY_MS);
+            } catch (InterruptedException e) {
+                return; // app exiting - abandon the check
+            }
+            check(gui);
+        }, "update-checker");
         t.setDaemon(true);
         t.start();
     }
