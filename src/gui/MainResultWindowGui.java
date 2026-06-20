@@ -160,7 +160,10 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             for (final java.io.File f : files) {
                 javax.swing.JMenuItem item = new javax.swing.JMenuItem(f.getName());
                 item.setToolTipText(f.getAbsolutePath());
-                item.addActionListener(e -> wc.doOpenFile(f));
+                item.addActionListener(e -> {
+                    persistenceCommons.SysApoio.setLoadMode("recent");
+                    wc.doOpenFile(f);
+                });
                 popup.add(item);
             }
             popup.addSeparator();
@@ -985,6 +988,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     }
 
     public void openEgfFile(File f) {
+        persistenceCommons.SysApoio.setLoadMode("dragdrop");
         wc.doOpenFile(f);
     }
 

@@ -636,6 +636,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
         int returnVal = fcResults.showOpenDialog(jbTemp);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
+            SysApoio.setLoadMode("menu");
             doOpenFile(fcResults.getSelectedFile());
         } else {
             log.info(labels.getString("OPEN.CANCELLED") + String.format(" [%s]", SysApoio.getPidOs()));

@@ -48,8 +48,12 @@ public class Main implements Serializable {
         String autoload;
         if (args.length == 1) {
             autoload = args[0];
+            // launched with a file argument = OS file-association / double-click / command line
+            SysApoio.setLoadMode("association");
         } else {
             autoload = sm.getConfig("autoLoad");
+            // no argument = the autoLoad game from properties.config opened at startup
+            SysApoio.setLoadMode("autostart");
         }
         if (autoload != null && autoload.endsWith(".rc.egf")) {
             java.util.regex.Matcher m = java.util.regex.Pattern
