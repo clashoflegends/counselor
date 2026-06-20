@@ -359,8 +359,12 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
 
     public void doLoadChars() {
         //carrega a lista de personagens
+        final long t0 = System.currentTimeMillis();
         TableModel model = personagemControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
+        final long t1 = System.currentTimeMillis();
         this.setMainModel(model);
+        LOG.info(String.format("STARTUP TIMING chars: model-build=%dms setMainModel(cols+select)=%dms rows=%d cols=%d",
+                t1 - t0, System.currentTimeMillis() - t1, model.getRowCount(), model.getColumnCount()));
     }
 
     public void doPersonagemClear() {
