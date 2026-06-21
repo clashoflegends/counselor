@@ -9,6 +9,7 @@ import baseLib.IBaseModel;
 import business.facade.ExercitoFacade;
 import control.MapaControler;
 import control.OrdemControler;
+import control.services.CidadeConverter;
 import control.support.ActorInterface;
 import gui.accessories.DialogHexView;
 import gui.charts.ChartBar;
@@ -38,6 +39,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import model.Cidade;
 import model.Exercito;
 import model.Ordem;
 import msgs.BaseMsgs;
@@ -269,13 +271,23 @@ public class ComponentFactory implements Serializable {
                 }
                 break;
             case CIDADE_NEWCAPITAL: {
-                //Cidade-NewCapital
-                //Inputbox
-                JFormattedTextField jtTemp = new JFormattedTextField(
-                        SysApoio.createFormatter("####"));
-                jtTemp.setName("jtCidadeNewCapital"); // NOI18N
-                jtTemp.setColumns(4);
-                cNovo = jtTemp;
+                //Cidade-NewCapital: restrict the choice to the nation's own large cities
+                //(burg/metropolis). The combo serializes the selection via getComboId() = the
+                //4-digit coordinate, matching the legacy free-text field and the server parse.
+                final List bigCities = CidadeConverter.listaByFiltro("bigcitymy");
+                if (bigCities == null || bigCities.isEmpty()) {
+                    //fallback to the legacy 4-digit free-text field (e.g. no eligible city found)
+                    JFormattedTextField jtTemp = new JFormattedTextField(
+                            SysApoio.createFormatter("####"));
+                    jtTemp.setName("jtCidadeNewCapital"); // NOI18N
+                    jtTemp.setColumns(4);
+                    cNovo = jtTemp;
+                } else {
+                    JComboBox cbTemp = new JComboBox(
+                            new GenericoComboBoxModel((Cidade[]) bigCities.toArray(new Cidade[0])));
+                    cbTemp.setName("cbCidadeNewCapital"); // NOI18N
+                    cNovo = cbTemp;
+                }
                 break;
             }
             case COORDENADA: {
