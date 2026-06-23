@@ -151,8 +151,150 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
             final ColumnWidthsAdjuster cwa = new ColumnWidthsAdjuster();
             cwa.calcColumnWidths(table);
         }
+        //Restore the player's saved sort + manual column widths for this table (overrides auto-fit).
+        restoreTableLayout(table);
+        //Double-click a row with a hex/Local to centre the map on it.
+        installRowToMap(table);
         //Right-click export menu (copy-with-headers / save CSV). Shared by every data table.
         gui.services.TableExportMenu.install(table, getTitle());
+    }
+
+    private static final String LAYOUT_INSTALLED = "layoutListenersInstalled";
+    private static final String ROW_TO_MAP_INSTALLED = "rowToMapInstalled";
+    private static final String TABLE_SEQ = "tableConfigSeq";
+    private int tableConfigSeq = 0;
+
+    /** Stable per-table config key: tab class + a per-tab table ordinal + a hash of the column titles.
+     *  The ordinal (assigned once, in construction order, cached on the table) disambiguates the
+     *  multiple tables in one tab that share identical columns - e.g. TabTipoTropas' attack/defense/
+     *  movement/ability subtables, all {Terrain, Value} - which a column-title hash alone collides on.
+     *  A language switch changes the hash and just forgets the (cosmetic) pref, which is acceptable. */
+    private String tableKey(JTable table) {
+        Object seq = table.getClientProperty(TABLE_SEQ);
+        if (seq == null) {
+            seq = tableConfigSeq++;
+            table.putClientProperty(TABLE_SEQ, seq);
+        }
+        StringBuilder cols = new StringBuilder();
+        for (int c = 0; c < table.getColumnCount(); c++) {
+            cols.append(table.getColumnName(c)).append('|');
+        }
+        return getClass().getSimpleName() + "#" + seq + "." + Integer.toHexString(cols.toString().hashCode());
+    }
+
+    /**
+     * Restore the saved sort key + manual column widths for this table, and (once per table) attach
+     * listeners that persist future changes. Sort survives filter/turn reloads; widths persist only
+     * the player's manual header drags (the width listener ignores any change with no resizing column).
+     */
+    private void restoreTableLayout(final JTable table) {
+        final String key = tableKey(table);
+        final SettingsManager sm = SettingsManager.getInstance();
+
+        // --- restore sort (the sorter is recreated on each setModel, so re-apply every time) ---
+        final javax.swing.RowSorter<?> sorter = table.getRowSorter();
+        if (sorter != null) {
+            String savedSort = sm.getConfig("TableSort." + key, "");
+            if (!savedSort.isEmpty()) {
+                try {
+                    String[] p = savedSort.split(":");
+                    int col = Integer.parseInt(p[0]);
+                    javax.swing.SortOrder order = javax.swing.SortOrder.valueOf(p[1]);
+                    if (col >= 0 && col < table.getColumnCount()) {
+                        sorter.setSortKeys(java.util.Collections.singletonList(new javax.swing.RowSorter.SortKey(col, order)));
+                    }
+                } catch (RuntimeException ignore) {
+                    // stale/corrupt pref - ignore, leave default order
+                }
+            }
+            sorter.addRowSorterListener((javax.swing.event.RowSorterEvent ev) -> {
+                if (ev.getType() != javax.swing.event.RowSorterEvent.Type.SORT_ORDER_CHANGED) {
+                    return;
+                }
+                java.util.List<? extends javax.swing.RowSorter.SortKey> keys = table.getRowSorter().getSortKeys();
+                if (keys != null && !keys.isEmpty()) {
+                    sm.setConfig("TableSort." + key, keys.get(0).getColumn() + ":" + keys.get(0).getSortOrder().name());
+                } else {
+                    sm.setConfig("TableSort." + key, ""); // user cycled the column back to unsorted - clear the pref
+                }
+            });
+        }
+
+        // --- restore manual column widths (override auto-fit), then track drags once per table ---
+        final javax.swing.table.TableColumnModel cm = table.getColumnModel();
+        String savedW = sm.getConfig("TableColW." + key, "");
+        if (!savedW.isEmpty()) {
+            String[] w = savedW.split(",");
+            if (w.length == cm.getColumnCount()) {
+                try {
+                    for (int i = 0; i < w.length; i++) {
+                        cm.getColumn(i).setPreferredWidth(Integer.parseInt(w[i]));
+                    }
+                } catch (RuntimeException ignore) {
+                    // stale/corrupt pref - ignore, keep auto-fit widths
+                }
+            }
+        }
+        if (table.getClientProperty(LAYOUT_INSTALLED) == null) {
+            table.putClientProperty(LAYOUT_INSTALLED, Boolean.TRUE);
+            cm.addColumnModelListener(new javax.swing.event.TableColumnModelListener() {
+                @Override
+                public void columnMarginChanged(javax.swing.event.ChangeEvent e) {
+                    // Persist ONLY a genuine user header drag. A drag holds a resizing column for its
+                    // whole duration; programmatic passes (auto-fit, our width restore, and the DEFERRED
+                    // doLayout that re-fires margin events on the next EDT cycle) have none - so a timing
+                    // flag can't catch them, but getResizingColumn() reliably can (antagonist-review catch).
+                    javax.swing.table.JTableHeader header = table.getTableHeader();
+                    if (header == null || header.getResizingColumn() == null) {
+                        return;
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < cm.getColumnCount(); i++) {
+                        if (i > 0) {
+                            sb.append(',');
+                        }
+                        sb.append(cm.getColumn(i).getWidth());
+                    }
+                    sm.setConfig("TableColW." + key, sb.toString());
+                }
+
+                @Override public void columnAdded(javax.swing.event.TableColumnModelEvent e) { }
+                @Override public void columnRemoved(javax.swing.event.TableColumnModelEvent e) { }
+                @Override public void columnMoved(javax.swing.event.TableColumnModelEvent e) { }
+                @Override public void columnSelectionChanged(javax.swing.event.ListSelectionEvent e) { }
+            });
+        }
+    }
+
+    /** Double-click a table row that carries a {@link Local}: centre + focus the map on that hex.
+     *  Guarded so the repeated doConfigTableColumns calls (one per filter/turn reload) don't stack
+     *  duplicate listeners that would fire printTag several times per double-click. */
+    private void installRowToMap(final JTable table) {
+        if (table.getClientProperty(ROW_TO_MAP_INSTALLED) != null) {
+            return;
+        }
+        table.putClientProperty(ROW_TO_MAP_INSTALLED, Boolean.TRUE);
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (e.getClickCount() != 2 || mapaControler == null) {
+                    return;
+                }
+                int viewRow = table.rowAtPoint(e.getPoint());
+                if (viewRow < 0) {
+                    return;
+                }
+                int modelRow = table.convertRowIndexToModel(viewRow);
+                javax.swing.table.TableModel m = table.getModel();
+                for (int c = 0; c < m.getColumnCount(); c++) {
+                    Object v = m.getValueAt(modelRow, c);
+                    if (v instanceof Local) {
+                        mapaControler.printTag((Local) v);
+                        return;
+                    }
+                }
+            }
+        });
     }
 
     /**
