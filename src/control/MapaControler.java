@@ -152,7 +152,10 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         if (z == 1.0) {
             return p;
         }
-        return new Point((int) (p.x / z), (int) (p.y / z));
+        // Round (not truncate) the zoom-divided point: doPositionToCoord truncates again on the 60/45
+        // grid pitch, so a second truncation here biased boundary clicks toward the up-left neighbour
+        // at fractional zoom (KI-002). Rounding centres the error so the hit matches what was clicked.
+        return new Point((int) Math.round(p.x / z), (int) Math.round(p.y / z));
     }
 
     public void addMovementTag(MovimentoExercito movimento) {
