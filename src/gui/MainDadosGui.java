@@ -69,6 +69,31 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
         if (SettingsManager.getInstance().isConfig("GuiShowLocationsTab", "1", "0")) {
             this.addTabBase(new TabOrdensGui("Ordens", labels.getString("ORDENS.SAVED")));
         }
+        restoreAndTrackSelectedTab();
+    }
+
+    /**
+     * Reopen on the tab the player last used, then remember the selection going forward. Keyed by tab
+     * TITLE (not index) because the tab set varies per game/turn (Spells, Startup packages, Locations
+     * tab are conditional); an unmatched title (e.g. after a language switch) just falls back to the
+     * first tab. Listener is attached after the restore so construction-time tab adds don't fire it.
+     */
+    private void restoreAndTrackSelectedTab() {
+        final String lastTab = SettingsManager.getInstance().getConfig("LastDataTab", "");
+        if (!lastTab.isEmpty()) {
+            for (int i = 0; i < jTabbedPane1.getTabCount(); i++) {
+                if (lastTab.equals(jTabbedPane1.getTitleAt(i))) {
+                    jTabbedPane1.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+        jTabbedPane1.addChangeListener(e -> {
+            int sel = jTabbedPane1.getSelectedIndex();
+            if (sel >= 0) {
+                SettingsManager.getInstance().setConfig("LastDataTab", jTabbedPane1.getTitleAt(sel));
+            }
+        });
     }
 
     //** Adiciona uma Tab ao painel principal de exibição */
