@@ -380,13 +380,16 @@ public class CidadeConverter implements Serializable {
     public static ComboBoxModel getCidadeComboModel(int tipo, Nacao nacao) {
         Cidade[] items = null;
         switch (tipo) {
-            case 0:
+            case 0: //all
                 items = listaCidadesAll();
                 break;
-            case 1:
+            case 1: //all from one nation
                 items = listaCidadesNacao(nacao);
                 break;
-//            throw new UnsupportedOperationException("Not yet implemented");
+            case 2: //Big Cities from one nation
+                final List bigCities = CidadeConverter.listaByFiltro("bigcitymy");
+                items = (Cidade[]) bigCities.toArray(new Cidade[0]);
+                break;
             default:
                 break;
         }

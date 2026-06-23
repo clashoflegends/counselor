@@ -274,8 +274,7 @@ public class ComponentFactory implements Serializable {
                 //Cidade-NewCapital: restrict the choice to the nation's own large cities
                 //(burg/metropolis). The combo serializes the selection via getComboId() = the
                 //4-digit coordinate, matching the legacy free-text field and the server parse.
-                final List bigCities = CidadeConverter.listaByFiltro("bigcitymy");
-                if (bigCities == null || bigCities.isEmpty()) {
+                if (isAllSelected()) {
                     //fallback to the legacy 4-digit free-text field (e.g. no eligible city found)
                     JFormattedTextField jtTemp = new JFormattedTextField(
                             SysApoio.createFormatter("####"));
@@ -283,8 +282,7 @@ public class ComponentFactory implements Serializable {
                     jtTemp.setColumns(4);
                     cNovo = jtTemp;
                 } else {
-                    JComboBox cbTemp = new JComboBox(
-                            new GenericoComboBoxModel((Cidade[]) bigCities.toArray(new Cidade[0])));
+                    JComboBox cbTemp = new JComboBox(getActor().getCidadeComboModel(2));
                     cbTemp.setName("cbCidadeNewCapital"); // NOI18N
                     cNovo = cbTemp;
                 }
