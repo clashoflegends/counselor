@@ -276,6 +276,30 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
                 showZoomOverlay();
             }
         });
+        // Ctrl + / Ctrl - keyboard zoom (same 1.1 step as the Ctrl+wheel), for laptops/trackpads
+        // without an easy Ctrl+wheel. VK_EQUALS covers the unshifted "+/=" key; VK_ADD/VK_SUBTRACT the numpad.
+        getActionMap().put("mapZoomIn", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                setZoom(zoom * 1.1);
+                showZoomOverlay();
+            }
+        });
+        getActionMap().put("mapZoomOut", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                setZoom(zoom / 1.1);
+                showZoomOverlay();
+            }
+        });
+        final int ctrl = java.awt.event.InputEvent.CTRL_DOWN_MASK;
+        final javax.swing.InputMap im = getInputMap(WHEN_IN_FOCUSED_WINDOW);
+        for (int k : new int[]{java.awt.event.KeyEvent.VK_PLUS, java.awt.event.KeyEvent.VK_EQUALS, java.awt.event.KeyEvent.VK_ADD}) {
+            im.put(javax.swing.KeyStroke.getKeyStroke(k, ctrl), "mapZoomIn");
+        }
+        for (int k : new int[]{java.awt.event.KeyEvent.VK_MINUS, java.awt.event.KeyEvent.VK_SUBTRACT}) {
+            im.put(javax.swing.KeyStroke.getKeyStroke(k, ctrl), "mapZoomOut");
+        }
     }
 
     /** Flash the transient "150%" badge centered near the top of the visible map and (re)start its
