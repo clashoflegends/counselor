@@ -1,5 +1,21 @@
 # What's New in Counselor
 
+## 22-JUN-2026 - v2.1.884
+
+### New nation power: Relocate Capital
+- A new **Startup Package** you can buy at the very start of a game: **move your capital** to one of your own large cities (a burg or metropolis). Pick the destination city; the move happens before the turn runs and is announced to the other nations. (Game of Thrones scenario.)
+
+### Map and navigation
+- **Zoom with the keyboard:** **Ctrl +** and **Ctrl -** now zoom the map (alongside Ctrl+wheel), handy on laptops and trackpads.
+- **Double-click to jump to the map:** double-click any row in a data table (a character, city, army...) and the map centres on that hex.
+- Clicking hexes **while zoomed** now lands on the hex you actually clicked (fixed an edge-of-hex off-by-one at fractional zoom).
+
+### Your tables, your layout
+- Counselor now **remembers your sort order and column widths** for each table between turns, and **reopens on the tab you were last using** instead of always jumping back to Characters.
+
+### Website (clashlegends.com)
+- **New My Connections page:** a personal map of the players you have shared games with - **green** lines for people you have mostly teamed with, **red** for opponents, thicker lines for more games together. Find it on the **Links** page.
+
 ## 20-JUN-2026 - v2.1.882
 
 ### Much faster startup
