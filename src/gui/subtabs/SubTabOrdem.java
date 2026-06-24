@@ -66,6 +66,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
 
     public SubTabOrdem(IAcaoGui parentTab, MapaControler mapaControl) {
         initComponents();
+        applyButtonIcons(); // swap the raster gif/png icons for crisp, theme-aware SVG icons (dark-mode friendly)
         //Basico do constructor
         this.setMapaControler(mapaControl);
         setTitle(labels.getString("ACAO"));
@@ -73,6 +74,18 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         this.parentTab = parentTab;
 
         iniciaConfig();
+    }
+
+    /** Replace the Matisse-generated raster button icons with crisp, theme-aware SVG icons (16px to
+     *  fit these compact order buttons), matching the main-toolbar treatment so they read well in
+     *  dark mode. Tooltips/sizes set by the .form are kept. */
+    private void applyButtonIcons() {
+        final int sz = 16;
+        jbOk.setIcon(gui.services.SvgIcon.themed("check", sz));
+        jbClear.setIcon(gui.services.SvgIcon.themed("eraser", sz));
+        jbDetach.setIcon(gui.services.SvgIcon.themed("external-link", sz));
+        jbRepeat.setIcon(gui.services.SvgIcon.themed("repeat", sz));
+        jbHelp.setIcon(gui.services.SvgIcon.themed("help", sz));
     }
 
     /**

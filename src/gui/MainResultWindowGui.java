@@ -118,11 +118,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
      * (icons are built once at startup; the theme is fixed per session).
      */
     private static javax.swing.Icon svgIcon(String name) {
-        com.formdev.flatlaf.extras.FlatSVGIcon icon = new com.formdev.flatlaf.extras.FlatSVGIcon(
-                "images/icons/" + name + ".svg", TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE);
-        icon.setColorFilter(new com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter(
-                c -> javax.swing.UIManager.getColor("Button.foreground")));
-        return icon;
+        return gui.services.SvgIcon.themed(name, TOOLBAR_ICON_SIZE);
     }
 
     /** Replace the Matisse-generated raster toolbar icons with vector SVG icons (called after
