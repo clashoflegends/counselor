@@ -143,6 +143,7 @@ jobs:
             --main-jar PbmCounselor.jar \
             --main-class client.Main \
             --type msi \
+            --java-options "-Dclash.distro=msi" \
             --app-version "$APP_VERSION" \
             --vendor "Clash of Legends" \
             --add-modules java.desktop,java.sql,java.xml,java.naming,java.logging,java.management,jdk.unsupported,jdk.crypto.ec \
@@ -172,6 +173,7 @@ jobs:
             --main-jar PbmCounselor.jar \
             --main-class client.Main \
             --type app-image \
+            --java-options "-Dclash.distro=windows-portable" \
             --app-version "$APP_VERSION" \
             --vendor "Clash of Legends" \
             --add-modules java.desktop,java.sql,java.xml,java.naming,java.logging,java.management,jdk.unsupported,jdk.crypto.ec \
@@ -203,6 +205,7 @@ jobs:
             --main-jar PbmCounselor.jar \
             --main-class client.Main \
             --type ${{ matrix.pkg-type }} \
+            --java-options "-Dclash.distro=${{ matrix.pkg-type }}" \
             --app-version "$APP_VERSION" \
             --vendor "Clash of Legends" \
             --add-modules java.desktop,java.sql,java.xml,java.naming,java.logging,java.management,jdk.unsupported,jdk.crypto.ec \

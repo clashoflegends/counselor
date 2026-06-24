@@ -2,6 +2,7 @@
 DIR="$(cd "$(dirname "$0")" && pwd)"
 java \
   -splash:"$DIR/dist/teaser_whs01.png" \
+  -Dclash.distro=portable-jar \
   --add-opens java.base/java.util=ALL-UNNAMED \
   --add-opens java.base/java.lang=ALL-UNNAMED \
   --add-opens java.base/java.lang.reflect=ALL-UNNAMED \
