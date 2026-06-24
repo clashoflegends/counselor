@@ -383,12 +383,19 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         getJlTag().setIcon(buildScaledTag(zoom));
         getJlTag().setBounds(tagRectangle);
         getJlTag().setVisible(true);
+        // Centre the viewport on the focused hex in ONE move, and only when it isn't already fully
+        // visible. The old jump-to-(0,0)-then-scrollRectToVisible-to-edge flashed the map to the
+        // top-left corner and jumped around as the player clicked through armies (the bubble tags
+        // themselves never scroll). Clamp so an edge hex just scrolls as far as the map allows.
         final JViewport vp = jScrollPane1.getViewport();
         final Rectangle viewRect = vp.getViewRect();
-        final boolean contains = viewRect.contains(tagRectangle);
-        if (!contains) {
-            vp.setViewPosition(new Point(0, 0));
-            vp.scrollRectToVisible(tagRectangle);
+        if (!viewRect.contains(tagRectangle)) {
+            final Dimension view = vp.getViewSize();
+            int cx = tagRectangle.x + tagRectangle.width / 2 - viewRect.width / 2;
+            int cy = tagRectangle.y + tagRectangle.height / 2 - viewRect.height / 2;
+            cx = Math.max(0, Math.min(cx, view.width - viewRect.width));
+            cy = Math.max(0, Math.min(cy, view.height - viewRect.height));
+            vp.setViewPosition(new Point(cx, cy));
         }
     }
 
