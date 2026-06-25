@@ -246,11 +246,14 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         }
     }
 
-    /** Ctrl+mouse-wheel zooms; Ctrl+0 resets to 100%. A plain wheel still
-     *  scrolls - the event is re-dispatched to the scroll pane (a child listener otherwise swallows it). */
+    /** Cmd/Ctrl+mouse-wheel zooms; Cmd/Ctrl+0 resets to 100%. A plain wheel still scrolls - the event
+     *  is re-dispatched to the scroll pane (a child listener otherwise swallows it). The zoom modifier
+     *  is the platform menu-shortcut key: Ctrl on Windows/Linux, Cmd on macOS (KI-005) - which also
+     *  avoids the macOS Ctrl+scroll Accessibility screen-zoom gesture. */
     private void installZoomControls() {
+        final int shortcut = java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
         mapaLabel.addMouseWheelListener((java.awt.event.MouseWheelEvent e) -> {
-            if (e.isControlDown()) {
+            if ((e.getModifiersEx() & shortcut) != 0) {
                 // Use precise rotation: getWheelRotation() is an int that is often 0 on precision
                 // touchpads / hi-res wheels (so its sign would wrongly read as zoom-out). The double
                 // getPreciseWheelRotation() carries a reliable sign there.
@@ -268,7 +271,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
             }
         });
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(javax.swing.KeyStroke.getKeyStroke(
-                java.awt.event.KeyEvent.VK_0, java.awt.event.InputEvent.CTRL_DOWN_MASK), "mapZoomReset");
+                java.awt.event.KeyEvent.VK_0, shortcut), "mapZoomReset");
         getActionMap().put("mapZoomReset", new javax.swing.AbstractAction() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -276,29 +279,29 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
                 showZoomOverlay();
             }
         });
-        // Ctrl + / Ctrl - keyboard zoom (same 1.1 step as the Ctrl+wheel), for laptops/trackpads
-        // without an easy Ctrl+wheel. VK_EQUALS covers the unshifted "+/=" key; VK_ADD/VK_SUBTRACT the numpad.
+        // Cmd/Ctrl + / - keyboard zoom in fixed 10% steps, snapped to the 10% grid so the values stay
+        // clean from any starting zoom (e.g. 133% -> 140% -> 150%). The mouse wheel stays multiplicative.
+        // VK_EQUALS covers the unshifted "+/=" key; VK_ADD/VK_SUBTRACT the numpad.
         getActionMap().put("mapZoomIn", new javax.swing.AbstractAction() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                setZoom(zoom * 1.1);
+                setZoom(Math.floor(zoom * 10.0 + 1e-6) / 10.0 + 0.10); // up to the next 10% step
                 showZoomOverlay();
             }
         });
         getActionMap().put("mapZoomOut", new javax.swing.AbstractAction() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                setZoom(zoom / 1.1);
+                setZoom(Math.ceil(zoom * 10.0 - 1e-6) / 10.0 - 0.10); // down to the previous 10% step
                 showZoomOverlay();
             }
         });
-        final int ctrl = java.awt.event.InputEvent.CTRL_DOWN_MASK;
         final javax.swing.InputMap im = getInputMap(WHEN_IN_FOCUSED_WINDOW);
         for (int k : new int[]{java.awt.event.KeyEvent.VK_PLUS, java.awt.event.KeyEvent.VK_EQUALS, java.awt.event.KeyEvent.VK_ADD}) {
-            im.put(javax.swing.KeyStroke.getKeyStroke(k, ctrl), "mapZoomIn");
+            im.put(javax.swing.KeyStroke.getKeyStroke(k, shortcut), "mapZoomIn");
         }
         for (int k : new int[]{java.awt.event.KeyEvent.VK_MINUS, java.awt.event.KeyEvent.VK_SUBTRACT}) {
-            im.put(javax.swing.KeyStroke.getKeyStroke(k, ctrl), "mapZoomOut");
+            im.put(javax.swing.KeyStroke.getKeyStroke(k, shortcut), "mapZoomOut");
         }
     }
 
