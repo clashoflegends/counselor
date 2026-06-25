@@ -48,6 +48,8 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, IDispatchRecei
      */
     public SubTabPopup() {
         initComponents();
+        // crisp, theme-aware detach icon (dark-mode), matching the toolbar / order-button treatment
+        jbDetach.setIcon(gui.services.SvgIcon.themed("external-link", 16));
         iniciaConfig();
     }
 

@@ -42,6 +42,8 @@ public class SubTabPopupPortrait extends TabBase implements IPopupTabGui, Serial
      */
     public SubTabPopupPortrait() {
         initComponents();
+        // crisp, theme-aware detach icon (dark-mode), matching the toolbar / order-button treatment
+        jbDetach.setIcon(gui.services.SvgIcon.themed("external-link", 16));
         iniciaConfig();
     }
 
