@@ -14,6 +14,9 @@
 - **The site now speaks your language - for everyone.** Portuguese, Spanish, Italian and Catalan are out of beta and live for all players; pick yours in **My Config** and it applies right away.
 - **Quick links on the home page.** The Links (Counselor downloads, guides, change logs, Request a Game, My Connections) now also sit in a table at the bottom of the home page.
 
+### In the forge - coming soon
+- **GOT: Fire & Dragons** - a brand-new Game of Thrones scenario is taking shape: the age of the Targaryens, dragonfire over Westeros, and a world rebuilt for those bold enough to ride. We are crafting it now - watch the New Games list for the call to arms. The age of fire is coming.
+
 ## 22-JUN-2026 - v2.1.884
 
 ### New nation power: Relocate Capital
