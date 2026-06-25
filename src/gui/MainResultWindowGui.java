@@ -414,7 +414,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar2.add(togglePathPjFuture);
 
         togglePathArmy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_path_army.png"))); // NOI18N
-        togglePathArmy.setSelected(true);
+        togglePathArmy.setSelected(isArmyPathSelected());
         togglePathArmy.setToolTipText(bundle.getString("SETTINGS.MAP.ARMYPATHORDER.TOOLTIP")); // NOI18N
         togglePathArmy.setActionCommand("drawPathArmy");
         togglePathArmy.setEnabled(false);
@@ -454,7 +454,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar2.add(toggleFogWar);
 
         toggleScouts.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_scout.png"))); // NOI18N
-        toggleScouts.setSelected(isFogOfWarSelected());
+        toggleScouts.setSelected(isScoutsSelected());
         toggleScouts.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SCOUT.TOOLTIP")); // NOI18N
         toggleScouts.setActionCommand("drawScoutTargets");
         toggleScouts.setEnabled(false);
@@ -938,6 +938,12 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         return drawPath > 0;
     }
 
+    /** Army-movement-path overlay toggle state, persisted by doDrawArmyPaths as "drawArmyMovPath"
+     *  (1/0; default on). Was hardcoded to true at init, so the saved choice was ignored on restart. */
+    public boolean isArmyPathSelected() {
+        return settingsManager.getConfigAsInt("drawArmyMovPath", "1") > 0;
+    }
+
     public JToggleButton getPcPath() {
         return this.togglePathPj;
     }
@@ -957,6 +963,12 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
     public boolean isFogOfWarSelected() {
         return settingsManager.getConfig("fogOfWarType", "1").equals("1");
+    }
+
+    /** Scouts overlay toggle state, persisted by doScoutTargets as "drawScoutOnMap" (1/0; default off).
+     *  Was incorrectly initialised from the fog setting (copy-paste) so the button ignored the saved choice. */
+    public boolean isScoutsSelected() {
+        return settingsManager.getConfig("drawScoutOnMap", "0").equals("1");
     }
 
     public boolean isShowCityCapSelected() {
