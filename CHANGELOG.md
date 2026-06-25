@@ -1,5 +1,19 @@
 # What's New in Counselor
 
+## 24-JUN-2026 - v2.1.886
+
+### Smoother map
+- **No more jumping around when you click through armies.** Selecting an army now gently centres the map on its hex (only when it is off-screen) instead of flashing to the corner and back.
+- **The map remembers your overlays.** Your **Scouts** and **Army-path** toggle choices now persist between sessions (and the Scouts button no longer just mirrors the Fog button).
+- **Keyboard zoom in clean 10% steps.** **Ctrl/Cmd +** and **-** zoom the map in fixed 10% increments, **Ctrl/Cmd 0** resets to 100%, and the wheel still zooms smoothly. On macOS this is **Cmd** (and it no longer clashes with the system screen-zoom gesture).
+
+### Sharper in dark mode
+- More crisp, theme-aware icons: the order-tab buttons (OK / clear / repeat / detach / help), the pop-out detach buttons, and the Battle Simulator.
+
+### Website (clashlegends.com)
+- **The site now speaks your language - for everyone.** Portuguese, Spanish, Italian and Catalan are out of beta and live for all players; pick yours in **My Config** and it applies right away.
+- **Quick links on the home page.** The Links (Counselor downloads, guides, change logs, Request a Game, My Connections) now also sit in a table at the bottom of the home page.
+
 ## 22-JUN-2026 - v2.1.884
 
 ### New nation power: Relocate Capital
