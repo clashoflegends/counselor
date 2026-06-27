@@ -545,7 +545,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
          * on the EDT; the worker only does the network call.
          */
         this.getGui().setStatusMsg(labels.getString("ENVIAR.POST.JUDGE"));
-        ensurePlayerTokenPrompt();
+        if (!ensurePlayerToken()) {
+            this.getGui().setStatusMsg(labels.getString("TOKEN.REQUIRED.STATUS"));
+            return; // no token set - cannot upload (no shared-secret fallback anymore)
+        }
         final PartidaJogadorWebInfo info = doPrepPost(attachment);
         final BusyGlass busy = BusyGlass.show(this.getGui(), labels.getString("ENVIAR.POST.JUDGE"));
         new SwingWorker<Integer, Void>() {
@@ -575,30 +578,23 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }.execute();
     }
 
-    /** Set once if the player skips the token prompt, so we don't nag again this session. */
-    private boolean playerTokenPromptSkipped = false;
-
     /**
-     * On the first order upload with no per-player token stored, offer to set one (fetch by login or
-     * paste from the website). Strictly optional: skipping proceeds with the upload (the server side
-     * is log-only until Phase B), and we only ask once per session. Runs on the EDT before the post.
+     * Ensures a per-player token is set before an order upload. The token is mandatory from this
+     * version on (the shared pToken is no longer sent): if none is stored, prompt for it. Returns
+     * true if a token is available (proceed with the upload), false if the player cancelled without
+     * setting one - the caller then aborts the upload (the player can still read/compose; they just
+     * can't submit until a token is set). Runs on the EDT before the post.
      */
-    private void ensurePlayerTokenPrompt() {
-        if (playerTokenPromptSkipped) {
-            return;
+    private boolean ensurePlayerToken() {
+        if (!SettingsManager.getInstance().getConfig("playerToken", "").trim().isEmpty()) {
+            return true; // already set - WebCounselorManager will send it
         }
         try {
-            if (!SettingsManager.getInstance().getConfig("playerToken", "").trim().isEmpty()) {
-                return; // already set - WebCounselorManager will send it
-            }
             String tok = TokenSetupDialog.show(this.getGui(), labels);
-            if (tok == null || tok.trim().isEmpty()) {
-                playerTokenPromptSkipped = true; // skipped - don't ask again until next launch
-            }
+            return (tok != null && !tok.trim().isEmpty());
         } catch (Throwable t) {
-            // The token prompt must NEVER block an order upload - log and proceed without it.
-            log.warn("Player token prompt failed (ignored): " + t);
-            playerTokenPromptSkipped = true;
+            log.warn("Player token prompt failed: " + t);
+            return false; // no token -> abort the upload (posting without it would just 401)
         }
     }
 
@@ -1292,6 +1288,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this.getGui()), msg);
                 }
                 return true;
+            case WebCounselorManager.ERROR_BADPLAYERTOKEN:
+                // Stored player token is invalid/stale (e.g. regenerated on the site). Clear it and
+                // reopen the setup dialog so the player can set a fresh one, then resubmit.
+                SettingsManager.getInstance().setConfigAndSaveToFile("playerToken", "");
+                this.getGui().setStatusMsg(labels.getString("TOKEN.INVALID.STATUS"));
+                SysApoio.showDialogError(labels.getString("TOKEN.INVALID.MSG"), labels.getString("ENVIAR.ERRO"), this.getGui());
+                ensurePlayerToken(); // prompt for a fresh token; the player resubmits after
+                return true; // handled - suppress the generic error dialog and don't email
             case WebCounselorManager.ERROR_GAMECLOSED:
                 //display alert!
                 SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"), this.getGui());

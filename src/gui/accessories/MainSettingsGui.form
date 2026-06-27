@@ -193,7 +193,7 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="sendOrderRequestCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="0" pref="55" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="39" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -440,13 +440,20 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="languageLabel" alignment="0" min="-2" pref="146" max="-2" attributes="0"/>
                       <Component id="themeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="playerTokenLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="themeComboBox" min="-2" max="-2" attributes="0"/>
-                      <Component id="languageComboBox" min="-2" pref="211" max="-2" attributes="0"/>
+                      <Component id="playerTokenTextField" alignment="0" max="32767" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="themeComboBox" min="-2" max="-2" attributes="0"/>
+                              <Component id="languageComboBox" min="-2" pref="211" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      </Group>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -462,6 +469,11 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="themeLabel" min="-2" max="-2" attributes="0"/>
                       <Component id="themeComboBox" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="playerTokenLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="playerTokenTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -501,6 +513,16 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
+        </Component>
+        <Component class="javax.swing.JLabel" name="playerTokenLabel">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="playerTokenTextField"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="playerTokenTextField">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="playerTokenTextField"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>
@@ -631,7 +653,7 @@
                   </Group>
                   <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                   <Component id="displayPortraitCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="34" max="32767" attributes="0"/>
+                  <EmptySpace pref="26" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

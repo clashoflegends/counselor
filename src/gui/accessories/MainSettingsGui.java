@@ -38,6 +38,17 @@ public class MainSettingsGui extends JPanel {
         saveDirButton.addActionListener(settingsControler);
         languageComboBox.addActionListener(settingsControler);
         themeLabel.setText(LABELS.getString("SETTINGS.LABEL.THEME")); // i18n (overrides the .form placeholder text)
+        // Per-player Counselor token: show the stored value, persist edits on focus-lost (constructor
+        // runs once, so this listener is added once). Lets a player paste/replace their token here as an
+        // alternative to the first-upload dialog and to recover a regenerated token.
+        playerTokenLabel.setText(LABELS.getString("SETTINGS.PLAYER.TOKEN")); // overrides the .form placeholder
+        playerTokenTextField.setText(settingsManager.getConfig("playerToken", ""));
+        playerTokenTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                settingsManager.setConfigAndSaveToFile("playerToken", playerTokenTextField.getText().trim());
+            }
+        });
         themeComboBox.setModel(getThemeModel());
         themeComboBox.setActionCommand("themeCombo");
         themeComboBox.addActionListener(settingsControler);
@@ -133,6 +144,8 @@ public class MainSettingsGui extends JPanel {
         languageComboBox = new javax.swing.JComboBox();
         themeLabel = new javax.swing.JLabel();
         themeComboBox = new javax.swing.JComboBox<>();
+        playerTokenLabel = new javax.swing.JLabel();
+        playerTokenTextField = new javax.swing.JTextField();
         displayPanel = new javax.swing.JPanel();
         filtroLabel = new javax.swing.JLabel();
         allFiltroRadioButton = new javax.swing.JRadioButton();
@@ -358,7 +371,7 @@ public class MainSettingsGui extends JPanel {
                     .addComponent(sendConfirmPopUpCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(sendOrderRequestCheckBox)
-                .addGap(0, 55, Short.MAX_VALUE))
+                .addGap(0, 39, Short.MAX_VALUE))
         );
 
         playerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.PLAYER"))); // NOI18N
@@ -371,6 +384,10 @@ public class MainSettingsGui extends JPanel {
 
         themeLabel.setText("Theme (restart to apply):");
 
+        playerTokenLabel.setText("playerTokenTextField");
+
+        playerTokenTextField.setText("playerTokenTextField");
+
         javax.swing.GroupLayout playerPanelLayout = new javax.swing.GroupLayout(playerPanel);
         playerPanel.setLayout(playerPanelLayout);
         playerPanelLayout.setHorizontalGroup(
@@ -379,12 +396,17 @@ public class MainSettingsGui extends JPanel {
                 .addContainerGap()
                 .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(languageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(themeLabel))
+                    .addComponent(themeLabel)
+                    .addComponent(playerTokenLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(themeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(languageComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(playerTokenTextField)
+                    .addGroup(playerPanelLayout.createSequentialGroup()
+                        .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(themeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(languageComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         playerPanelLayout.setVerticalGroup(
             playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -397,6 +419,10 @@ public class MainSettingsGui extends JPanel {
                 .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(themeLabel)
                     .addComponent(themeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(playerTokenLabel)
+                    .addComponent(playerTokenTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -584,7 +610,7 @@ public class MainSettingsGui extends JPanel {
                     .addComponent(portraitFolderNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(6, 6, 6)
                 .addComponent(displayPortraitCheckBox)
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         mapPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.MAP"))); // NOI18N
@@ -696,7 +722,7 @@ public class MainSettingsGui extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(gamePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
-                    .addComponent(displayPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE))
+                    .addComponent(displayPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 523, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(playerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
@@ -776,6 +802,8 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JComboBox pcPathComboBox;
     private javax.swing.JLabel pcPathLabel;
     private javax.swing.JPanel playerPanel;
+    private javax.swing.JLabel playerTokenLabel;
+    private javax.swing.JTextField playerTokenTextField;
     private javax.swing.JTextField portraitFolderNameTextField;
     private javax.swing.JLabel portraitsFolderLabel;
     private javax.swing.JButton saveDirButton;
@@ -796,6 +824,10 @@ public class MainSettingsGui extends JPanel {
 
     public JTextField getSaveDirTextField() {
         return saveDirTextField;
+    }
+
+    public JTextField getPlayerTokenTextField() {
+        return playerTokenTextField;
     }
 
     public JTextField getLoadDirTextField() {

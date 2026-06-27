@@ -74,9 +74,9 @@ public final class TokenSetupDialog extends JDialog {
         c.insets = new Insets(0, 0, 8, 0);
 
         JLabel intro = new JLabel(tx("TOKEN.SETUP.INTRO",
-                "<html><body style='width:420px'>Counselor can tag your order uploads with a personal token "
-                + "so the game master knows they came from you. Fetch it with your website login, or open the "
-                + "website token page and paste it here. You can skip this and set it later.</body></html>"));
+                "<html><body style='width:420px'>Counselor needs your personal token to upload orders - it "
+                + "identifies the upload as coming from you. Fetch it with your website login, or open the "
+                + "website token page and paste it here. You can also set it later under Settings.</body></html>"));
         p.add(intro, c);
 
         // --- Option A: fetch by login + password ---
@@ -155,14 +155,14 @@ public final class TokenSetupDialog extends JDialog {
         // --- buttons ---
         JPanel buttons = new JPanel();
         JButton save = new JButton(tx("TOKEN.SETUP.SAVE", "Save"));
-        JButton skip = new JButton(tx("TOKEN.SETUP.SKIP", "Skip for now"));
+        JButton cancel = new JButton(tx("TOKEN.SETUP.CANCEL", "Cancel"));
         save.addActionListener(e -> doSave());
-        skip.addActionListener(e -> {
-            result = null;
+        cancel.addActionListener(e -> {
+            result = null; // caller aborts this upload - the token is required to submit
             dispose();
         });
         buttons.add(save);
-        buttons.add(skip);
+        buttons.add(cancel);
         c.gridy++;
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.NONE;
