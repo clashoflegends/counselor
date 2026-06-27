@@ -1,5 +1,20 @@
 # What's New in Counselor
 
+## 27-JUN-2026 - v2.1.891
+
+### See the whole map at a glance
+- **New Map Legend.** A **Legend** button on the map toolbar (next to Display Portraits) opens a handy key to every map symbol - terrain types, settlement sizes (camp to city), fortifications (tower to citadel), capitals, ports and docks, roads, rivers, bridges, fords and landings, plus armies, fleets, characters, magic items, gold mines, combat and movement paths. It floats beside the map so you can keep it open while you plan.
+
+### One-click updates
+- **Counselor can fetch its own update.** When a newer version is available, the update notice is now clickable - Counselor downloads the right installer for your system and opens the folder so you can run it.
+
+### Your personal upload token
+- **Order uploads now carry your personal token**, so the game master knows they came from you. The first time you submit, Counselor sets it up - fetch it with your website login, or paste it from the website - and you can view or change it anytime under **Settings** or on the website's **My Counselor Token** page.
+- **Please upgrade:** from **July 1** you will need this version (or later) to upload orders. Older Counselors will be turned away.
+
+### Website (clashlegends.com)
+- **My Counselor Token page.** View, copy or regenerate your upload token on the website (linked from **Links**) - handy if you ever need to reset it.
+
 ## 24-JUN-2026 - v2.1.886
 
 ### Smoother map
