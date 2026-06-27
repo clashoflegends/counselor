@@ -27,6 +27,7 @@ import gui.charts.DataSetForChart;
 import gui.services.AppIcon;
 import gui.services.BusyGlass;
 import gui.services.ComponentFactory;
+import gui.services.TokenSetupDialog;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -544,6 +545,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
          * on the EDT; the worker only does the network call.
          */
         this.getGui().setStatusMsg(labels.getString("ENVIAR.POST.JUDGE"));
+        ensurePlayerTokenPrompt();
         final PartidaJogadorWebInfo info = doPrepPost(attachment);
         final BusyGlass busy = BusyGlass.show(this.getGui(), labels.getString("ENVIAR.POST.JUDGE"));
         new SwingWorker<Integer, Void>() {
@@ -571,6 +573,33 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 }
             }
         }.execute();
+    }
+
+    /** Set once if the player skips the token prompt, so we don't nag again this session. */
+    private boolean playerTokenPromptSkipped = false;
+
+    /**
+     * On the first order upload with no per-player token stored, offer to set one (fetch by login or
+     * paste from the website). Strictly optional: skipping proceeds with the upload (the server side
+     * is log-only until Phase B), and we only ask once per session. Runs on the EDT before the post.
+     */
+    private void ensurePlayerTokenPrompt() {
+        if (playerTokenPromptSkipped) {
+            return;
+        }
+        try {
+            if (!SettingsManager.getInstance().getConfig("playerToken", "").trim().isEmpty()) {
+                return; // already set - WebCounselorManager will send it
+            }
+            String tok = TokenSetupDialog.show(this.getGui(), labels);
+            if (tok == null || tok.trim().isEmpty()) {
+                playerTokenPromptSkipped = true; // skipped - don't ask again until next launch
+            }
+        } catch (Throwable t) {
+            // The token prompt must NEVER block an order upload - log and proceed without it.
+            log.warn("Player token prompt failed (ignored): " + t);
+            playerTokenPromptSkipped = true;
+        }
     }
 
     /**

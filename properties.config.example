@@ -8,6 +8,9 @@
 #saveDir=/path/to/folder
 # Token provided by the game admin when you join a game. Required to upload orders.
 #counselorToken=<token provided by admin>
+# Your personal Counselor token. Get it from the website (My Counselor Token page) or let Counselor
+# fetch it for you on first upload. Identifies your uploads as coming from your account.
+#playerToken=<your personal token from the website>
 # Automatic crash reporting: if Counselor crashes, a diagnostic report (version, OS, error
 # details) is sent to the game server so the GM can investigate without asking for your log file.
 # On by default. Set to false to opt out. No personal data or file contents are sent.
