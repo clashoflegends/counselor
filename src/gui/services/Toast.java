@@ -43,11 +43,13 @@ public final class Toast {
 
     private final JWindow window;
     private final JPanel panel;
+    private final Runnable onClick;
     private Timer slideTimer;
     private Timer holdTimer;
     private Timer flashTimer;
 
-    private Toast(Window owner, String message, Icon icon) {
+    private Toast(Window owner, String message, Icon icon, Runnable onClick) {
+        this.onClick = onClick;
         window = new JWindow(owner);
         window.setFocusableWindowState(false); // never steal keyboard focus from the app
         window.setAutoRequestFocus(false);
@@ -70,14 +72,21 @@ public final class Toast {
             label.setText("<html><body style='width:" + (MAX_WIDTH - 56) + "px'>" + escapeHtml(message) + "</body></html>");
             window.pack();
         }
-        MouseAdapter clickToDismiss = new MouseAdapter() {
+        MouseAdapter clickHandler = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                if (Toast.this.onClick != null) {
+                    try {
+                        Toast.this.onClick.run();
+                    } catch (Exception ex) {
+                        // a toast action must never crash the EDT
+                    }
+                }
                 dismiss();
             }
         };
-        panel.addMouseListener(clickToDismiss);
-        label.addMouseListener(clickToDismiss);
+        panel.addMouseListener(clickHandler);
+        label.addMouseListener(clickHandler);
     }
 
     /** Show a toast for {@code message}, anchored to {@code owner}'s bottom-left. Safe to call off-EDT. */
@@ -104,8 +113,16 @@ public final class Toast {
 
     /** As {@link #show(Window, String)} but with a leading icon (e.g. a warning/info icon). */
     public static void show(final Window owner, final String message, final Icon icon) {
+        show(owner, message, icon, null);
+    }
+
+    /**
+     * As {@link #show(Window, String, Icon)} but the toast is clickable: clicking runs {@code onClick}
+     * (e.g. download an update) and then dismisses. With {@code onClick == null} a click just dismisses.
+     */
+    public static void show(final Window owner, final String message, final Icon icon, final Runnable onClick) {
         if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(() -> show(owner, message, icon));
+            SwingUtilities.invokeLater(() -> show(owner, message, icon, onClick));
             return;
         }
         if (owner == null || !owner.isShowing() || message == null || message.isEmpty()) {
@@ -114,7 +131,7 @@ public final class Toast {
         if (current != null) {
             current.dismiss(); // one at a time: replace the previous toast
         }
-        current = new Toast(owner, message, icon);
+        current = new Toast(owner, message, icon, onClick);
         current.slideIn(owner);
     }
 

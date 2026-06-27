@@ -814,7 +814,9 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         if (!this.updateVersion.isEmpty()) {
             String msg = String.format(labels.getString("UPDATE.AVAILABLE"), this.updateVersion);
             setStatusMsg(msg);
-            gui.services.Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this), msg);
+            String toastMsg = String.format(labels.getString("UPDATE.AVAILABLE.CLICK"), this.updateVersion);
+            gui.services.Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this), toastMsg, null,
+                    () -> control.services.UpdateDownloader.start(this, labels));
         }
         refreshWindowTitle();
     }
