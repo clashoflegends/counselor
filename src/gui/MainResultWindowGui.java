@@ -106,6 +106,17 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar1.revalidate();
         jToolBar1.repaint();
 
+        // Map legend button, placed right after the display-portrait toggle on the map-toggles toolbar
+        // (jToolBar2). Icon-only to match the toggles; positioned by toggleDisplayPortrait's index so it
+        // survives toolbar reordering. Opens the non-modal legend.
+        javax.swing.JButton jbLegend = new javax.swing.JButton(svgIcon("help"));
+        jbLegend.setToolTipText(labels.getString("MAPLEGEND.TOOLBAR.TOOLTIP"));
+        jbLegend.setFocusable(false);
+        jbLegend.addActionListener(e -> gui.services.MapLegendDialog.show(this, labels));
+        jToolBar2.add(jbLegend, jToolBar2.getComponentZOrder(toggleDisplayPortrait) + 1);
+        jToolBar2.revalidate();
+        jToolBar2.repaint();
+
         wc.doAutoLoad(autoLoad);
         EgfDropHandler.install(this, this);
     }
