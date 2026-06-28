@@ -215,7 +215,7 @@ public final class TokenSetupDialog extends JDialog {
     }
 
     private void doOpenPage() {
-        final String url = SettingsManager.getInstance().getConfig("TokenPageUrl", "http://clashlegends.com/PbmSite/p_token.php");
+        final String url = SettingsManager.getInstance().getConfig("TokenPageUrl", "http://clashlegends.com/PbmSite/p_myconfig.php");
         try {
             if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                 Desktop.getDesktop().browse(new URI(url));
