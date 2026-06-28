@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package control.services;
 
 import business.DownloadPortraitsService;
@@ -13,139 +8,78 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.net.URLConnection;
-import java.net.UnknownHostException;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *
- * @author Serguei
+ * Downloads the portraits zip over HTTPS. As of 2026-06 the pack is hosted as a GitHub Release asset
+ * (clashoflegends/portraits, public) at a stable "latest" URL - no more GoDaddy /portraits/ folder or
+ * portraits.config manifest. The zip URL is supplied by the caller (a config value, see PortraitsChecker).
  */
 public class DownloadPortraitsHttpServiceImpl implements DownloadPortraitsService {
 
     private static final Log LOG = LogFactory.getLog(DownloadPortraitsService.class);
-
-    private static final String PROTOCOL_HOST = "http://";
-    private static final String CLASH_HOST = "clashlegends.com";
-    private static final String PORTRAITS_PATH = "/portraits/";
-    private static final String PROPERTIES_FILENAME = "portraits.config";
-
-    // Connect/read timeout for every portrait HTTP call. These calls run on the EDT (see EDT_AUDIT.md);
-    // without a timeout an unreachable server froze the UI until the OS TCP timeout (tens of seconds).
-    private static final int NET_TIMEOUT_MS = 5000;
+    private static final int CONNECT_TIMEOUT_MS = 8000;
+    private static final int READ_TIMEOUT_MS = 120_000; // the pack is ~10MB+
 
     @Override
     public void checkNetworkConnection() throws ConnectException {
-        boolean networkAvalaible = false;
-
         try {
-            final URL url = URI.create(PROTOCOL_HOST + CLASH_HOST).toURL();
-            final URLConnection conn = url.openConnection();
-            conn.setConnectTimeout(NET_TIMEOUT_MS);
-            conn.setReadTimeout(NET_TIMEOUT_MS);
+            URLConnection conn = URI.create("https://github.com").toURL().openConnection();
+            conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            conn.setReadTimeout(CONNECT_TIMEOUT_MS);
             conn.connect();
-            networkAvalaible = true;
-           
-            /*
-            InetAddress[] addresses = InetAddress.getAllByName(CLASH_HOST);
-            for (InetAddress address : addresses) {
-                if (address.isReachable(timeout)) {
-                    networkAvalaible = true;
-                }
-            }
-*/
-        } catch (UnknownHostException e1) {
-            LOG.error(e1);
-            networkAvalaible = false;
-        } catch (IOException e2) {
-            LOG.error(e2);
-            networkAvalaible = false;
-        }
-
-        if (!networkAvalaible) {
+        } catch (IOException e) {
+            LOG.error("No network for portraits download: " + e);
             throw new ConnectException();
         }
     }
 
     @Override
-    public Properties getServerPropertiesFile() throws IOException {
-        Properties propFile = null;
-
+    public File downloadPortraitsZip(String url, String destFolder) throws FileNotFoundException {
+        File file = new File(destFolder, "portraits.zip");
+        HttpURLConnection conn = null;
         try {
-            propFile = new Properties();
-            URL website = URI.create(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + PROPERTIES_FILENAME).toURL();
-
-            URLConnection conn = website.openConnection();
-            conn.setConnectTimeout(NET_TIMEOUT_MS);
-            conn.setReadTimeout(NET_TIMEOUT_MS);
-            InputStream is = conn.getInputStream();
-            propFile.load(is);
-            is.close();
-        } catch (MalformedURLException ex) {
-            LOG.error(ex);
-            throw new IOException();
-        }
-        return propFile;
-    }
-
-    @Override
-    public File downloadPortraisFile(String portraitsFileName, String portraitsFolderName) throws FileNotFoundException {
-        File file = null;
-        try {
-            URL website = URI.create(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + portraitsFileName).toURL();
-            //https://www.colorado.edu/conflict/peace/download/peace.zip
-            // speedtest.ftp.otenet.gr/files/test10Mb.db
-          //  URL website = new URL("https://www.colorado.edu/conflict/peace/download/peace.zip");
-            file = new File(portraitsFolderName + File.separator + portraitsFileName);
-            URLConnection dlConn = website.openConnection();
-            dlConn.setConnectTimeout(NET_TIMEOUT_MS);
-            dlConn.setReadTimeout(NET_TIMEOUT_MS);
-            ReadableByteChannel rbc = Channels.newChannel(dlConn.getInputStream());
-
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            fos.close();
-
+            conn = (HttpURLConnection) URI.create(url).toURL().openConnection();
+            conn.setInstanceFollowRedirects(true); // GitHub latest-asset URL 302s to the CDN
+            conn.setRequestProperty("User-Agent", "Counselor");
+            conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            conn.setReadTimeout(READ_TIMEOUT_MS);
+            try (InputStream in = conn.getInputStream(); FileOutputStream fos = new FileOutputStream(file)) {
+                in.transferTo(fos);
+            }
         } catch (IOException ex) {
-            LOG.error(ex);
+            LOG.error("Portraits download failed from " + url + ": " + ex);
             throw new FileNotFoundException();
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
         return file;
     }
 
     @Override
-    public int getSize(String portraitsFileName) throws FileNotFoundException {
-
-        int size = 0;
-        URL website;
-        URLConnection conn = null;
-        try {            
-            website = URI.create(PROTOCOL_HOST + CLASH_HOST + PORTRAITS_PATH + portraitsFileName).toURL();
-         //   website = new URL("https://www.colorado.edu/conflict/peace/download/peace.zip");
-            
-            conn = website.openConnection();
-            conn.setConnectTimeout(NET_TIMEOUT_MS);
-            conn.setReadTimeout(NET_TIMEOUT_MS);
-            if (conn instanceof HttpURLConnection) {
-                ((HttpURLConnection) conn).setRequestMethod("HEAD");
-            }
-            conn.getInputStream();
-            size = conn.getContentLength();
+    public int getSize(String url) throws FileNotFoundException {
+        HttpURLConnection conn = null;
+        try {
+            conn = (HttpURLConnection) URI.create(url).toURL().openConnection();
+            conn.setInstanceFollowRedirects(true);
+            conn.setRequestProperty("User-Agent", "Counselor");
+            conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            conn.setReadTimeout(CONNECT_TIMEOUT_MS);
+            conn.setRequestMethod("HEAD");
+            conn.connect();
+            return conn.getContentLength(); // 0 if a redirect hop doesn't report it - only used for a size hint
         } catch (IOException ex) {
-            LOG.error(ex);
+            LOG.error("Portraits size check failed: " + ex);
             throw new FileNotFoundException(ex.getMessage());
         } finally {
-            if (conn instanceof HttpURLConnection) {
-                ((HttpURLConnection) conn).disconnect();
+            if (conn != null) {
+                conn.disconnect();
             }
         }
-        return size;
     }
 }

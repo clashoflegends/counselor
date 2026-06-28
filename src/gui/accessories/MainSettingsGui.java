@@ -85,6 +85,12 @@ public class MainSettingsGui extends JPanel {
         autoLoadActionCheck.addActionListener(settingsControler);
         displayPortraitCheckBox.addActionListener(settingsControler);
         downloadPortraitsButton.addActionListener(settingsControler);
+        autoDownloadPortraitsCheck.setText(settingsManager.getBundleManager().getString("SETTINGS.PORTRAITS.AUTODOWNLOAD"));
+        autoDownloadPortraitsCheck.setToolTipText(settingsManager.getBundleManager().getString("SETTINGS.PORTRAITS.AUTODOWNLOAD.TOOLTIP"));
+        autoDownloadPortraitsCheck.setActionCommand("autoDownloadPortraits");
+        autoDownloadPortraitsCheck.setSelected(isAutoDownloadPortraitsSelected());
+        autoDownloadPortraitsCheck.setEnabled(isShowPortraitCheckEnabled());
+        autoDownloadPortraitsCheck.addActionListener(settingsControler);
         mountainColorButton.addActionListener(settingsControler);
         barbarianColorButton.addActionListener(settingsControler);
         unknownColorButton.addActionListener(settingsControler);
@@ -99,10 +105,12 @@ public class MainSettingsGui extends JPanel {
             displayPortraitCheckBox.setVisible(true);
             portraitsFolderLabel.setVisible(true);
             downloadPortraitsButton.setVisible(true);
+            autoDownloadPortraitsCheck.setVisible(true);
         } else {
             displayPortraitCheckBox.setVisible(false);
             portraitsFolderLabel.setVisible(false);
             downloadPortraitsButton.setVisible(false);
+            autoDownloadPortraitsCheck.setVisible(false);
         }
     }
 
@@ -168,6 +176,7 @@ public class MainSettingsGui extends JPanel {
         downloadPortraitsButton = new javax.swing.JButton();
         portraitFolderNameTextField = new javax.swing.JTextField();
         colorDifficultyCheckBox = new javax.swing.JCheckBox();
+        autoDownloadPortraitsCheck = new javax.swing.JCheckBox();
         mapPanel = new javax.swing.JPanel();
         hexTagStyleLabel = new javax.swing.JLabel();
         armyPathLabel = new javax.swing.JLabel();
@@ -519,6 +528,8 @@ public class MainSettingsGui extends JPanel {
 
         colorDifficultyCheckBox.setText("Collor dificulty");
 
+        autoDownloadPortraitsCheck.setText("autoDownloadPortraits");
+
         javax.swing.GroupLayout displayPanelLayout = new javax.swing.GroupLayout(displayPanel);
         displayPanel.setLayout(displayPanelLayout);
         displayPanelLayout.setHorizontalGroup(
@@ -558,7 +569,8 @@ public class MainSettingsGui extends JPanel {
                                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(alphabeticOrderButton)
                                     .addComponent(allFiltroRadioButton)
-                                    .addComponent(downloadPortraitsButton))
+                                    .addComponent(downloadPortraitsButton)
+                                    .addComponent(autoDownloadPortraitsCheck))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(ownFiltroRadioButton)
@@ -609,7 +621,9 @@ public class MainSettingsGui extends JPanel {
                     .addComponent(downloadPortraitsButton)
                     .addComponent(portraitFolderNameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(6, 6, 6)
-                .addComponent(displayPortraitCheckBox)
+                .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(displayPortraitCheckBox)
+                    .addComponent(autoDownloadPortraitsCheck))
                 .addContainerGap(26, Short.MAX_VALUE))
         );
 
@@ -758,6 +772,7 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JRadioButton alphabeticOrderButton;
     private javax.swing.JComboBox armyPathComboBox;
     private javax.swing.JLabel armyPathLabel;
+    private javax.swing.JCheckBox autoDownloadPortraitsCheck;
     private javax.swing.JButton autoLoadActionButton;
     private javax.swing.JCheckBox autoLoadActionCheck;
     private javax.swing.JLabel autoLoadActionLabel;
@@ -853,6 +868,11 @@ public class MainSettingsGui extends JPanel {
     public void checkDisplayPortraitCheckBox() {
         boolean isEnable = isShowPortraitCheckEnabled();
         displayPortraitCheckBox.setEnabled(isEnable);
+        autoDownloadPortraitsCheck.setEnabled(isEnable);
+    }
+
+    private boolean isAutoDownloadPortraitsSelected() {
+        return "true".equalsIgnoreCase(settingsManager.getConfig("autoDownloadPortraits", "false"));
     }
 
     private boolean isOverrideSelected() {
@@ -956,7 +976,8 @@ public class MainSettingsGui extends JPanel {
      * config tokens; the default selection uses Application.DEFAULT_LAF_THEME
      * so it agrees with what actually loads at startup (single source of
      * truth). The chosen theme applies on the next restart.
-     * @return 
+     *
+     * @return
      */
     public final ComboBoxModel getThemeModel() {
         ComboItem[] items = new ComboItem[]{
@@ -964,7 +985,7 @@ public class MainSettingsGui extends JPanel {
             new ComboItem("FlatDark", LABELS.getString("SETTINGS.THEME.MODERNDARK")),
             new ComboItem("0", LABELS.getString("SETTINGS.THEME.SYSTEM")),
             new ComboItem("Cross", LABELS.getString("SETTINGS.THEME.CROSS")),
-            new ComboItem("Metal", "Metal"),   // L&F proper names - not translated
+            new ComboItem("Metal", "Metal"), // L&F proper names - not translated
             new ComboItem("Nimbus", "Nimbus")
         };
         DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel(items);

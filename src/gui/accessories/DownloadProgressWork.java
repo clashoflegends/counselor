@@ -31,7 +31,7 @@ public class DownloadProgressWork extends SwingWorker<Void, Void> {
     private static final Log LOG = LogFactory.getLog(DownloadProgressWork.class);
 
     private final DownloadPortraitsService portraitsService;
-    private final String portraitsFileName;
+    private final String zipUrl;
     private final String portraitsFolder;
     private File downloadFile = null;
     private int filesCount = 0;
@@ -45,9 +45,9 @@ public class DownloadProgressWork extends SwingWorker<Void, Void> {
         // setProgress(>100). Sequential work + milestone progress (0/70/100) is deterministic and safe.
         setProgress(0);
         // Set the path up front so done() can clean up a partial file even if the download throws.
-        downloadFile = new File(new File(portraitsFolder), portraitsFileName);
+        downloadFile = new File(new File(portraitsFolder), "portraits.zip");
         try {
-            downloadFile = portraitsService.downloadPortraisFile(portraitsFileName, portraitsFolder);
+            downloadFile = portraitsService.downloadPortraitsZip(zipUrl, portraitsFolder);
             setProgress(70); // downloaded; uncompressing next
             filesCount = doUncompressZip(downloadFile);
             succeeded = true;
@@ -65,6 +65,13 @@ public class DownloadProgressWork extends SwingWorker<Void, Void> {
             downloadFile.delete(); // remove the temp zip (fully downloaded, or a partial on failure)
         }
         if (succeeded) {
+            // Record the pack version just installed, so PortraitsChecker stops re-notifying for it.
+            String tag = control.services.PortraitsChecker.fetchLatestTag();
+            if (tag != null) {
+                persistenceCommons.SettingsManager.getInstance().setConfigAndSaveToFile("PortraitsVersion", tag);
+            }
+            LOG.info("Portraits pack installed: " + filesCount + " images extracted into " + portraitsFolder
+                    + (tag != null ? " (version " + tag + ")" : ""));
             String successLabel = "Successful download and uncompress process. A total of " + filesCount + " portraits have been obtained.";
             gui.services.Toast.show(successLabel, javax.swing.UIManager.getIcon("OptionPane.informationIcon"));
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(1));
@@ -76,9 +83,9 @@ public class DownloadProgressWork extends SwingWorker<Void, Void> {
         }
     }
 
-    public DownloadProgressWork(String portraitsFileName, String portraitsFolder) {
+    public DownloadProgressWork(String zipUrl, String portraitsFolder) {
         portraitsService = new DownloadPortraitsHttpServiceImpl();
-        this.portraitsFileName = portraitsFileName;
+        this.zipUrl = zipUrl;
         this.portraitsFolder = portraitsFolder;
     }
 

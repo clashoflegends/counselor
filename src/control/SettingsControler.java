@@ -313,13 +313,23 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             }
             case "downloadPortraits":
                 DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
-                if (!displayPortraitsManager.isShowPortraitEnableable()) {
+                if (displayPortraitsManager.isShowPortraitEnableable()) {
+                    // Already have a portraits folder -> re-download the latest pack into it (update/refresh).
+                    displayPortraitsManager.downloadLatest(settingsGui);
+                } else {
+                    // First time -> choose a folder, then download, with the progress bar.
                     progressMonitor = new ProgressMonitor(settingsGui, labels.getString("CONFIG.DOWNLOAD.FILE"), "", 0, 100);
                     progressMonitor.setProgress(0);
                     displayPortraitsManager.downloadPortraits(settingsGui, this);
                 }
                 settingsGui.checkDisplayPortraitCheckBox();
                 break;
+            case "autoDownloadPortraits": {
+                JCheckBox autoDl = (JCheckBox) e.getSource();
+                SettingsManager.getInstance().setConfigAndSaveToFile("autoDownloadPortraits",
+                        autoDl.isSelected() ? "true" : "false");
+                break;
+            }
             case "MountainColorButton":
                 Color colorBefore = ColorFactory.getColorBd(SettingsManager.getInstance().getConfig("MapColorCoordinate", "efefef"));
                 Color c = JColorChooser.showDialog(this.settingsGui, "Choose", colorBefore);

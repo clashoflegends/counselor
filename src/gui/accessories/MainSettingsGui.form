@@ -585,6 +585,7 @@
                                       <Component id="alphabeticOrderButton" min="-2" max="-2" attributes="0"/>
                                       <Component id="allFiltroRadioButton" min="-2" max="-2" attributes="0"/>
                                       <Component id="downloadPortraitsButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="autoDownloadPortraitsCheck" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
@@ -652,7 +653,10 @@
                       <Component id="portraitFolderNameTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                  <Component id="displayPortraitCheckBox" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="displayPortraitCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="autoDownloadPortraitsCheck" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
                   <EmptySpace pref="26" max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -892,6 +896,11 @@
         <Component class="javax.swing.JCheckBox" name="colorDifficultyCheckBox">
           <Properties>
             <Property name="text" type="java.lang.String" value="Collor dificulty"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="autoDownloadPortraitsCheck">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="autoDownloadPortraits"/>
           </Properties>
         </Component>
       </SubComponents>

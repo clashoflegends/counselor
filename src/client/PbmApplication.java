@@ -109,6 +109,8 @@ public class PbmApplication extends Application implements Serializable {
         SysApoio.setStartupTimeMs(tShown - client.Main.launchMs);
         //check GitHub for a newer release (async, daemon thread; notifies title + status bar if found)
         control.services.UpdateChecker.checkAsync(mainWin);
+        //check GitHub for a newer portrait pack (async; toast to download if the player uses portraits)
+        control.services.PortraitsChecker.checkAsync(mainWin);
         log.info(String.format(
                 "STARTUP TIMING: jvm+preInit=%dms config=%dms images=%dms gui+autoload=%dms pack+show=%dms | total-since-launch=%dms",
                 tStart - client.Main.launchMs, tConfig - tStart, tImages - tConfig,
