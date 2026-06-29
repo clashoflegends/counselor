@@ -1,5 +1,13 @@
 # What's New in Counselor
 
+## 28-JUN-2026 - v2.1.892
+
+### Character portraits that keep themselves current
+- **Portraits now update on their own.** Counselor notices when a newer portrait pack is available and offers it with a single click - or fetches it quietly in the background if you switch on the new **Auto-download portrait updates** option in **Settings**. Fresh character art (including the latest Fire & Dragons cast) now arrives without you hunting for a download.
+
+### Fire & Dragons
+- **Army banners for the Blacks and the Greens** now appear on the map, so the rival Targaryen factions are easy to tell apart at a glance.
+
 ## 27-JUN-2026 - v2.1.891
 
 ### See the whole map at a glance
