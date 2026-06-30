@@ -79,8 +79,19 @@ public class Main implements Serializable {
         org.apache.log4j.Appender a = org.apache.log4j.Logger.getRootLogger().getAppender("logfile");
         if (a instanceof org.apache.log4j.FileAppender) {
             org.apache.log4j.FileAppender fa = (org.apache.log4j.FileAppender) a;
-            fa.setFile(dataDir + java.io.File.separator + "counselor.log");
+            // log4j already opened the relative "counselor.log" in the launch CWD (= the EGF's folder
+            // on a file-association launch) at static init, before main() ran. Capture that stray path,
+            // redirect the appender to the data dir, then remove the orphaned file if it's still empty
+            // (nothing is logged before this runs). Guarded so we never delete the real log on
+            // portable/dev (dataDir == null returns above) or a file that actually has content.
+            java.io.File stray = (fa.getFile() != null) ? new java.io.File(fa.getFile()).getAbsoluteFile() : null;
+            String target = dataDir + java.io.File.separator + "counselor.log";
+            fa.setFile(target);
             fa.activateOptions();
+            if (stray != null && !stray.equals(new java.io.File(target).getAbsoluteFile())
+                    && stray.isFile() && stray.length() == 0) {
+                stray.delete();
+            }
         }
     }
 
