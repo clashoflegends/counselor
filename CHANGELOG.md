@@ -1,6 +1,16 @@
 # What's New in Counselor
 
-## 28-JUN-2026 - v2.1.892
+## 29-JUN-2026 - v2.1.893
+
+### Counselor can update itself
+- **One-click updates that actually install.** When a newer version is available, clicking the update notice now does the right thing for your build: the portable (JAR) and macOS builds **install the update for you** and apply it the next time you start Counselor; the Linux and Windows-portable builds download it and open the folder; the Windows installer opens the download page. Updates **never restart Counselor on their own**, so an update can't interrupt orders you haven't sent, and the previous version is kept until the new one is verified - a failed update rolls back instead of breaking your install.
+
+### Know whether your orders are in
+- **New "orders sent" indicator** in the status bar (bottom-right). At a glance it tells you whether the orders open in Counselor match what the server already received (green), whether you have changes you haven't sent yet (amber), or that it can't tell right now (grey) - and reminds you if you still need to set your upload token (red). Hover for details.
+
+### Smaller touches
+- The **About box** now shows which build you're running (installer, portable, macOS, etc.).
+- Fixed a stray empty `counselor.log` file being left next to your turn file when opening it by double-click.
 
 ### Character portraits that keep themselves current
 - **Portraits now update on their own.** Counselor notices when a newer portrait pack is available and offers it with a single click - or fetches it quietly in the background if you switch on the new **Auto-download portrait updates** option in **Settings**. Fresh character art (including the latest Fire & Dragons cast) now arrives without you hunting for a download.
