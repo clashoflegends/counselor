@@ -16,6 +16,7 @@ import business.facade.PointsFacade;
 import business.services.ComparatorFactory;
 import control.facade.WorldFacadeCounselor;
 import control.services.NacaoConverter;
+import control.services.OrdersHashService;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
@@ -634,6 +635,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 fcWorld.setCurrentDirectory(dir);
                 fcMapImage.setCurrentDirectory(dir);
                 client.RecentFiles.add(resultsFile); // record only successful opens (covers menu, drag-drop, recent-menu)
+                refreshOrderSyncFromServer(); // order-sync indicator: compare loaded orders to what the server holds
             } catch (BusinessException ex) {
                 //parse-time failure: file not found, corrupted, or incompatible version (already a player-readable message)
                 log.error("Failed to open results file: " + resultsFile.getName(), ex);
@@ -1287,6 +1289,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     // Non-modal toast instead of a blocking dialog: confirms the post without interrupting work.
                     Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this.getGui()), msg);
                 }
+                // The orders just uploaded are now what the server holds -> flip the indicator to SENT
+                // without a round-trip (the hash sent == the current local hash).
+                OrdersHashService.getInstance().markSent(WFC.getTurno());
+                updateOrderSyncIndicator();
                 return true;
             case WebCounselorManager.ERROR_BADPLAYERTOKEN:
                 // Stored player token is invalid/stale (e.g. regenerated on the site). Clear it and
@@ -1331,6 +1337,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         if (!nacoes.isEmpty()) {
             info.setCdToken(nacoes.get(0).getCdToken());
         }
+        // Order-sync indicator: attach the canonical hash of the order set being sent, so the site
+        // can store it and later answer "are these the orders you hold?".
+        OrdersHashService.getInstance().refreshLocal(WFC);
+        info.setOrdersHash(OrdersHashService.getInstance().getLocalHash());
         return info;
     }
 
@@ -1367,6 +1377,52 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private void doUpdateGuiActionCount() {
         getGui().setActionsCount(this.actionsCount, this.actionsSlots);
+        updateOrderSyncIndicator();
+    }
+
+    /**
+     * Recompute the local order hash and refresh the status-bar order-sync indicator, comparing
+     * against the server hash already cached from the last fetch / send (no network). Runs on every
+     * action-count change, so any order edit flips the indicator to PENDING.
+     */
+    private void updateOrderSyncIndicator() {
+        OrdersHashService svc = OrdersHashService.getInstance();
+        svc.refreshLocal(WFC);
+        getGui().setOrderSyncState(svc.resolve(WFC.getTurno()));
+    }
+
+    /**
+     * Fetch (background) the orders hash the server currently holds for the loaded game/turn/nation
+     * and refresh the indicator. Called on order-file load. Degrades to UNKNOWN/NO_TOKEN gracefully
+     * when offline or no token is set (fetchOrdersHash returns null).
+     */
+    private void refreshOrderSyncFromServer() {
+        final int gameId = WFC.getPartida().getId();
+        final int turn = WFC.getTurno();
+        final List<Nacao> nacoes = WFC.getNacoesJogadorAtivo();
+        final int egfToken = nacoes.isEmpty() ? 0 : nacoes.get(0).getCdToken();
+        OrdersHashService.getInstance().refreshLocal(WFC);
+        new SwingWorker<String, Void>() {
+            @Override
+            protected String doInBackground() {
+                try {
+                    return WebCounselorManager.getInstance().fetchOrdersHash(gameId, turn, egfToken);
+                } catch (Exception ex) {
+                    log.warn("Orders-hash fetch failed: " + ex);
+                    return null;
+                }
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    OrdersHashService.getInstance().setServerResponse(get());
+                } catch (Exception ignore) {
+                    // keep whatever was cached; indicator resolves to UNKNOWN
+                }
+                updateOrderSyncIndicator();
+            }
+        }.execute();
     }
 
     private void doDrawPjPaths() {

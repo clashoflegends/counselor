@@ -236,6 +236,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         statusBar = new javax.swing.JPanel();
         statusLabel = new javax.swing.JLabel();
         jlActionCountPlaceholder = new javax.swing.JLabel();
+        orderSyncIndicator = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(1024, 768));
 
@@ -266,7 +267,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         labelJogo.setText(labels.getString("JOGO")); // NOI18N
         labelJogo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
         jbOpen.setText(labels.getString("ABRIR.TURNO")); // NOI18N
@@ -425,7 +425,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar2.add(togglePathPjFuture);
 
         togglePathArmy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_path_army.png"))); // NOI18N
-        togglePathArmy.setSelected(isArmyPathSelected());
+        togglePathArmy.setSelected(true);
         togglePathArmy.setToolTipText(bundle.getString("SETTINGS.MAP.ARMYPATHORDER.TOOLTIP")); // NOI18N
         togglePathArmy.setActionCommand("drawPathArmy");
         togglePathArmy.setEnabled(false);
@@ -465,7 +465,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar2.add(toggleFogWar);
 
         toggleScouts.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_scout.png"))); // NOI18N
-        toggleScouts.setSelected(isScoutsSelected());
+        toggleScouts.setSelected(isFogOfWarSelected());
         toggleScouts.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SCOUT.TOOLTIP")); // NOI18N
         toggleScouts.setActionCommand("drawScoutTargets");
         toggleScouts.setEnabled(false);
@@ -553,7 +553,6 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
                 .addContainerGap())
         );
 
-        splitMainPanel.setBorder(null);
         splitMainPanel.setDividerSize(8);
         splitMainPanel.setAutoscrolls(true);
         splitMainPanel.setMinimumSize(new java.awt.Dimension(0, 0));
@@ -578,20 +577,25 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jlActionCountPlaceholder.setBackground(new java.awt.Color(204, 204, 255));
         jlActionCountPlaceholder.setText(String.format("%s: 0 / 0 ", labels.getString("ACOES")));
 
+        orderSyncIndicator.setText("orderSyncIndicator");
+
         javax.swing.GroupLayout statusBarLayout = new javax.swing.GroupLayout(statusBar);
         statusBar.setLayout(statusBarLayout);
         statusBarLayout.setHorizontalGroup(
             statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(statusBarLayout.createSequentialGroup()
-                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jlActionCountPlaceholder))
+                .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 1015, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jlActionCountPlaceholder)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(orderSyncIndicator))
         );
         statusBarLayout.setVerticalGroup(
             statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(statusBarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                 .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jlActionCountPlaceholder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jlActionCountPlaceholder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(orderSyncIndicator))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -660,6 +664,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JLabel labelMoney;
     private javax.swing.JLabel labelNacao;
     private javax.swing.JLabel labelTurno;
+    private javax.swing.JLabel orderSyncIndicator;
     private javax.swing.JSplitPane splitMainPanel;
     private javax.swing.JPanel statusBar;
     private javax.swing.JLabel statusLabel;
@@ -928,6 +933,51 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jlActionCounter.setText(String.format("%s: %s / %s ", labels.getString("ACOES"), (int) actionCount, (int) slotCount));
     }
 
+    /**
+     * Order-sync indicator (loaded orders vs. what the server holds). The controller drives this on
+     * load / edit / send. Rendered on the far-right status-bar label: a state-coloured dot plus the
+     * localized state word (the text follows the theme foreground, so it stays legible white-on-dark
+     * / black-on-light) plus a tooltip - never colour-only.
+     */
+    public void setOrderSyncState(control.services.OrdersHashService.OrderSyncState state) {
+        this.orderSyncState = state;
+        if (orderSyncIndicator == null) {
+            return;
+        }
+        javax.swing.SwingUtilities.invokeLater(() -> renderOrderSync(state));
+    }
+
+    private control.services.OrdersHashService.OrderSyncState orderSyncState
+            = control.services.OrdersHashService.OrderSyncState.UNKNOWN;
+
+    private void renderOrderSync(control.services.OrdersHashService.OrderSyncState state) {
+        String key;
+        Color dot;
+        switch (state) {
+            case SENT:     key = "ORDERSYNC.SENT";    dot = new Color(0x2E9E44); break; // green
+            case PENDING:  key = "ORDERSYNC.PENDING"; dot = new Color(0xD9920A); break; // amber
+            case NO_TOKEN: key = "ORDERSYNC.NOTOKEN"; dot = new Color(0xC62828); break; // red
+            default:       key = "ORDERSYNC.UNKNOWN"; dot = new Color(0x9E9E9E); break; // grey
+        }
+        orderSyncIndicator.setIcon(makeDot(dot));
+        orderSyncIndicator.setText(labels.getString(key) + " ");
+        orderSyncIndicator.setToolTipText(labels.getString(key + ".TOOLTIP"));
+    }
+
+    /** A small filled status dot with a darker ring, so it reads on either a light or dark status bar. */
+    private static javax.swing.Icon makeDot(Color c) {
+        int d = 10;
+        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(d + 2, d + 2, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        java.awt.Graphics2D g = img.createGraphics();
+        g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(c);
+        g.fillOval(1, 1, d, d);
+        g.setColor(c.darker());
+        g.drawOval(1, 1, d - 1, d - 1);
+        g.dispose();
+        return new javax.swing.ImageIcon(img);
+    }
+
     private void doConfigStatusBar() {
         final ComponentFactory cf = new ComponentFactory();
         jlActionCounter = cf.getLabelGradient();
@@ -939,6 +989,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         //replace component in UI
         GroupLayout parLayout = (GroupLayout) statusBar.getLayout();
         parLayout.replace(jlActionCountPlaceholder, jlActionCounter);
+        renderOrderSync(orderSyncState); // replace the Matisse placeholder text with the initial state
     }
 
     public boolean isPcPathSelected() {

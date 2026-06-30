@@ -89,6 +89,8 @@ public class MainAboutBox extends TabBase implements Serializable {
         lModeratorLink1 = new javax.swing.JLabel();
         lFacebookLink1 = new javax.swing.JLabel();
         lNewVersion = new javax.swing.JLabel();
+        lDistroTitle = new javax.swing.JLabel();
+        lDistro = new javax.swing.JLabel();
 
         lAboutTitle.setFont(new java.awt.Font("Verdana", 0, 18)); // NOI18N
         lAboutTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -149,6 +151,10 @@ public class MainAboutBox extends TabBase implements Serializable {
 
         lNewVersion.setText("jLabel1");
 
+        lDistroTitle.setText("jLabel1");
+
+        lDistro.setText("jLabel2");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -180,7 +186,7 @@ public class MainAboutBox extends TabBase implements Serializable {
                             .addComponent(lModeratorLink1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lFacebookLink, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lModeratorLink, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lMaillistLink, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE)
+                            .addComponent(lMaillistLink, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lWebsiteLink, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(lWebAdminLink, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())
@@ -198,6 +204,12 @@ public class MainAboutBox extends TabBase implements Serializable {
                 .addGap(142, 142, 142)
                 .addComponent(lIconLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lDistroTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lDistro)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -254,7 +266,11 @@ public class MainAboutBox extends TabBase implements Serializable {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lOs)
                     .addComponent(lOsTitle))
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lDistroTitle)
+                    .addComponent(lDistro))
+                .addContainerGap(53, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -278,6 +294,8 @@ public class MainAboutBox extends TabBase implements Serializable {
     private javax.swing.JLabel lCommons;
     private javax.swing.JLabel lCommonsTitle;
     private javax.swing.JLabel lCounselorTitle;
+    private javax.swing.JLabel lDistro;
+    private javax.swing.JLabel lDistroTitle;
     private javax.swing.JLabel lFacebookLink;
     private javax.swing.JLabel lFacebookLink1;
     private javax.swing.JLabel lFacebookTitle;
@@ -306,6 +324,8 @@ public class MainAboutBox extends TabBase implements Serializable {
         log.info(System.getProperties().toString());
         lClient.setText("2." + SysApoio.getVersionClash("version_counselor"));
         lCommons.setText("1." + SysApoio.getVersionClash("version_commons"));
+        lDistroTitle.setText(labels.getString("ABOUT.DISTRO"));
+        lDistro.setText(distroDisplay(SysApoio.getDistro()));
         lJava.setText(SysApoio.getVersionJava());
         lOs.setText(SysApoio.getVersionOs());
         lScreen.setText(SysApoio.getScreenSize());
@@ -373,6 +393,23 @@ public class MainAboutBox extends TabBase implements Serializable {
         this.setLayout(new BorderLayout());
         this.add(jPanel1, BorderLayout.CENTER);
         this.add(pathPanel, BorderLayout.SOUTH);
+    }
+
+    /** Friendly name for the SysApoio.getDistro() code (the launcher's -Dclash.distro). */
+    private static String distroDisplay(String code) {
+        if (code == null) {
+            return "";
+        }
+        switch (code) {
+            case "msi":              return "Windows Installer (MSI)";
+            case "windows-portable": return "Windows portable";
+            case "dmg":              return "macOS (Apple Silicon)";
+            case "deb":              return "Linux (.deb)";
+            case "portable-jar":     return "Portable JAR";
+            case "jpackage":         return "Installed";
+            case "dev":              return "Development";
+            default:                 return code;
+        }
     }
 
     /** Theme-aware "download" icon for the new-version link (bundled Tabler SVG). */

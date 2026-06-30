@@ -66,7 +66,7 @@
                               <Component id="lModeratorLink1" alignment="1" max="32767" attributes="0"/>
                               <Component id="lFacebookLink" alignment="1" max="32767" attributes="0"/>
                               <Component id="lModeratorLink" alignment="1" max="32767" attributes="0"/>
-                              <Component id="lMaillistLink" alignment="1" pref="346" max="32767" attributes="0"/>
+                              <Component id="lMaillistLink" alignment="1" max="32767" attributes="0"/>
                               <Component id="lWebsiteLink" alignment="1" max="32767" attributes="0"/>
                               <Component id="lWebAdminLink" alignment="1" max="32767" attributes="0"/>
                           </Group>
@@ -90,6 +90,13 @@
                   <EmptySpace min="-2" pref="142" max="-2" attributes="0"/>
                   <Component id="lIconLabel" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+              </Group>
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="lDistroTitle" min="-2" pref="297" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="lDistro" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -154,6 +161,11 @@
                       <Component id="lOsTitle" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="lDistroTitle" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="lDistro" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="53" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -317,6 +329,16 @@
         <Component class="javax.swing.JLabel" name="lNewVersion">
           <Properties>
             <Property name="text" type="java.lang.String" value="jLabel1"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lDistroTitle">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="jLabel1"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lDistro">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="jLabel2"/>
           </Properties>
         </Component>
       </SubComponents>

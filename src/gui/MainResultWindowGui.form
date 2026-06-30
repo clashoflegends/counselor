@@ -162,7 +162,6 @@
         </Component>
         <Container class="javax.swing.JToolBar" name="jToolBar1">
           <Properties>
-            <Property name="floatable" type="boolean" value="false"/>
             <Property name="rollover" type="boolean" value="true"/>
           </Properties>
 
@@ -617,9 +616,6 @@
     </Container>
     <Container class="javax.swing.JSplitPane" name="splitMainPanel">
       <Properties>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="null"/>
-        </Property>
         <Property name="dividerSize" type="int" value="8"/>
         <Property name="autoscrolls" type="boolean" value="true"/>
         <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -666,9 +662,11 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="statusLabel" max="32767" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="statusLabel" pref="1015" max="32767" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="jlActionCountPlaceholder" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="orderSyncIndicator" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -677,6 +675,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="statusLabel" alignment="3" max="32767" attributes="0"/>
                   <Component id="jlActionCountPlaceholder" alignment="3" max="32767" attributes="0"/>
+                  <Component id="orderSyncIndicator" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -698,6 +697,11 @@
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="String.format(&quot;%s: 0 / 0 &quot;, labels.getString(&quot;ACOES&quot;))" type="code"/>
             </Property>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="orderSyncIndicator">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="orderSyncIndicator"/>
           </Properties>
         </Component>
       </SubComponents>
