@@ -66,6 +66,10 @@ public class PbmApplication extends Application implements Serializable {
         ImageManager.getInstance();
         final long tImages = System.currentTimeMillis();
 
+        // App-wide right-click Cut/Copy/Paste/Select All + Ctrl+C on every text component (one global
+        // hook, covers all windows/dialogs without per-form changes).
+        gui.services.TextContextMenu.install();
+
         MainResultWindowGui mainWin = null;
         try {
             //Create and set up the main content pane.
