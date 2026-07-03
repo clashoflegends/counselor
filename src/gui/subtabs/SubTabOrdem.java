@@ -476,6 +476,18 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         return this.cbOrdersAll.isSelected();
     }
 
+    /**
+     * Newbie safeguard: after an action is saved, uncheck the "ALL" box so the per-order checks
+     * re-engage for the next action. Power users can opt out by adding MaintainOrdersAllChecked=1
+     * to properties.config (no Settings UI), which keeps ALL checked until they clear it themselves.
+     */
+    public void resetOrdersAllOnSave() {
+        if (this.cbOrdersAll.isSelected()
+                && !SettingsManager.getInstance().isConfig("MaintainOrdersAllChecked", "1", "0")) {
+            this.cbOrdersAll.setSelected(false);
+        }
+    }
+
     private void setOrdensModel(TableModel model) {
         if (model == null) {
             jtListaOrdens.setModel(new javax.swing.table.DefaultTableModel(

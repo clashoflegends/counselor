@@ -139,6 +139,7 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             JButton button = (JButton) actionEvent.getSource();
             if ("jbOk".equals(button.getActionCommand())) {
                 doSalvaAction();
+                getTabGui().resetOrdersAllOnSave();
             } else if ("jbRepeat".equals(button.getActionCommand())) {
                 doRepeatAction();
             } else if ("jbClear".equals(button.getActionCommand())) {
