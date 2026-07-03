@@ -113,11 +113,13 @@ public class PersonagemConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("ARTEFATOS"));
         classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("EPIC.HERO"));
+        classes.add(java.lang.String.class);
+        colNames.add(labels.getString("SEXO"));
+        classes.add(java.lang.String.class);
         colNames.add(labels.getString("CLIMA"));
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("TERRENO"));
-        classes.add(java.lang.String.class);
-        colNames.add(labels.getString("EPIC.HERO"));
         classes.add(java.lang.String.class);
         colNames.add(labels.getString("OBS"));
         classes.add(java.lang.String.class);
@@ -162,9 +164,10 @@ public class PersonagemConverter implements Serializable {
         cArray[ii++] = personagemFacade.getNacaoNome(personagem);
         cArray[ii++] = personagemFacade.getUpkeepMoney(personagem, WorldFacadeCounselor.getInstance().getCenario());
         cArray[ii++] = personagemFacade.getArtefatos(personagem).size();
+        cArray[ii++] = SysApoio.iif(personagemFacade.isHero(personagem), labels.getString("SIM"), labels.getString("NAO"));
+        cArray[ii++] = labels.getString("SEXO." + personagem.getSexo());
         cArray[ii++] = localFacade.getClima(local);
         cArray[ii++] = localFacade.getTerrenoNome(local);
-        cArray[ii++] = SysApoio.iif(personagemFacade.isHero(personagem), labels.getString("SIM"), labels.getString("NAO"));
         if (isProprio(personagem)) {
             cArray[ii++] = labels.getString("PROPRIO");
         } else if (personagemFacade.isComandaExercito(personagem)) {
