@@ -1,5 +1,11 @@
 # What's New in Counselor
 
+## 04-JUL-2026 - v2.1.898
+
+### Smoother turn loading
+- Fixed a crash that could stop certain turn results from opening.
+- If a turn file was made by a **newer Counselor than yours**, the message now says exactly that and points you to the update, instead of a vague "wrong version" notice.
+
 ## 03-JUL-2026 - v2.1.897
 
 > **Please update.** This version is required to open turn files produced by the current server. If you're on an older Counselor and a new turn won't open, updating fixes it.
