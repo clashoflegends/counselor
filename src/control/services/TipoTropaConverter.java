@@ -312,8 +312,11 @@ public class TipoTropaConverter implements Serializable {
                 }
                 int nn = 0;
                 ret[ii][nn++] = tpTropa.getNome();
-                for (Terreno terreno : listaTerreno.keySet()) {
-                    ret[ii][nn++] = getTerrenoValue(listaTerreno, terreno);
+                // Iterate values() directly instead of keySet()+get(): a reference-keyed TreeMap can have
+                // get() miss a key that IS in keySet() after EGF deserialization, and the old get()-then-
+                // unbox NPE'd, bubbled out of doMuda, and left these sub-tabs on their empty fallback model.
+                for (Integer valor : listaTerreno.values()) {
+                    ret[ii][nn++] = (valor == null || valor == 999) ? 0 : valor;
                 }
                 ii++;
             }
@@ -371,13 +374,9 @@ public class TipoTropaConverter implements Serializable {
     }
 
     private static int getTerrenoValue(SortedMap<Terreno, Integer> listaTerreno, Terreno terreno) {
-        int ret;
-        // Converte TipoTropa para um Array[] 
-        if (listaTerreno.get(terreno) != 999) {
-            ret = listaTerreno.get(terreno);
-        } else {
-            ret = 0;
-        }
-        return ret;
+        // get() may return null (terrain absent from this troop's map, or a reference-keyed TreeMap whose
+        // lookup misses after EGF deserialization). The old "!= 999" auto-unboxed null -> NPE. Null-safe now.
+        final Integer ret = listaTerreno.get(terreno);
+        return (ret == null || ret == 999) ? 0 : ret;
     }
 }
