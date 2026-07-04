@@ -74,6 +74,16 @@ public class WorldFacadeCounselor implements Serializable {
     public synchronized void doStart(File file) throws BusinessException {
         try {
             WorldManager.getInstance().doStart(file);
+            //feed the crash reporter the loaded game/player so crash reports attribute correctly (any context)
+            try {
+                var partida = WorldManager.getInstance().getPartida();
+                if (partida != null) {
+                    var jog = partida.getJogadorAtivo();
+                    persistenceCommons.CrashReporter.setSession(partida.getId(), jog != null ? jog.getLogin() : "");
+                }
+            } catch (RuntimeException ignore) {
+                //crash-context setup must never break a load
+            }
         } catch (PersistenceException ex) {
             throw new BusinessException(ex);
         }
