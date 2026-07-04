@@ -309,6 +309,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         Jogador jogadorAtivo = partida.getJogadorAtivo();
         Comando comando = new Comando();
         comando.setInfos(partida);
+        // Stamp the SENDER (this machine's configured player login) so the server can show a "Sender:"
+        // line on the results email when submitting on-behalf. Owner stays jogadorAtivo (setInfos).
+        // Empty when unknown (paste-token user who hasn't been backfilled yet) -> server shows no line.
+        comando.setSenderLogin(SettingsManager.getInstance().getConfig("playerLogin", ""));
         String missingActionMsg = doSaveActorActions(jogadorAtivo, comando);
         if (comando.size() == 0) {
             Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this.getGui()),
