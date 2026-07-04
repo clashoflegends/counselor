@@ -1,5 +1,23 @@
 # What's New in Counselor
 
+## 03-JUL-2026 - v2.1.897
+
+> **Please update.** This version is required to open turn files produced by the current server. If you're on an older Counselor and a new turn won't open, updating fixes it.
+
+### See your characters at a glance
+- The **characters table** now has a **Gender** column, so you can tell your commanders, agents and emissaries apart more easily.
+
+### Safer duels & assassinations
+- Orders like **duel** and **assassination** now **hide your allies** by default, so you can't accidentally target a friend. Need to betray one? Tick **ALL** to reveal every possible target.
+- The **ALL** checkbox now **clears itself after each order you save**, so it can't quietly stay on and catch you out on the next action. (If you'd rather it stay ticked, set `MaintainOrdersAllChecked=1` in your config.)
+
+### Copy anything
+- **Copy & paste now works everywhere** - right-click any text (reports, order details, dialogs) for a Copy/Cut/Paste menu, or just use Ctrl+C.
+
+### Website (clashlegends.com)
+- **Auctions:** sending a character to *find out the bids* when **nobody has bid** now completes normally - your character still trains and the usual cost applies - and reports that the field was empty. Empty is useful intel, not a wasted order.
+- Improvements to **wild dragon** behaviour.
+
 ## 29-JUN-2026 - v2.1.893
 
 ### Counselor can update itself
