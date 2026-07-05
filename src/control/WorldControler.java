@@ -767,6 +767,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             } else {
                 doAutoLoadCommands(resultsFile);
             }
+            // Autoload parity with doOpenFile: fetch the server's stored order hash so the order-sync
+            // indicator (and the submit button's at-rest tint) resolve on startup instead of staying grey.
+            refreshOrderSyncFromServer();
             fcOrders.setSelectedFile(resultsFile);
             this.saved = false;
         } catch (BusinessException ex) {
