@@ -616,7 +616,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 }
                 boolean ok;
                 try {
-                    ok = handleSendResult(get(), attachment);
+                    ok = handleSendResult(get(), attachment, info);
                 } catch (Exception ex) {
                     // network failure / PersistenceException
                     WorldControler.this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
@@ -1327,10 +1327,19 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * on a SwingWorker in doSend(); this is invoked from its done(). Returns true when no further
      * error handling is needed, false to trigger the generic "ENVIAR.ERRO.INSTRUCTIONS" dialog.
      */
-    private boolean handleSendResult(int ret, File attachment) {
+    private boolean handleSendResult(int ret, File attachment, PartidaJogadorWebInfo info) {
         switch (ret) {
             case WebCounselorManager.OK:
-                final String msg = String.format(labels.getString("POST.DONE"), attachment.getName());
+                // Tailor the confirmation to how the orders were sent: a stand-by set, an on-behalf submit
+                // (name whose orders they are), or a plain self-submit.
+                final String msg;
+                if (info.isShadow()) {
+                    msg = String.format(labels.getString("POST.DONE.STANDBY"), attachment.getName());
+                } else if (info.isOnBehalf()) {
+                    msg = String.format(labels.getString("POST.DONE.BEHALF"), info.getPlayerLogin(), attachment.getName());
+                } else {
+                    msg = String.format(labels.getString("POST.DONE"), attachment.getName());
+                }
                 log.info(msg);
                 if (SettingsManager.getInstance().isConfig("DebugWebpostTime", "1", "0")) {
                     log.info(WebCounselorManager.getInstance().getLastResponseString());
