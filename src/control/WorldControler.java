@@ -104,6 +104,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private boolean msgSubmitReady = false;
     private boolean loadingEgf = false; // EDT-confined guard: blocks a concurrent open while one is in progress
     private int actionsSlots = 0;
+    // Session-scoped memory of the stand-by/normal choice per owner login (lowercased), populated when the
+    // player ticks "don't ask again this session" in the on-behalf submit dialog. Cleared on app restart.
+    private final java.util.Map<String, Boolean> shadowChoiceRemembered = new java.util.HashMap<>();
     private int actionsCount = 0;
     private MainResultWindowGui gui = null;
     private final AcaoFacade acaoFacade = new AcaoFacade();
@@ -562,20 +565,33 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         final String senderLogin = SettingsManager.getInstance().getConfig("playerLogin", "").trim();
         final String ownerLogin = WFC.getPartida().getJogadorAtivo().getLogin();
         if (!senderLogin.isEmpty() && !senderLogin.equalsIgnoreCase(ownerLogin)) {
-            final Object[] options = {
-                labels.getString("SHADOW.OPT.NORMAL"),
-                labels.getString("SHADOW.OPT.STANDBY"),
-                labels.getString("TOKEN.SETUP.CANCEL")};
-            final int choice = JOptionPane.showOptionDialog(this.getGui(),
-                    String.format(labels.getString("SHADOW.PROMPT.MSG"), ownerLogin),
-                    labels.getString("SHADOW.PROMPT.TITLE"),
-                    JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                    options, options[0]); // default = normal on-behalf
-            if (choice != 0 && choice != 1) { // Cancel / closed
-                this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
-                return;
+            final String ownerKey = ownerLogin.toLowerCase();
+            if (shadowChoiceRemembered.containsKey(ownerKey)) {
+                // Player ticked "don't ask again this session" for this owner earlier — reuse that choice.
+                shadow = shadowChoiceRemembered.get(ownerKey);
+            } else {
+                final javax.swing.JCheckBox dontAsk = new javax.swing.JCheckBox(
+                        String.format(labels.getString("SHADOW.PROMPT.REMEMBER"), ownerLogin));
+                final Object[] message = {
+                    String.format(labels.getString("SHADOW.PROMPT.MSG"), ownerLogin), dontAsk};
+                final Object[] options = {
+                    labels.getString("SHADOW.OPT.NORMAL"),
+                    labels.getString("SHADOW.OPT.STANDBY"),
+                    labels.getString("TOKEN.SETUP.CANCEL")};
+                final int choice = JOptionPane.showOptionDialog(this.getGui(), message,
+                        labels.getString("SHADOW.PROMPT.TITLE"),
+                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                        options, options[0]); // default = normal on-behalf
+                if (choice != 0 && choice != 1) { // Cancel / closed
+                    this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
+                    return;
+                }
+                shadow = (choice == 1);
+                if (dontAsk.isSelected()) {
+                    // Remember the DECISION (normal or stand-by) for this owner for the rest of the session.
+                    shadowChoiceRemembered.put(ownerKey, shadow);
+                }
             }
-            shadow = (choice == 1);
         }
         final PartidaJogadorWebInfo info = doPrepPost(attachment, shadow);
         final BusyGlass busy = BusyGlass.show(this.getGui(), labels.getString("ENVIAR.POST.JUDGE"));
