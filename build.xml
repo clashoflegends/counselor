@@ -38,12 +38,6 @@
         </junitlauncher>
     </target>
 
-    <!-- Autoincrement version number -->
-    <target name="-pre-jar" >
-        <propertyfile file="${src.dir}/version_counselor.properties">
-            <entry key="BUILD" value="1" type="int" operation="+"/>
-        </propertyfile>
-    </target>
     <!--
 
     There exist several targets which are by default empty and which can be
