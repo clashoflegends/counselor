@@ -1,5 +1,13 @@
 # What's New in Counselor
 
+## 04-JUL-2026 - v2.1.899
+
+### Fixes
+- **Troops** tab: the per-terrain **Attack / Defense / Movement** breakdowns no longer come up empty.
+
+### Fire & Dragons (coming soon)
+- Groundwork for two new dragon commands in the upcoming **Fire & Dragons** variant: **Fly on Dragonback** (soar across the map carrying your dragon, far beyond a normal march) and **Dragonfire Ultimatum** (a dragonrider demands an undefended enemy city bow the knee - or burns its walls down).
+
 ## 04-JUL-2026 - v2.1.898
 
 ### Smoother turn loading
