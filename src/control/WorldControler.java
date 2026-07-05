@@ -104,6 +104,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private boolean msgSubmitReady = false;
     private boolean loadingEgf = false; // EDT-confined guard: blocks a concurrent open while one is in progress
     private int actionsSlots = 0;
+    // Session-scoped memory of the stand-by/normal choice per owner login (lowercased), populated when the
+    // player ticks "don't ask again this session" in the on-behalf submit dialog. Cleared on app restart.
+    private final java.util.Map<String, Boolean> shadowChoiceRemembered = new java.util.HashMap<>();
     private int actionsCount = 0;
     private MainResultWindowGui gui = null;
     private final AcaoFacade acaoFacade = new AcaoFacade();
@@ -554,7 +557,51 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.getGui().setStatusMsg(labels.getString("TOKEN.REQUIRED.STATUS"));
             return; // no token set - cannot upload (no shared-secret fallback anymore)
         }
-        final PartidaJogadorWebInfo info = doPrepPost(attachment);
+        // Stand-by / SHADOW option (Phase-2 #4): only OFFER it when a stand-by submit could actually succeed,
+        // so the player is never shown a choice that is guaranteed to be rejected. Pre-reqs the client can
+        // check: (1) on-behalf — the configured sender login differs from the nation owner (jogadorAtivo);
+        // (2) the loaded nation carries a per-EGF token (cdToken > 0) — the Site's shadow gate mandates
+        // pEgfToken, so without it a stand-by is a certain 401. The per-player token is already guaranteed by
+        // ensurePlayerToken() above. (fl_accept_shadow / on-behalf policy are Site-side and can't be
+        // pre-checked; if those reject, the Site's message is surfaced.) When stand-by isn't offered we just
+        // submit a normal on-behalf set with no prompt.
+        boolean shadow = false;
+        final String senderLogin = SettingsManager.getInstance().getConfig("playerLogin", "").trim();
+        final String ownerLogin = WFC.getPartida().getJogadorAtivo().getLogin();
+        final List<Nacao> nacoesAtivo = WFC.getNacoesJogadorAtivo();
+        final boolean egfTokenPresent = !nacoesAtivo.isEmpty() && nacoesAtivo.get(0).getCdToken() > 0;
+        final boolean onBehalf = !senderLogin.isEmpty() && !senderLogin.equalsIgnoreCase(ownerLogin);
+        if (onBehalf && egfTokenPresent) {
+            final String ownerKey = ownerLogin.toLowerCase();
+            if (shadowChoiceRemembered.containsKey(ownerKey)) {
+                // Player ticked "don't ask again this session" for this owner earlier — reuse that choice.
+                shadow = shadowChoiceRemembered.get(ownerKey);
+            } else {
+                final javax.swing.JCheckBox dontAsk = new javax.swing.JCheckBox(
+                        String.format(labels.getString("SHADOW.PROMPT.REMEMBER"), ownerLogin));
+                final Object[] message = {
+                    String.format(labels.getString("SHADOW.PROMPT.MSG"), ownerLogin), dontAsk};
+                final Object[] options = {
+                    labels.getString("SHADOW.OPT.NORMAL"),
+                    labels.getString("SHADOW.OPT.STANDBY"),
+                    labels.getString("TOKEN.SETUP.CANCEL")};
+                final int choice = JOptionPane.showOptionDialog(this.getGui(), message,
+                        labels.getString("SHADOW.PROMPT.TITLE"),
+                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                        options, options[0]); // default = normal on-behalf
+                if (choice != 0 && choice != 1) { // Cancel / closed
+                    this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
+                    return;
+                }
+                shadow = (choice == 1);
+                if (dontAsk.isSelected()) {
+                    // Remember the DECISION (normal or stand-by) for this owner for the rest of the session.
+                    shadowChoiceRemembered.put(ownerKey, shadow);
+                }
+            }
+        }
+        final PartidaJogadorWebInfo info = doPrepPost(attachment, shadow);
+        info.setOnBehalf(onBehalf); // so a gate rejection surfaces the site's message (not the generic error)
         final BusyGlass busy = BusyGlass.show(this.getGui(), labels.getString("ENVIAR.POST.JUDGE"));
         new SwingWorker<Integer, Void>() {
             @Override
@@ -1311,6 +1358,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"), this.getGui());
                 this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                 return true; //dont try email
+            case WebCounselorManager.ERROR_SERVERMSG:
+                // On-behalf / stand-by gate rejection: show the site's own message (owner doesn't accept
+                // on-behalf orders, not a teammate, doesn't accept stand-by, bad EGF token, ...) — the client
+                // can't pre-validate it, so surface the server's exact reason instead of a generic error.
+                final String serverMsg = WebCounselorManager.getInstance().getLastResponseString();
+                SysApoio.showDialogError(
+                        (serverMsg == null || serverMsg.trim().isEmpty()) ? labels.getString("ERROR") : serverMsg,
+                        labels.getString("ENVIAR.ERRO"), this.getGui());
+                this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
+                return true; //dont try email
             case WebCounselorManager.ERROR_TURN:
                 final String expectedTurn = String.format(labels.getString("ENVIAR.ERRO.WRONGTURN"), WebCounselorManager.getInstance().getLastResponseString());
                 //display alert!
@@ -1324,11 +1381,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private PartidaJogadorWebInfo doPrepPost(File attachment) {
+    private PartidaJogadorWebInfo doPrepPost(File attachment, boolean shadow) {
         Partida partida = WFC.getPartida();
         Jogador jogador = partida.getJogadorAtivo();
 
         PartidaJogadorWebInfo info = new PartidaJogadorWebInfo();
+        info.setShadow(shadow);
         info.setAttachment(attachment);
         info.setOrders(listaOrdens());
         info.setGameId(partida.getId());
