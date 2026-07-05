@@ -557,14 +557,21 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.getGui().setStatusMsg(labels.getString("TOKEN.REQUIRED.STATUS"));
             return; // no token set - cannot upload (no shared-secret fallback anymore)
         }
-        // Stand-by / SHADOW option (Phase-2 #4): offered ONLY when this is an on-behalf submission — the
-        // configured sender login differs from the nation owner (jogadorAtivo). A stand-by set runs only if
-        // the owner submits nothing. Default is a normal on-behalf submit (one extra keypress). The client
-        // check only decides whether to OFFER the option; the Site's id-based gate is the real guard.
+        // Stand-by / SHADOW option (Phase-2 #4): only OFFER it when a stand-by submit could actually succeed,
+        // so the player is never shown a choice that is guaranteed to be rejected. Pre-reqs the client can
+        // check: (1) on-behalf — the configured sender login differs from the nation owner (jogadorAtivo);
+        // (2) the loaded nation carries a per-EGF token (cdToken > 0) — the Site's shadow gate mandates
+        // pEgfToken, so without it a stand-by is a certain 401. The per-player token is already guaranteed by
+        // ensurePlayerToken() above. (fl_accept_shadow / on-behalf policy are Site-side and can't be
+        // pre-checked; if those reject, the Site's message is surfaced.) When stand-by isn't offered we just
+        // submit a normal on-behalf set with no prompt.
         boolean shadow = false;
         final String senderLogin = SettingsManager.getInstance().getConfig("playerLogin", "").trim();
         final String ownerLogin = WFC.getPartida().getJogadorAtivo().getLogin();
-        if (!senderLogin.isEmpty() && !senderLogin.equalsIgnoreCase(ownerLogin)) {
+        final List<Nacao> nacoesAtivo = WFC.getNacoesJogadorAtivo();
+        final boolean egfTokenPresent = !nacoesAtivo.isEmpty() && nacoesAtivo.get(0).getCdToken() > 0;
+        final boolean onBehalf = !senderLogin.isEmpty() && !senderLogin.equalsIgnoreCase(ownerLogin);
+        if (onBehalf && egfTokenPresent) {
             final String ownerKey = ownerLogin.toLowerCase();
             if (shadowChoiceRemembered.containsKey(ownerKey)) {
                 // Player ticked "don't ask again this session" for this owner earlier — reuse that choice.
