@@ -554,7 +554,30 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.getGui().setStatusMsg(labels.getString("TOKEN.REQUIRED.STATUS"));
             return; // no token set - cannot upload (no shared-secret fallback anymore)
         }
-        final PartidaJogadorWebInfo info = doPrepPost(attachment);
+        // Stand-by / SHADOW option (Phase-2 #4): offered ONLY when this is an on-behalf submission — the
+        // configured sender login differs from the nation owner (jogadorAtivo). A stand-by set runs only if
+        // the owner submits nothing. Default is a normal on-behalf submit (one extra keypress). The client
+        // check only decides whether to OFFER the option; the Site's id-based gate is the real guard.
+        boolean shadow = false;
+        final String senderLogin = SettingsManager.getInstance().getConfig("playerLogin", "").trim();
+        final String ownerLogin = WFC.getPartida().getJogadorAtivo().getLogin();
+        if (!senderLogin.isEmpty() && !senderLogin.equalsIgnoreCase(ownerLogin)) {
+            final Object[] options = {
+                labels.getString("SHADOW.OPT.NORMAL"),
+                labels.getString("SHADOW.OPT.STANDBY"),
+                labels.getString("TOKEN.SETUP.CANCEL")};
+            final int choice = JOptionPane.showOptionDialog(this.getGui(),
+                    String.format(labels.getString("SHADOW.PROMPT.MSG"), ownerLogin),
+                    labels.getString("SHADOW.PROMPT.TITLE"),
+                    JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                    options, options[0]); // default = normal on-behalf
+            if (choice != 0 && choice != 1) { // Cancel / closed
+                this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
+                return;
+            }
+            shadow = (choice == 1);
+        }
+        final PartidaJogadorWebInfo info = doPrepPost(attachment, shadow);
         final BusyGlass busy = BusyGlass.show(this.getGui(), labels.getString("ENVIAR.POST.JUDGE"));
         new SwingWorker<Integer, Void>() {
             @Override
@@ -1311,6 +1334,15 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"), this.getGui());
                 this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                 return true; //dont try email
+            case WebCounselorManager.ERROR_SHADOW:
+                // Stand-by / SHADOW gate rejection: show the site's own message (owner doesn't accept
+                // stand-by, on-behalf not allowed, bad EGF token, ...) — the client can't pre-validate it.
+                final String shadowMsg = WebCounselorManager.getInstance().getLastResponseString();
+                SysApoio.showDialogError(
+                        (shadowMsg == null || shadowMsg.trim().isEmpty()) ? labels.getString("ERROR") : shadowMsg,
+                        labels.getString("ENVIAR.ERRO"), this.getGui());
+                this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
+                return true; //dont try email
             case WebCounselorManager.ERROR_TURN:
                 final String expectedTurn = String.format(labels.getString("ENVIAR.ERRO.WRONGTURN"), WebCounselorManager.getInstance().getLastResponseString());
                 //display alert!
@@ -1324,11 +1356,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private PartidaJogadorWebInfo doPrepPost(File attachment) {
+    private PartidaJogadorWebInfo doPrepPost(File attachment, boolean shadow) {
         Partida partida = WFC.getPartida();
         Jogador jogador = partida.getJogadorAtivo();
 
         PartidaJogadorWebInfo info = new PartidaJogadorWebInfo();
+        info.setShadow(shadow);
         info.setAttachment(attachment);
         info.setOrders(listaOrdens());
         info.setGameId(partida.getId());
