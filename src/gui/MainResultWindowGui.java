@@ -962,6 +962,64 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         orderSyncIndicator.setIcon(makeDot(dot));
         orderSyncIndicator.setText(labels.getString(key) + " ");
         orderSyncIndicator.setToolTipText(labels.getString(key + ".TOOLTIP"));
+        // Submit button (jbSend) at-rest tint follows the same order-sync colour as this indicator.
+        // While a "ready" blink is running it owns the icon, so just remember the target and let the
+        // blink settle onto it when it ends (avoids a stale/racing tint).
+        submitSyncColor = dot;
+        if (submitBlinkTimer == null || !submitBlinkTimer.isRunning()) {
+            recolorSubmit(dot);
+        }
+    }
+
+    // --- Submit button (jbSend) feedback -------------------------------------------------------------
+    // (code-only; no .form change) At rest, the cloud-upload glyph is tinted to the current order-sync
+    // colour (#2). When orders become ready, it blinks blue<->grey in lock-step with the ready toast (#1),
+    // then settles back to the at-rest colour.
+    private java.awt.Color submitSyncColor = new java.awt.Color(0x9E9E9E); // grey until the first sync render
+    private javax.swing.Timer submitBlinkTimer;
+
+    private void recolorSubmit(java.awt.Color c) {
+        if (jbSend != null) {
+            jbSend.setIcon(gui.services.SvgIcon.colored("cloud-upload", TOOLBAR_ICON_SIZE, c));
+        }
+    }
+
+    /**
+     * Blink jbSend blue&lt;-&gt;grey using the ready toast's exact palette + cadence (Toast.FLASH_*), so the
+     * button and the toast pulse together, then settle on the current order-sync colour. Called by the
+     * controller at the "orders ready" moment (once per turn).
+     */
+    public void blinkSubmitReady() {
+        if (jbSend == null) {
+            return;
+        }
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            if (submitBlinkTimer != null && submitBlinkTimer.isRunning()) {
+                submitBlinkTimer.stop(); // never stack blinks
+            }
+            final int[] ticks = {gui.services.Toast.FLASH_TICKS};
+            submitBlinkTimer = new javax.swing.Timer(gui.services.Toast.FLASH_INTERVAL_MS, null);
+            submitBlinkTimer.addActionListener(e -> {
+                if (ticks[0] <= 0) {
+                    submitBlinkTimer.stop();
+                    recolorSubmit(submitSyncColor); // settle to the at-rest sync colour (#2)
+                    return;
+                }
+                recolorSubmit((ticks[0] % 2 == 0) ? gui.services.Toast.FLASH_BG : gui.services.Toast.REST_BG);
+                ticks[0]--;
+            });
+            submitBlinkTimer.start();
+        });
+    }
+
+    /** Stop any running submit blink (e.g. on turn reset) and settle the icon to the at-rest colour. */
+    public void stopSubmitBlink() {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            if (submitBlinkTimer != null && submitBlinkTimer.isRunning()) {
+                submitBlinkTimer.stop();
+            }
+            recolorSubmit(submitSyncColor);
+        });
     }
 
     /** A small filled status dot with a darker ring, so it reads on either a light or dark status bar. */

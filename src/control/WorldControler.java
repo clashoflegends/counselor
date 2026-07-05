@@ -336,6 +336,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this.getGui()),
                     labels.getString("ORDERS.READY.SUBMIT"),
                     javax.swing.UIManager.getIcon("OptionPane.warningIcon"));
+            this.getGui().blinkSubmitReady(); // pulse the submit button in sync with the ready toast
             this.msgSubmitReady = true;
         }
 
@@ -677,6 +678,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
                 this.getGui().setOpenFileName(resultsFile.getName());
                 this.msgSubmitReady = false;
+                this.getGui().stopSubmitBlink(); // kill any running blink from the previous turn
                 this.saved = false;
                 this.savedWorld = false;
                 doAutoLoadCommands(resultsFile);

@@ -35,9 +35,12 @@ public final class Toast {
     private static final int SLIDE_TICK_MS = 15;
     private static final int MAX_WIDTH = 440;      // wrap longer messages instead of growing very wide
 
-    private static final Color REST_BG = new Color(0x1a3c6e);  // resting blue
-    private static final Color FLASH_BG = new Color(0x8a93a3); // grey flash to draw the eye
-    private static final int FLASH_TICKS = 6;                  // ~6 * 150ms toggles (~0.9s) then settle
+    // Public so other widgets (e.g. the submit button's "orders ready" blink) can mirror the exact
+    // flash palette + cadence and stay visually in sync with the toast.
+    public static final Color REST_BG = new Color(0x1a3c6e);  // resting blue
+    public static final Color FLASH_BG = new Color(0x8a93a3); // grey flash to draw the eye
+    public static final int FLASH_TICKS = 6;                  // ~6 * 150ms toggles (~0.9s) then settle
+    public static final int FLASH_INTERVAL_MS = 150;
 
     private static Toast current; // single active toast; EDT-confined, no locking needed
 
@@ -161,7 +164,7 @@ public final class Toast {
     /** Briefly flash the background grey<->blue (~0.9s) so a freshly-shown toast catches the eye. */
     private void startFlash() {
         final int[] ticks = {FLASH_TICKS};
-        flashTimer = new Timer(150, null);
+        flashTimer = new Timer(FLASH_INTERVAL_MS, null);
         flashTimer.addActionListener(e -> {
             if (ticks[0] <= 0) {
                 panel.setBackground(REST_BG);
