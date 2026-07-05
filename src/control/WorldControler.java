@@ -601,6 +601,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             }
         }
         final PartidaJogadorWebInfo info = doPrepPost(attachment, shadow);
+        info.setOnBehalf(onBehalf); // so a gate rejection surfaces the site's message (not the generic error)
         final BusyGlass busy = BusyGlass.show(this.getGui(), labels.getString("ENVIAR.POST.JUDGE"));
         new SwingWorker<Integer, Void>() {
             @Override
@@ -1357,12 +1358,13 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"), this.getGui());
                 this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                 return true; //dont try email
-            case WebCounselorManager.ERROR_SHADOW:
-                // Stand-by / SHADOW gate rejection: show the site's own message (owner doesn't accept
-                // stand-by, on-behalf not allowed, bad EGF token, ...) — the client can't pre-validate it.
-                final String shadowMsg = WebCounselorManager.getInstance().getLastResponseString();
+            case WebCounselorManager.ERROR_SERVERMSG:
+                // On-behalf / stand-by gate rejection: show the site's own message (owner doesn't accept
+                // on-behalf orders, not a teammate, doesn't accept stand-by, bad EGF token, ...) — the client
+                // can't pre-validate it, so surface the server's exact reason instead of a generic error.
+                final String serverMsg = WebCounselorManager.getInstance().getLastResponseString();
                 SysApoio.showDialogError(
-                        (shadowMsg == null || shadowMsg.trim().isEmpty()) ? labels.getString("ERROR") : shadowMsg,
+                        (serverMsg == null || serverMsg.trim().isEmpty()) ? labels.getString("ERROR") : serverMsg,
                         labels.getString("ENVIAR.ERRO"), this.getGui());
                 this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                 return true; //dont try email
