@@ -1,5 +1,22 @@
 # What's New in Counselor
 
+## 05-JUL-2026 - v2.1.900
+
+### Stand-by orders for your team
+- Open a **teammate's turn** and you can now submit a **stand-by set** - the Judge runs it **only if they don't send their own orders** that turn. A safety net so your team never misses a turn. It's offered only when you're submitting for someone else and their turn file supports it, and they must opt in on the website first. Handy checkbox to **not ask again this session** once you've chosen.
+
+### Order-status light now reliable
+- The **"orders sent?"** indicator now shows the correct state as soon as you open a turn (it could previously stay grey until you re-opened the file). The **Submit** button echoes that same colour and gives a gentle pulse when your orders are ready to send.
+
+### Clearer submit confirmations
+- After sending, Counselor now tells you exactly what happened: a normal submit, one **on someone's behalf** (naming whose orders), or a **stand-by** set. If a stand-by is turned down, you see the site's actual reason instead of a generic error.
+
+### Under the hood
+- Order uploads no longer hang if the connection stalls - they time out cleanly and tell you, instead of spinning indefinitely.
+
+### Website (clashlegends.com)
+- **Stand-by orders** support, and clearer order-receipt emails that say how the orders arrived and copy both players on an on-behalf submit. See the website's What's New for details.
+
 ## 04-JUL-2026 - v2.1.899
 
 ### Fixes
