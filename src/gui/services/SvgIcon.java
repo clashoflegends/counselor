@@ -20,4 +20,16 @@ public final class SvgIcon {
         icon.setColorFilter(new FlatSVGIcon.ColorFilter(c -> UIManager.getColor("Button.foreground")));
         return icon;
     }
+
+    /**
+     * A {@code size} x {@code size} icon for {@code images/icons/<name>.svg} recoloured to a FIXED
+     * {@code color} (ignores the theme foreground). Used to tint a glyph to a status colour - e.g. the
+     * submit button following the order-sync state. After a light/dark switch the tint persists until
+     * the caller recolours again.
+     */
+    public static Icon colored(String name, int size, java.awt.Color color) {
+        FlatSVGIcon icon = new FlatSVGIcon("images/icons/" + name + ".svg", size, size);
+        icon.setColorFilter(new FlatSVGIcon.ColorFilter(c -> color));
+        return icon;
+    }
 }
