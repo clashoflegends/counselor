@@ -8,10 +8,11 @@ import gui.services.IDispatchReceiver;
 import java.awt.Component;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collections;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.WeakHashMap;
 import model.Local;
 import model.Nacao;
 import model.PersonagemOrdem;
@@ -26,8 +27,15 @@ public class DispatchManager implements Serializable {
 
     private static final Log log = LogFactory.getLog(DispatchManager.class);
     private static DispatchManager instance;
-    private final List<IDispatchReceiver> controlers = new ArrayList<>();
-    private final SortedMap<Integer, HashSet<IDispatchReceiver>> lista = new TreeMap<>();
+    // Receivers are held via WEAK references (Collections.newSetFromMap(WeakHashMap)) so a GUI tree
+    // discarded on a turn-reload - each turn-open rebuilds MainDadosGui, whose Tab*Gui panels each new
+    // their own ControlBase controller that registers here - is NOT pinned alive by this singleton and
+    // gets GC'd. Long-lived receivers stay strongly reachable elsewhere so their weak entries survive:
+    // WorldControler (the MainResultWindowGui.wc field) and MapaControler (cached in WorldFacadeCounselor).
+    // This fixes the reload memory leak (many turn-opens in one window -> heap OOM). transient because the
+    // backing WeakHashMap is not Serializable; this singleton is never actually serialized (getInstance()).
+    private final transient Set<IDispatchReceiver> controlers = Collections.newSetFromMap(new WeakHashMap<>());
+    private final transient SortedMap<Integer, Set<IDispatchReceiver>> lista = new TreeMap<>();
     //public MSGS
     public static final int SET_LABEL_MONEY = 0;
     public static final int CLEAR_FINANCES_FORECAST = 1;
@@ -66,56 +74,59 @@ public class DispatchManager implements Serializable {
     }
 
     public final void registerForMsg(int msgName, IDispatchReceiver controler) {
-        if (lista.containsKey(msgName)) {
-            lista.get(msgName).add(controler);
-        } else {
-            HashSet<IDispatchReceiver> set = new HashSet<>();
-            set.add(controler);
-            lista.put(msgName, set);
-        }
+        lista.computeIfAbsent(msgName, k -> Collections.newSetFromMap(new WeakHashMap<>())).add(controler);
     }
 
+    // Dispatch snapshots the receiver set into an ArrayList first: (1) the copy strong-refs the live
+    // receivers for the duration so a mid-dispatch GC can't clear one out from under us; (2) it avoids a
+    // ConcurrentModificationException if a receiver (re-)registers during dispatch or a WeakHashMap expunge
+    // structurally changes the set. A GC'd receiver simply isn't in the set anymore -> not dispatched.
     public final void sendDispatchForMsg(int msgName) {
-        if (lista.containsKey(msgName)) {
-            for (IDispatchReceiver cb : lista.get(msgName)) {
+        final Set<IDispatchReceiver> set = lista.get(msgName);
+        if (set != null) {
+            for (IDispatchReceiver cb : new ArrayList<>(set)) {
                 cb.receiveDispatch(msgName);
             }
         }
     }
 
     public final void sendDispatchForMsg(int msgName, Component cmpnt) {
-        if (lista.containsKey(msgName)) {
-            for (IDispatchReceiver cb : lista.get(msgName)) {
+        final Set<IDispatchReceiver> set = lista.get(msgName);
+        if (set != null) {
+            for (IDispatchReceiver cb : new ArrayList<>(set)) {
                 cb.receiveDispatch(msgName, cmpnt);
             }
         }
     }
 
     public final void sendDispatchForMsg(int msgName, String txt) {
-        if (lista.containsKey(msgName)) {
-            for (IDispatchReceiver cb : lista.get(msgName)) {
+        final Set<IDispatchReceiver> set = lista.get(msgName);
+        if (set != null) {
+            for (IDispatchReceiver cb : new ArrayList<>(set)) {
                 cb.receiveDispatch(msgName, txt);
             }
         }
     }
 
     public final void sendDispatchForChar(Nacao nation, PersonagemOrdem before, PersonagemOrdem after) {
-        for (IDispatchReceiver cb : controlers) {
+        for (IDispatchReceiver cb : new ArrayList<>(controlers)) {
             cb.receiveDispatch(nation, before, after);
         }
     }
 
     public final void sendDispatchForMsg(int msgName, Local local) {
-        if (lista.containsKey(msgName)) {
-            for (IDispatchReceiver cb : lista.get(msgName)) {
+        final Set<IDispatchReceiver> set = lista.get(msgName);
+        if (set != null) {
+            for (IDispatchReceiver cb : new ArrayList<>(set)) {
                 cb.receiveDispatch(msgName, local);
             }
         }
     }
 
     public final void sendDispatchForMsg(int msgName, Local local, int range) {
-        if (lista.containsKey(msgName)) {
-            for (IDispatchReceiver cb : lista.get(msgName)) {
+        final Set<IDispatchReceiver> set = lista.get(msgName);
+        if (set != null) {
+            for (IDispatchReceiver cb : new ArrayList<>(set)) {
                 cb.receiveDispatch(msgName, local, range);
             }
         }
