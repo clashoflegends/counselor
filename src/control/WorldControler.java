@@ -4,6 +4,8 @@
  */
 package control;
 
+import gui.services.ClipboardHelper;
+
 import baseLib.BaseModel;
 import business.BusinessException;
 import business.facade.AcaoFacade;
@@ -1631,7 +1633,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             dataSet.add(new DataSetForChart(nmTeam, value, "", SysApoio.getColorFromName(nmTeam)));
         }
         //copy para o clipboard
-        SysApoio.setClipboardContents(dataBody);
+        ClipboardHelper.copy(dataBody);
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
         //create and display chart
@@ -1665,7 +1667,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
 
         //copy para o clipboard
-        SysApoio.setClipboardContents(dataBody);
+        ClipboardHelper.copy(dataBody);
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
         //create and display chart
@@ -1701,7 +1703,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
 
         //copy para o clipboard
-        SysApoio.setClipboardContents(dataBody);
+        ClipboardHelper.copy(dataBody);
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
         //create and display chart
@@ -1728,7 +1730,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             dataSet.add(new DataSetForChart(nmTeam, value, "", getColorForTeam(nmTeam)));
         }
         //copy para o clipboard
-        SysApoio.setClipboardContents(dataBody);
+        ClipboardHelper.copy(dataBody);
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
         //create and display chart
@@ -1756,7 +1758,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
 
         //copy para o clipboard
-        SysApoio.setClipboardContents(dataBody);
+        ClipboardHelper.copy(dataBody);
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
         ComponentFactory.showChartPie(labels.getString("PONTOS.VITORIA.NATION"), dataSet, getPartidaTagName(), this.gui);
 
@@ -1822,7 +1824,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
 
         //copy para o clipboard
-        SysApoio.setClipboardContents(dataBody);
+        ClipboardHelper.copy(dataBody);
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
         //create and display chart
@@ -1889,7 +1891,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
 
         //copy para o clipboard
-        SysApoio.setClipboardContents(dataBody);
+        ClipboardHelper.copy(dataBody);
         this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
 
         ComponentFactory.showChartLine(labels.getString("PONTOS.VITORIA.HISTORY"), dataSet, getPartidaTagName(), labels.getString("TURNO"), labels.getString("PONTOS.VITORIA"), true, this.gui);

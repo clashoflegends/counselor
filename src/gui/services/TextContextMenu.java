@@ -96,7 +96,7 @@ public final class TextContextMenu {
         if (sel == null || sel.isEmpty()) {
             return false;
         }
-        SysApoio.setClipboardContents(sel);
+        ClipboardHelper.copy(sel);
         return true;
     }
 

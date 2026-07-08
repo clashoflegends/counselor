@@ -37,7 +37,8 @@ public final class Toast {
 
     // Public so other widgets (e.g. the submit button's "orders ready" blink) can mirror the exact
     // flash palette + cadence and stay visually in sync with the toast.
-    public static final Color REST_BG = new Color(0x1a3c6e);  // resting blue
+    public static final Color REST_BG = new Color(0x1a3c6e);  // resting blue (normal toast)
+    public static final Color ERROR_BG = new Color(0x9B2D3A); // resting pink/red (error toast)
     public static final Color FLASH_BG = new Color(0x8a93a3); // grey flash to draw the eye
     public static final int FLASH_TICKS = 6;                  // ~6 * 150ms toggles (~0.9s) then settle
     public static final int FLASH_INTERVAL_MS = 150;
@@ -47,17 +48,19 @@ public final class Toast {
     private final JWindow window;
     private final JPanel panel;
     private final Runnable onClick;
+    private final Color restBg; // resting background this toast settles to (blue normal / red error)
     private Timer slideTimer;
     private Timer holdTimer;
     private Timer flashTimer;
 
-    private Toast(Window owner, String message, Icon icon, Runnable onClick) {
+    private Toast(Window owner, String message, Icon icon, Runnable onClick, Color restBg) {
         this.onClick = onClick;
+        this.restBg = restBg;
         window = new JWindow(owner);
         window.setFocusableWindowState(false); // never steal keyboard focus from the app
         window.setAutoRequestFocus(false);
         panel = new JPanel();
-        panel.setBackground(REST_BG);
+        panel.setBackground(restBg);
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(0x0f2647)),
                 BorderFactory.createEmptyBorder(10, 16, 10, 16)));
@@ -120,12 +123,34 @@ public final class Toast {
     }
 
     /**
+     * Error toast: a pink/red-backed toast that self-resolves the active window (like
+     * {@link #show(String, Icon)}). Use for a non-fatal failure the player should notice, e.g. a copy
+     * that couldn't reach the system clipboard. Auto-dismisses like any toast.
+     */
+    public static void showError(final String message) {
+        Window w = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+        if (w == null || !w.isShowing()) {
+            for (Frame f : Frame.getFrames()) {
+                if (f.isShowing()) {
+                    w = f;
+                    break;
+                }
+            }
+        }
+        show(w, message, null, null, ERROR_BG);
+    }
+
+    /**
      * As {@link #show(Window, String, Icon)} but the toast is clickable: clicking runs {@code onClick}
      * (e.g. download an update) and then dismisses. With {@code onClick == null} a click just dismisses.
      */
     public static void show(final Window owner, final String message, final Icon icon, final Runnable onClick) {
+        show(owner, message, icon, onClick, REST_BG);
+    }
+
+    private static void show(final Window owner, final String message, final Icon icon, final Runnable onClick, final Color restBg) {
         if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(() -> show(owner, message, icon, onClick));
+            SwingUtilities.invokeLater(() -> show(owner, message, icon, onClick, restBg));
             return;
         }
         if (owner == null || !owner.isShowing() || message == null || message.isEmpty()) {
@@ -134,7 +159,7 @@ public final class Toast {
         if (current != null) {
             current.dismiss(); // one at a time: replace the previous toast
         }
-        current = new Toast(owner, message, icon, onClick);
+        current = new Toast(owner, message, icon, onClick, restBg);
         current.slideIn(owner);
     }
 
@@ -167,11 +192,11 @@ public final class Toast {
         flashTimer = new Timer(FLASH_INTERVAL_MS, null);
         flashTimer.addActionListener(e -> {
             if (ticks[0] <= 0) {
-                panel.setBackground(REST_BG);
+                panel.setBackground(restBg);
                 flashTimer.stop();
                 return;
             }
-            panel.setBackground((ticks[0] % 2 == 0) ? FLASH_BG : REST_BG);
+            panel.setBackground((ticks[0] % 2 == 0) ? FLASH_BG : restBg);
             ticks[0]--;
         });
         flashTimer.start();

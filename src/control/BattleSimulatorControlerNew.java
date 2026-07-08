@@ -4,6 +4,8 @@
  */
 package control;
 
+import gui.services.ClipboardHelper;
+
 import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.IBaseModel;
@@ -415,7 +417,7 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
 
     private void doCopyTableArmy() {
         //copy para o clipboard
-        SysApoio.setClipboardContents(listArmies());
+        ClipboardHelper.copy(listArmies());
         //update status bar
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.STATUS_BAR_MSG, labels.getString("COPIAR.ARMY.DETAILS"));
     }
