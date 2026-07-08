@@ -49,13 +49,20 @@ public final class SubTabRelacionamento extends TabBase implements Serializable 
         relControl.setTabGui(this);
         //liga actionlisteners para a combo
         jcbNacao.setModel(nacaoComboModel);
+        // Guard the empty-combo case: with no target nations (fog / early turn) the model is empty,
+        // getIndexById returns its 0 default, and setSelectedIndex(0) throws "0 out of bounds" (crash
+        // game 889). Only select + wire the relationship combo when there is actually a target nation.
         int index = nacaoComboModel.getIndexById(vlId[0]);
-        jcbNacao.setSelectedIndex(index);
+        if (index >= 0 && index < jcbNacao.getItemCount()) {
+            jcbNacao.setSelectedIndex(index);
+        }
         jcbNacao.setActionCommand("jcbNacao");
         jcbNacao.addItemListener(relControl);
         //seta model no combo do panel
         GenericoComboObject nacaoAlvoObj = (GenericoComboObject) jcbNacao.getModel().getSelectedItem();
-        setRelacionamentoCombo((Nacao) nacaoAlvoObj.getObject());
+        if (nacaoAlvoObj != null && nacaoAlvoObj.getObject() != null) {
+            setRelacionamentoCombo((Nacao) nacaoAlvoObj.getObject());
+        }
     }
 
     /**
