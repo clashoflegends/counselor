@@ -105,8 +105,12 @@ public class TipoTropaControler implements Serializable, ActionListener, ListSel
                 TipoTropa tpTropa = (TipoTropa) listaExibida.get(modelIndex);
                 getTabGui().doMuda(listaExibida, tpTropa);
             }
-        } catch (IndexOutOfBoundsException ex) {
-            //lista vazia?
+        } catch (RuntimeException ex) {
+            // Was catch(IndexOutOfBoundsException) with an empty body: any failure building the troop
+            // sub-tab models (e.g. the terrain-array overflow that left every terrain sub-tab blank in
+            // game 886) was swallowed silently -> empty panes with no trace. Log it now so it is visible;
+            // the terrain models are also sized defensively in TipoTropaConverter so this should not fire.
+            log.warn("Failed to refresh troop sub-tabs on selection: " + ex, ex);
         }
     }
 }

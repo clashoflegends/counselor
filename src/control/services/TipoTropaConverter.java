@@ -256,72 +256,81 @@ public class TipoTropaConverter implements Serializable {
         }
     }
 
-    public static GenericoTableModel getTerrainTableModel(List<TipoTropa> lista, int tipo) {
-        final String[] colNames = getTerrainColNames(lista.get(0));
-        GenericoTableModel model = new GenericoTableModel(
-                colNames,
-                getTerrainAsArray(lista, tipo, colNames.length),
-                new Class[]{
-                    java.lang.String.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class,
-                    java.lang.Integer.class, java.lang.Integer.class
-                });
-        return model;
+    /** The per-terrain value map for the requested sub-tab: 0=attack, 1=defense, else=movement. */
+    private static SortedMap<Terreno, Integer> terrenoMap(TipoTropa tpTropa, int tipo) {
+        switch (tipo) {
+            case 0:
+                return tpTropa.getAtaqueTerreno();
+            case 1:
+                return tpTropa.getDefesaTerreno();
+            default:
+                return tpTropa.getMovimentoTerreno();
+        }
     }
 
-    private static String[] getTerrainColNames(TipoTropa tpTropa) {
+    public static GenericoTableModel getTerrainTableModel(List<TipoTropa> lista, int tipo) {
+        if (lista == null || lista.isEmpty()) {
+            return null; // caller (TabTipoTropasGui.setXxxModel) renders its empty fallback
+        }
+        // Size the table to the WIDEST troop's terrain map for this tab. Troops can have non-uniform terrain
+        // sets (game 886 has 2 troops with 10 terrains while the rest have 9); the old code sized columns from
+        // troop[0]'s attack map and then wrote each troop's own values, so a wider troop overran the row array
+        // -> ArrayIndexOutOfBounds, which TipoTropaControler.valueChanged swallowed as an IndexOutOfBounds ->
+        // every terrain sub-tab silently stayed empty. Size to the max + bound each row so nothing overflows.
+        TipoTropa widest = lista.get(0);
+        int maxN = 0;
+        for (TipoTropa t : lista) {
+            final SortedMap<Terreno, Integer> m = terrenoMap(t, tipo);
+            final int n = (m == null) ? 0 : m.size();
+            if (n > maxN) {
+                maxN = n;
+                widest = t;
+            }
+        }
+        final String[] colNames = getTerrainColNames(widest, tipo, maxN);
+        final Class[] classes = new Class[colNames.length];
+        classes[0] = java.lang.String.class;
+        for (int c = 1; c < classes.length; c++) {
+            classes[c] = java.lang.Integer.class;
+        }
+        return new GenericoTableModel(colNames, getTerrainAsArray(lista, tipo, colNames.length), classes);
+    }
+
+    private static String[] getTerrainColNames(TipoTropa widest, int tipo, int maxN) {
         final List<String> colNames = new ArrayList<>();
         colNames.add(labels.getString("TROPA.NOME"));
-        for (Terreno terreno : tpTropa.getAtaqueTerreno().keySet()) {
-            colNames.add(terreno.getNome());
+        final SortedMap<Terreno, Integer> m = terrenoMap(widest, tipo);
+        if (m != null) {
+            for (Terreno terreno : m.keySet()) {
+                colNames.add(terreno == null ? "?" : terreno.getNome());
+            }
+        }
+        while (colNames.size() < maxN + 1) { // pad if the widest map had null keys
+            colNames.add("?");
         }
         return (colNames.toArray(new String[0]));
     }
 
-    private static Object[][] getTerrainAsArray(List<TipoTropa> lista, int tipo, int size) {
-        if (lista.isEmpty()) {
-            Object[][] ret = {{"", ""}};
-            return (ret);
-        } else {
-            Object[][] ret = new Object[lista.size()][size];
-            SortedMap<Terreno, Integer> listaTerreno;
-            int ii = 0;
-            for (TipoTropa tpTropa : lista) {
-                switch (tipo) {
-                    case 0:
-                        listaTerreno = tpTropa.getAtaqueTerreno();
-                        break;
-                    case 1:
-                        listaTerreno = tpTropa.getDefesaTerreno();
-                        break;
-                    default:
-                        listaTerreno = tpTropa.getMovimentoTerreno();
-                        break;
-                }
-                int nn = 0;
-                ret[ii][nn++] = tpTropa.getNome();
-                // Iterate values() directly instead of keySet()+get(): a reference-keyed TreeMap can have
-                // get() miss a key that IS in keySet() after EGF deserialization, and the old get()-then-
-                // unbox NPE'd, bubbled out of doMuda, and left these sub-tabs on their empty fallback model.
+    private static Object[][] getTerrainAsArray(List<TipoTropa> lista, int tipo, int cols) {
+        Object[][] ret = new Object[lista.size()][cols];
+        int ii = 0;
+        for (TipoTropa tpTropa : lista) {
+            int nn = 0;
+            ret[ii][nn++] = tpTropa.getNome();
+            // Iterate values() directly (not keySet()+get(): a reference-keyed TreeMap can miss get() after
+            // EGF deserialize). Bound by cols so a troop with more terrains than the header never overflows.
+            final SortedMap<Terreno, Integer> listaTerreno = terrenoMap(tpTropa, tipo);
+            if (listaTerreno != null) {
                 for (Integer valor : listaTerreno.values()) {
+                    if (nn >= cols) {
+                        break;
+                    }
                     ret[ii][nn++] = (valor == null || valor == 999) ? 0 : valor;
                 }
-                ii++;
             }
-            return (ret);
+            ii++;
         }
+        return (ret);
     }
 
     public static GenericoTableModel getHabilidadeTableModel(TipoTropa tpTropa) {
