@@ -1,5 +1,14 @@
 # What's New in Counselor
 
+## 07-JUL-2026 - v2.1.901
+
+### Stability: several crashes fixed
+- Fixed a crash opening the **Key City / Domination** points chart.
+- Fixed a crash setting a **diplomatic relationship** when no other nations were known yet.
+- **Copy** no longer crashes when another program is momentarily holding the clipboard - it retries, and if it still can't, shows a quick message instead of failing.
+- Fixed a crash when **saving orders** under a very short file name.
+- Fixed a slow **memory build-up** when opening many turns in the same window without restarting, and raised the memory ceiling - together these stop the rare out-of-memory crashes on long sessions.
+
 ## 05-JUL-2026 - v2.1.900
 
 ### Stand-by orders for your team
