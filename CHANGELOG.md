@@ -1,5 +1,10 @@
 # What's New in Counselor
 
+## 09-JUL-2026 - v2.1.902
+
+### If a crash might already be fixed, we'll tell you
+- If Counselor hits an unexpected error and a **newer version is available**, the exit message now says so - there's a good chance the issue is already fixed in the new release - with a link to update and a one-click **Update now** where supported. Staying current is the best fix for most crashes.
+
 ## 07-JUL-2026 - v2.1.901
 
 ### Stability: several crashes fixed
