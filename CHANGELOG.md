@@ -5,6 +5,9 @@
 ### If a crash might already be fixed, we'll tell you
 - If Counselor hits an unexpected error and a **newer version is available**, the exit message now says so - there's a good chance the issue is already fixed in the new release - with a link to update and a one-click **Update now** where supported. Staying current is the best fix for most crashes.
 
+### Website (clashlegends.com)
+- **Your game emails, now in your language** - turn results, new-game welcomes, and missing-orders reminders now arrive in the language you choose in **My Config** (English, Português, Español, Italiano, Català), not just the website.
+
 ## 07-JUL-2026 - v2.1.901
 
 ### Stability: several crashes fixed
