@@ -196,13 +196,48 @@ public final class UpdateDownloader {
         }
     }
 
-    private static void openReleasesPage() {
+    /** Open the GitHub "latest release" page in the browser (the manual-download fallback). */
+    public static void openReleasesPage() {
         try {
             if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                 Desktop.getDesktop().browse(new URI(UpdateChecker.getLatestReleaseUrl()));
             }
         } catch (Exception ex) {
             log.warn("Could not open releases page: " + ex);
+        }
+    }
+
+    /**
+     * Crash-exit path: synchronously download + stage the latest release for THIS install's distro, on
+     * the CALLING thread. The normal {@link #start} flow is async (SwingWorker + done()), which cannot
+     * finish before the crashed process calls System.exit - so this blocking variant is used from the
+     * uncaught-exception dialog instead. Only portable-jar/dmg self-install (active on the NEXT launch,
+     * never a relaunch); every other distro (and any failure) opens the releases page for a manual
+     * download. Best-effort: never throws. Returns true only if the update was actually staged/installed.
+     */
+    public static boolean stageLatestForCrashExit() {
+        try {
+            String distro = SysApoio.getDistro();
+            boolean autoInstallable = "portable-jar".equals(distro) || "dmg".equals(distro);
+            if (!autoInstallable) {
+                openReleasesPage(); // msi (SignPath-deferred) / deb / windows-portable / dev / unknown
+                return false;
+            }
+            String url = pickAssetUrl(distro);
+            if (url == null) {
+                openReleasesPage();
+                return false;
+            }
+            File file = downloadTo(url);
+            boolean installed = installOrStage(distro, file);
+            if (!installed) {
+                openReleasesPage();
+            }
+            return installed;
+        } catch (Throwable ex) {
+            log.warn("Crash-exit update failed; opening releases page: " + ex);
+            openReleasesPage();
+            return false;
         }
     }
 

@@ -10,14 +10,27 @@ import business.ImageManager;
 import control.support.DispatchManager;
 import gui.MainResultWindowGui;
 import gui.services.EgfDropHandler;
+import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.MissingResourceException;
+import javax.swing.BorderFactory;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.SwingWorker;
+import javax.swing.event.HyperlinkEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
 
@@ -173,5 +186,137 @@ public class PbmApplication extends Application implements Serializable {
                 }
             }
         });
+    }
+
+    /**
+     * Crash-exit dialog (the base {@link Application} builds + shows it modally, then calls System.exit).
+     * The crash report was already POSTed by {@code Application.uncaughtException}. Here we additionally
+     * nudge OUTDATED clients to update: {@link control.services.UpdateChecker} runs an async check ~20s
+     * after startup and caches whether a newer build exists, so {@code getAvailableVersion()} is a
+     * non-blocking "are we behind" signal - no network on the crash path. When we KNOW a newer build
+     * exists (and this was not an OOM, which we can't reliably download our way out of), we tell the
+     * player the issue is likely already fixed and offer a one-click "Update now" (reuses the normal
+     * downloader: self-install for portable-jar/dmg, releases page otherwise) plus a clickable link.
+     * Otherwise we show the plain message, matching the base behavior.
+     */
+    @Override
+    protected JDialog getUncaughtExceptionDialog() {
+        final BundleManager labels = SettingsManager.getInstance().getBundleManager();
+        final boolean oom = getUncaughtThrowable() instanceof OutOfMemoryError;
+        final String newer = control.services.UpdateChecker.getAvailableVersion();
+        final String title = tx(labels, "CRASH.TITLE", "Error");
+        final String baseMsg = oom
+                ? tx(labels, "CRASH.MSG.OOM", "Java ran out of memory. " + getName() + " will now exit. Just relaunch it and it will be fine.")
+                : tx(labels, "CRASH.MSG.GENERIC", "An unrecoverable error has occurred. " + getName() + " will now exit. You can send the counselor.log file to the GM for investigation.");
+
+        // Only offer the update path when we KNOW a newer build exists and this was not an OOM.
+        if (newer == null || oom) {
+            JOptionPane pane = new JOptionPane(baseMsg, JOptionPane.ERROR_MESSAGE);
+            JDialog dialog = pane.createDialog(null, title);
+            dialog.setAlwaysOnTop(true);
+            dialog.toFront();
+            dialog.setVisible(true);
+            return dialog;
+        }
+
+        final String url = control.services.UpdateChecker.getLatestReleaseUrl();
+        final String outdatedTmpl = tx(labels, "CRASH.OUTDATED",
+                "Your %s is outdated (%s available). There is a good chance this issue is already fixed in the new version.");
+        String outdatedMsg;
+        try {
+            outdatedMsg = String.format(outdatedTmpl, getName(), newer);
+        } catch (RuntimeException badFormat) {
+            // a mis-typed % in some translation must not turn the crash dialog into another crash
+            outdatedMsg = String.format("Your %s is outdated (%s available). There is a good chance this issue is already fixed in the new version.", getName(), newer);
+        }
+        final String outdated = outdatedMsg;
+        JEditorPane body = new JEditorPane("text/html",
+                "<html><body style='width:380px; font-family:sans-serif'>"
+                + "<p>" + baseMsg + "</p>"
+                + "<p><b>" + outdated + "</b></p>"
+                + "<p>" + tx(labels, "CRASH.UPDATE.LINK", "Update here:")
+                + " <a href='" + url + "'>" + url + "</a></p></body></html>");
+        body.setEditable(false);
+        body.setOpaque(false);
+        body.addHyperlinkListener(e -> {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                browse(url);
+            }
+        });
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(body, BorderLayout.CENTER);
+
+        Object[] options = {
+            tx(labels, "CRASH.BTN.UPDATE", "Update now"),
+            tx(labels, "CRASH.BTN.EXIT", "Exit")
+        };
+        JOptionPane pane = new JOptionPane(panel, JOptionPane.ERROR_MESSAGE,
+                JOptionPane.YES_NO_OPTION, null, options, options[1]);
+        JDialog dialog = pane.createDialog(null, title);
+        dialog.setAlwaysOnTop(true);
+        dialog.toFront();
+        dialog.setVisible(true); // modal - blocks until the player picks
+        if (options[0].equals(pane.getValue())) {
+            runUpdateBeforeExit(labels);
+        }
+        return dialog;
+    }
+
+    /**
+     * Run the update synchronously while a small modal progress dialog is up, then return so the base
+     * class exits. The download/stage runs off the EDT in a worker; the modal dialog pumps its own event
+     * loop so {@code done()} can dispose it - this blocks the crash-exit until staging finishes, without
+     * freezing. Never relaunches (unsaved orders are safe); the staged update is active on the next start.
+     */
+    private void runUpdateBeforeExit(BundleManager labels) {
+        final JDialog progress = new JDialog((Frame) null, getName(), true);
+        progress.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        JPanel p = new JPanel(new BorderLayout(10, 10));
+        p.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        p.add(new JLabel(tx(labels, "CRASH.DOWNLOADING", "Getting the update... " + getName() + " will close when it finishes.")), BorderLayout.NORTH);
+        JProgressBar bar = new JProgressBar();
+        bar.setIndeterminate(true);
+        p.add(bar, BorderLayout.CENTER);
+        progress.setContentPane(p);
+        progress.pack();
+        progress.setLocationRelativeTo(null);
+        progress.setAlwaysOnTop(true);
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                try {
+                    control.services.UpdateDownloader.stageLatestForCrashExit();
+                } catch (Throwable ignore) {
+                    // best-effort; base class exits regardless
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                progress.dispose();
+            }
+        }.execute();
+        progress.setVisible(true); // blocks (modal) until done() disposes it
+    }
+
+    private void browse(String url) {
+        try {
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(new URI(url));
+            }
+        } catch (Exception ex) {
+            log.warn("Could not open the releases page: " + ex);
+        }
+    }
+
+    /** Localized label with an English fallback (matches UpdateDownloader.tx); never throws. */
+    private static String tx(BundleManager labels, String key, String fallback) {
+        try {
+            String s = labels.getString(key);
+            return (s == null || s.startsWith("N/A (Missing Translation")) ? fallback : s;
+        } catch (Exception e) {
+            return fallback;
+        }
     }
 }
