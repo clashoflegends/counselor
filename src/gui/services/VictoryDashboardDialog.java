@@ -186,8 +186,8 @@ public final class VictoryDashboardDialog extends JDialog {
                 || r.kind == VictoryStatus.Kind.INFO) {
             return null;
         }
-        final Double toWin = gaugeToWin(r);
-        final Double toLose = gaugeToLose(r);
+        final GaugeVal toWin = gaugeToWin(r);
+        final GaugeVal toLose = gaugeToLose(r);
         if (toWin == null && toLose == null) {
             return null;
         }
@@ -213,33 +213,54 @@ public final class VictoryDashboardDialog extends JDialog {
         return card;
     }
 
-    private JPanel dial(String caption, double pct) {
-        final JPanel p = ChartGauge.buildPanel(caption, pct, GAUGE_W, GAUGE_H);
-        p.setPreferredSize(new Dimension(GAUGE_W, GAUGE_H));
-        return p;
+    /** A gauge value plus the raw numbers behind it (shown as a small debug readout under the dial). */
+    private static final class GaugeVal {
+        final double pct;
+        final String detail;
+
+        GaugeVal(double pct, String detail) {
+            this.pct = pct;
+            this.detail = detail;
+        }
     }
 
-    /** "Toward victory" gauge value 0..100, or null when the row has no sensible progress metric. */
-    private Double gaugeToWin(Row r) {
+    private JPanel dial(String caption, GaugeVal g) {
+        final JPanel col = new JPanel();
+        col.setLayout(new BoxLayout(col, BoxLayout.Y_AXIS));
+        final JPanel p = ChartGauge.buildPanel(caption, g.pct, GAUGE_W, GAUGE_H);
+        p.setPreferredSize(new Dimension(GAUGE_W, GAUGE_H));
+        p.setAlignmentX(Component.CENTER_ALIGNMENT);
+        col.add(p);
+        // DEBUG readout: the raw numbers behind the % (John's request; gate/remove once understood).
+        final JLabel nums = new JLabel(String.format("%s (%.0f%%)", g.detail, g.pct), SwingConstants.CENTER);
+        nums.setAlignmentX(Component.CENTER_ALIGNMENT);
+        nums.setForeground(java.awt.Color.decode(GRAY));
+        nums.setFont(nums.getFont().deriveFont(java.awt.Font.PLAIN, 9f));
+        col.add(nums);
+        return col;
+    }
+
+    /** "Toward victory" gauge value + raw numbers, or null when the row has no sensible progress metric. */
+    private GaugeVal gaugeToWin(Row r) {
         switch (r.kind) {
             case PROGRESS:
                 if (r.threshold <= 0) {
                     return null;
                 }
-                return clampPct(100.0 * r.myValue / r.threshold);
+                return new GaugeVal(clampPct(100.0 * r.myValue / r.threshold), r.myValue + " / " + r.threshold);
             case SURVIVAL:
                 // elimination race: threshold = enemy kills still needed to win (0 = already there).
                 if (r.state == State.WINNING || r.threshold == 0) {
-                    return 100.0;
+                    return new GaugeVal(100.0, "reached");
                 }
                 if (r.othersValue <= 0) {
-                    return 100.0;   // no enemy left
+                    return new GaugeVal(100.0, "no enemy left");
                 }
-                // Standing proxy (no game history to count eliminations): my supremacy share of the way to
-                // the line. othersValue = enemies still alive, threshold = enemy kills still needed. Rises
-                // as enemies fall, drops if I lose nations (threshold grows). Reads ~66% at an even start
-                // because supremacy wins at 75% while both sides begin near 50% - that is expected.
-                return clampPct(100.0 * r.othersValue / (r.othersValue + r.threshold));
+                // Standing proxy (no game history to count eliminations): supremacy share of the way to the
+                // line. othersValue = enemies alive, threshold = enemy kills still needed. Reads ~66% at an
+                // even start because supremacy wins at 75% while both sides begin near 50% - that is expected.
+                return new GaugeVal(clampPct(100.0 * r.othersValue / (r.othersValue + r.threshold)),
+                        "enemy " + r.othersValue + ", kill " + r.threshold);
             case CAPITALS:
                 return null;   // capitals is a pure "toward defeat" condition
             default:
@@ -247,32 +268,29 @@ public final class VictoryDashboardDialog extends JDialog {
         }
     }
 
-    /** "Toward defeat" gauge value 0..100, or null when no single rival/loss metric is knowable. */
-    private Double gaugeToLose(Row r) {
+    /** "Toward defeat" gauge value + raw numbers, or null when no single rival/loss metric is knowable. */
+    private GaugeVal gaugeToLose(Row r) {
         switch (r.kind) {
             case PROGRESS:
                 // Only authoritative rows carry an honest single-rival figure; territory (fogged) does not.
                 if (!r.rivalKnown || r.threshold <= 0) {
                     return null;
                 }
-                return clampPct(100.0 * r.rivalToWin / r.threshold);
+                return new GaugeVal(clampPct(100.0 * r.rivalToWin / r.threshold),
+                        "rival " + r.rivalToWin + " / " + r.threshold);
             case SURVIVAL:
                 // rivalToWin = enemy eliminations of MY nations still needed for THEM to win.
-                if (r.state == State.LOSING) {
-                    return 100.0;
+                if (r.state == State.LOSING || r.rivalToWin <= 0 || r.myValue <= 0) {
+                    return new GaugeVal(100.0, "you " + r.myValue + ", lose in " + r.rivalToWin);
                 }
-                if (r.rivalToWin <= 0) {
-                    return 100.0;
-                }
-                if (r.myValue <= 0) {
-                    return 100.0;
-                }
-                return clampPct(100.0 * r.myValue / (r.myValue + r.rivalToWin));
+                return new GaugeVal(clampPct(100.0 * r.myValue / (r.myValue + r.rivalToWin)),
+                        "you " + r.myValue + ", lose in " + r.rivalToWin);
             case CAPITALS:
                 if (r.threshold <= 0) {
                     return null;
                 }
-                return clampPct(100.0 * r.myValue / r.threshold);
+                return new GaugeVal(clampPct(100.0 * r.myValue / r.threshold),
+                        r.myValue + " / " + r.threshold + " lost");
             default:
                 return null;
         }
