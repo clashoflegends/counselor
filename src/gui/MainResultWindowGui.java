@@ -144,7 +144,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbEmailList.setIcon(svgIcon("mail"));
         jbMap.setIcon(svgIcon("map"));
         jbScoreGraph.setIcon(svgIcon("chart-bar"));
-        jbScoreGraph1.setIcon(svgIcon("chart-bar"));
+        jbScoreGraph1.setIcon(svgIcon("target"));
         jbScoreGraph2.setIcon(svgIcon("chart-area"));
         jbScoreGraph3.setIcon(svgIcon("chart-bar"));
         jbScoreGraph4.setIcon(svgIcon("chart-bar"));
@@ -153,6 +153,11 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbHexview.setIcon(svgIcon("hexagon"));
         jbConfigs.setIcon(svgIcon("settings"));
         jbAbout.setIcon(svgIcon("info-circle"));
+        // Pass 1 graphs rework: repurpose the dead "single-turn" button as the Victory Dashboard, and
+        // hide the other dead button (key-city-per-team). Done here (post-initComponents) so no .form edit.
+        jbScoreGraph1.setActionCommand("jbVictoryDashboard");
+        jbScoreGraph1.setToolTipText(labels.getString("VDASH.TITLE"));
+        jbScoreGraph5.setVisible(false);
     }
 
     /** Build and show the recently-opened-files popup below the Recent toolbar button. */
@@ -738,7 +743,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         }
         jbMap.setEnabled(true);
         jbScoreGraph.setEnabled(true);
-        jbScoreGraph1.setEnabled(false);
+        jbScoreGraph1.setEnabled(true); // repurposed: Victory Dashboard
         jbScoreGraph2.setEnabled(true);
         jbScoreGraph3.setEnabled(wc.isBattleRoyal());
         jbScoreGraph4.setEnabled(true);
