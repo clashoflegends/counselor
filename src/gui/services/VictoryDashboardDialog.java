@@ -39,7 +39,8 @@ public final class VictoryDashboardDialog extends JDialog {
     private boolean isTeam;
 
     private VictoryDashboardDialog(Window parent, BundleManager labels, Assessment a) {
-        super(parent, ModalityType.APPLICATION_MODAL);
+        // Modeless: the player can keep the dashboard open while inspecting the data tabs and the map.
+        super(parent, ModalityType.MODELESS);
         this.labels = labels;
         AppIcon.applyTo(this);
         setTitle(titleFor(a.gameId));

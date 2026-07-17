@@ -6,16 +6,22 @@ package gui.charts;
 
 import business.ImageManager;
 import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.RadialGradientPaint;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.GroupLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import persistenceCommons.SettingsManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartFactory;
@@ -45,6 +51,10 @@ public class ChartLine extends JFrame {
     private String yLabel;
     private PlotOrientation orientation = PlotOrientation.VERTICAL;
     private boolean legendDisplay = true;
+    // "% share" mode: plot each series as its share of that turn's total (0-100%) instead of raw values,
+    // so relative standing is visible (raw values rise for everyone). Toggled by a checkbox on the window.
+    private boolean shareMode = false;
+    private JPanel chartHolder;
     
     public ChartLine(String title, List<DataSetForChart> dataSet, String subtitle) {
         initComponents();
@@ -118,13 +128,29 @@ public class ChartLine extends JFrame {
      *
      * @return A panel.
      */
-    private JPanel createPanel() {
+    private ChartPanel buildChartPanel() {
         JFreeChart chart = createChart(createDataset());
         ChartPanel chartPanel = new ChartPanel(chart, false);
         chartPanel.setFillZoomRectangle(true);
         chartPanel.setMouseWheelEnabled(true);
         chartPanel.setPreferredSize(new Dimension(500, 270));
         return chartPanel;
+    }
+
+    /** Rebuild the chart in place after the %-share toggle flips. */
+    private void refreshChart() {
+        if (chartHolder == null) {
+            return;
+        }
+        chartHolder.removeAll();
+        chartHolder.add(buildChartPanel(), BorderLayout.CENTER);
+        chartHolder.revalidate();
+        chartHolder.repaint();
+    }
+
+    private String tx(String key, String fallback) {
+        final String s = SettingsManager.getInstance().getBundleManager().getString(key);
+        return (s == null || s.startsWith("N/A (Missing Translation")) ? fallback : s;
     }
 
     /**
@@ -134,9 +160,22 @@ public class ChartLine extends JFrame {
      */
     private CategoryDataset createDataset() {
         DefaultCategoryDataset chartDataset = new DefaultCategoryDataset();
-        for (DataSetForChart item : dataSet) {
-            //value; series; x-axis (i.e. turns)
-            chartDataset.addValue(item.getValue(), item.getKey(), item.getGrouping());
+        if (shareMode) {
+            // per-category (turn) totals, then emit each value as its % of that turn's total
+            final Map<String, Double> totals = new HashMap<>();
+            for (DataSetForChart item : dataSet) {
+                totals.merge(item.getGrouping(), item.getValue(), Double::sum);
+            }
+            for (DataSetForChart item : dataSet) {
+                final double total = totals.getOrDefault(item.getGrouping(), 0.0);
+                final double pct = total > 0 ? item.getValue() / total * 100.0 : 0.0;
+                chartDataset.addValue(pct, item.getKey(), item.getGrouping());
+            }
+        } else {
+            for (DataSetForChart item : dataSet) {
+                //value; series; x-axis (i.e. turns)
+                chartDataset.addValue(item.getValue(), item.getKey(), item.getGrouping());
+            }
         }
         return chartDataset;
         /*
@@ -158,9 +197,10 @@ public class ChartLine extends JFrame {
      * @return The chart.
      */
     private JFreeChart createChart(CategoryDataset dataset) {
+        final String yAxisLabel = shareMode ? tx("CHART.LINE.SHARE.AXIS", "% share") : this.getyLabel();
         JFreeChart chart = ChartFactory.createLineChart(
                 getTitle(),
-                this.getxLabel(), this.getyLabel(),
+                this.getxLabel(), yAxisLabel,
                 dataset,
                 this.getOrientation(),// Plot orientation 
                 this.isLegendDisplay(), // include legend
@@ -184,21 +224,35 @@ public class ChartLine extends JFrame {
         
         ChartUtils.applyCurrentTheme(chart);
 
-        // customise the renderer...
+        // customise the renderer... (apply AFTER the theme so our per-series styling wins)
         LineAndShapeRenderer renderer = (LineAndShapeRenderer) plot.getRenderer();
-//        // use gradients and white borders for the section colours
-//        int nn = 0;
-//        for (DataSetForChart ds : dataSet) {
-//            renderer.setSeriesPaint(nn++,
-//                    createGradientPaint(new Color(200, 200, 255), ds.getColor()));
-//        }
         renderer.setDefaultLinesVisible(true);
-        renderer.setDrawOutlines(true);
-        renderer.setUseFillPaint(true);
-        renderer.setDefaultFillPaint(Color.white);
-        renderer.setSeriesStroke(0, new BasicStroke(1.0f));
-        renderer.setSeriesOutlineStroke(0, new BasicStroke(5.0f));
-        renderer.setSeriesShape(0, new Ellipse2D.Double(-5.0, -5.0, 10.0, 10.0));
+        renderer.setDefaultShapesVisible(false);
+        // Per-nation styling: colour = nation identity; stroke = allegiance (solid = your side, dashed =
+        // enemy); your own nation is emphasised (thicker + round markers). Style comes from the first
+        // data point seen for each series (all points of a nation share it).
+        final java.util.Map<String, DataSetForChart> styleByKey = new java.util.LinkedHashMap<>();
+        for (DataSetForChart d : dataSet) {
+            styleByKey.putIfAbsent(d.getKey(), d);
+        }
+        for (int i = 0; i < dataset.getRowCount(); i++) {
+            final DataSetForChart s = styleByKey.get((String) dataset.getRowKey(i));
+            if (s == null) {
+                continue;
+            }
+            renderer.setSeriesPaint(i, s.getColor());
+            final float w = s.isEmphasis() ? 3.5f : 2.0f;
+            if (s.isDashed()) {
+                renderer.setSeriesStroke(i, new BasicStroke(w, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
+                        1.0f, new float[]{6.0f, 6.0f}, 0.0f));
+            } else {
+                renderer.setSeriesStroke(i, new BasicStroke(w, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            }
+            renderer.setSeriesShapesVisible(i, s.isEmphasis());
+            if (s.isEmphasis()) {
+                renderer.setSeriesShape(i, new Ellipse2D.Double(-3.0, -3.0, 6.0, 6.0));
+            }
+        }
         return chart;
     }
 
@@ -221,8 +275,22 @@ public class ChartLine extends JFrame {
      * set any configs before starting
      */
     final public void doStart() {
+        final JPanel container = new JPanel(new BorderLayout());
+        final JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
+        final JCheckBox shareToggle = new JCheckBox(tx("CHART.LINE.SHARE", "Show % share"));
+        shareToggle.setToolTipText(tx("CHART.LINE.SHARE.TOOLTIP",
+                "Plot each nation's share of the total this turn, instead of raw points."));
+        shareToggle.addActionListener(e -> {
+            shareMode = shareToggle.isSelected();
+            refreshChart();
+        });
+        top.add(shareToggle);
+        container.add(top, BorderLayout.NORTH);
+        chartHolder = new JPanel(new BorderLayout());
+        chartHolder.add(buildChartPanel(), BorderLayout.CENTER);
+        container.add(chartHolder, BorderLayout.CENTER);
         GroupLayout parLayout = (GroupLayout) jpQuadro.getLayout();
-        parLayout.replace(jPanel1, createPanel());
+        parLayout.replace(jPanel1, container);
     }
 
     /**

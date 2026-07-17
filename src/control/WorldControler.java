@@ -1866,10 +1866,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         final Set<String> teams = new TreeSet<>();
         final SortedMap<String, Nacao> mapNations = new TreeMap<>();
         List<Nacao> nations = doPrepNations(mapNations, teams);
-//        final List<Nacao> nationsList = new ArrayList<>(WorldFacadeCounselor.getInstance().getNacoes().values());
-//        //sort by points
-//        ComparatorFactory.getComparatorNationVictoryPointsSorter(nationsList);
         final VictoryPointsGame victoryPoints = WFC.getVictoryPoints();
+        // For line styling: my own nation is emphasised, and nations not on my side are drawn dashed.
+        // isTeam mirrors PartidaControl.isTeam() (GLA/GSL); in solo/FFA "my side" is just my nation.
+        final Nacao myNation = WFC.getJogadorAtivo().getNacoes().get(WFC.getJogadorAtivo().getNacoes().firstKey());
+        final boolean isTeam = WFC.getPartida().isTeamLocked() || WFC.getPartida().isTeamWithLord();
 
         //data header with cariable columns as a functions of how many turns so far
         String dataBody = String.format("%s / %s of ", labels.getString("NACAO"), labels.getString("PONTOS.VITORIA"), labels.getString("TURN"));
@@ -1894,9 +1895,15 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 }
                 dataBody += nation.getNome();
                 SortedMap<Integer, Integer> nationPoints = victoryPoints.getNationPoints(nation);
+                final boolean emphasis = nation == myNation;
+                final boolean dashed = isTeam
+                        ? !myNation.getTeamFlag().equals(nation.getTeamFlag())
+                        : nation != myNation;
                 for (Integer turn : victoryPoints.getTurnList()) {
                     dataBody += String.format("\t%s", nationPoints.get(turn));
-                    dataSet.add(new DataSetForChart(nation.getNome(), nationPoints.get(turn), String.format("T %s", turn), nation.getFillColor()));
+                    dataSet.add(new DataSetForChart(nation.getNome(), nationPoints.get(turn),
+                            String.format("T %s", turn), nation.getFillColor())
+                            .setEmphasis(emphasis).setDashed(dashed));
                 }
                 dataBody += "\n";
             }
