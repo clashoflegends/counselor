@@ -49,6 +49,15 @@ public class MainSettingsGui extends JPanel {
                 settingsManager.setConfigAndSaveToFile("playerToken", playerTokenTextField.getText().trim());
             }
         });
+        // "Fetch from website..." button: reuse the same first-upload dialog (fetch by login+password or
+        // paste). TokenSetupDialog.show already persists playerToken on Save; we just sync the visible field.
+        fetchTokenButton.setText(LABELS.getString("SETTINGS.PLAYER.TOKEN.FETCH")); // overrides the .form placeholder
+        fetchTokenButton.addActionListener(e -> {
+            String tok = gui.services.TokenSetupDialog.show(this, LABELS);
+            if (tok != null && !tok.isEmpty()) {
+                playerTokenTextField.setText(tok);
+            }
+        });
         themeComboBox.setModel(getThemeModel());
         themeComboBox.setActionCommand("themeCombo");
         themeComboBox.addActionListener(settingsControler);
@@ -154,6 +163,7 @@ public class MainSettingsGui extends JPanel {
         themeComboBox = new javax.swing.JComboBox<>();
         playerTokenLabel = new javax.swing.JLabel();
         playerTokenTextField = new javax.swing.JTextField();
+        fetchTokenButton = new javax.swing.JButton();
         displayPanel = new javax.swing.JPanel();
         filtroLabel = new javax.swing.JLabel();
         allFiltroRadioButton = new javax.swing.JRadioButton();
@@ -397,6 +407,8 @@ public class MainSettingsGui extends JPanel {
 
         playerTokenTextField.setText("playerTokenTextField");
 
+        fetchTokenButton.setText("jButton1");
+
         javax.swing.GroupLayout playerPanelLayout = new javax.swing.GroupLayout(playerPanel);
         playerPanel.setLayout(playerPanelLayout);
         playerPanelLayout.setHorizontalGroup(
@@ -412,6 +424,7 @@ public class MainSettingsGui extends JPanel {
                     .addComponent(playerTokenTextField)
                     .addGroup(playerPanelLayout.createSequentialGroup()
                         .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(fetchTokenButton)
                             .addComponent(themeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(languageComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -432,6 +445,8 @@ public class MainSettingsGui extends JPanel {
                 .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(playerTokenLabel)
                     .addComponent(playerTokenTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(fetchTokenButton)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -790,6 +805,7 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JPanel displayPanel;
     private javax.swing.JCheckBox displayPortraitCheckBox;
     private javax.swing.JButton downloadPortraitsButton;
+    private javax.swing.JButton fetchTokenButton;
     private javax.swing.ButtonGroup filtroButtonGroup;
     private javax.swing.JLabel filtroLabel;
     private javax.swing.JCheckBox fogOfWarCheckBox;
