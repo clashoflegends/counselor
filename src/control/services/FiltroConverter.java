@@ -51,8 +51,9 @@ public class FiltroConverter implements Serializable {
             lista.add(new GenericoComboObject(labels.getString("FILTRO.GARRISON.MEU"), "garrisonmy"));
         }
         if (options == 5) {
-            //army options
+            //big-city options
             lista.add(new GenericoComboObject(labels.getString("FILTRO.BIGCITY.MEU"), "bigcitymy"));
+            lista.add(new GenericoComboObject(labels.getString("FILTRO.BIGCITY.ALL"), "bigcityall"));
         }
         if (options == 6) {
             //Active options

@@ -340,6 +340,12 @@ public class CidadeConverter implements Serializable {
                     ret.add(cidade);
                 }
             }
+        } else if (filtro.equalsIgnoreCase("bigcityall")) {
+            for (Cidade cidade : listFactory.listCidades().values()) {
+                if (cidadeFacade.isBigCity(cidade)) {
+                    ret.add(cidade);
+                }
+            }
         } else if (filtro.equalsIgnoreCase("team") && jAtivo != null) {
             for (Cidade cidade : listFactory.listCidades().values()) {
                 if (jAtivo.isJogadorAliado(cidadeFacade.getNacao(cidade)) || jAtivo.isNacao(cidadeFacade.getNacao(cidade))) {
