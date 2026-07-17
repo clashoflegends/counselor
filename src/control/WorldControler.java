@@ -243,7 +243,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 doDataVictoryPointsPerNation();
                 break;
             case "jbVictoryDashboard":
-                VictoryDashboardDialog.show(this.gui, labels);
+                VictoryDashboardDialog.show(this.gui, labels, this);
                 break;
             case "jbGraphSingleTurn":
                 //disabled: doDataVictoryPointsPerTeam();
@@ -256,9 +256,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 break;
             case "jbGraphKeyCityPerNation":
                 doDataKeyCityPerNation();
-                break;
-            case "jbGraphVictoryOverview":
-                doDataVictoryOverview();
                 break;
             case "jbGraphDomination":
                 doGraphBattleRoyale();
@@ -1780,85 +1777,29 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         ComponentFactory.showChartStackedBar(labels.getString("PONTOS.VITORIA.TEAM"), dataSet, getPartidaTagName(), labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), this.gui);
     }
 
-    private void doDataVictoryOverview() {
-        List<DataSetForChart> dataSet = new ArrayList<>();
-        final PointsFacade pf = new PointsFacade();
+    // The Victory Overview chart storm (bar + stacked + US gauge) was retired in the Pass-2 graphs rework:
+    // the Victory Dashboard now carries that assessment as text rows plus small side-by-side gauges (see
+    // gui.services.VictoryDashboardDialog + control.VictoryStatus). The other detailed charts moved into the
+    // dashboard's own toolbar via the public launchers below.
 
-        final String title = "PONTOS.VITORIA.OVERVIEW";
-        final Set<String> teams = new TreeSet<>();
-        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
-        CounterStringInt pointsCount;
-        String seriesName;
-        List<Nacao> nations = doPrepNations(mapNations, teams);
-
-        //data header
-        //run once for the titles.
-        pointsCount = pf.doVictoryScoreUsThem(WorldFacadeCounselor.getInstance().getNacoes().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-        String dataBody = "";
-        for (String flagTeam : pointsCount.getKeys()) {
-            dataBody += String.format("%s\t", flagTeam);
-        }
-        dataBody += String.format("%s\n", labels.getString("VICTORY.CONDITION"));
-
-        //data body
-        seriesName = getHabilidateName(";VSK;");
-        if (seriesName != null) {
-            pointsCount = pf.doVictoryDominationUsThem(WorldFacadeCounselor.getInstance().getLocais().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-            dataBody += doSeries(pointsCount, seriesName, dataSet);
-        }
-
-        //DB.POWER.VSP=Victory goal: Score, game ends when one nation has more victory points than all opponents combined starting on %s turn. Or 3:1 for teams
-        seriesName = getHabilidateName(";VSP;");
-        if (seriesName != null) {
-            pointsCount = pf.doVictoryScoreUsThem(WorldFacadeCounselor.getInstance().getNacoes().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-            dataBody += doSeries(pointsCount, seriesName, dataSet);
-        }
-
-        //DB.POWER.VSC=Victory goal: Conquest, game ends when one nation has more burghs and metropolis than all opponents combined starting on %s turn.  Or 3:1 for teams
-        seriesName = getHabilidateName(";VSC;");
-        if (seriesName != null) {
-            pointsCount = pf.doVictoryConquestUsThem(WorldFacadeCounselor.getInstance().getCidades(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-            dataBody += doSeries(pointsCount, seriesName, dataSet);
-        }
-
-        //DB.POWER.VSS=Victory goal: Supremacy, game ends when a team has twice as many nations as the other teams starting on %s turn. Or 3:1 for teams
-        seriesName = getHabilidateName(";VSS;");
-        if (seriesName != null) {
-            pointsCount = pf.doVictorySupremacyUsThem(WorldFacadeCounselor.getInstance().getNacoes().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-            dataBody += doSeries(pointsCount, seriesName, dataSet);
-        }
-
-        //DB.POWER.VCP=Victory goal: Battle Royale, game ends when one nation has more key cities points than all opponents combined starting on %s turn.  Or 3:1 for teams
-        seriesName = getHabilidateName(";VCP;");
-        if (seriesName != null) {
-            pointsCount = pf.doDominationBattleRoyaleUsThem(WorldFacadeCounselor.getInstance().getLocais().values(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
-            dataBody += doSeries(pointsCount, seriesName, dataSet);
-        }
-
-        //copy para o clipboard
-        ClipboardHelper.copy(dataBody);
-        this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
-
-        //create and display chart
-        ComponentFactory.showChartBar(labels.getString("PONTOS.VITORIA.OVERVIEW"), dataSet, getPartidaTagName(), labels.getString("NACAO") + " / " + labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), this.gui);
-        ComponentFactory.showChartStackedBar(labels.getString("PONTOS.VITORIA.OVERVIEW"), dataSet, getPartidaTagName(), labels.getString("TEAM"), labels.getString("PONTOS.VITORIA"), this.gui);
-        for (DataSetForChart item : dataSet) {
-            if (!item.getKey().equalsIgnoreCase("US")) {
-                continue;
-            }
-            ComponentFactory.showChartGauge(labels.getString("PONTOS.VITORIA.OVERVIEW"), item, this.gui);
-        }
+    /** Launches the "VP per nation" chart set (moved from the main toolbar into the dashboard). */
+    public void showVpPerNationChart() {
+        doDataVictoryPointsPerNation();
     }
 
-    private String doSeries(CounterStringInt pointsCount, String seriesName, List<DataSetForChart> dataSet) {
-        String body = "";
-        for (String flagTeam : pointsCount.getKeys()) {
-            body += String.format("%.1f%%\t", pointsCount.getValuePercent(flagTeam));
-            final double value = pointsCount.getValuePercent(flagTeam);
-            dataSet.add(new DataSetForChart(flagTeam, value, seriesName, getColorForTeam(flagTeam)));
-        }
-        body += String.format("%s\n", seriesName);
-        return body;
+    /** Launches the "key cities per nation" chart (moved from the main toolbar into the dashboard). */
+    public void showKeyCityChart() {
+        doDataKeyCityPerNation();
+    }
+
+    /** Launches the "VP history (all turns)" chart (moved from the main toolbar into the dashboard). */
+    public void showVpHistoryChart() {
+        doDataVictoryPointHistoryAllTurns();
+    }
+
+    /** Launches the Battle Royale (domination) chart; only meaningful when {@code isBattleRoyal()}. */
+    public void showBattleRoyaleChart() {
+        doGraphBattleRoyale();
     }
 
     private void doDataVictoryPointHistoryAllTurns() {

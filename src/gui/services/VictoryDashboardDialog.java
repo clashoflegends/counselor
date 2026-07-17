@@ -4,26 +4,38 @@ import control.VictoryStatus;
 import control.VictoryStatus.Assessment;
 import control.VictoryStatus.Row;
 import control.VictoryStatus.State;
+import control.WorldControler;
+import gui.charts.ChartGauge;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 
 /**
- * "Lay of the land" victory dashboard: reads {@link VictoryStatus} and shows, per active victory
- * condition, whether you are winning, close, contested, or at risk - with a one-line action hint - plus
- * the always-on turn-limit standing. Content-first (HTML in a JEditorPane); the layout is deliberately
- * simple so Pass 2 can restyle it. Read-only, modeless-friendly (shown modal here for focus).
+ * "Lay of the land" victory dashboard AND graphs hub: reads {@link VictoryStatus} and shows, per active
+ * victory condition, whether you are winning, close, contested, or at risk - with a one-line action hint -
+ * plus the always-on turn-limit standing. Pass 2 turned it into the graphs hub: a toolbar (NORTH) launches
+ * the detailed charts (VP per nation, key cities, VP history, Battle Royale) that used to live on the main
+ * window, and a grid of small gauges under the assessment shows how close each active condition is to a win
+ * (and, for authoritative conditions with a known rival, to defeat) so they can be compared side by side
+ * without a window storm. Read-only, modeless.
  */
 public final class VictoryDashboardDialog extends JDialog {
 
@@ -34,22 +46,45 @@ public final class VictoryDashboardDialog extends JDialog {
     private static final String BLUE = "#1565c0";
     private static final String MUTED = "#9e9e9e";
 
+    private static final int GAUGE_ICON = 18;
+    private static final int GAUGE_W = 170;
+    private static final int GAUGE_H = 130;
+
     private final BundleManager labels;
+    private final transient WorldControler wc;
     private java.util.List<String> vpFlags = java.util.Collections.emptyList();
     private boolean isTeam;
 
-    private VictoryDashboardDialog(Window parent, BundleManager labels, Assessment a) {
+    private VictoryDashboardDialog(Window parent, BundleManager labels, WorldControler wc, Assessment a) {
         // Modeless: the player can keep the dashboard open while inspecting the data tabs and the map.
         super(parent, ModalityType.MODELESS);
         this.labels = labels;
+        this.wc = wc;
         AppIcon.applyTo(this);
         setTitle(titleFor(a.gameId));
 
+        // NORTH: the graphs-hub toolbar - launchers for the detailed charts that used to sit on the main window.
+        final JToolBar toolbar = buildToolbar(a);
+
+        // CENTER: the HTML assessment above a grid of small gauges, all inside one scroll pane so a tiny
+        // window degrades to a scrollbar rather than clipping.
         final JEditorPane pane = new JEditorPane("text/html", buildHtml(a));
         pane.setEditable(false);
         pane.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
-        final JScrollPane scroll = new JScrollPane(pane);
-        scroll.setPreferredSize(new Dimension(560, 520));
+
+        final JPanel center = new JPanel();
+        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
+        pane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        center.add(pane);
+        final JPanel gauges = buildGaugePanel(a);
+        if (gauges != null) {
+            gauges.setAlignmentX(Component.LEFT_ALIGNMENT);
+            center.add(gauges);
+        }
+
+        final JScrollPane scroll = new JScrollPane(center);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        scroll.setPreferredSize(new Dimension(580, 560));
 
         final JPanel buttons = new JPanel();
         final JButton copy = new JButton(tx("VDASH.COPY", "Copy"));
@@ -60,6 +95,7 @@ public final class VictoryDashboardDialog extends JDialog {
         buttons.add(close);
 
         setLayout(new BorderLayout());
+        add(toolbar, BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
         add(buttons, BorderLayout.SOUTH);
         getRootPane().setDefaultButton(close);
@@ -68,10 +104,182 @@ public final class VictoryDashboardDialog extends JDialog {
         pane.setCaretPosition(0);
     }
 
-    public static void show(Component parent, BundleManager labels) {
+    public static void show(Component parent, BundleManager labels, WorldControler wc) {
         final Window w = (parent instanceof Window) ? (Window) parent
                 : javax.swing.SwingUtilities.getWindowAncestor(parent);
-        new VictoryDashboardDialog(w, labels, new VictoryStatus().evaluate()).setVisible(true);
+        new VictoryDashboardDialog(w, labels, wc, new VictoryStatus().evaluate()).setVisible(true);
+    }
+
+    // ---- toolbar (graphs hub) -------------------------------------------------------------------
+
+    /** The dashboard's own toolbar: the detailed-chart launchers moved off the main window. */
+    private JToolBar buildToolbar(Assessment a) {
+        final JToolBar bar = new JToolBar();
+        bar.setFloatable(false);
+        bar.setRollover(true);
+        if (wc != null) {
+            bar.add(toolButton("chart-bar", tx("VDASH.CHART.VP", "Victory points per nation"),
+                    e -> wc.showVpPerNationChart()));
+            bar.add(toolButton("chart-bar", withHint(tx("VDASH.CHART.KEYCITY", "Key cities per nation"),
+                    tx("VDASH.HINT.KEYCITY", "Key cities: a nation's original capital locations.")),
+                    e -> wc.showKeyCityChart()));
+            bar.add(toolButton("chart-area", tx("VDASH.CHART.HISTORY", "Victory point history (all turns)"),
+                    e -> wc.showVpHistoryChart()));
+            if (a.battleRoyale) {
+                bar.add(toolButton("chart-pie", withHint(tx("VDASH.CHART.BATTLEROYALE", "Battle Royale (domination points)"),
+                        tx("VDASH.HINT.DOMINATION", "Domination points: points from a city's size and importance.")),
+                        e -> wc.showBattleRoyaleChart()));
+            }
+        }
+        return bar;
+    }
+
+    private JButton toolButton(String icon, String tooltip, java.awt.event.ActionListener onClick) {
+        final JButton b = new JButton(SvgIcon.themed(icon, GAUGE_ICON));
+        b.setToolTipText(tooltip);
+        b.setFocusable(false);
+        b.addActionListener(onClick);
+        return b;
+    }
+
+    /** Appends a de-jargon hint to a tooltip so hovering the button explains the game term. */
+    private String withHint(String label, String hint) {
+        return "<html>" + esc(label) + "<br><i>" + esc(hint) + "</i></html>";
+    }
+
+    // ---- gauges ---------------------------------------------------------------------------------
+
+    /**
+     * A grid of small gauges, one card per ACTIVE PROGRESS/SURVIVAL/CAPITALS condition. Each card holds a
+     * "toward victory" gauge and, where a single rival is known, a "toward defeat" gauge, so conditions can
+     * be compared side by side. Returns null when no condition has a meaningful gauge (degrades gracefully).
+     */
+    private JPanel buildGaugePanel(Assessment a) {
+        final List<JPanel> cards = new ArrayList<>();
+        for (Row r : a.rows) {
+            final JPanel card = gaugeCard(r);
+            if (card != null) {
+                cards.add(card);
+            }
+        }
+        if (cards.isEmpty()) {
+            return null;
+        }
+        final JPanel wrap = new JPanel(new BorderLayout());
+        wrap.setBorder(BorderFactory.createEmptyBorder(4, 12, 10, 12));
+        final JLabel heading = new JLabel(tx("VDASH.GAUGES", "How close each goal is"));
+        heading.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+        wrap.add(heading, BorderLayout.NORTH);
+        final int cols = Math.min(2, cards.size());
+        final JPanel grid = new JPanel(new GridLayout(0, cols, 6, 6));
+        for (JPanel card : cards) {
+            grid.add(card);
+        }
+        wrap.add(grid, BorderLayout.CENTER);
+        return wrap;
+    }
+
+    /** One condition's gauge card, or null if it has no meaningful gauge (not active / info / turn-limit). */
+    private JPanel gaugeCard(Row r) {
+        if (r.state == State.NOT_ACTIVE
+                || r.kind == VictoryStatus.Kind.TURNLIMIT
+                || r.kind == VictoryStatus.Kind.INFO) {
+            return null;
+        }
+        final Double toWin = gaugeToWin(r);
+        final Double toLose = gaugeToLose(r);
+        if (toWin == null && toLose == null) {
+            return null;
+        }
+        final JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(java.awt.Color.decode(MUTED)),
+                BorderFactory.createEmptyBorder(4, 4, 4, 4)));
+        final JLabel name = new JLabel(conditionName(r.code), SwingConstants.CENTER);
+        name.setAlignmentX(Component.CENTER_ALIGNMENT);
+        name.setToolTipText(conditionHint(r.code));
+        card.add(name);
+
+        final JPanel dials = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
+        if (toWin != null) {
+            dials.add(dial(tx("VDASH.GAUGE.WIN", "toward victory"), toWin));
+        }
+        if (toLose != null) {
+            dials.add(dial(tx("VDASH.GAUGE.LOSE", "toward defeat"), toLose));
+        }
+        dials.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.add(dials);
+        return card;
+    }
+
+    private JPanel dial(String caption, double pct) {
+        final JPanel p = ChartGauge.buildPanel(caption, pct, GAUGE_W, GAUGE_H);
+        p.setPreferredSize(new Dimension(GAUGE_W, GAUGE_H));
+        return p;
+    }
+
+    /** "Toward victory" gauge value 0..100, or null when the row has no sensible progress metric. */
+    private Double gaugeToWin(Row r) {
+        switch (r.kind) {
+            case PROGRESS:
+                if (r.threshold <= 0) {
+                    return null;
+                }
+                return clampPct(100.0 * r.myValue / r.threshold);
+            case SURVIVAL:
+                // elimination race: threshold = enemy kills still needed to win (0 = already there).
+                if (r.state == State.WINNING || r.threshold == 0) {
+                    return 100.0;
+                }
+                if (r.othersValue <= 0) {
+                    return 100.0;   // no enemy left
+                }
+                // Standing proxy (no game history to count eliminations): my supremacy share of the way to
+                // the line. othersValue = enemies still alive, threshold = enemy kills still needed. Rises
+                // as enemies fall, drops if I lose nations (threshold grows). Reads ~66% at an even start
+                // because supremacy wins at 75% while both sides begin near 50% - that is expected.
+                return clampPct(100.0 * r.othersValue / (r.othersValue + r.threshold));
+            case CAPITALS:
+                return null;   // capitals is a pure "toward defeat" condition
+            default:
+                return null;
+        }
+    }
+
+    /** "Toward defeat" gauge value 0..100, or null when no single rival/loss metric is knowable. */
+    private Double gaugeToLose(Row r) {
+        switch (r.kind) {
+            case PROGRESS:
+                // Only authoritative rows carry an honest single-rival figure; territory (fogged) does not.
+                if (!r.rivalKnown || r.threshold <= 0) {
+                    return null;
+                }
+                return clampPct(100.0 * r.rivalToWin / r.threshold);
+            case SURVIVAL:
+                // rivalToWin = enemy eliminations of MY nations still needed for THEM to win.
+                if (r.state == State.LOSING) {
+                    return 100.0;
+                }
+                if (r.rivalToWin <= 0) {
+                    return 100.0;
+                }
+                if (r.myValue <= 0) {
+                    return 100.0;
+                }
+                return clampPct(100.0 * r.myValue / (r.myValue + r.rivalToWin));
+            case CAPITALS:
+                if (r.threshold <= 0) {
+                    return null;
+                }
+                return clampPct(100.0 * r.myValue / r.threshold);
+            default:
+                return null;
+        }
+    }
+
+    private double clampPct(double v) {
+        return Math.max(0.0, Math.min(100.0, v));
     }
 
     // ---- HTML rendering -------------------------------------------------------------------------
@@ -450,6 +658,15 @@ public final class VictoryDashboardDialog extends JDialog {
             case ";VSD;": return tx("VDASH.NAME.VSD", "First blood");
             case ";VKK;": return tx("VDASH.NAME.VKK", "King of Kings");
             default: return code;
+        }
+    }
+
+    /** De-jargon tooltip for a condition name (game terms explained in plain words); null = no hint. */
+    private String conditionHint(String code) {
+        switch (code) {
+            case ";VSK;": return tx("VDASH.HINT.KEYCITY", "Key cities: a nation's original capital locations.");
+            case ";VCP;": return tx("VDASH.HINT.DOMINATION", "Domination points: points from a city's size and importance.");
+            default: return null;
         }
     }
 

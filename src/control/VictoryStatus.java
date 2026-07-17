@@ -77,6 +77,13 @@ public final class VictoryStatus {
         public final String othersName;    // rival team/nation name, or null when combined
         public final boolean rivalKnown;   // true = othersValue is a single rival; false = combined/fogged
         public final boolean territoryBased;
+        /**
+         * Strongest SINGLE rival toward the win line (authoritative PROGRESS rows only; 0 otherwise). This is
+         * the honest "toward defeat" figure: the lose condition is one side crossing the threshold, NOT the
+         * everyone-else-combined {@link #othersValue}. On SURVIVAL rows this carries the rival's remaining
+         * eliminations-to-win ({@code killsToLose}) instead. Used by the dashboard's defeat gauge.
+         */
+        public int rivalToWin;
         /** All sides sorted desc (authoritative rows only, for %-breakdown + ahead/behind colour); else null. */
         public List<Side> sides;
 
@@ -277,8 +284,10 @@ public final class VictoryStatus {
             st = State.CONTESTED;
         }
         // myValue=my nations, othersValue=enemy nations, threshold=enemy eliminations needed to win.
-        a.rows.add(new Row(";VSS;", Kind.SURVIVAL, st, hab.getValor() + 1, myAlive, killsToWin,
-                total, enemyAlive, null, true, false));
+        final Row survivalRow = new Row(";VSS;", Kind.SURVIVAL, st, hab.getValor() + 1, myAlive, killsToWin,
+                total, enemyAlive, null, true, false);
+        survivalRow.rivalToWin = killsToLose;   // the enemy's remaining eliminations to win (toward defeat)
+        a.rows.add(survivalRow);
     }
 
     private void addAuthoritative(Assessment a, String code, Standing s) {
@@ -306,6 +315,7 @@ public final class VictoryStatus {
         final State state = state(activeNow, s.raceTotal, threshold, myValue, topRival, true);
         final Row row = new Row(code, Kind.PROGRESS, state, hab.getValor() + 1, myValue, threshold,
                 displayTotal, themCombined, null, true, false);
+        row.rivalToWin = topRival;   // honest single-rival "toward defeat" figure (never the combined total)
         final List<Side> sides = new ArrayList<>();
         for (String k : s.counter.getKeys()) {
             sides.add(new Side(k, s.counter.getValue(k), k.equals(keyOf())));

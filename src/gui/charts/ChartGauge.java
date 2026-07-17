@@ -108,31 +108,39 @@ public final class ChartGauge extends JFrame {
      * @return A panel.
      */
     private JPanel createPanel() {
-        JFreeChart chart = createChart(createDataset());
+        return buildPanel(getSubtitle(), getValue(), 400, 250);
+    }
+
+    /**
+     * Builds a standalone embeddable gauge panel (a JFreeChart {@link ChartPanel}) with the same DialPlot
+     * look as the full window. Used by the Victory Dashboard to lay small gauges side by side without a
+     * window storm. The value is clamped to the dial scale (0..100) so the pin never flies off the arc.
+     *
+     * @param subtitle the caption drawn under the dial
+     * @param value    the gauge value (clamped to 0..100)
+     * @param width    preferred width in pixels
+     * @param height   preferred height in pixels
+     * @return the chart panel
+     */
+    public static ChartPanel buildPanel(String subtitle, double value, int width, int height) {
+        final double clamped = Math.max(0d, Math.min(100d, value));
+        JFreeChart chart = createChart(new DefaultValueDataset(clamped), subtitle);
         ChartPanel chartPanel = new ChartPanel(chart, false);
         chartPanel.setFillZoomRectangle(true);
         chartPanel.setMouseWheelEnabled(true);
-        chartPanel.setPreferredSize(new Dimension(400, 250));
+        chartPanel.setPreferredSize(new Dimension(width, height));
         return chartPanel;
     }
 
     /**
-     * Returns a sample dataset.
+     * Creates the gauge chart.
      *
-     * @return The dataset.
-     */
-    private DefaultValueDataset createDataset() {
-        return new DefaultValueDataset(getValue());
-    }
-
-    /**
-     * Creates a sample chart.
-     *
-     * @param dataset the dataset.
+     * @param dataset  the dataset.
+     * @param subtitle the caption drawn under the dial.
      *
      * @return The chart.
      */
-    private JFreeChart createChart(DefaultValueDataset dataset) {
+    private static JFreeChart createChart(DefaultValueDataset dataset, String subtitle) {
 
         DialPlot dialplot = new DialPlot();
         dialplot.setView(0.20999999999999999D, 0.0D, 0.57999999999999996D, 0.29999999999999999D);
@@ -156,7 +164,7 @@ public final class ChartGauge extends JFrame {
         pin.setRadius(0.81999999999999995D);
         dialplot.addLayer(pin);
         JFreeChart jfreechart = new JFreeChart(dialplot);
-        jfreechart.setTitle(getSubtitle());
+        jfreechart.setTitle(subtitle);
         return jfreechart;
     }
 

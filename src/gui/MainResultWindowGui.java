@@ -158,6 +158,14 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph1.setActionCommand("jbVictoryDashboard");
         jbScoreGraph1.setToolTipText(labels.getString("VDASH.TITLE"));
         jbScoreGraph5.setVisible(false);
+        // Pass 2 graphs rework: the dashboard is now the graphs hub. Only the "target" button (jbScoreGraph1)
+        // stays on the main toolbar to open it; the detailed-chart launchers and the retired Overview chart
+        // move into the dashboard's own toolbar, so hide their main-window buttons to avoid duplication.
+        jbScoreGraph.setVisible(false);   // VP per nation
+        jbScoreGraph2.setVisible(false);  // VP history (all turns)
+        jbScoreGraph3.setVisible(false);  // Battle Royale (domination)
+        jbScoreGraph4.setVisible(false);  // key cities per nation
+        jbScoreGraph6.setVisible(false);  // retired Victory Overview chart storm
     }
 
     /** Build and show the recently-opened-files popup below the Recent toolbar button. */
