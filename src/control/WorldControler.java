@@ -1732,11 +1732,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         //data header
         String dataBody = String.format("%s\t%s\t%s\n", labels.getString("TEAM"), labels.getString("PONTOS.KEYCITY.TEAM"), labels.getString("PERCENTAGE"));
 
-        //data body
+        //data body ("Us"/"Them" are internal codes - show plain You / Opponents to the player)
         for (String nmTeam : pointsCount.getKeys()) {
             final double value = pointsCount.getValue(nmTeam);
-            dataBody += String.format("%.0f\t%.1f%%\t%s\n", value, (value / total * 100d), nmTeam);
-            dataSet.add(new DataSetForChart(nmTeam, value, "", getColorForTeam(nmTeam)));
+            final String display = usThemLabel(nmTeam);
+            dataBody += String.format("%.0f\t%.1f%%\t%s\n", value, (value / total * 100d), display);
+            dataSet.add(new DataSetForChart(display, value, "", getColorForTeam(nmTeam)));
         }
         //copy para o clipboard
         ClipboardHelper.copy(dataBody);
@@ -1901,5 +1902,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             }
         }
         return colorTeam;
+    }
+
+    /** Map the internal "Us"/"Them" counter keys to plain player-facing labels; pass other keys through. */
+    private String usThemLabel(String key) {
+        if ("Us".equals(key)) {
+            return labels.getString("PONTOS.YOU");
+        }
+        if ("Them".equals(key)) {
+            return labels.getString("PONTOS.OPPONENTS");
+        }
+        return key;
     }
 }
