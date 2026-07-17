@@ -96,6 +96,25 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 }
                 break;
             }
+            case "setAutoLoadCurrent": {
+                // Pin the currently open EGF as the autoload file, skipping the browser. If nothing is open
+                // this session, tell the player to open a results file first (never silently pin a stale path).
+                File current = settingsGui.getCurrentResultsFile();
+                if (current == null) {
+                    persistenceCommons.SysApoio.showDialogError(
+                            labels.getString("SETTINGS.GAME.AUTOLOAD.SETCURRENT.NOFILE"),
+                            labels.getString("MENU.CONFIG"), settingsGui);
+                    break;
+                }
+                String path = current.getAbsolutePath();
+                SettingsManager.getInstance().setConfig("autoLoad", path);
+                // Reflect + enable in the UI (setSelected does not fire the checkbox listener, so mirror its work).
+                settingsGui.getAutoLoadCheck().setSelected(true);
+                settingsGui.getAutoLoadTextField().setEnabled(true);
+                settingsGui.getAutoLoadTextField().setText(path);
+                settingsGui.getAutoLoadButton().setEnabled(true);
+                break;
+            }
             case "fLoadAutoAction": {
                 JFileChooser fc = new JFileChooser();
                 fc.setFileFilter(PathFactory.getFilterAcoes());

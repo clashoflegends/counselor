@@ -31,6 +31,7 @@ import gui.services.AppIcon;
 import gui.services.BusyGlass;
 import gui.services.ComponentFactory;
 import gui.services.TokenSetupDialog;
+import gui.services.VictoryDashboardDialog;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -110,6 +111,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     // player ticks "don't ask again this session" in the on-behalf submit dialog. Cleared on app restart.
     private final java.util.Map<String, Boolean> shadowChoiceRemembered = new java.util.HashMap<>();
     private int actionsCount = 0;
+    private File currentResultsFile = null; // the EGF currently open (both manual-open and autoload paths); source for "set autoload to current"
     private MainResultWindowGui gui = null;
     private final AcaoFacade acaoFacade = new AcaoFacade();
     private final OrdemFacade ordemFacade = new OrdemFacade();
@@ -239,6 +241,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 break;
             case "jbScoreGraph":
                 doDataVictoryPointsPerNation();
+                break;
+            case "jbVictoryDashboard":
+                VictoryDashboardDialog.show(this.gui, labels);
                 break;
             case "jbGraphSingleTurn":
                 //disabled: doDataVictoryPointsPerTeam();
@@ -437,7 +442,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     private void doConfig() throws HeadlessException {
 
-        MainSettingsGui settingPanel = new MainSettingsGui();
+        MainSettingsGui settingPanel = new MainSettingsGui(this.currentResultsFile);
 
         int option = JOptionPane.showOptionDialog(getGui(), settingPanel, labels.getString("MENU.CONFIG"),
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
@@ -679,6 +684,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 getGui().iniciaConfig();
                 this.getGui().setStatusMsg(labels.getString("OPENING: ") + resultsFile.getName());
                 this.getGui().setOpenFileName(resultsFile.getName());
+                this.currentResultsFile = resultsFile;
                 this.msgSubmitReady = false;
                 this.getGui().stopSubmitBlink(); // kill any running blink from the previous turn
                 this.saved = false;
@@ -761,6 +767,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
             getGui().iniciaConfig();
             this.getGui().setOpenFileName(resultsFile.getName());
+            this.currentResultsFile = resultsFile;
             String autoLoadActions = SettingsManager.getInstance().getConfig("autoLoadActions", "none");
             if (!autoLoadActions.equals("none") && !autoLoadActions.isEmpty()) {
                 //check if there's a defined orders file to be loaded
@@ -1140,6 +1147,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      */
     public MainResultWindowGui getGui() {
         return gui;
+    }
+
+    /** The EGF currently open (manual-open or autoload), or null if none opened this session. */
+    public File getCurrentResultsFile() {
+        return currentResultsFile;
     }
 
     /**

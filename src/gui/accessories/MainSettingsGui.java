@@ -28,9 +28,11 @@ public class MainSettingsGui extends JPanel {
 
     private final SettingsControler settingsControler;
     private final SettingsManager settingsManager;
+    private final File currentResultsFile;
 
-    public MainSettingsGui() {
+    public MainSettingsGui(File currentResultsFile) {
 
+        this.currentResultsFile = currentResultsFile;
         this.settingsManager = SettingsManager.getInstance();
         settingsControler = new SettingsControler(this);
         initComponents();
@@ -63,6 +65,11 @@ public class MainSettingsGui extends JPanel {
         themeComboBox.addActionListener(settingsControler);
         autoLoadButton.addActionListener(settingsControler);
         autoLoadActionButton.addActionListener(settingsControler);
+        // "Set autoload to the currently open file" - icon-only button (Matisse) that skips the file browser.
+        setAutoLoadCurrentButton.setIcon(gui.services.SvgIcon.themed("target", 16));
+        setAutoLoadCurrentButton.setToolTipText(LABELS.getString("SETTINGS.GAME.AUTOLOAD.SETCURRENT.TOOLTIP"));
+        setAutoLoadCurrentButton.setActionCommand("setAutoLoadCurrent");
+        setAutoLoadCurrentButton.addActionListener(settingsControler);
         autoSaveOrdersCheck.addActionListener(settingsControler);
         saveOrdersNoPromptCheck.addActionListener(settingsControler);
         overEliminCheckBox.addActionListener(settingsControler);
@@ -156,6 +163,7 @@ public class MainSettingsGui extends JPanel {
         saveOrdersNoPromptCheck = new javax.swing.JCheckBox();
         sendConfirmPopUpCheckBox = new javax.swing.JCheckBox();
         sendOrderRequestCheckBox = new javax.swing.JCheckBox();
+        setAutoLoadCurrentButton = new javax.swing.JButton();
         playerPanel = new javax.swing.JPanel();
         languageLabel = new javax.swing.JLabel();
         languageComboBox = new javax.swing.JComboBox();
@@ -292,6 +300,10 @@ public class MainSettingsGui extends JPanel {
         sendOrderRequestCheckBox.setToolTipText(bundle.getString("SETTINGS.PLAYER.SENDORDERRECEIPT.TOOLTIP")); // NOI18N
         sendOrderRequestCheckBox.setActionCommand("recieveConfirm");
 
+        setAutoLoadCurrentButton.setMaximumSize(new java.awt.Dimension(27, 27));
+        setAutoLoadCurrentButton.setMinimumSize(new java.awt.Dimension(27, 27));
+        setAutoLoadCurrentButton.setPreferredSize(new java.awt.Dimension(27, 27));
+
         javax.swing.GroupLayout gamePanelLayout = new javax.swing.GroupLayout(gamePanel);
         gamePanel.setLayout(gamePanelLayout);
         gamePanelLayout.setHorizontalGroup(
@@ -318,16 +330,18 @@ public class MainSettingsGui extends JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(gamePanelLayout.createSequentialGroup()
+                                .addComponent(autoLoadButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(autoLoadCheck)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(setAutoLoadCurrentButton, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(gamePanelLayout.createSequentialGroup()
                                 .addComponent(autoLoadActionButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(autoLoadActionCheck))
-                            .addGroup(gamePanelLayout.createSequentialGroup()
-                                .addComponent(autoLoadButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(autoLoadCheck))
                             .addComponent(saveDirButton)
                             .addComponent(openSaveDir))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(46, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, gamePanelLayout.createSequentialGroup()
                         .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(overEliminCheckBox1)
@@ -361,13 +375,13 @@ public class MainSettingsGui extends JPanel {
                     .addComponent(loadDirLabel)
                     .addComponent(saveDirButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(autoLoadButton, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(autoLoadDirLabel)
-                            .addComponent(autoLoadTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(autoLoadCheck))
+                .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(autoLoadButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(autoLoadDirLabel)
+                        .addComponent(autoLoadTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(autoLoadCheck)
+                    .addComponent(setAutoLoadCurrentButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(gamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -427,7 +441,7 @@ public class MainSettingsGui extends JPanel {
                             .addComponent(fetchTokenButton)
                             .addComponent(themeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(languageComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 148, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         playerPanelLayout.setVerticalGroup(
@@ -844,6 +858,7 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JCheckBox sendConfirmPopUpCheckBox;
     private javax.swing.JCheckBox sendOrderRequestCheckBox;
     private javax.swing.JRadioButton sequenceRadioButton;
+    private javax.swing.JButton setAutoLoadCurrentButton;
     private javax.swing.JLabel sortOrdersLabel;
     private javax.swing.JLabel splitSizeLabel;
     private javax.swing.JSpinner splitSizeSpinner;
@@ -879,6 +894,18 @@ public class MainSettingsGui extends JPanel {
 
     public JButton getAutoLoadButton() {
         return autoLoadButton;
+    }
+
+    public javax.swing.JCheckBox getAutoLoadCheck() {
+        return autoLoadCheck;
+    }
+
+    /**
+     * The EGF open when Settings was opened, or null if none. Source for the
+     * "set autoload to current" button.
+     */
+    public File getCurrentResultsFile() {
+        return currentResultsFile;
     }
 
     public void checkDisplayPortraitCheckBox() {
