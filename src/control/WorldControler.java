@@ -1860,6 +1860,100 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         ComponentFactory.showChartLine(labels.getString("PONTOS.VITORIA.HISTORY"), dataSet, getPartidaTagName(), labels.getString("TURNO"), labels.getString("PONTOS.VITORIA"), true, this.gui);
     }
 
+    /** Launcher for the dashboard hub: Nation Power Comparison (X1) radar. */
+    public void showNationPowerChart() {
+        doNationPowerComparison();
+    }
+
+    /**
+     * Radar of YOUR nation vs a few key others across normalised power metrics (gold, income, cities, big
+     * cities, key cities, troops, characters). Team games show you + your strongest ally + the 2 strongest
+     * rivals; solo/FFA shows you + the 3 strongest rivals (all by victory points). Each metric is normalised
+     * to a percent of the leader among the shown nations. Opponent figures are fog-limited.
+     */
+    private void doNationPowerComparison() {
+        final NacaoFacade nf = new NacaoFacade();
+        final CidadeFacade cf = new CidadeFacade();
+        final Jogador player = WFC.getJogadorAtivo();
+        final Nacao myNation = player.getNacoes().get(player.getNacoes().firstKey());
+        final boolean isTeam = WFC.getPartida().isTeamLocked() || WFC.getPartida().isTeamWithLord();
+        final String myTeam = myNation.getTeamFlag();
+
+        final List<Nacao> allies = new ArrayList<>();
+        final List<Nacao> rivals = new ArrayList<>();
+        for (Nacao n : WFC.getNacoes().values()) {
+            if (!nf.isAtivaPC(n) || n == myNation) {
+                continue;   // active player nations only (excludes barbarians / NPCs)
+            }
+            if (isTeam && myTeam.equals(n.getTeamFlag())) {
+                allies.add(n);
+            } else {
+                rivals.add(n);
+            }
+        }
+        final java.util.Comparator<Nacao> byVpDesc = (a, b) -> Integer.compare(nf.getPointVictory(b), nf.getPointVictory(a));
+        allies.sort(byVpDesc);
+        rivals.sort(byVpDesc);
+
+        final List<Nacao> shown = new ArrayList<>();
+        shown.add(myNation);
+        if (isTeam) {
+            if (!allies.isEmpty()) {
+                shown.add(allies.get(0));                       // your strongest ally
+            }
+            for (int k = 0; k < Math.min(2, rivals.size()); k++) {
+                shown.add(rivals.get(k));                       // 2 strongest rivals
+            }
+        } else {
+            for (int k = 0; k < Math.min(3, rivals.size()); k++) {
+                shown.add(rivals.get(k));                       // solo/FFA: 3 strongest rivals
+            }
+        }
+
+        final String[] axes = {
+            labels.getString("CHART.POWER.GOLD"), labels.getString("CHART.POWER.INCOME"),
+            labels.getString("CHART.POWER.CITIES"), labels.getString("CHART.POWER.BIGCITIES"),
+            labels.getString("CHART.POWER.KEYCITIES"), labels.getString("CHART.POWER.TROOPS"),
+            labels.getString("CHART.POWER.CHARS")
+        };
+        final java.util.Map<Nacao, int[]> raw = new java.util.LinkedHashMap<>();
+        for (Nacao n : shown) {
+            int big = 0;
+            for (Cidade c : n.getCidades()) {
+                if (cf.isBigCity(c)) {
+                    big++;
+                }
+            }
+            final Integer keyCities = nf.getPointsKeyCity(n);
+            raw.put(n, new int[]{
+                nf.getMoneySaldo(n), nf.getArrecadacao(n), n.getCidades().size(), big,
+                keyCities == null ? 0 : keyCities, nf.getTropasQt(n, WFC.getExercitos()), nf.getPersonagens(n)
+            });
+        }
+        final int[] max = new int[axes.length];
+        for (int[] v : raw.values()) {
+            for (int m = 0; m < axes.length; m++) {
+                max[m] = Math.max(max[m], v[m]);
+            }
+        }
+
+        final List<DataSetForChart> dataSet = new ArrayList<>();
+        String dataBody = labels.getString("NACAO") + "\t" + String.join("\t", axes) + "\n";
+        for (Nacao n : shown) {
+            final int[] v = raw.get(n);
+            dataBody += n.getNome();
+            for (int m = 0; m < axes.length; m++) {
+                final double pct = max[m] > 0 ? 100.0 * v[m] / max[m] : 0.0;
+                dataSet.add(new DataSetForChart(n.getNome(), pct, axes[m], n.getFillColor()).setEmphasis(n == myNation));
+                dataBody += "\t" + v[m];
+            }
+            dataBody += "\n";
+        }
+        ClipboardHelper.copy(dataBody);
+        this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
+        ComponentFactory.showChartRadar(labels.getString("CHART.POWER.TITLE"), dataSet, getPartidaTagName(), labels.getString("CHART.POWER.FOGNOTE"), this.gui);
+    }
+
     private List<Nacao> doPrepNations(SortedMap<String, Nacao> mapNations, Set<String> teams) {
         List<Nacao> nations = new ArrayList<>(WorldFacadeCounselor.getInstance().getNacoes().values());
         //sort by points

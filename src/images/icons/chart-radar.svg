@@ -1,0 +1,21 @@
+<!--
+tags: [chart, radar, spider, comparison, statistics]
+category: Charts
+version: "1.0"
+unicode: "f2f9"
+-->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 3 L20.5 9.2 L17.2 20 L6.8 20 L3.5 9.2 Z" />
+  <path d="M12 12 L12 3 M12 12 L20.5 9.2 M12 12 L17.2 20 M12 12 L6.8 20 M12 12 L3.5 9.2" />
+  <path d="M12 7.5 L16.3 10.6 L14.6 15.4 L9.4 15.4 L7.7 10.6 Z" />
+</svg>
