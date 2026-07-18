@@ -271,6 +271,17 @@ public final class VictoryDashboardDialog extends JDialog {
                         clampPct(100.0 / r.threshold), -1.0,
                         String.format("lost %d of %d capitals", r.myValue, r.threshold));
             }
+            case DRAGON: {
+                if (r.total <= 0) {
+                    return null;   // hold ALL to win: needle = your share, win band = the last dragon
+                }
+                final double winFrom = r.total <= 1 ? 100.0 : clampPct(100.0 * (r.total - 1) / r.total);
+                final double defeatTo = r.total <= 1 ? -1.0 : clampPct(100.0 / r.total);
+                final String detail = r.myValue >= r.total
+                        ? String.format("hold all %d dragons", r.total)
+                        : String.format("you %d of %d dragons (+%d win)", r.myValue, r.total, r.total - r.myValue);
+                return new GaugeSpec(clampPct(100.0 * r.myValue / r.total), defeatTo, winFrom, detail);
+            }
             default:
                 return null;
         }
@@ -363,7 +374,9 @@ public final class VictoryDashboardDialog extends JDialog {
     private String rowHtml(Row r) {
         final StringBuilder sb = new StringBuilder(256);
         final boolean authoritative = r.kind == VictoryStatus.Kind.PROGRESS && r.sides != null;
-        final boolean gapKind = r.kind == VictoryStatus.Kind.PROGRESS || r.kind == VictoryStatus.Kind.SURVIVAL;
+        final boolean gapKind = r.kind == VictoryStatus.Kind.PROGRESS
+                || r.kind == VictoryStatus.Kind.SURVIVAL
+                || r.kind == VictoryStatus.Kind.DRAGON;
         sb.append("<p style='margin:6px 0 2px 0;'>");
         sb.append("<b>").append(esc(conditionName(r.code))).append("</b> ");
         // PROGRESS + SURVIVAL rows get an ahead/behind chip; WINNING/LOSING keep the verdict chip, as does
@@ -388,6 +401,20 @@ public final class VictoryDashboardDialog extends JDialog {
                             r.myValue, r.total, r.threshold, r.othersValue);
                     final String c = gapColor(gapOf(r));
                     sb.append(c == null ? esc(terr) : colorSpan(c, esc(terr)));
+                }
+                break;
+            case DRAGON:
+                if (r.state == State.NOT_ACTIVE) {
+                    sb.append(esc(String.format(tx("VDASH.NOTACTIVE", "Active from turn %s."), r.activeFromTurn)));
+                } else if (r.total == 0) {
+                    sb.append(esc(tx("VDASH.DRAGON.NONE", "No living dragons in play yet. Hold every dragon to win.")));
+                } else {
+                    final String drg = r.myValue >= r.total
+                            ? String.format(tx("VDASH.DRAGON.ALL", "You hold all %s living dragons - Dragonlord!"), r.total)
+                            : String.format(tx("VDASH.DRAGON", "You hold %s of %s living dragons. Hold every one to win."),
+                                    r.myValue, r.total);
+                    final String c = gapColor(gapOf(r));
+                    sb.append(c == null ? esc(drg) : colorSpan(c, esc(drg)));
                 }
                 break;
             case SURVIVAL:
@@ -587,7 +614,9 @@ public final class VictoryDashboardDialog extends JDialog {
 
     /** Plain-text status: ahead/behind for gap rows, else the verdict word. */
     private String statusText(Row r) {
-        final boolean gapKind = r.kind == VictoryStatus.Kind.PROGRESS || r.kind == VictoryStatus.Kind.SURVIVAL;
+        final boolean gapKind = r.kind == VictoryStatus.Kind.PROGRESS
+                || r.kind == VictoryStatus.Kind.SURVIVAL
+                || r.kind == VictoryStatus.Kind.DRAGON;
         if (r.state != State.NOT_ACTIVE && r.state != State.WINNING && r.state != State.LOSING && gapKind) {
             final double gap = gapOf(r);
             final int mag = (int) Math.round(Math.abs(gap));
@@ -636,6 +665,14 @@ public final class VictoryDashboardDialog extends JDialog {
                                 r.myValue, r.othersValue, r.threshold);
             case CAPITALS:
                 return String.format(tx("VDASH.CAPITALS", "Your team has lost %s of %s capitals."), r.myValue, r.threshold);
+            case DRAGON:
+                if (r.total == 0) {
+                    return tx("VDASH.DRAGON.NONE", "No living dragons in play yet. Hold every dragon to win.");
+                }
+                return r.myValue >= r.total
+                        ? String.format(tx("VDASH.DRAGON.ALL", "You hold all %s living dragons - Dragonlord!"), r.total)
+                        : String.format(tx("VDASH.DRAGON", "You hold %s of %s living dragons. Hold every one to win."),
+                                r.myValue, r.total);
             case INFO:
                 return conditionInfo(r.code);
             default:
@@ -655,6 +692,7 @@ public final class VictoryDashboardDialog extends JDialog {
             case ";VKC;": return tx("VDASH.NAME.VKC", "Capitals");
             case ";VSD;": return tx("VDASH.NAME.VSD", "First blood");
             case ";VKK;": return tx("VDASH.NAME.VKK", "King of Kings");
+            case ";VDL;": return tx("VDASH.NAME.VDL", "Dragonlord (dragons)");
             default: return code;
         }
     }
@@ -678,6 +716,7 @@ public final class VictoryDashboardDialog extends JDialog {
             case ";VKC;": return tx("VDASH.ACT.VKC", "Protect your capitals - do not let them fall.");
             case ";VSD;": return tx("VDASH.ACT.VSD", "Do not be the first to lose a nation; strike a weak rival.");
             case ";VKK;": return tx("VDASH.ACT.VKK", "Outlast every rival alliance.");
+            case ";VDL;": return tx("VDASH.ACT.VDL", "Hold every living dragon - capture, bond, or hatch them.");
             default: return "";
         }
     }

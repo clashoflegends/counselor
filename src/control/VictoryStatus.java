@@ -13,6 +13,7 @@ import model.Jogador;
 import model.Local;
 import model.Nacao;
 import model.Partida;
+import model.Personagem;
 import utils.CounterStringInt;
 
 /**
@@ -48,7 +49,7 @@ public final class VictoryStatus {
     }
 
     public enum Kind {
-        PROGRESS, SURVIVAL, CAPITALS, TURNLIMIT, INFO
+        PROGRESS, SURVIVAL, CAPITALS, DRAGON, TURNLIMIT, INFO
     }
 
     /** A side's standing in an authoritative (per-rival) condition. */
@@ -168,6 +169,7 @@ public final class VictoryStatus {
         addTerritory(a, ";VCP;", cityPointsTally());          // Battle Royale (city domination points)
         addTerritory(a, ";VSK;", keyCityTally());             // Domination (key cities)
 
+        addDragonlord(a);      // VDL (F&D) - dragons are ;RDR; NPCs, always visible (;CNV;), so fog-proof
         addInfo(a, ";VSD;");   // first blood
         addInfo(a, ";VKK;");   // king of kings
         return a;
@@ -420,6 +422,63 @@ public final class VictoryStatus {
         // total/others not meaningful for VKC; keep 0.
         a.rows.add(new Row(";VKC;", Kind.CAPITALS, state, hab.getValor() + 1, myLost, limitLost,
                 0, 0, null, false, true));
+    }
+
+    /**
+     * Dragonlord (;VDL;): one side wins by holding ALL living dragons. Dragons are NPC characters carrying
+     * the race habilidade ;RDR; and the ;CNV; "always visible" flag, so the client sees every living dragon
+     * regardless of fog - "hold all" is confirmable here (unlike other territory conditions). Owner is the
+     * nation the dragon is subordinate to; wild / barbarian-held dragons belong to no side (game goes on).
+     */
+    private void addDragonlord(Assessment a) {
+        final Habilidade hab = getHabilidade(";VDL;");
+        if (hab == null) {
+            return;
+        }
+        int total = 0, mine = 0;
+        final CounterStringInt bySide = new CounterStringInt();
+        for (Personagem p : wfc.getPersonagemAll()) {
+            if (!p.isNpc() || !p.hasHabilidade(";RDR;") || p.getVida() <= 0) {
+                continue;
+            }
+            total++;
+            final Nacao owner = p.getNacaoSubordinada();
+            if (owner == null || nacaoFacade.isNacaoBarbarian(owner)) {
+                continue;   // wild / unheld -> counts toward total, held by no side
+            }
+            bySide.add(keyOf(owner), 1);
+            if (isMine(owner)) {
+                mine++;
+            }
+        }
+        int topEnemy = 0;
+        for (String k : bySide.getKeys()) {
+            if (k.equals(keyOf()) || "-".equals(k)) {
+                continue;
+            }
+            topEnemy = Math.max(topEnemy, bySide.getValue(k));
+        }
+        final boolean activeNow = a.turno > hab.getValor();
+        final State st;
+        if (!activeNow) {
+            st = State.NOT_ACTIVE;
+        } else if (total == 0) {
+            st = State.CONTESTED;        // goal active but no living dragons in play yet (e.g. only eggs)
+        } else if (mine == total) {
+            st = State.WINNING;          // you hold every dragon
+        } else if (topEnemy == total) {
+            st = State.LOSING;           // a single enemy holds them all
+        } else if (topEnemy == total - 1) {
+            st = State.AT_RISK;
+        } else if (mine == total - 1) {
+            st = State.CLOSE;
+        } else {
+            st = State.CONTESTED;
+        }
+        final Row row = new Row(";VDL;", Kind.DRAGON, st, hab.getValor() + 1, mine, total,
+                total, topEnemy, null, true, false);
+        row.rivalToWin = topEnemy;
+        a.rows.add(row);
     }
 
     private void addInfo(Assessment a, String code) {

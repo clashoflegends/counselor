@@ -1047,6 +1047,20 @@ public class ComponentFactory implements Serializable {
         return hexViewDialog;
     }
 
+    /**
+     * Close the transient graph/dashboard windows (charts + Victory Dashboard). Called when a different
+     * game/turn is opened so those snapshots don't linger showing stale data. Leaves the main window and
+     * the map (which rebuild in place) alone.
+     */
+    public static void disposeSecondaryWindows() {
+        for (java.awt.Window w : java.awt.Window.getWindows()) {
+            if (w instanceof ChartBar || w instanceof ChartLine || w instanceof ChartPie
+                    || w instanceof ChartGauge || w instanceof VictoryDashboardDialog) {
+                w.dispose();
+            }
+        }
+    }
+
     public static ChartPie showChartPie(String title, List<DataSetForChart> dataSet, String subtitle, Component relativeTo) {
         ChartPie chart = new ChartPie(title, dataSet, subtitle);
         chart.doStart();

@@ -676,6 +676,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             try {
                 log.info(labels.getString("OPENING: ") + resultsFile.getName() + String.format(" [%s]", SysApoio.getPidOs()));
                 WFC.doStart(resultsFile);
+                // A new game/turn is loaded: close stale graph/dashboard popups from the previous game.
+                ComponentFactory.disposeSecondaryWindows();
                 this.setActionsSlots(doCountActorActions(WFC.getJogadorAtivo()));
                 log.info(labels.getString("INICIALIZANDO.GUI"));
                 getGui().iniciaConfig();
