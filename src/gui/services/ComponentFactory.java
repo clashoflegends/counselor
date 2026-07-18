@@ -1075,20 +1075,6 @@ public class ComponentFactory implements Serializable {
         return chart;
     }
 
-    public static ChartGauge showChartGauge(String title, DataSetForChart dataItem, Component relativeTo) {
-        ChartGauge chart = new ChartGauge(title, dataItem.getGrouping(), dataItem.getValue());
-        chart.doStart();
-        chart.pack();
-        //configura jDialog
-        if (relativeTo != null) {
-            chart.setLocationRelativeTo(relativeTo);
-        } else {
-            UIUtils.centerFrameOnScreen(chart);
-        }
-        chart.setVisible(true);
-        return chart;
-    }
-
     public static ChartBar showChartBar(String title, List<DataSetForChart> dataSet, String subtitle, String xLabel, String yLabel, Component relativeTo) {
         return showChartBarFinal(title, dataSet, subtitle, xLabel, yLabel, true, false, relativeTo);
     }

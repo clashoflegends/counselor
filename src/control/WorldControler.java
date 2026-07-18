@@ -1879,20 +1879,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return subtitle;
     }
 
-    private String getHabilidateName(String cdAbility) {
-        //Partida obverrides Scenario
-        Habilidade hab1 = WorldFacadeCounselor.getInstance().getPartida().getHabilidades().get(cdAbility);
-        if (hab1 != null) {
-            return hab1.getNome();
-        }
-        Habilidade hab2 = WorldFacadeCounselor.getInstance().getCenario().getHabilidades().get(cdAbility);
-        if (hab2 != null) {
-            return hab2.getNome();
-        } else {
-            return null;
-        }
-    }
-
     private Color getColorForTeam(String nmTeam) {
         Color colorTeam;
         colorTeam = SysApoio.getColorFromNameNoDefault(nmTeam);
