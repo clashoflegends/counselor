@@ -127,6 +127,8 @@ public final class VictoryDashboardDialog extends JDialog {
                     e -> wc.showVpHistoryChart()));
             bar.add(toolButton("chart-radar", tx("VDASH.CHART.POWER", "Nation power comparison (you vs key rivals)"),
                     e -> wc.showNationPowerChart()));
+            bar.add(toolButton("trending-up", tx("VDASH.CHART.GROW", "What should I grow? (you vs game average)"),
+                    e -> wc.showGrowthChart()));
             if (a.battleRoyale) {
                 bar.add(toolButton("chart-pie", withHint(tx("VDASH.CHART.BATTLEROYALE", "Battle Royale (domination points)"),
                         tx("VDASH.HINT.DOMINATION", "Domination points: points from a city's size and importance.")),

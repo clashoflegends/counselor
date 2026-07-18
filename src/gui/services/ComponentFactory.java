@@ -1056,6 +1056,7 @@ public class ComponentFactory implements Serializable {
         for (java.awt.Window w : java.awt.Window.getWindows()) {
             if (w instanceof ChartBar || w instanceof ChartLine || w instanceof ChartPie
                     || w instanceof ChartGauge || w instanceof gui.charts.ChartRadar
+                    || w instanceof gui.charts.ChartGrowth
                     || w instanceof VictoryDashboardDialog) {
                 w.dispose();
             }
@@ -1104,6 +1105,19 @@ public class ComponentFactory implements Serializable {
 
     public static gui.charts.ChartRadar showChartRadar(String title, List<DataSetForChart> dataSet, String subtitle, String caveat, Component relativeTo) {
         gui.charts.ChartRadar chart = new gui.charts.ChartRadar(title, dataSet, subtitle, caveat);
+        chart.doStart();
+        chart.pack();
+        if (relativeTo != null) {
+            chart.setLocationRelativeTo(relativeTo);
+        } else {
+            UIUtils.centerFrameOnScreen(chart);
+        }
+        chart.setVisible(true);
+        return chart;
+    }
+
+    public static gui.charts.ChartGrowth showChartGrowth(String title, List<DataSetForChart> dataSet, String subtitle, String caveat, String valueAxisLabel, String baselineLabel, Component relativeTo) {
+        gui.charts.ChartGrowth chart = new gui.charts.ChartGrowth(title, dataSet, subtitle, caveat, valueAxisLabel, baselineLabel);
         chart.doStart();
         chart.pack();
         if (relativeTo != null) {

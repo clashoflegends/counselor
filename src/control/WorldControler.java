@@ -1954,6 +1954,112 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         ComponentFactory.showChartRadar(labels.getString("CHART.POWER.TITLE"), dataSet, getPartidaTagName(), labels.getString("CHART.POWER.FOGNOTE"), this.gui);
     }
 
+    /** Launcher for the dashboard hub: "What should I grow?" (N2). */
+    public void showGrowthChart() {
+        doGrowthAdvice();
+    }
+
+    /**
+     * "What should I grow?" (N2, newbie-oriented). Your nation on each power lever expressed as a percent of
+     * the GAME AVERAGE (over all active player nations), so a bar below the 100% baseline is a lever you are
+     * behind on. Levers that feed THIS game's active victory conditions are highlighted (strong colour), the
+     * rest muted - so a new player learns which stat actually wins the game they are in. Opponent economy is
+     * fog-limited, so the average understates gold/income (caveat).
+     */
+    private void doGrowthAdvice() {
+        final NacaoFacade nf = new NacaoFacade();
+        final CidadeFacade cf = new CidadeFacade();
+        final Jogador player = WFC.getJogadorAtivo();
+        final Nacao myNation = player.getNacoes().get(player.getNacoes().firstKey());
+
+        final String[] axes = {
+            labels.getString("CHART.POWER.GOLD"), labels.getString("CHART.POWER.INCOME"),
+            labels.getString("CHART.POWER.CITIES"), labels.getString("CHART.POWER.BIGCITIES"),
+            labels.getString("CHART.POWER.KEYCITIES"), labels.getString("CHART.POWER.TROOPS"),
+            labels.getString("CHART.POWER.CHARS")
+        };
+
+        final long[] sum = new long[axes.length];
+        int count = 0;
+        int[] mine = null;
+        for (Nacao n : WFC.getNacoes().values()) {
+            if (!nf.isAtivaPC(n)) {
+                continue;   // active player nations only (excludes barbarians / NPCs)
+            }
+            int big = 0;
+            for (Cidade c : n.getCidades()) {
+                if (cf.isBigCity(c)) {
+                    big++;
+                }
+            }
+            final Integer keyCities = nf.getPointsKeyCity(n);
+            final int[] v = new int[]{
+                nf.getMoneySaldo(n), nf.getArrecadacao(n), n.getCidades().size(), big,
+                keyCities == null ? 0 : keyCities, nf.getTropasQt(n, WFC.getExercitos()), nf.getPersonagens(n)
+            };
+            for (int m = 0; m < axes.length; m++) {
+                sum[m] += v[m];
+            }
+            count++;
+            if (n == myNation) {
+                mine = v;
+            }
+        }
+        if (mine == null || count == 0) {
+            return;
+        }
+
+        // Which levers feed an active victory condition -> highlight them.
+        final boolean[] priority = new boolean[axes.length];
+        for (VictoryStatus.Row r : new VictoryStatus().evaluate().rows) {
+            for (int idx : growthLeversFor(r.code)) {
+                priority[idx] = true;
+            }
+        }
+        boolean anyPriority = false;
+        for (boolean b : priority) {
+            anyPriority |= b;
+        }
+        if (!anyPriority) {
+            java.util.Arrays.fill(priority, true);   // unknown/legacy goal set: don't grey everything out
+        }
+
+        final List<DataSetForChart> dataSet = new ArrayList<>();
+        String dataBody = labels.getString("CHART.POWER.TITLE") + "\t" + labels.getString("PONTOS.YOU")
+                + "\t" + labels.getString("CHART.GROW.BASELINE") + "\t%\n";
+        for (int m = 0; m < axes.length; m++) {
+            final double avg = (double) sum[m] / count;
+            final double pct = avg > 0 ? 100.0 * mine[m] / avg : 0.0;
+            dataSet.add(new DataSetForChart("you", pct, axes[m], myNation.getFillColor()).setEmphasis(priority[m]));
+            dataBody += axes[m] + "\t" + mine[m] + "\t" + Math.round(avg) + "\t" + Math.round(pct) + "\n";
+        }
+        ClipboardHelper.copy(dataBody);
+        this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
+        ComponentFactory.showChartGrowth(labels.getString("CHART.GROW.TITLE"), dataSet, getPartidaTagName(),
+                labels.getString("CHART.GROW.CAVEAT"), labels.getString("CHART.GROW.AXIS"),
+                labels.getString("CHART.GROW.BASELINE"), this.gui);
+    }
+
+    /** Power levers (index into the N2 axes) that feed each victory-condition code. */
+    private static int[] growthLeversFor(String code) {
+        switch (code) {
+            case ";VSP;":                 // Score (victory points): economy + territory + leaders
+                return new int[]{1, 2, 3, 6};
+            case ";VSC;":                 // Conquest (big cities)
+            case ";VCP;":                 // Battle Royale (city domination points)
+                return new int[]{2, 3};
+            case ";VSK;":                 // Domination (key cities)
+            case ";VKC;":                 // your team's capital (key-city) losses
+                return new int[]{4};
+            case ";VSS;":                 // Supremacy (elimination): military
+                return new int[]{5, 6};
+            case ";VDL;":                 // Dragonlord: characters (dragons are NPC chars)
+                return new int[]{6};
+            default:
+                return new int[0];
+        }
+    }
+
     private List<Nacao> doPrepNations(SortedMap<String, Nacao> mapNations, Set<String> teams) {
         List<Nacao> nations = new ArrayList<>(WorldFacadeCounselor.getInstance().getNacoes().values());
         //sort by points
