@@ -1129,6 +1129,23 @@ public class ComponentFactory implements Serializable {
         return chart;
     }
 
+    public static ChartLine showChartRank(String title, List<DataSetForChart> dataSet, String subtitle, String xLabel, String yLabel, int nationCount, Component relativeTo) {
+        ChartLine chart = new ChartLine(title, dataSet, subtitle);
+        chart.setyLabel(yLabel);
+        chart.setxLabel(xLabel);
+        chart.setOrientation(true);
+        chart.setRankMode(nationCount);
+        chart.doStart();
+        chart.pack();
+        if (relativeTo != null) {
+            chart.setLocationRelativeTo(relativeTo);
+        } else {
+            UIUtils.centerFrameOnScreen(chart);
+        }
+        chart.setVisible(true);
+        return chart;
+    }
+
     public static ChartLine showChartLine(String title, List<DataSetForChart> dataSet, String subtitle, String xLabel, String yLabel, boolean vertical, Component relativeTo) {
         ChartLine chart = new ChartLine(title, dataSet, subtitle);
         chart.setyLabel(yLabel);

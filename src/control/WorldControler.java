@@ -1865,6 +1865,78 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         doNationPowerComparison();
     }
 
+    /** Launcher for the dashboard hub: Your momentum (X2) - rank per turn. */
+    public void showMomentumChart() {
+        doDataMomentum();
+    }
+
+    /**
+     * "Your momentum" (X2): a bump chart of every nation's RANK (1 = leader) per turn, derived from the VP
+     * history ({@code VictoryPointsGame}). Your own line is emphasised (thick + markers), your side solid /
+     * enemies dashed - so a climb toward the top or a slide is obvious at a glance. Rank each turn uses
+     * standard competition ranking (1 + the number of nations strictly ahead that turn).
+     */
+    private void doDataMomentum() {
+        final VictoryPointsGame victoryPoints = WFC.getVictoryPoints();
+        final Set<String> teams = new TreeSet<>();
+        final SortedMap<String, Nacao> mapNations = new TreeMap<>();
+        final List<Nacao> nations = doPrepNations(mapNations, teams);
+        final Nacao myNation = WFC.getJogadorAtivo().getNacoes().get(WFC.getJogadorAtivo().getNacoes().firstKey());
+        final boolean isTeam = WFC.getPartida().isTeamLocked() || WFC.getPartida().isTeamWithLord();
+
+        // per-nation VP-by-turn map, fetched once.
+        final java.util.Map<Nacao, SortedMap<Integer, Integer>> ptsByNation = new java.util.LinkedHashMap<>();
+        for (Nacao n : nations) {
+            ptsByNation.put(n, victoryPoints.getNationPoints(n));
+        }
+
+        final List<DataSetForChart> dataSet = new ArrayList<>();
+        String dataBody = labels.getString("NACAO") + " / " + labels.getString("PONTOS.MOMENTUM.RANK");
+        for (Integer turn : victoryPoints.getTurnList()) {
+            dataBody += String.format("\t%s", turn);
+        }
+        dataBody += "\n";
+
+        for (String teamName : teams) {
+            for (Nacao nation : nations) {
+                if (!teamName.equals(nation.getTeamFlag())) {
+                    continue;
+                }
+                dataBody += nation.getNome();
+                final boolean emphasis = nation == myNation;
+                final boolean dashed = isTeam
+                        ? !myNation.getTeamFlag().equals(nation.getTeamFlag())
+                        : nation != myNation;
+                for (Integer turn : victoryPoints.getTurnList()) {
+                    final Integer myPts = ptsByNation.get(nation).get(turn);
+                    if (myPts == null) {
+                        dataBody += "\t";
+                        continue;   // nation not in play that turn -> break the line
+                    }
+                    int rank = 1;
+                    for (Nacao other : nations) {
+                        if (other == nation) {
+                            continue;
+                        }
+                        final Integer op = ptsByNation.get(other).get(turn);
+                        if (op != null && op > myPts) {
+                            rank++;
+                        }
+                    }
+                    dataSet.add(new DataSetForChart(nation.getNome(), rank, String.format("T %s", turn),
+                            nation.getFillColor()).setEmphasis(emphasis).setDashed(dashed));
+                    dataBody += String.format("\t%s", rank);
+                }
+                dataBody += "\n";
+            }
+        }
+
+        ClipboardHelper.copy(dataBody);
+        this.getGui().setStatusMsg(labels.getString("COPIAR.DATASET.STATUS"));
+        ComponentFactory.showChartRank(labels.getString("PONTOS.MOMENTUM.TITLE"), dataSet, getPartidaTagName(),
+                labels.getString("TURNO"), labels.getString("PONTOS.MOMENTUM.AXIS"), nations.size(), this.gui);
+    }
+
     /**
      * Radar of YOUR nation vs a few key others across normalised power metrics (gold, income, cities, big
      * cities, key cities, troops, characters). Team games show you + your strongest ally + the 2 strongest

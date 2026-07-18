@@ -125,6 +125,8 @@ public final class VictoryDashboardDialog extends JDialog {
                     e -> wc.showKeyCityChart()));
             bar.add(toolButton("chart-area", tx("VDASH.CHART.HISTORY", "Victory point history (all turns)"),
                     e -> wc.showVpHistoryChart()));
+            bar.add(toolButton("trophy", tx("VDASH.CHART.MOMENTUM", "Your momentum (are you climbing or sliding?)"),
+                    e -> wc.showMomentumChart()));
             bar.add(toolButton("chart-radar", tx("VDASH.CHART.POWER", "Nation power comparison (you vs key rivals)"),
                     e -> wc.showNationPowerChart()));
             bar.add(toolButton("trending-up", tx("VDASH.CHART.GROW", "What should I grow? (you vs game average)"),

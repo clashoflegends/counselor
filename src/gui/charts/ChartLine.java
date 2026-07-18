@@ -54,6 +54,10 @@ public class ChartLine extends JFrame {
     // "% share" mode: plot each series as its share of that turn's total (0-100%) instead of raw values,
     // so relative standing is visible (raw values rise for everyone). Toggled by a checkbox on the window.
     private boolean shareMode = false;
+    // "rank" (momentum bump-chart) mode: values are ranks (1 = leader), so the range axis is inverted with
+    // 1 pinned at the top and fixed integer ticks over [1..rankMax]. The %-share toggle is hidden (moot).
+    private boolean rankMode = false;
+    private int rankMax = 0;
     private JPanel chartHolder;
     
     public ChartLine(String title, List<DataSetForChart> dataSet, String subtitle) {
@@ -226,6 +230,15 @@ public class ChartLine extends JFrame {
         
         ChartUtils.applyCurrentTheme(chart);
 
+        if (rankMode) {
+            // rank 1 (leader) at the TOP; fixed integer ticks over the whole field so the axis is stable.
+            rangeAxis.setInverted(true);
+            if (rankMax > 0) {
+                rangeAxis.setRange(0.5, rankMax + 0.5);
+            }
+            rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        }
+
         // customise the renderer... (apply AFTER the theme so our per-series styling wins)
         LineAndShapeRenderer renderer = (LineAndShapeRenderer) plot.getRenderer();
         renderer.setDefaultLinesVisible(true);
@@ -278,16 +291,18 @@ public class ChartLine extends JFrame {
      */
     final public void doStart() {
         final JPanel container = new JPanel(new BorderLayout());
-        final JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
-        final JCheckBox shareToggle = new JCheckBox(tx("CHART.LINE.SHARE", "Show % share"));
-        shareToggle.setToolTipText(tx("CHART.LINE.SHARE.TOOLTIP",
-                "Plot each nation's share of the total this turn, instead of raw points."));
-        shareToggle.addActionListener(e -> {
-            shareMode = shareToggle.isSelected();
-            refreshChart();
-        });
-        top.add(shareToggle);
-        container.add(top, BorderLayout.NORTH);
+        if (!rankMode) {   // %-share is meaningless for a rank axis
+            final JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
+            final JCheckBox shareToggle = new JCheckBox(tx("CHART.LINE.SHARE", "Show % share"));
+            shareToggle.setToolTipText(tx("CHART.LINE.SHARE.TOOLTIP",
+                    "Plot each nation's share of the total this turn, instead of raw points."));
+            shareToggle.addActionListener(e -> {
+                shareMode = shareToggle.isSelected();
+                refreshChart();
+            });
+            top.add(shareToggle);
+            container.add(top, BorderLayout.NORTH);
+        }
         chartHolder = new JPanel(new BorderLayout());
         chartHolder.add(buildChartPanel(), BorderLayout.CENTER);
         container.add(chartHolder, BorderLayout.CENTER);
@@ -350,6 +365,12 @@ public class ChartLine extends JFrame {
      */
     public boolean isLegendDisplay() {
         return legendDisplay;
+    }
+
+    /** Switch to rank (momentum) mode: inverted integer range axis pinned 1..{@code nationCount}. */
+    public void setRankMode(int nationCount) {
+        this.rankMode = true;
+        this.rankMax = nationCount;
     }
 
     /**
