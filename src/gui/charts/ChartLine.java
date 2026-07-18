@@ -218,6 +218,8 @@ public class ChartLine extends JFrame {
         CategoryPlot plot = (CategoryPlot) chart.getPlot();
         plot.setRangePannable(true);
         plot.setRangeGridlinesVisible(false);
+        // Turns are many -> angle the x-axis (turn) labels so they don't collapse to "..." at full width.
+        plot.getDomainAxis().setCategoryLabelPositions(org.jfree.chart.axis.CategoryLabelPositions.UP_45);
         // customise the range axis...
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
