@@ -111,7 +111,7 @@
                               <Component id="saveDirButton" min="-2" max="-2" attributes="0"/>
                               <Component id="openSaveDir" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="46" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="40" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -119,11 +119,10 @@
                               <Component id="autoSaveOrdersCheck" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="overEliminCheckBox2" min="-2" max="-2" attributes="0"/>
-                              <Component id="overEliminCheckBox" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="overEliminCheckBox2" max="32767" attributes="0"/>
+                              <Component id="overEliminCheckBox" pref="232" max="32767" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -131,13 +130,13 @@
                               <Component id="saveOrdersNoPromptCheck" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="sendOrderRequestCheckBox" min="-2" max="-2" attributes="0"/>
-                              <Component id="sendConfirmPopUpCheckBox" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="sendOrderRequestCheckBox" max="32767" attributes="0"/>
+                              <Component id="sendConfirmPopUpCheckBox" pref="232" max="32767" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
                       </Group>
                   </Group>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
