@@ -20,6 +20,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.dial.ArcDialFrame;
 import org.jfree.chart.plot.dial.DialBackground;
 import org.jfree.chart.plot.dial.DialPlot;
+import org.jfree.chart.plot.dial.StandardDialRange;
 import org.jfree.chart.plot.dial.StandardDialScale;
 import org.jfree.chart.ui.GradientPaintTransformType;
 import org.jfree.chart.ui.StandardGradientPaintTransformer;
@@ -123,8 +124,17 @@ public final class ChartGauge extends JFrame {
      * @return the chart panel
      */
     public static ChartPanel buildPanel(String subtitle, double value, int width, int height) {
+        return buildPanel(subtitle, value, -1d, -1d, width, height);
+    }
+
+    /**
+     * Gauge with an optional amber "defeat" band [0, defeatTo] and blue "win" band [winFrom, 100] on the
+     * scale, so the needle (your current share) can be read against both thresholds at a glance. Pass a
+     * negative / out-of-range bound to omit that band. Value is clamped to 0..100.
+     */
+    public static ChartPanel buildPanel(String subtitle, double value, double defeatTo, double winFrom, int width, int height) {
         final double clamped = Math.max(0d, Math.min(100d, value));
-        JFreeChart chart = createChart(new DefaultValueDataset(clamped), subtitle);
+        JFreeChart chart = createChart(new DefaultValueDataset(clamped), subtitle, defeatTo, winFrom);
         ChartPanel chartPanel = new ChartPanel(chart, false);
         chartPanel.setFillZoomRectangle(true);
         chartPanel.setMouseWheelEnabled(true);
@@ -141,6 +151,10 @@ public final class ChartGauge extends JFrame {
      * @return The chart.
      */
     private static JFreeChart createChart(DefaultValueDataset dataset, String subtitle) {
+        return createChart(dataset, subtitle, -1d, -1d);
+    }
+
+    private static JFreeChart createChart(DefaultValueDataset dataset, String subtitle, double defeatTo, double winFrom) {
 
         DialPlot dialplot = new DialPlot();
         dialplot.setView(0.20999999999999999D, 0.0D, 0.57999999999999996D, 0.29999999999999999D);
@@ -160,6 +174,19 @@ public final class ChartGauge extends JFrame {
         standarddialscale.setTickLabelOffset(0.070000000000000007D);
         standarddialscale.setMajorTickIncrement(25D);
         dialplot.addScale(0, standarddialscale);
+        // amber "defeat" band [0, defeatTo] and blue "win" band [winFrom, 100] on the scale.
+        if (defeatTo > 0D) {
+            StandardDialRange amber = new StandardDialRange(0D, Math.min(100D, defeatTo), new Color(0xE6, 0x51, 0x00));
+            amber.setInnerRadius(0.60D);
+            amber.setOuterRadius(0.85D);
+            dialplot.addLayer(amber);
+        }
+        if (winFrom >= 0D && winFrom < 100D) {
+            StandardDialRange blue = new StandardDialRange(winFrom, 100D, new Color(0x15, 0x65, 0xC0));
+            blue.setInnerRadius(0.60D);
+            blue.setOuterRadius(0.85D);
+            dialplot.addLayer(blue);
+        }
         org.jfree.chart.plot.dial.DialPointer.Pin pin = new org.jfree.chart.plot.dial.DialPointer.Pin();
         pin.setRadius(0.81999999999999995D);
         dialplot.addLayer(pin);

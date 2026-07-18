@@ -157,7 +157,7 @@ public final class VictoryDashboardDialog extends JDialog {
     private JPanel buildGaugePanel(Assessment a) {
         final List<JPanel> cards = new ArrayList<>();
         for (Row r : a.rows) {
-            final JPanel card = gaugeCard(r);
+            final JPanel card = gaugeCard(r, a.isTeam);
             if (card != null) {
                 cards.add(card);
             }
@@ -180,15 +180,14 @@ public final class VictoryDashboardDialog extends JDialog {
     }
 
     /** One condition's gauge card, or null if it has no meaningful gauge (not active / info / turn-limit). */
-    private JPanel gaugeCard(Row r) {
+    private JPanel gaugeCard(Row r, boolean isTeam) {
         if (r.state == State.NOT_ACTIVE
                 || r.kind == VictoryStatus.Kind.TURNLIMIT
                 || r.kind == VictoryStatus.Kind.INFO) {
             return null;
         }
-        final GaugeVal toWin = gaugeToWin(r);
-        final GaugeVal toLose = gaugeToLose(r);
-        if (toWin == null && toLose == null) {
+        final GaugeSpec g = gaugeSpec(r, isTeam);
+        if (g == null) {
             return null;
         }
         final JPanel card = new JPanel();
@@ -201,96 +200,77 @@ public final class VictoryDashboardDialog extends JDialog {
         name.setToolTipText(conditionHint(r.code));
         card.add(name);
 
-        final JPanel dials = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
-        if (toWin != null) {
-            dials.add(dial(tx("VDASH.GAUGE.WIN", "toward victory"), toWin));
-        }
-        if (toLose != null) {
-            dials.add(dial(tx("VDASH.GAUGE.LOSE", "toward defeat"), toLose));
-        }
-        dials.setAlignmentX(Component.CENTER_ALIGNMENT);
-        card.add(dials);
+        // One combined dial: needle = my share; amber "defeat" band at the bottom, blue "win" band at top.
+        final JPanel p = ChartGauge.buildPanel(String.format("%.0f%%", g.needle), g.needle,
+                g.defeatTo, g.winFrom, GAUGE_W, GAUGE_H);
+        p.setPreferredSize(new Dimension(GAUGE_W, GAUGE_H));
+        p.setAlignmentX(Component.CENTER_ALIGNMENT);
+        card.add(p);
+
+        // Readout: the raw gap(s) at a glance.
+        final JLabel nums = new JLabel(g.detail, SwingConstants.CENTER);
+        nums.setAlignmentX(Component.CENTER_ALIGNMENT);
+        nums.setForeground(java.awt.Color.decode(GRAY));
+        nums.setFont(nums.getFont().deriveFont(java.awt.Font.PLAIN, 9f));
+        card.add(nums);
         return card;
     }
 
-    /** A gauge value plus the raw numbers behind it (shown as a small debug readout under the dial). */
-    private static final class GaugeVal {
-        final double pct;
-        final String detail;
+    /** A combined gauge: needle (my share), amber defeat band [0,defeatTo], blue win band [winFrom,100]. */
+    private static final class GaugeSpec {
+        final double needle;
+        final double defeatTo;   // amber upper bound, or -1 for none
+        final double winFrom;    // blue lower bound, or -1 for none
+        final String detail;     // gap readout
 
-        GaugeVal(double pct, String detail) {
-            this.pct = pct;
+        GaugeSpec(double needle, double defeatTo, double winFrom, String detail) {
+            this.needle = needle;
+            this.defeatTo = defeatTo;
+            this.winFrom = winFrom;
             this.detail = detail;
         }
     }
 
-    private JPanel dial(String caption, GaugeVal g) {
-        final JPanel col = new JPanel();
-        col.setLayout(new BoxLayout(col, BoxLayout.Y_AXIS));
-        final JPanel p = ChartGauge.buildPanel(caption, g.pct, GAUGE_W, GAUGE_H);
-        p.setPreferredSize(new Dimension(GAUGE_W, GAUGE_H));
-        p.setAlignmentX(Component.CENTER_ALIGNMENT);
-        col.add(p);
-        // DEBUG readout: the raw numbers behind the % (John's request; gate/remove once understood).
-        final JLabel nums = new JLabel(String.format("%s (%.0f%%)", g.detail, g.pct), SwingConstants.CENTER);
-        nums.setAlignmentX(Component.CENTER_ALIGNMENT);
-        nums.setForeground(java.awt.Color.decode(GRAY));
-        nums.setFont(nums.getFont().deriveFont(java.awt.Font.PLAIN, 9f));
-        col.add(nums);
-        return col;
-    }
-
-    /** "Toward victory" gauge value + raw numbers, or null when the row has no sensible progress metric. */
-    private GaugeVal gaugeToWin(Row r) {
+    /**
+     * Needle = my share (matches the text %); win band starts at the threshold's share of the total; defeat
+     * band ends at the complementary share (both discount out-of-race barbarians via threshold vs total).
+     * The readout carries the raw gap to the win line. "Up" is always good for me (more share / nations /
+     * safe capitals). Returns null when the row has no meaningful gauge.
+     */
+    private GaugeSpec gaugeSpec(Row r, boolean isTeam) {
+        final double f = isTeam ? 0.75 : 0.50;
         switch (r.kind) {
-            case PROGRESS:
+            case PROGRESS: {
+                if (r.threshold <= 0 || r.total <= 0) {
+                    return null;
+                }
+                final double winFrom = clampPct(100.0 * r.threshold / r.total);   // Score 72, territory 75
+                final double defeatTo = clampPct(winFrom * (1 - f) / f);           // Score 24, territory 25
+                final int winGap = Math.max(0, r.threshold - r.myValue);
+                final String detail = r.rivalKnown
+                        ? String.format("you %d (+%d win) · rival +%d", r.myValue, winGap,
+                                Math.max(0, r.threshold - r.rivalToWin))
+                        : String.format("you %d of %d (+%d win)", r.myValue, r.total, winGap);
+                return new GaugeSpec(clampPct(100.0 * r.myValue / r.total), defeatTo, winFrom, detail);
+            }
+            case SURVIVAL: {
+                if (r.total <= 0) {
+                    return null;   // nations, no barbarians -> clean 75/25 bands
+                }
+                final String detail = r.threshold == 0
+                        ? String.format("%d of %d nations - supremacy", r.myValue, r.total)
+                        : String.format("%d of %d nations · kill %d to win", r.myValue, r.total, r.threshold);
+                return new GaugeSpec(clampPct(100.0 * r.myValue / r.total),
+                        clampPct((1 - f) * 100.0), clampPct(f * 100.0), detail);
+            }
+            case CAPITALS: {
                 if (r.threshold <= 0) {
-                    return null;
+                    return null;   // defeat-only: needle = capitals still safe (up = good), no win band
                 }
-                return new GaugeVal(clampPct(100.0 * r.myValue / r.threshold), r.myValue + " / " + r.threshold);
-            case SURVIVAL:
-                // elimination race: threshold = enemy kills still needed to win (0 = already there).
-                if (r.state == State.WINNING || r.threshold == 0) {
-                    return new GaugeVal(100.0, "reached");
-                }
-                if (r.othersValue <= 0) {
-                    return new GaugeVal(100.0, "no enemy left");
-                }
-                // Standing proxy (no game history to count eliminations): supremacy share of the way to the
-                // line. othersValue = enemies alive, threshold = enemy kills still needed. Reads ~66% at an
-                // even start because supremacy wins at 75% while both sides begin near 50% - that is expected.
-                return new GaugeVal(clampPct(100.0 * r.othersValue / (r.othersValue + r.threshold)),
-                        "enemy " + r.othersValue + ", kill " + r.threshold);
-            case CAPITALS:
-                return null;   // capitals is a pure "toward defeat" condition
-            default:
-                return null;
-        }
-    }
-
-    /** "Toward defeat" gauge value + raw numbers, or null when no single rival/loss metric is knowable. */
-    private GaugeVal gaugeToLose(Row r) {
-        switch (r.kind) {
-            case PROGRESS:
-                // Only authoritative rows carry an honest single-rival figure; territory (fogged) does not.
-                if (!r.rivalKnown || r.threshold <= 0) {
-                    return null;
-                }
-                return new GaugeVal(clampPct(100.0 * r.rivalToWin / r.threshold),
-                        "rival " + r.rivalToWin + " / " + r.threshold);
-            case SURVIVAL:
-                // rivalToWin = enemy eliminations of MY nations still needed for THEM to win.
-                if (r.state == State.LOSING || r.rivalToWin <= 0 || r.myValue <= 0) {
-                    return new GaugeVal(100.0, "you " + r.myValue + ", lose in " + r.rivalToWin);
-                }
-                return new GaugeVal(clampPct(100.0 * r.myValue / (r.myValue + r.rivalToWin)),
-                        "you " + r.myValue + ", lose in " + r.rivalToWin);
-            case CAPITALS:
-                if (r.threshold <= 0) {
-                    return null;
-                }
-                return new GaugeVal(clampPct(100.0 * r.myValue / r.threshold),
-                        r.myValue + " / " + r.threshold + " lost");
+                return new GaugeSpec(clampPct(100.0 * (r.threshold - r.myValue) / r.threshold),
+                        clampPct(100.0 / r.threshold), -1.0,
+                        String.format("lost %d of %d capitals", r.myValue, r.threshold));
+            }
             default:
                 return null;
         }
