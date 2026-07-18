@@ -1,5 +1,15 @@
 # What's New in Counselor
 
+## 18-JUL-2026 - v2.1.904
+
+### More ways to read the game, from the Victory Dashboard
+- **Nation power comparison** - a new radar chart pits **you against your key rivals** (and, in team games, your strongest ally) across gold, income, cities, big cities, key cities, troops, and characters, so you can see where you lead and where you trail at a glance.
+- **"What should I grow?"** - a coach-style chart showing your nation on each lever as a share of the **game average**, with the levers that matter for **this game's victory conditions highlighted** - so a new player knows exactly what to build toward.
+- **Your momentum** - a rank-over-time chart (1st place at the top) tracing **whether you are climbing or sliding** each turn, with your line highlighted against the pack.
+
+### Smaller touches
+- **Victory Point history** turn labels no longer collapse to "..." on long games - the turns are always readable now.
+
 ## 17-JUL-2026 - v2.1.903
 
 ### New: the Victory Dashboard - your lay of the land
