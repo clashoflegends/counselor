@@ -1,5 +1,17 @@
 # What's New in Counselor
 
+## 17-JUL-2026 - v2.1.903
+
+### New: the Victory Dashboard - your lay of the land
+- A new **Victory Dashboard** (the target button on the results toolbar) shows at a glance **how this game is won and how close each side is**. It reads the game's active victory goals and tells you, in plain language, **where you can push for a win and where you are at risk**.
+- Each goal gets a **gauge** with a blue **win zone** and an amber **defeat zone**, so you can see how close victory or defeat is, plus the exact gap (for example "you 2204, +1397 to win").
+- It covers every goal in play: **Score, Conquest, Domination, Battle Royale, Supremacy, Capitals, First Blood, King of Kings**, the **turn-limit** standing, and, in Fire & Dragons, **Dragonlord** (hold every living dragon).
+- The dashboard stays open while you browse your turn and the map, and it closes on its own when you open a different game.
+
+### All your graphs in one place
+- The dashboard is now the **hub for the graphs**: open **Victory Points per nation**, **Key cities**, **Victory Point history**, and **Battle Royale** charts right from its toolbar.
+- **Victory Point history** now highlights **your nation**, draws **your side solid and rivals dashed**, and has a **"% share"** toggle to see relative standing over the whole game.
+
 ## 09-JUL-2026 - v2.1.902
 
 ### If a crash might already be fixed, we'll tell you
