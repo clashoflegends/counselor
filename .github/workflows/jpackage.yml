@@ -233,6 +233,10 @@ jobs:
         with:
           name: installer-${{ matrix.os }}
           path: installer/
+          # This artifact is only the build->release cross-job hand-off; the release page keeps the
+          # installers permanently as release assets. Keep it 1 day so it does not accrue against the
+          # Actions storage quota (hit 2026-07-18; ~150 MB per tagged release across the 3 platforms).
+          retention-days: 1
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')

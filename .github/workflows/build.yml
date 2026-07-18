@@ -25,3 +25,6 @@ jobs:
           name: test-results
           path: build/test/results/
           if-no-files-found: ignore
+          # Uploaded on every branch push; keep a short window (debug aid only) so it does not
+          # accumulate against the Actions storage quota. Default is 90 days.
+          retention-days: 7
