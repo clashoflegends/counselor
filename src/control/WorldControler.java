@@ -52,6 +52,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -218,6 +219,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 break;
             case "jbCopy":
                 doCopy();
+                break;
+            case "jbCopyTeam":
+                doCopyTeam();
                 break;
             case "jbEmailList":
                 doEmailList();
@@ -441,11 +445,18 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
         MainSettingsGui settingPanel = new MainSettingsGui(this.currentResultsFile);
 
+        // Custom 3-button dialog: Save / Reset to Defaults / Cancel. With an explicit options[] the return
+        // value is the button INDEX (0/1/2), or CLOSED_OPTION (-1) when dismissed via the window X.
+        final Object[] buttons = {
+            labels.getString("SETTINGS.BTN.SAVE"),
+            labels.getString("SETTINGS.BTN.RESET"),
+            labels.getString("SETTINGS.BTN.CANCEL")
+        };
         int option = JOptionPane.showOptionDialog(getGui(), settingPanel, labels.getString("MENU.CONFIG"),
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
-                new javax.swing.ImageIcon(getClass().getResource("/images/icon_customize.gif")), null, null);
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
+                new javax.swing.ImageIcon(getClass().getResource("/images/icon_customize.gif")), buttons, buttons[0]);
 
-        if (option == JOptionPane.OK_OPTION) {
+        if (option == 0) {   // Save
             log.debug("Saving settings from option window.");
 
             Enumeration keys = SettingsManager.getInstance().listConfigs();
@@ -457,7 +468,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 }
             }
 
-        } else {
+        } else if (option == 1) {   // Reset to Defaults
+            doResetConfigs();
+
+        } else {   // Cancel (button index 2) or window closed (-1)
             SettingsManager.getInstance().listConfigs();
             log.debug("Cancel settings option window.");
 
@@ -469,6 +483,24 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     /**
+     * Wipe properties.config and rewrite it with the default batch (SysProperties.setPropDefault). Confirmed
+     * first because it clears ALL saved settings, including the Counselor token (re-fetchable from the site).
+     * Some settings (theme, language) take effect only after a restart.
+     */
+    private void doResetConfigs() {
+        int confirm = JOptionPane.showConfirmDialog(getGui(),
+                labels.getString("SETTINGS.RESET.CONFIRM"), labels.getString("SETTINGS.RESET.TITLE"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+        SettingsManager.getInstance().resetToDefaults();
+        log.info("Settings reset to defaults by the user.");
+        SysApoio.showDialogInfo(labels.getString("SETTINGS.RESET.DONE"),
+                labels.getString("SETTINGS.RESET.TITLE"), getGui());
+    }
+
+    /**
      * Transitional method for development purpose. Must be deleted after new methods in SettingsManager would be implemented.
      *
      * @param props
@@ -477,13 +509,28 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * settingsManager.getProperties("saveDir")); return mapProperties; }
      */
     private void doCopy() throws HeadlessException {
+        doCopy(playerFilter(), "COPIAR.ACOES");
+    }
+
+    /**
+     * Team variant of {@link #doCopy()}: lists actions for the WHOLE team (my nations + allies). An "ally"
+     * is any actor whose orders I actually have loaded in the shared world - teammates' EGFs autoloaded from
+     * the same folder merge their actors (Nacao/Cidade/Personagem) with their {@code getAcoes()} populated,
+     * so {@link #teamFilter()} keeps mine plus anyone with loaded orders and naturally drops fogged enemies
+     * (no orders). Works in FFA too (temporary allies whose EGFs I loaded outside Clash).
+     */
+    private void doCopyTeam() throws HeadlessException {
+        doCopy(teamFilter(), "COPIAR.ACOES.TEAM");
+    }
+
+    private void doCopy(Predicate<BaseModel> filter, String titleKey) throws HeadlessException {
         //config text Area
         JTextArea jtaResultado = new javax.swing.JTextArea(80, 20);
         jtaResultado.setLineWrap(false);
         jtaResultado.setWrapStyleWord(false);
         jtaResultado.setEditable(false);
         //carrega o texto
-        jtaResultado.setText(listaOrdens());
+        jtaResultado.setText(listaOrdens(filter));
         //copy para o clipboard
         jtaResultado.selectAll();
         jtaResultado.copy();
@@ -495,7 +542,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             //configura jDialog
             JDialog dAbout = new JDialog(new JFrame(), true);
             AppIcon.applyTo(dAbout);
-            dAbout.setTitle(labels.getString("COPIAR.ACOES"));
+            dAbout.setTitle(labels.getString(titleKey));
             dAbout.setAlwaysOnTop(true);
             dAbout.setPreferredSize(new Dimension(600, 400));
             dAbout.add(jsp);
@@ -503,6 +550,43 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             dAbout.pack();
             dAbout.setVisible(true);
         }
+    }
+
+    /** Actor filter for the "My Actions" listing: only the active player's own actors. */
+    private Predicate<BaseModel> playerFilter() {
+        final Jogador jogadorAtivo = WFC.getJogadorAtivo();
+        return a -> isMine(a, jogadorAtivo);
+    }
+
+    /**
+     * Actor filter for the "Team Actions" listing: the active player's own actors PLUS any actor that has
+     * loaded orders (an ally whose EGF I autoloaded). Fogged/enemy actors carry no orders, so they drop out.
+     */
+    private Predicate<BaseModel> teamFilter() {
+        final Jogador jogadorAtivo = WFC.getJogadorAtivo();
+        return a -> isMine(a, jogadorAtivo) || actorHasAcoes(a);
+    }
+
+    /**
+     * True if the actor belongs to the active player. Uses OWNER identity ({@code nacao.getOwner()}), the
+     * same test as {@code getNacoesJogadorAtivo()} - NOT {@code Jogador.isNacao()}, which is unreliable
+     * once allies' EGFs are autoloaded and their nation instances are merged into the shared world.
+     */
+    private boolean isMine(BaseModel a, Jogador jogadorAtivo) {
+        return a != null && a.getNacao() != null && a.getNacao().getOwner() == jogadorAtivo;
+    }
+
+    /** True if the actor has at least one non-null action loaded. */
+    private boolean actorHasAcoes(BaseModel a) {
+        if (a == null || a.getAcoes() == null) {
+            return false;
+        }
+        for (PersonagemOrdem po : a.getAcoes().values()) {
+            if (po != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void doEmailList() throws HeadlessException {
@@ -810,31 +894,35 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return ret;
     }
 
+    /** Player-only action listing (used by the orders upload, {@link #handleSendResult}). */
     private String listaOrdens() {
+        return listaOrdens(playerFilter());
+    }
+
+    private String listaOrdens(Predicate<BaseModel> filter) {
         String ret = "";
         if (WFC.isStartupPackages() && WFC.getTurno() == 0) {
-            ret += listaPackages() + "\n\n";
+            ret += listaPackages(filter) + "\n\n";
         }
-        ret += listaOrdensBySequence() + "\n\n";
+        ret += listaOrdensBySequence(filter) + "\n\n";
         if (cenarioFacade.hasOrdensNacao(WFC.getPartida())) {
-            ret += listaOrdensByNation() + "\n\n";
+            ret += listaOrdensByNation(filter) + "\n\n";
         }
         if (WFC.hasOrdensCidade()) {
-            ret += listaOrdensByCity() + "\n\n";
+            ret += listaOrdensByCity(filter) + "\n\n";
         }
         if (SettingsManager.getInstance().getConfig("CopyActionsOrder", "1").equals("1")) {
-            ret += listaOrdensByPers() + "\n\n";
+            ret += listaOrdensByPers(filter) + "\n\n";
         }
         return ret;
     }
 
-    private String listaOrdensByPers() {
+    private String listaOrdensByPers(Predicate<BaseModel> filter) {
         String ret = labels.getString("TITLE.LIST.BYCHAR") + ":\n";
-        Jogador jogadorAtivo = WFC.getJogadorAtivo();
         //lista todos os personagens
         for (Iterator<Personagem> iter = WFC.getPersonagens(); iter.hasNext();) {
             Personagem personagem = iter.next();
-            if (!jogadorAtivo.isNacao(personagem.getNacao())) {
+            if (!filter.test(personagem)) {
                 continue;
             }
             ret += personagemFacade.getResultadoLocal(personagem);
@@ -861,12 +949,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return ret;
     }
 
-    private String listaOrdensByCity() {
+    private String listaOrdensByCity(Predicate<BaseModel> filter) {
         String ret = labels.getString("TITLE.LIST.BYCITY") + ":\n";
-        final Jogador jogadorAtivo = WFC.getJogadorAtivo();
         //lista todos as cidades
         for (Cidade cidade : WFC.getCidades()) {
-            if (jogadorAtivo.isNacao(cidade.getNacao())) {
+            if (filter.test(cidade)) {
                 for (String msg : cidadeFacade.getInfoTitle(cidade)) {
                     ret += msg;
                 }
@@ -878,10 +965,13 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return ret;
     }
 
-    private String listaOrdensByNation() {
+    private String listaOrdensByNation(Predicate<BaseModel> filter) {
         String ret = labels.getString("TITLE.LIST.BYNATION") + ":\n";
-        //lista todos as cidades
-        for (Nacao nacao : WFC.getNacoesJogadorAtivo()) {
+        //lista todas as nacoes (filtradas)
+        for (Nacao nacao : WFC.getNacoes().values()) {
+            if (!filter.test(nacao)) {
+                continue;
+            }
             for (String msg : nacaoFacade.getInfoTitle(nacao)) {
                 ret += msg;
             }
@@ -916,9 +1006,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return ret;
     }
 
-    private String listaPackages() {
+    private String listaPackages(Predicate<BaseModel> filter) {
         String ret = "";
-        for (Nacao nacao : WorldManager.getInstance().getNacoesJogadorAtivo()) {
+        for (Nacao nacao : WFC.getNacoes().values()) {
+            if (!filter.test(nacao)) {
+                continue;
+            }
             List<Habilidade> packages = getPackages(nacao);
             if (!packages.isEmpty()) {
                 ret += String.format(labels.getString("STARTUP.NATION.TITLE") + "\n", nacao.getNome());
@@ -934,13 +1027,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private String listaOrdensBySequence() {
+    private String listaOrdensBySequence(Predicate<BaseModel> filter) {
         String ret = labels.getString("TITLE.LIST.BYSEQ") + ":\n";
-        Jogador jogadorAtivo = WFC.getJogadorAtivo();
         SortedMap<Integer, List<PersonagemOrdem>> ordens = new TreeMap<>();
         //list all actions from all actors
         for (BaseModel actor : WFC.getActors()) {
-            if (jogadorAtivo.isNacao(actor.getNacao())) {
+            if (filter.test(actor)) {
                 for (PersonagemOrdem po : actor.getAcoes().values()) {
                     if (po != null) {
                         List<PersonagemOrdem> lista = ordens.get(po.getOrdem().getNumero());
@@ -1077,7 +1169,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private int setOrdens(Comando comando, List<String> errorMsgs) {
         int ret = 0;
         final SortedMap<String, BaseModel> actors = WFC.getActorsAll();
-        if (SettingsManager.getInstance().isConfig("LoadActionsBehavior", "Clean", "Clean")) {
+        // Default "append" to match the checkbox (MainSettingsGui) + the team-load gate; only an explicit
+        // "clean" wipes existing orders first. Keeps multi-file team loads additive instead of wiping between files.
+        if (SettingsManager.getInstance().isConfig("LoadActionsBehavior", "clean", "append")) {
             //limpa todas as ordens
             for (BaseModel actor : actors.values()) {
                 actor.remAcoes();
@@ -1434,7 +1528,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     }
 
     private boolean isLoadTeamOrders() {
-        return SettingsManager.getInstance().isConfig("LoadActionsBehavior", "append", "0") && SettingsManager.getInstance().isConfig("LoadActionsOtherNations", "allow", "0");
+        // Defaults MUST match the Settings checkboxes (MainSettingsGui reads "append"/"allow"), otherwise the
+        // boxes display as checked while this gate sees them unset -> team orders silently never load.
+        return SettingsManager.getInstance().isConfig("LoadActionsBehavior", "append", "append")
+                && SettingsManager.getInstance().isConfig("LoadActionsOtherNations", "allow", "allow");
     }
 
     /**

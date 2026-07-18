@@ -260,6 +260,20 @@
                 <Property name="name" type="java.lang.String" value="jbCopy" noResource="true"/>
               </Properties>
             </Component>
+            <Component class="javax.swing.JButton" name="jbCopyTeam">
+              <Properties>
+                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                  <ResourceString bundle="gui/Bundle.properties" key="COPIAR.ACOES" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+                </Property>
+                <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                  <ResourceString bundle="gui/Bundle.properties" key="COPIAR.ACOES.TOOLTIP" replaceFormat="labels.getString(&quot;{key}&quot;)"/>
+                </Property>
+                <Property name="actionCommand" type="java.lang.String" value="jbCopyTeam"/>
+                <Property name="enabled" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="name" type="java.lang.String" value="jbCopy" noResource="true"/>
+              </Properties>
+            </Component>
             <Component class="javax.swing.JButton" name="jbEmailList">
               <Properties>
                 <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
@@ -662,7 +676,7 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="statusLabel" pref="1015" max="32767" attributes="0"/>
+                  <Component id="statusLabel" max="32767" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="jlActionCountPlaceholder" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
