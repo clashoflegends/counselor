@@ -12,6 +12,15 @@
 - The dashboard is now the **hub for the graphs**: open **Victory Points per nation**, **Key cities**, **Victory Point history**, and **Battle Royale** charts right from its toolbar.
 - **Victory Point history** now highlights **your nation**, draws **your side solid and rivals dashed**, and has a **"% share"** toggle to see relative standing over the whole game.
 
+### Smaller touches
+- **Set your upload token from Settings** - a new **"Fetch from website..."** button grabs your Counselor token with your website login, no copy and paste.
+- **One-click autoload** - a button in Settings sets the currently open file as your autoload.
+- **"All big cities" filter** on the Cities tab.
+
+### Website (clashlegends.com)
+- **Request a multi-nation game** - the **Request New Game** page can now let players ask for **more than one nation** at sign-up.
+- **Fairer games** - new behind-the-scenes fair-play tools give the GM Team a complete view across games to catch **multi-accounts and ghost accounts**. Play straight and you will never notice; try to cheat and we can see everything.
+
 ## 09-JUL-2026 - v2.1.902
 
 ### If a crash might already be fixed, we'll tell you
