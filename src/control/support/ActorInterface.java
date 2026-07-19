@@ -71,7 +71,9 @@ public abstract class ActorInterface extends ControlBase implements Serializable
     /**
      * 0 = Personagens 1 = Personagem-Comandante-Ex 2 = Personagem-Local 3 =
      * Personagem-Nacao-Local 4 = Personagem-Local-NoNacao minus allies 5 =
-     * Personagem-Nacao 5 = Personagem-local_self
+     * Personagem-Nacao 6 = Personagem-local_self 7 = commanders (2-arg) 8 =
+     * Personagem-Local-Friend (mine + friendly nations, no enemies) 9 =
+     * Personagem-Local-Friend-Self (case 8 + the actor)
      *
      * @param tipo
      * @param personagem
@@ -96,6 +98,10 @@ public abstract class ActorInterface extends ControlBase implements Serializable
             items = localFacade.listPersonagemLocal(getLocal(), getPersonagem(), 4);
         } else if (tipo == 7) {
             items = localFacade.listPersonagemLocal(getLocal(), getNacao());
+        } else if (tipo == 8) {
+            items = localFacade.listPersonagemLocal(getLocal(), getPersonagem(), 6);
+        } else if (tipo == 9) {
+            items = localFacade.listPersonagemLocal(getLocal(), getPersonagem(), 7);
         } else {
             items = localFacade.listPersonagemLocal(getLocal(), getPersonagem(), 4);
         }

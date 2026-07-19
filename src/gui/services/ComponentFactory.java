@@ -9,7 +9,6 @@ import baseLib.IBaseModel;
 import business.facade.ExercitoFacade;
 import control.MapaControler;
 import control.OrdemControler;
-import control.services.CidadeConverter;
 import control.support.ActorInterface;
 import gui.accessories.DialogHexView;
 import gui.charts.ChartBar;
@@ -39,7 +38,6 @@ import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import model.Cidade;
 import model.Exercito;
 import model.Ordem;
 import msgs.BaseMsgs;
@@ -63,86 +61,96 @@ public class ComponentFactory implements Serializable {
     private MapaControler mapaControler;
     private OrdemControler ordemControl;
     // Constantes para busca das chaves no banco.
-    private static final String ALIANCA = "Alianca";
-    private static final String ARTEFATO_CARRIED = "Artefato_Carried";
-    private static final String ARTEFATO_CARRIED_SCRY = "Artefato_Carried_Scry";
-    private static final String ARTEFATO_CARRIED_SUMMON = "Artefato_Carried_Summon";
-    private static final String ARTEFATO_CARRIED_DRAGONEGG = "Artefato_Carried_Dragonegg";
-    private static final String ARTEFATO_NACAO_DROP = "Artefato_Nacao_Drop";
-    private static final String ARTEFATO_NONACAO = "Artefato_NoNacao";
-    private static final String ARTEFATO_ALL = "Artefato_All";
-    private static final String CIDADE_ANY = "Cidade_Any";
-    private static final String CIDADE_NACAO = "Cidade_Nacao";
-    private static final String CIDADE_NEWCAPITAL = "Cidade_NewCapital";
-    private static final String COORDENADA = "Coordenada";
-    private static final String COORDENADAW = "CoordenadaW";
-    private static final String COORDENADAC = "Coordenadac";
-    private static final String COORDENADAX = "Coordenadax";
-    private static final String COORDENADA_3 = "Coordenada_3";
-    private static final String COORDENADA_3C = "Coordenada_3c";
-    private static final String COORDENADA_3X = "Coordenada_3x";
-    private static final String COORDENADA_3W = "Coordenada_3w";
-    private static final String COORDENADA_5 = "Coordenada_5";
-    private static final String COORDENADA_5C = "Coordenada_5c";
-    private static final String COORDENADA_5X = "Coordenada_5x";
-    private static final String COORDENADA_5W = "Coordenada_5w";
-    private static final String COORDENADA_8 = "Coordenada_8";
-    private static final String COORDENADA_8C = "Coordenada_8c";
-    private static final String COORDENADA_8X = "Coordenada_8x";
-    private static final String COORDENADA_8W = "Coordenada_8W";
-    private static final String COORDENADA_12 = "Coordenada_12";
-    private static final String COORDENADA_12C = "Coordenada_12c";
-    private static final String COORDENADA_12X = "Coordenada_12x";
-    private static final String COORDENADA_12W = "Coordenada_12w";
-    private static final String COORDENADA_NAVIO = "Coordenada_Navio";
-    private static final String DIRECAO = "Direcao";
-    private static final String DIRECAO_EX = "Direcao_Ex";
-    private static final String DIRECAO_3 = "Direcao_3";
-    private static final String EVASIVO = "Evasivo";
-    private static final String MALE_FEMALE = "Male_Female";
-    private static final String MAGIA_ALL = "Magia_All";
-    private static final String MAGIA_KNOWN = "Magia_Known";
-    private static final String MAGIA_PRE = "Magia_Pre";
-    private static final String NACAO = "Nacao";
-    private static final String NACAO_ALLY = "Nacao_Ally";
-    private static final String NACAO_RELACIONAMENTO = "Nacao_Relacionamento";
-    private static final String NOME = "Nome";
-    private static final String NOVACIDADE5 = "NovaCidade";
-    private static final String NOVACIDADE8 = "NovaCidade_8";
-    private static final String NOMEGENDER = "NomeGender";
-    private static final String NO_VALUE = "None";
-    private static final String OURO = "Ouro";
-    private static final String PERCENTAGE = "Percentage";
-    private static final String PERSONAGEM_LOCAL_EX_COMANDANTE = "Personagem_Comandante_Ex";
-    private static final String PERSONAGEM_LOCAL = "Personagem_Local";
-    private static final String PERSONAGEM_LOCAL_SELF = "Personagem_Local_Self";
-    private static final String PERSONAGEM_LOCAL_NACAO = "Personagem_Nacao_Local";
-    private static final String PERSONAGEM_LOCAL_NACAO_NONHERO = "Personagem_Nacao_Nonhero_Local";
-    private static final String PERSONAGEM_LOCAL_NONACAO = "Personagem_Local_NoNacao";
-    private static final String PERSONAGEM_NONACAO = "Personagem_NoNacao";
-    private static final String PERSONAGEM_NACAO = "Personagem_Nacao";
-    private static final String PERSONAGEM_REFEM = "Personagem_Refem";
-    private static final String PERSONAGEM_REFEM_NONACAO = "Personagem_Refem_NoNacao";
-    private static final String PRODUTO = "Produto";
-    private static final String PRODUTO_ALL = "Produto_All";
-    private static final String PRODUTO_ARMADURA = "Produto_Armadura";
-    private static final String PRODUTO_WEAPON = "Produto_Metal";
-    private static final String QUANTIDADE = "Quantidade";
-    private static final String RELACIONAMENTO_MUDA = "Relacionamento_Muda";
-    private static final String REFEM = "Refem";
-    private static final String SIM_NAO = "Sim_Nao";
-    private static final String TATICA = "Tatica";
-    private static final String TERRENO = "Terreno";
-    private static final String TEXTO_20 = "Texto_20";
-    private static final String TROPA_TIPO = "Tropa_Tipo";
-    private static final String TROPA_TIPO_BASIC = "Tropa_Tipo_Basic";
-    private static final String TROPA_TABLE = "Tropa_Table";
-    private static final String TROPA_TABLE_TR = "Tropa_Table_Tr";
-    private static final String TROPA_TABLE_GARRISON = "Tropa_Table_Garrison";
-    private static final String VARIADO = "Variado";
+    private static final String ALIANCA = "Alianca"; //combo: alliance type (Black Servants / Neutrals / Free Peoples)
+    private static final String ARTEFATO_CARRIED = "Artefato_Carried"; //combo: artifacts the actor carries (ALL = every artifact)
+    private static final String ARTEFATO_CARRIED_SCRY = "Artefato_Carried_Scry"; //combo: actor's carried scrying artifacts (ALL = every artifact)
+    private static final String ARTEFATO_CARRIED_SUMMON = "Artefato_Carried_Summon"; //combo: actor's carried summon artifacts (ALL = every artifact)
+    private static final String ARTEFATO_CARRIED_DRAGONEGG = "Artefato_Carried_Dragonegg"; //combo: actor's carried dragon-egg artifacts (ALL = every artifact)
+    private static final String ARTEFATO_NACAO_DROP = "Artefato_Nacao_Drop"; //combo: artifacts the nation owns
+    private static final String ARTEFATO_NONACAO = "Artefato_NoNacao"; //combo: artifacts the nation does NOT own (ALL = every artifact)
+    private static final String ARTEFATO_ALL = "Artefato_All"; //combo: every artifact
+    private static final String CIDADE_ANY = "Cidade_Any"; //combo: a city (ALL = type a 4-digit hex)
+    private static final String CIDADE_NACAO = "Cidade_Nacao"; //combo: one of the nation's cities (ALL = type a 4-digit hex)
+    private static final String CIDADE_NEWCAPITAL = "Cidade_NewCapital"; //combo: nation's own big cities to relocate the capital (ALL = 4-digit hex)
+    private static final String COORDENADA = "Coordenada"; //map hex picker, unlimited range, land only
+    private static final String COORDENADAW = "CoordenadaW"; //map hex picker, unlimited range, all hexes incl. water
+    private static final String COORDENADAC = "Coordenadac"; //map hex picker, unlimited range, land cities only
+    private static final String COORDENADAX = "Coordenadax"; //map hex picker, unlimited range, all hexes incl. water, non-city only
+    private static final String COORDENADA_3 = "Coordenada_3"; //map hex picker, range 3, land only
+    private static final String COORDENADA_3C = "Coordenada_3c"; //map hex picker, range 3, land cities only
+    private static final String COORDENADA_3X = "Coordenada_3x"; //map hex picker, range 3, land non-city only
+    private static final String COORDENADA_3W = "Coordenada_3w"; //map hex picker, range 3, land only
+    private static final String COORDENADA_5 = "Coordenada_5"; //map hex picker, range 5, land only
+    private static final String COORDENADA_5C = "Coordenada_5c"; //map hex picker, range 5, land cities only
+    private static final String COORDENADA_5X = "Coordenada_5x"; //map hex picker, range 5, land non-city only
+    private static final String COORDENADA_5W = "Coordenada_5w"; //map hex picker, range 5, land only
+    private static final String COORDENADA_8 = "Coordenada_8"; //map hex picker, range 8, land only
+    private static final String COORDENADA_8C = "Coordenada_8c"; //map hex picker, range 8, land cities only
+    private static final String COORDENADA_8X = "Coordenada_8x"; //map hex picker, range 8, land non-city only
+    private static final String COORDENADA_8W = "Coordenada_8W"; //map hex picker, range 8, all hexes incl. water
+    private static final String COORDENADA_12 = "Coordenada_12"; //map hex picker, range 12, land only
+    private static final String COORDENADA_12C = "Coordenada_12c"; //map hex picker, range 12, land cities only
+    private static final String COORDENADA_12X = "Coordenada_12x"; //map hex picker, range 12, land non-city only
+    private static final String COORDENADA_12W = "Coordenada_12w"; //map hex picker, range 12, land only
+    private static final String COORDENADA_NAVIO = "Coordenada_Navio"; //free-text 4-digit hex (ship target)
+    private static final String DIRECAO = "Direcao"; //combo: compass direction
+    private static final String DIRECAO_EX = "Direcao_Ex"; //army movement/direction picker
+    private static final String DIRECAO_3 = "Direcao_3"; //direction picker, range 3
+    private static final String EVASIVO = "Evasivo"; //combo: Normal / Evasive
+    private static final String MALE_FEMALE = "Male_Female"; //combo: Male / Female
+    private static final String MAGIA_ALL = "Magia_All"; //combo: spells the actor does NOT know
+    private static final String MAGIA_KNOWN = "Magia_Known"; //combo: spells the actor knows (for this order)
+    private static final String MAGIA_PRE = "Magia_Pre"; //combo: spells the actor can learn (ALL = broader list)
+    private static final String NACAO = "Nacao"; //combo: a nation, excluding the actor's own
+    private static final String NACAO_ALLY = "Nacao_Ally"; //combo: an allied nation
+    private static final String NACAO_RELACIONAMENTO = "Nacao_Relacionamento"; //relationship editor toward another nation
+    private static final String NOME = "Nome"; //free-text name input (max 20, first letter uppercased)
+    private static final String NOVACIDADE5 = "NovaCidade"; //two-in-one: name + hex (range-5 non-city) for a new city
+    private static final String NOVACIDADE8 = "NovaCidade_8"; //two-in-one: name + hex (range-8 non-city) for a new city
+    private static final String NOMEGENDER = "NomeGender"; //two-in-one: name + gender (M/F)
+    private static final String NO_VALUE = "None"; //no parameter (throws NOT.IMPLEMENTED; hides a spell param)
+    private static final String OURO = "Ouro"; //integer input: gold (0-999999)
+    private static final String PERCENTAGE = "Percentage"; //integer input: percent (1-100, default 100)
+    private static final String PERSONAGEM_LOCAL_EX_COMANDANTE = "Personagem_Comandante_Ex"; //in hex, PCs= army-commanders of any nation + "Garrison" option (actor removed only if it leads an army)
+    private static final String PERSONAGEM_LOCAL = "Personagem_Local"; //in hex, PCs= all minus actor (mine + friendly + neutrals + enemies)
+    private static final String PERSONAGEM_LOCAL_SELF = "Personagem_Local_Self"; //in hex, PCs= all plus actor (mine + friendly + neutrals + enemies)
+    private static final String PERSONAGEM_LOCAL_NACAO = "Personagem_Local_Nacao"; //in hex, PCs= mine minus actor (friendly, neutrals and enemies excluded)
+    private static final String PERSONAGEM_LOCAL_NACAO_NONHERO = "Personagem_Local_Nacao_Nonhero"; //in hex, PCs= mine non-heroes plus actor (friendly, neutrals and enemies excluded)
+    private static final String PERSONAGEM_LOCAL_NONACAO = "Personagem_Local_NoNacao"; //in hex, PCs= other nations not allied = enemies + neutrals (mine, friendly and actor excluded)
+    private static final String PERSONAGEM_LOCAL_FRIEND = "Personagem_Local_Friend"; //in hex, PCs= mine minus actor plus friendly (neutrals and enemies excluded)
+    private static final String PERSONAGEM_LOCAL_FRIEND_SELF = "Personagem_Local_Friend_Self"; //in hex, PCs= mine plus actor plus friendly (neutrals and enemies excluded)
+    private static final String PERSONAGEM_ENEMY = "Personagem_Enemy"; //whole map, PCs= not my nation (allies + neutrals + enemies; mine and actor excluded)
+    private static final String PERSONAGEM_NACAO = "Personagem_Nacao"; //whole map, PCs= mine minus actor (no enemies, no friends)
+    private static final String PERSONAGEM_REFEM = "Personagem_Refem"; //NOT IMPLEMENTED (empty case)
+    private static final String PERSONAGEM_REFEM_ENEMY = "Personagem_Refem_Enemy"; //NOT IMPLEMENTED (empty case)
+    private static final String PRODUTO = "Produto"; //combo: scenario products, excluding gold
+    private static final String PRODUTO_ALL = "Produto_All"; //combo: scenario products, including gold
+    private static final String PRODUTO_ARMADURA = "Produto_Armadura"; //combo: armor products
+    private static final String PRODUTO_WEAPON = "Produto_Metal"; //combo: weapon/metal products
+    private static final String QUANTIDADE = "Quantidade"; //integer input: quantity (0-999999)
+    private static final String RELACIONAMENTO_MUDA = "Relacionamento_Muda"; //combo: Improve / Worsen relationship
+    private static final String REFEM = "Refem"; //empty case (hostage, not implemented)
+    private static final String SIM_NAO = "Sim_Nao"; //combo: Yes / No
+    private static final String TATICA = "Tatica"; //combo: battle tactics from the scenario
+    private static final String TERRENO = "Terreno"; //combo: terrain types from the scenario
+    private static final String TEXTO_20 = "Texto_20"; //free-text input (max 20 chars)
+    private static final String TROPA_TIPO = "Tropa_Tipo"; //combo: troop types the nation can recruit (ALL = every type)
+    private static final String TROPA_TIPO_BASIC = "Tropa_Tipo_Basic"; //combo: basic troop types the nation can recruit (ALL = every type)
+    private static final String TROPA_TABLE = "Tropa_Table"; //table: scenario troop types + quantity (army)
+    private static final String TROPA_TABLE_TR = "Tropa_Table_Tr"; //table: transferable troop types + quantity
+    private static final String TROPA_TABLE_GARRISON = "Tropa_Table_Garrison"; //table: garrison troop types + quantity
+    private static final String VARIADO = "Variado"; //varies - built specifically in the GUI, not here
+    // Deprecated parameter tokens renamed 2026-07-19 (see KI-026). Kept ONLY so pre-rename EGFs still open
+    // (the controle string is serialized inside the Cenario in each EGF). Retire no earlier than 2027-07-01:
+    // remove these + their paired fall-through case labels once no old EGFs are in circulation.
+    private static final String PERSONAGEM_LOCAL_NACAO_DEPR = "Personagem_Nacao_Local";
+    private static final String PERSONAGEM_LOCAL_NACAO_NONHERO_DEPR = "Personagem_Nacao_Nonhero_Local";
+    private static final String PERSONAGEM_ENEMY_DEPR = "Personagem_NoNacao";
+    private static final String PERSONAGEM_REFEM_ENEMY_DEPR = "Personagem_Refem_NoNacao";
 
     /**
-     * Prepara o componente do parametro da ordem [JComboBox ou JFormattedTextField]
+     * Prepara o componente do parametro da ordem [JComboBox ou
+     * JFormattedTextField]
      *
      * @param controle
      * @return componente
@@ -680,14 +688,16 @@ public class ComponentFactory implements Serializable {
                 cNovo = cbTemp;
                 break;
             }
+            case PERSONAGEM_LOCAL_NACAO_DEPR: // deprecated alias (retire >= 2027-07-01, KI-026)
             case PERSONAGEM_LOCAL_NACAO: {
-                //Personagem-Nacao-Local
+                //Personagem-Local-Nacao
                 //é um combo com o model com os personagens conhecidos no local da mesma nacao
                 JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(3));
                 cbTemp.setEditable(true);
                 cNovo = cbTemp;
                 break;
             }
+            case PERSONAGEM_LOCAL_NACAO_NONHERO_DEPR: // deprecated alias (retire >= 2027-07-01, KI-026)
             case PERSONAGEM_LOCAL_NACAO_NONHERO: {
                 //é um combo com o model com os personagens conhecidos no local da mesma nacao nao heros
                 JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(7));
@@ -703,6 +713,22 @@ public class ComponentFactory implements Serializable {
                 cNovo = cbTemp;
                 break;
             }
+            case PERSONAGEM_LOCAL_FRIEND: {
+                //Personagem-Local-Friend
+                //é um combo com os personagens conhecidos no local da minha nacao + nacoes amigas (sem inimigos)
+                JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(8));
+                cbTemp.setEditable(true);
+                cNovo = cbTemp;
+                break;
+            }
+            case PERSONAGEM_LOCAL_FRIEND_SELF: {
+                //Personagem-Local-Friend-Self
+                //como Personagem_Local_Friend (minha nacao + amigas, sem inimigos) mas INCLUI o actor
+                JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(9));
+                cbTemp.setEditable(true);
+                cNovo = cbTemp;
+                break;
+            }
             case PERSONAGEM_LOCAL_SELF: {
                 //Personagem-Local
                 //é um combo com o model com os personagens conhecidos no local, independente da nacao.
@@ -711,8 +737,9 @@ public class ComponentFactory implements Serializable {
                 cNovo = cbTemp;
                 break;
             }
-            case PERSONAGEM_NONACAO: {
-                //Personagem-NoNacao
+            case PERSONAGEM_ENEMY_DEPR: // deprecated alias (retire >= 2027-07-01, KI-026)
+            case PERSONAGEM_ENEMY: {
+                //Personagem-Enemy (whole map, not my nation)
                 //é um combo com o model com os personagens conhecidos de outras nacoes
                 JComboBox cbTemp = new JComboBox(getActor().getPersonagensComboModel(0));
                 cbTemp.setEditable(true);
@@ -737,7 +764,8 @@ public class ComponentFactory implements Serializable {
             /*
          * FIXME: Refem nao ocorre no cenario 4. deixei pra depois
              */
-            case PERSONAGEM_REFEM_NONACAO:
+            case PERSONAGEM_REFEM_ENEMY_DEPR: // deprecated alias (retire >= 2027-07-01, KI-026)
+            case PERSONAGEM_REFEM_ENEMY:
                 break;
             case PRODUTO: {
                 //Produto
@@ -1048,9 +1076,10 @@ public class ComponentFactory implements Serializable {
     }
 
     /**
-     * Close the transient graph/dashboard windows (charts + Victory Dashboard). Called when a different
-     * game/turn is opened so those snapshots don't linger showing stale data. Leaves the main window and
-     * the map (which rebuild in place) alone.
+     * Close the transient graph/dashboard windows (charts + Victory Dashboard).
+     * Called when a different game/turn is opened so those snapshots don't
+     * linger showing stale data. Leaves the main window and the map (which
+     * rebuild in place) alone.
      */
     public static void disposeSecondaryWindows() {
         for (java.awt.Window w : java.awt.Window.getWindows()) {
