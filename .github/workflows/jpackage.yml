@@ -131,6 +131,26 @@ jobs:
           sips -z 1024 1024 icon/icon.png --out iconset.iconset/icon_512x512@2x.png
           iconutil -c icns iconset.iconset -o icon/icon.icns
 
+      - name: Verify main.wxs fork vs JDK stock (drift guard, Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          # main.wxs is a FORK of the JDK's stock jpackage template (jdk.jpackage.jmod) with only our two
+          # artwork WixVariable lines added. setup-java tracks the floating '21' patch, so a JDK bump can
+          # silently change the stock template and leave this fork missing new upstream behavior. Guard:
+          # extract the current stock template and diff it against the committed reference (main.wxs.stock).
+          # CR-stripped so autocrlf checkout can't cause a false positive. Drift => fail loudly; re-sync:
+          # re-extract stock into main.wxs.stock and re-apply the 2 WixVariable lines into main.wxs.
+          JMOD="$JAVA_HOME/jmods/jdk.jpackage.jmod"
+          RES="classes/jdk/jpackage/internal/resources/main.wxs"
+          unzip -p "$JMOD" "$RES" 2>/dev/null | tr -d '\r' > stock_now.wxs
+          tr -d '\r' < jpackage/win-resources/main.wxs.stock > stock_ref.wxs
+          if ! diff -u stock_ref.wxs stock_now.wxs; then
+            echo "::error::JDK stock main.wxs changed vs the committed main.wxs.stock reference. The JDK was likely bumped. Re-extract the stock template into jpackage/win-resources/main.wxs.stock, re-apply the 2 artwork WixVariable lines into main.wxs, then commit both."
+            exit 1
+          fi
+          echo "main.wxs stock template unchanged since fork."
+
       - name: Run jpackage (Windows)
         if: runner.os == 'Windows'
         shell: bash

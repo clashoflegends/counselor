@@ -1,1 +1,6 @@
 *.egf binary
+
+# WiX installer templates: keep LF so the MSI drift-check (jpackage.yml) compares
+# byte-for-byte against the JDK's stock main.wxs (also LF) without CRLF false positives.
+*.wxs text eol=lf
+*.wxs.stock text eol=lf

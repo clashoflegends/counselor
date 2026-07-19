@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Clash of Legends: fork of the JDK 21 jpackage default main.wxs (jdk.jpackage.jmod).
-     ONLY change vs stock = the two WixVariable lines before </Product> that point WixUIDialogBmp /
-     WixUIBannerBmp at our custom installer artwork. The pristine stock template is committed alongside
-     as main.wxs.stock; the "Verify main.wxs fork vs JDK stock" step in jpackage.yml diffs the current
-     JDK's stock against it and fails the build if a JDK bump changed it. On that failure: re-extract the
-     stock into main.wxs.stock and re-apply these 2 lines here. @RESDIR@ is substituted at build time. -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 
@@ -136,10 +130,6 @@
     <InstallUISequence>
       <Custom Action="JpFindRelatedProducts" After="FindRelatedProducts"/>
     </InstallUISequence>
-
-    <!-- Clash: custom installer artwork (WixUIExtension WelcomeDlg / interior banner). -->
-    <WixVariable Id="WixUIDialogBmp" Value="@RESDIR@/dialog.bmp" />
-    <WixVariable Id="WixUIBannerBmp" Value="@RESDIR@/banner.bmp" />
 
   </Product>
 </Wix>
