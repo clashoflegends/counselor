@@ -136,6 +136,11 @@ jobs:
         shell: bash
         run: |
           mkdir -p installer
+          # Installer artwork: override the WiX dialog + banner bitmaps with Clash art.
+          # WixVariable bitmap paths must be absolute (WiX links from a temp config dir); pwd -W gives a Windows path.
+          RESDIR="$(pwd -W)/jpackage/win-resources"
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<Include>\n  <WixVariable Id="WixUIDialogBmp" Value="%s/dialog.bmp" />\n  <WixVariable Id="WixUIBannerBmp" Value="%s/banner.bmp" />\n</Include>\n' "$RESDIR" "$RESDIR" > jpackage/win-resources/overrides.wxi
+          cat jpackage/win-resources/overrides.wxi
           jpackage \
             --input dist \
             --dest installer \
@@ -157,6 +162,7 @@ jobs:
             --java-options "--add-opens=java.base/java.text=ALL-UNNAMED" \
             --java-options "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED" \
             --icon icon/icon.${{ matrix.icon-ext }} \
+            --resource-dir jpackage/win-resources \
             --file-associations jpackage/file-associations.properties \
             --win-dir-chooser \
             --win-shortcut
