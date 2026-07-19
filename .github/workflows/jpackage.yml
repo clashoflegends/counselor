@@ -136,11 +136,9 @@ jobs:
         shell: bash
         run: |
           mkdir -p installer
-          # Installer artwork: override the WiX dialog + banner bitmaps with Clash art.
-          # WixVariable bitmap paths must be absolute (WiX links from a temp config dir); pwd -W gives a Windows path.
-          RESDIR="$(pwd -W)/jpackage/win-resources"
-          printf '<?xml version="1.0" encoding="utf-8"?>\n<Include>\n  <WixVariable Id="WixUIDialogBmp" Value="%s/dialog.bmp" />\n  <WixVariable Id="WixUIBannerBmp" Value="%s/banner.bmp" />\n</Include>\n' "$RESDIR" "$RESDIR" > jpackage/win-resources/overrides.wxi
-          cat jpackage/win-resources/overrides.wxi
+          # Custom installer artwork: our forked main.wxs sets WixUIDialogBmp/WixUIBannerBmp; substitute the
+          # absolute resource path (WiX links from a temp config dir; pwd -W gives a Windows-style path).
+          sed -i "s|@RESDIR@|$(pwd -W)/jpackage/win-resources|g" jpackage/win-resources/main.wxs
           jpackage \
             --input dist \
             --dest installer \
