@@ -1,14 +1,25 @@
 # What's New in Counselor
 
-## 18-JUL-2026 - v2.1.904
+## 19-JUL-2026 - v2.1.904
 
 ### More ways to read the game, from the Victory Dashboard
 - **Nation power comparison** - a new radar chart pits **you against your key rivals** (and, in team games, your strongest ally) across gold, income, cities, big cities, key cities, troops, and characters, so you can see where you lead and where you trail at a glance.
 - **"What should I grow?"** - a coach-style chart showing your nation on each lever as a share of the **game average**, with the levers that matter for **this game's victory conditions highlighted** - so a new player knows exactly what to build toward.
 - **Your momentum** - a rank-over-time chart (1st place at the top) tracing **whether you are climbing or sliding** each turn, with your line highlighted against the pack.
 
+### See your team's whole plan
+- The results toolbar now has **My Actions** (your own orders) and **Team Actions** - your whole team's orders in one view (your nations plus any allies whose order files you have loaded into the same folder). Handy for coordinating and reviewing the team's plan before the deadline.
+
+### Settings
+- **Reset to Defaults** - a new button in the Settings dialog restores every Counselor setting to its default in one click. (It clears your saved config, including your upload token, which you can re-fetch from the website.)
+
 ### Smaller touches
+- **Safer duels & assassinations** now also keep **your own nation** out of the target list (previously only allies were hidden) - so only valid enemy targets show. Tick **ALL** to override for a betrayal.
 - **Victory Point history** turn labels no longer collapse to "..." on long games - the turns are always readable now.
+
+### Website (clashlegends.com)
+- **New: Order Statistics** (under Statistics) - **roll fairness** charts your dice spread against the whole player base with a normal-range band, and **success-by-order-type** shows how often your assassinations, thefts, spells and more land, this game vs your whole career - separating skill and target choices from luck.
+- **Send turn copies to more inboxes** - add up to 3 CC email addresses per nation on My Games (results and receipts).
 
 ## 17-JUL-2026 - v2.1.903
 
