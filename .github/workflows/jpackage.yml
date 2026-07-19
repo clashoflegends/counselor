@@ -143,7 +143,12 @@ jobs:
           # re-extract stock into main.wxs.stock and re-apply the 2 WixVariable lines into main.wxs.
           JMOD="$JAVA_HOME/jmods/jdk.jpackage.jmod"
           RES="classes/jdk/jpackage/internal/resources/main.wxs"
-          unzip -p "$JMOD" "$RES" 2>/dev/null | tr -d '\r' > stock_now.wxs
+          # A jmod has a 4-byte magic prefix, so unzip prints a "4 extra bytes" warning and returns
+          # exit code 1 (warning) even on a successful extract. Tolerate <=1 under set -e/pipefail;
+          # fail only on a real error (>=2). Then guard against an empty extract.
+          unzip -p "$JMOD" "$RES" > stock_raw.wxs 2>/dev/null || { rc=$?; [ "$rc" -le 1 ] || { echo "::error::unzip failed (rc=$rc) extracting stock main.wxs from the jmod"; exit 1; }; }
+          [ -s stock_raw.wxs ] || { echo "::error::extracted stock main.wxs is empty"; exit 1; }
+          tr -d '\r' < stock_raw.wxs > stock_now.wxs
           tr -d '\r' < jpackage/win-resources/main.wxs.stock > stock_ref.wxs
           if ! diff -u stock_ref.wxs stock_now.wxs; then
             echo "::error::JDK stock main.wxs changed vs the committed main.wxs.stock reference. The JDK was likely bumped. Re-extract the stock template into jpackage/win-resources/main.wxs.stock, re-apply the 2 artwork WixVariable lines into main.wxs, then commit both."
