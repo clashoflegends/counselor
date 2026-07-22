@@ -4,7 +4,6 @@
 package gui.services;
 
 import control.services.CityLoyalty;
-import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
 import javax.swing.JTable;
@@ -12,20 +11,17 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 /**
- * Colors the city-loyalty column to warn about imminent size reductions, following the same visual
- * language as {@link LifeTableCellRenderer} (the character life column): RED when the city is already
- * below the reduction threshold, ORANGE when it is within the amber margin of it. Explicit
- * foreground/background pairs keep it readable under any Look and Feel (light or FlatLaf dark).
+ * Colors the city-loyalty column to warn about imminent size reductions, using the shared LAF-aware
+ * {@link LafTint} palette (light tints + dark-mode variants): RED when the city is already below the
+ * reduction threshold, AMBER when it is within the amber margin of it.
  *
  * The RED/AMBER classification lives on the {@link CityLoyalty} cell value (shared with the cities-tab
- * risk filters, so coloring and filtering can never disagree), so this renderer stays trivial.
+ * risk filters, so coloring and filtering can never disagree), so this renderer stays trivial. The
+ * selection highlight is left to the L&amp;F (cells are tinted only when not selected).
  *
  * @author jmoura
  */
 public class CityLoyaltyTableCellRenderer extends DefaultTableCellRenderer implements Serializable {
-
-    private final Color colorBgSelected = new Color(46, 106, 197);
-    private final Color colorFgSelected = Color.WHITE;
 
     public CityLoyaltyTableCellRenderer() {
         super();
@@ -35,29 +31,27 @@ public class CityLoyaltyTableCellRenderer extends DefaultTableCellRenderer imple
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         this.setHorizontalAlignment(SwingConstants.RIGHT);
-
-        boolean red = false;
-        boolean amber = false;
-        if (value instanceof CityLoyalty) {
-            final CityLoyalty cl = (CityLoyalty) value;
-            red = cl.isImminentDecay();
-            amber = cl.isAtDecayRisk();
-        }
-
-        if (red) {
-            c.setBackground(Color.RED);
-            c.setForeground(Color.WHITE);
-        } else if (amber) {
-            c.setBackground(Color.ORANGE);
-            c.setForeground(Color.BLACK);
-        } else if (isSelected) {
-            c.setBackground(colorBgSelected);
-            c.setForeground(colorFgSelected);
-        } else {
-            // reset - DefaultTableCellRenderer reuses one component, so an uncolored cell must clear
-            // any red/orange left over from a previous row on scroll/reuse.
-            c.setBackground(table.getBackground());
-            c.setForeground(table.getForeground());
+        if (!isSelected) {
+            LafTint tint = null;
+            if (value instanceof CityLoyalty) {
+                final CityLoyalty cl = (CityLoyalty) value;
+                if (cl.isImminentDecay()) {
+                    tint = LafTint.RED;
+                } else if (cl.isAtDecayRisk()) {
+                    tint = LafTint.AMBER;
+                }
+            }
+            if (tint != null) {
+                c.setBackground(tint.bg());
+                c.setForeground(LafTint.fg());
+            } else {
+                // Explicit reset. DefaultTableCellRenderer reuses one component and stores the last
+                // setBackground as its "unselected" color, which super reuses for the next unselected
+                // cell - so a neutral cell must clear any tint left by a previously rendered row, or
+                // zeros/neutrals inherit red/amber on scroll, sort, or filter changes.
+                c.setBackground(table.getBackground());
+                c.setForeground(table.getForeground());
+            }
         }
         return c;
     }
