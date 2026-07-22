@@ -58,8 +58,12 @@ public class MainSettingsGui extends JPanel {
             String tok = gui.services.TokenSetupDialog.show(this, LABELS);
             if (tok != null && !tok.isEmpty()) {
                 playerTokenTextField.setText(tok);
+                refreshPlayerLogin(); // the fetch also captured + stored the canonical login
             }
         });
+        // Website login (the plogin) captured by the token fetch and stored in properties.config;
+        // shown read-only beside the token so a player can confirm which account this Counselor is tied to.
+        refreshPlayerLogin();
         themeComboBox.setModel(getThemeModel());
         themeComboBox.setActionCommand("themeCombo");
         themeComboBox.addActionListener(settingsControler);
@@ -130,6 +134,15 @@ public class MainSettingsGui extends JPanel {
         }
     }
 
+    // Show the player's website login (read from properties.config "playerLogin", written by the
+    // token fetch). Blank/unfetched -> a hint. Not editable: it is derived from the site, not typed here.
+    private void refreshPlayerLogin() {
+        final String login = SettingsManager.getInstance().getConfig("playerLogin", "").trim();
+        jlPlayerLogin.setText(login.isEmpty()
+                ? LABELS.getString("SETTINGS.PLAYER.LOGIN.NONE")
+                : String.format(LABELS.getString("SETTINGS.PLAYER.LOGIN"), login));
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -172,6 +185,7 @@ public class MainSettingsGui extends JPanel {
         playerTokenLabel = new javax.swing.JLabel();
         playerTokenTextField = new javax.swing.JTextField();
         fetchTokenButton = new javax.swing.JButton();
+        jlPlayerLogin = new javax.swing.JLabel();
         displayPanel = new javax.swing.JPanel();
         filtroLabel = new javax.swing.JLabel();
         allFiltroRadioButton = new javax.swing.JRadioButton();
@@ -422,6 +436,8 @@ public class MainSettingsGui extends JPanel {
 
         fetchTokenButton.setText("jButton1");
 
+        jlPlayerLogin.setText("jLabel1");
+
         javax.swing.GroupLayout playerPanelLayout = new javax.swing.GroupLayout(playerPanel);
         playerPanel.setLayout(playerPanelLayout);
         playerPanelLayout.setHorizontalGroup(
@@ -437,10 +453,13 @@ public class MainSettingsGui extends JPanel {
                     .addComponent(playerTokenTextField)
                     .addGroup(playerPanelLayout.createSequentialGroup()
                         .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(fetchTokenButton)
                             .addComponent(themeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(languageComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 148, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(playerPanelLayout.createSequentialGroup()
+                        .addComponent(fetchTokenButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(jlPlayerLogin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         playerPanelLayout.setVerticalGroup(
@@ -459,7 +478,9 @@ public class MainSettingsGui extends JPanel {
                     .addComponent(playerTokenLabel)
                     .addComponent(playerTokenTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fetchTokenButton)
+                .addGroup(playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fetchTokenButton)
+                    .addComponent(jlPlayerLogin))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -764,11 +785,11 @@ public class MainSettingsGui extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(gamePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
-                    .addComponent(displayPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE))
+                    .addComponent(displayPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 523, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(playerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
-                    .addComponent(mapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)))
+                    .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 533, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -779,7 +800,7 @@ public class MainSettingsGui extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(displayPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
-                    .addComponent(mapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)))
+                    .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 337, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -826,6 +847,7 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JCheckBox hexTagFrameCheckBox;
     private javax.swing.JComboBox hexTagStyleComboBox;
     private javax.swing.JLabel hexTagStyleLabel;
+    private javax.swing.JLabel jlPlayerLogin;
     private javax.swing.JCheckBox keepPopUpCheckBox;
     private javax.swing.JComboBox languageComboBox;
     private javax.swing.JLabel languageLabel;
