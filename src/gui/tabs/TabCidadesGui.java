@@ -15,6 +15,7 @@ import control.facade.WorldFacadeCounselor;
 import control.services.CidadeConverter;
 import control.services.FiltroConverter;
 import gui.TabBase;
+import gui.services.CityLoyaltyTableCellRenderer;
 import gui.services.IAcaoGui;
 import gui.subtabs.SubTabBaseList;
 import gui.subtabs.SubTabOrdem;
@@ -52,6 +53,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     private final SubTabBaseList stProdutos = new SubTabBaseList();
     private SubTabOrdem stOrdens;
     private Cenario cenario;
+    private CityLoyaltyTableCellRenderer clcr;
 
     /**
      * Creates new form TabCidadesGui
@@ -240,6 +242,9 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         comboFiltro.addActionListener(cidadeControl);
         jtMainLista.getSelectionModel().addListSelectionListener(cidadeControl);
 
+        //loyalty column: red below the size-reduction threshold, amber within 9 points of it.
+        clcr = new CityLoyaltyTableCellRenderer(9);
+
         TableModel model = cidadeControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
         this.setMainModel(model);
         stResults.setFontText(detalhesCidade.getFont());
@@ -263,6 +268,10 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         stProdutos.setListModelClear();
         this.jtMainLista.setModel(model);
         this.doConfigTableColumns(jtMainLista);
+        if (clcr != null) {
+            //re-apply after every model swap: autoCreateColumnsFromModel rebuilds the columns.
+            jtMainLista.getColumnModel().getColumn(jtMainLista.getColumn(labels.getString("LEALDADE")).getModelIndex()).setCellRenderer(clcr);
+        }
         this.updateGui();
         this.doTagHide();
         this.jtMainLista.getSelectionModel().setSelectionInterval(0, 0);

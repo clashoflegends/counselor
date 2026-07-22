@@ -84,7 +84,7 @@ public class CidadeConverter implements Serializable {
         colNames.add(labels.getString("CUSTO.MANUTENCAO"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("LEALDADE"));
-        classes.add(java.lang.Integer.class);
+        classes.add(CityLoyalty.class);
         colNames.add(labels.getString("LEALDADE.VARIACAO"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("PRESENCAS"));
@@ -140,6 +140,8 @@ public class CidadeConverter implements Serializable {
 
     private static Object[] toArray(Cidade cidade) {
         final Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
+        final Local local = cidadeFacade.getLocal(cidade);
+        final int presencasQt = localFacade.getPersonagens(local).size();
         int ii = 0;
         Object[] cArray = new Object[getCidadeColNames(new ArrayList<>(30)).length];
         cArray[ii++] = cidadeFacade.getNome(cidade);
@@ -158,14 +160,14 @@ public class CidadeConverter implements Serializable {
             cArray[ii++] = openSlot;
         }
         cArray[ii++] = cidadeFacade.getTamanhoNome(cidade);
-        cArray[ii++] = cidadeFacade.getLocal(cidade);
+        cArray[ii++] = local;
 
         cArray[ii++] = cidadeFacade.getArrecadacaoImpostos(cidade);
         cArray[ii++] = cidadeFacade.getProducao(cidade, WorldFacadeCounselor.getInstance().getCenario().getMoney(), WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getTurno());
         cArray[ii++] = cidadeFacade.getUpkeepMoney(cidade, WorldFacadeCounselor.getInstance().getCenario());
-        cArray[ii++] = cidadeFacade.getLealdade(cidade);
+        cArray[ii++] = buildCityLoyalty(cidade, presencasQt);
         cArray[ii++] = cidadeFacade.getLealdadeDelta(cidade);
-        cArray[ii++] = localFacade.getPersonagens(cidadeFacade.getLocal(cidade)).size();
+        cArray[ii++] = presencasQt;
         cArray[ii++] = cidadeFacade.getRacaNome(cidade);
         cArray[ii++] = cidadeFacade.getDocasNome(cidade);
         cArray[ii++] = cidadeFacade.getFortificacaoNome(cidade);
@@ -178,8 +180,8 @@ public class CidadeConverter implements Serializable {
         cArray[ii++] = cidadeFacade.getSitiado(cidade);
         cArray[ii++] = cidadeFacade.getPointsDomination(cidade);
         cArray[ii++] = cidadeFacade.getNacaoNome(cidade);
-        cArray[ii++] = localFacade.getTerrenoNome(cidadeFacade.getLocal(cidade));
-        cArray[ii++] = localFacade.getClima(cidadeFacade.getLocal(cidade));
+        cArray[ii++] = localFacade.getTerrenoNome(local);
+        cArray[ii++] = localFacade.getClima(local);
         cArray[ii++] = cidadeFacade.getResourceBestSell(cidade, mercado, WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getTurno());
         if (WorldFacadeCounselor.getInstance().hasResourceManagement()) {
             for (Produto produto : getResourceList()) {
@@ -189,6 +191,18 @@ public class CidadeConverter implements Serializable {
             }
         }
         return cArray;
+    }
+
+    /**
+     * Builds the loyalty cell with its size-reduction threshold pre-computed (via the shared
+     * {@code CidadeFacade} rule), so the renderer can flag at-risk cities. Capitals never flip and
+     * loyalty &lt;= 0 (unknown, e.g. enemy cities) is not flagged. Presence is fog-limited on the client.
+     */
+    private static CityLoyalty buildCityLoyalty(Cidade cidade, int presencasQt) {
+        final int loyalty = cidadeFacade.getLealdade(cidade);
+        final int threshold = cidadeFacade.getLoyaltyReductionThreshold(cidade, presencasQt > 0);
+        final boolean eligible = loyalty > 0 && !cidadeFacade.isCapital(cidade);
+        return new CityLoyalty(loyalty, threshold, eligible);
     }
 
     private static Object[][] getCidadesAsArray(List listaExibir) {
