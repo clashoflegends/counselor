@@ -54,6 +54,9 @@ public class FiltroConverter implements Serializable {
             //big-city options
             lista.add(new GenericoComboObject(labels.getString("FILTRO.BIGCITY.MEU"), "bigcitymy"));
             lista.add(new GenericoComboObject(labels.getString("FILTRO.BIGCITY.ALL"), "bigcityall"));
+            //loyalty decay-risk options (match the loyalty column colours: red = imminent, amber = some)
+            lista.add(new GenericoComboObject(labels.getString("FILTRO.DECAY.RED"), "decayred"));
+            lista.add(new GenericoComboObject(labels.getString("FILTRO.DECAY.AMBER"), "decayamber"));
         }
         if (options == 6) {
             //Active options

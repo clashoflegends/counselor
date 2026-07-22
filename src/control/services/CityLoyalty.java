@@ -47,6 +47,19 @@ public class CityLoyalty implements Comparable<CityLoyalty>, Serializable {
         return eligible;
     }
 
+    /** Loyalty margin above the reduction threshold within which a city is "at risk" (amber). */
+    public static final int AMBER_MARGIN = 9;
+
+    /** RED: eligible and already below the reduction threshold (a size reduction may occur). */
+    public boolean isImminentDecay() {
+        return eligible && loyalty < threshold;
+    }
+
+    /** AMBER: eligible, not yet below the threshold, but within {@link #AMBER_MARGIN} points of it. */
+    public boolean isAtDecayRisk() {
+        return eligible && !isImminentDecay() && loyalty <= threshold + AMBER_MARGIN;
+    }
+
     @Override
     public int compareTo(CityLoyalty o) {
         return Integer.compare(this.loyalty, o.loyalty);

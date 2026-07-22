@@ -243,7 +243,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         jtMainLista.getSelectionModel().addListSelectionListener(cidadeControl);
 
         //loyalty column: red below the size-reduction threshold, amber within 9 points of it.
-        clcr = new CityLoyaltyTableCellRenderer(9);
+        clcr = new CityLoyaltyTableCellRenderer();
 
         TableModel model = cidadeControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
         this.setMainModel(model);

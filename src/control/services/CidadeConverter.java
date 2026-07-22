@@ -194,6 +194,14 @@ public class CidadeConverter implements Serializable {
     }
 
     /**
+     * A city's loyalty + reduction threshold, shared by the table cell (coloring) and the cities-tab
+     * decay-risk filters. Presence is the fog-limited count of visible characters on the city's hex.
+     */
+    public static CityLoyalty getCityLoyalty(Cidade cidade) {
+        return buildCityLoyalty(cidade, localFacade.getPersonagens(cidadeFacade.getLocal(cidade)).size());
+    }
+
+    /**
      * Builds the loyalty cell with its size-reduction threshold pre-computed (via the shared
      * {@code CidadeFacade} rule), so the renderer can flag at-risk cities. Capitals never flip and
      * loyalty &lt;= 0 (unknown, e.g. enemy cities) is not flagged. Presence is fog-limited on the client.
@@ -375,6 +383,20 @@ public class CidadeConverter implements Serializable {
         } else if (filtro.equalsIgnoreCase("enemies") && jAtivo != null) {
             for (Cidade cidade : listFactory.listCidades().values()) {
                 if (!jAtivo.isJogadorAliado(cidadeFacade.getNacao(cidade)) && !jAtivo.isNacao(cidadeFacade.getNacao(cidade))) {
+                    ret.add(cidade);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("decayred")) {
+            //cities at imminent risk of a loyalty-driven size reduction (red loyalty)
+            for (Cidade cidade : listFactory.listCidades().values()) {
+                if (getCityLoyalty(cidade).isImminentDecay()) {
+                    ret.add(cidade);
+                }
+            }
+        } else if (filtro.equalsIgnoreCase("decayamber")) {
+            //cities at some risk of a loyalty-driven size reduction (amber loyalty)
+            for (Cidade cidade : listFactory.listCidades().values()) {
+                if (getCityLoyalty(cidade).isAtDecayRisk()) {
                     ret.add(cidade);
                 }
             }

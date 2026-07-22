@@ -14,11 +14,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 /**
  * Colors the city-loyalty column to warn about imminent size reductions, following the same visual
  * language as {@link LifeTableCellRenderer} (the character life column): RED when the city is already
- * below the reduction threshold, ORANGE when it is within {@code amberMargin} points of it. Explicit
+ * below the reduction threshold, ORANGE when it is within the amber margin of it. Explicit
  * foreground/background pairs keep it readable under any Look and Feel (light or FlatLaf dark).
  *
- * The per-city threshold rides on the {@link CityLoyalty} cell value (computed in CidadeConverter from
- * PbmJudge's MilestoneProducaoBase.doCidadeTestFlip formula), so this renderer stays trivial.
+ * The RED/AMBER classification lives on the {@link CityLoyalty} cell value (shared with the cities-tab
+ * risk filters, so coloring and filtering can never disagree), so this renderer stays trivial.
  *
  * @author jmoura
  */
@@ -26,11 +26,9 @@ public class CityLoyaltyTableCellRenderer extends DefaultTableCellRenderer imple
 
     private final Color colorBgSelected = new Color(46, 106, 197);
     private final Color colorFgSelected = Color.WHITE;
-    private final int amberMargin;
 
-    public CityLoyaltyTableCellRenderer(int amberMargin) {
+    public CityLoyaltyTableCellRenderer() {
         super();
-        this.amberMargin = amberMargin;
     }
 
     @Override
@@ -42,10 +40,8 @@ public class CityLoyaltyTableCellRenderer extends DefaultTableCellRenderer imple
         boolean amber = false;
         if (value instanceof CityLoyalty) {
             final CityLoyalty cl = (CityLoyalty) value;
-            if (cl.isEligible()) {
-                red = cl.getLoyalty() < cl.getThreshold();
-                amber = !red && cl.getLoyalty() <= cl.getThreshold() + amberMargin;
-            }
+            red = cl.isImminentDecay();
+            amber = cl.isAtDecayRisk();
         }
 
         if (red) {
