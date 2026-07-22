@@ -55,11 +55,14 @@ public class DifficultyColorTableCellRenderer extends DefaultTableCellRenderer i
                     c.setBackground(bg);
                     c.setForeground(Color.BLACK);
                 }
+            } else {
+                // Explicit reset. DefaultTableCellRenderer stores the last setBackground as its
+                // "unselected" color and reuses it for the next unselected cell, so an unmatched cell
+                // must clear any tint left by a previously rendered row - otherwise "-"/empty difficulty
+                // slots inherit a colour on scroll, sort, or filter changes.
+                c.setBackground(table.getBackground());
+                c.setForeground(table.getForeground());
             }
-            // Unmatched cells: leave the colors super already set for the
-            // unselected state (table default, or a striping LaF's row color),
-            // so this feature never flattens row striping. super resets bg/fg
-            // on every call, so no tint leaks from a previously colored cell.
         }
         return c;
     }
