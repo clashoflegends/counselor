@@ -217,6 +217,19 @@ jobs:
             --java-options "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED" \
             --icon icon/icon.ico
 
+      - name: Add AV-safe portable launcher to app-image (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          # jpackage strips java.exe/javaw.exe from the app runtime - the app boots via the UNSIGNED
+          # Counselor.exe stub, which some corporate antivirus tools false-flag as a trojan and delete.
+          # Drop the SIGNED Temurin launchers (Eclipse Adoptium-signed) back into the runtime plus a
+          # run-portable.bat that uses them, so a player whose AV quarantines Counselor.exe can still
+          # run Counselor from the bundled (signed) runtime with no separate Java install. Verified: the
+          # copied launcher boots against the stripped jpackage runtime. See jpackage/run-portable.bat.
+          cp "$JAVA_HOME/bin/java.exe" "$JAVA_HOME/bin/javaw.exe" appimage/Counselor/runtime/bin/
+          cp jpackage/run-portable.bat appimage/Counselor/run-portable.bat
+
       - name: ZIP app-image (Windows)
         if: runner.os == 'Windows'
         shell: pwsh

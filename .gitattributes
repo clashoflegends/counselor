@@ -4,3 +4,6 @@
 # byte-for-byte against the JDK's stock main.wxs (also LF) without CRLF false positives.
 *.wxs text eol=lf
 *.wxs.stock text eol=lf
+
+# Windows batch launchers must be CRLF so cmd.exe parses caret line-continuations reliably.
+*.bat text eol=crlf
