@@ -1,5 +1,15 @@
 # What's New in Counselor
 
+## 21-JUL-2026 - v2.1.905
+
+### See which cities are in trouble at a glance
+- The **Cities** tab now colour-codes loyalty: a city in danger of shrinking from low loyalty shows **red** (critical) or **amber** (at risk), so you can catch problems before you lose population.
+- The **loyalty-change** column is colour-coded too - **green/blue** when a city is gaining loyalty, **red/amber** when it's slipping - so one glance tells you where things are heading. Colours adapt to light and dark themes.
+- Two new **Cities filters** - **"Loyalty critical"** and **"Loyalty at risk"** - list just the cities that need your attention.
+
+### Settings
+- Your **website login** now shows next to your Counselor token, so it's clear which account the client is signed in as.
+
 ## 19-JUL-2026 - v2.1.904
 
 ### More ways to read the game, from the Victory Dashboard
