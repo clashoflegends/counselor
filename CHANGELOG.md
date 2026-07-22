@@ -1,5 +1,10 @@
 # What's New in Counselor
 
+## 21-JUL-2026 - v2.1.906
+
+### Fixes
+- Fixed a rare colour-smear glitch where a tinted cell's colour could bleed onto other cells in a table when scrolling, sorting, or changing a filter (seen in the order **Difficulty** column).
+
 ## 21-JUL-2026 - v2.1.905
 
 ### See which cities are in trouble at a glance
