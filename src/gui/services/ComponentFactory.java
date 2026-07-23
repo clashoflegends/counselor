@@ -262,7 +262,7 @@ public class ComponentFactory implements Serializable {
                     //é um combo com o model com os personagens conhecidos no local da mesma nacao
                     //filterable city picker (type name or coord, sort toggle, pick-on-map) - UI only,
                     //still serializes the city coordinate. See CidadeAlvoPicker.
-                    cNovo = new CidadeAlvoPicker(getActor().getCidadeComboModel(0), getMapaControler(), false);
+                    cNovo = new CidadeAlvoPicker(getActor().getCidadeComboModel(0), getMapaControler(), "CITY.PICK.MAP.HINT.ANY");
                 }
                 break;
             case CIDADE_NACAO:
@@ -276,7 +276,7 @@ public class ComponentFactory implements Serializable {
                     cNovo = jtTemp;
                 } else {
                     //é um combo com o model com os personagens conhecidos no local da mesma nacao
-                    cNovo = new CidadeAlvoPicker(getActor().getCidadeComboModel(1), getMapaControler(), true);
+                    cNovo = new CidadeAlvoPicker(getActor().getCidadeComboModel(1), getMapaControler(), "CITY.PICK.MAP.HINT.NACAO");
                 }
                 break;
             case CIDADE_NEWCAPITAL: {
@@ -291,9 +291,9 @@ public class ComponentFactory implements Serializable {
                     jtTemp.setColumns(4);
                     cNovo = jtTemp;
                 } else {
-                    JComboBox cbTemp = new JComboBox(getActor().getCidadeComboModel(2));
-                    cbTemp.setName("cbCidadeNewCapital"); // NOI18N
-                    cNovo = cbTemp;
+                    //filterable city picker (type name or coord, sort, pick-on-map) over the nation's
+                    //own large cities; UI only, still serializes the coordinate. See CidadeAlvoPicker.
+                    cNovo = new CidadeAlvoPicker(getActor().getCidadeComboModel(2), getMapaControler(), "CITY.PICK.MAP.HINT.BIG");
                 }
                 break;
             }

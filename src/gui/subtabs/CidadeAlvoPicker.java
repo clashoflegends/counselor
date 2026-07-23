@@ -54,14 +54,14 @@ public class CidadeAlvoPicker extends JPanel {
     private final JButton sortBtn = new JButton();
     private final JToggleButton mapBtn = new JToggleButton();
     private final MapaControler mapaControler;
-    private final boolean nacaoOnly;   // true = Cidade_Nacao (own cities); false = Cidade_Any
+    private final String mapHintKey;   // label key for the mode-specific "click on the map" hint
     private boolean sortByCoord;
     private IBaseModel lastValid;
 
-    public CidadeAlvoPicker(ComboBoxModel model, MapaControler mapaControler, boolean nacaoOnly) {
+    public CidadeAlvoPicker(ComboBoxModel model, MapaControler mapaControler, String mapHintKey) {
         super(new BorderLayout(4, 0));
         this.mapaControler = mapaControler;
-        this.nacaoOnly = nacaoOnly;
+        this.mapHintKey = mapHintKey;
         this.sortByCoord = "coord".equals(SettingsManager.getInstance().getConfig(SORT_CONFIG, "name"));
         // Snapshot the caller's model - we mutate our own DefaultComboBoxModel when filtering, never theirs.
         for (int i = 0; i < model.getSize(); i++) {
@@ -124,7 +124,7 @@ public class CidadeAlvoPicker extends JPanel {
             if (mapBtn.isSelected()) {
                 Window w = SwingUtilities.getWindowAncestor(this);
                 if (w != null) {
-                    Toast.show(w, labels.getString(nacaoOnly ? "CITY.PICK.MAP.HINT.NACAO" : "CITY.PICK.MAP.HINT.ANY"));
+                    Toast.show(w, labels.getString(mapHintKey));
                 }
                 mapaControler.armCityPick(this::onMapPick);
             } else {
