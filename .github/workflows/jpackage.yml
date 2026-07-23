@@ -187,6 +187,7 @@ jobs:
             --icon icon/icon.${{ matrix.icon-ext }} \
             --resource-dir jpackage/win-resources \
             --file-associations jpackage/file-associations.properties \
+            --win-per-user-install \
             --win-dir-chooser \
             --win-shortcut
 
