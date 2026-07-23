@@ -1,5 +1,10 @@
 # What's New in Counselor
 
+## 22-JUL-2026 - v2.1.907
+
+### Windows portable: antivirus-safe launcher
+- The Windows portable download now includes **run-portable.bat**. If your antivirus wrongly flags or deletes **Counselor.exe** (a known false positive on the unsigned launcher), just double-click **run-portable.bat** instead - it starts Counselor using the bundled, code-signed Java runtime. No reinstall and no separate Java install needed.
+
 ## 21-JUL-2026 - v2.1.906
 
 ### Fixes
