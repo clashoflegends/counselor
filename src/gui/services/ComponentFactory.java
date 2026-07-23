@@ -18,6 +18,7 @@ import gui.charts.ChartPie;
 import gui.charts.DataSetForChart;
 import gui.components.DialogTextArea;
 import gui.components.JLabelGradient;
+import gui.subtabs.CidadeAlvoPicker;
 import gui.subtabs.SubTabCoordenadas;
 import gui.subtabs.SubTabDirecao;
 import gui.subtabs.SubTabDirecaoExercito;
@@ -259,8 +260,9 @@ public class ComponentFactory implements Serializable {
                     cNovo = jtTemp;
                 } else {
                     //é um combo com o model com os personagens conhecidos no local da mesma nacao
-                    JComboBox cbTemp = new JComboBox(getActor().getCidadeComboModel(0));
-                    cNovo = cbTemp;
+                    //filterable city picker (type name or coord, sort toggle, pick-on-map) - UI only,
+                    //still serializes the city coordinate. See CidadeAlvoPicker.
+                    cNovo = new CidadeAlvoPicker(getActor().getCidadeComboModel(0), getMapaControler(), false);
                 }
                 break;
             case CIDADE_NACAO:
@@ -274,8 +276,7 @@ public class ComponentFactory implements Serializable {
                     cNovo = jtTemp;
                 } else {
                     //é um combo com o model com os personagens conhecidos no local da mesma nacao
-                    JComboBox cbTemp = new JComboBox(getActor().getCidadeComboModel(1));
-                    cNovo = cbTemp;
+                    cNovo = new CidadeAlvoPicker(getActor().getCidadeComboModel(1), getMapaControler(), true);
                 }
                 break;
             case CIDADE_NEWCAPITAL: {
@@ -939,6 +940,16 @@ public class ComponentFactory implements Serializable {
                 //PENDING: nao tem nada pra selecionar, provavelmente nao pode dar esta ordem agora
                 //log.info("JG: " + ex);
             }
+        } else if (cNovo instanceof CidadeAlvoPicker) {
+            //same default-select rules as the plain city combo above (restore the saved value,
+            //else Cidade_Nacao defaults to the actor's own hex) - the picker is a JPanel so it does
+            //not match the JComboBox branch.
+            CidadeAlvoPicker picker = (CidadeAlvoPicker) cNovo;
+            if (!vlInicialDisplay.equals("")) {
+                picker.setSelectedByDisplay(vlInicialDisplay);
+            } else if (controle.equals(CIDADE_NACAO)) {
+                picker.setSelectedById(getActor().getLocalCoordenadas());
+            }
         } else if (cNovo instanceof JFormattedTextField) {
             //&& ordemSelecionada == actorOrdemGravada
             JFormattedTextField jtTemp = (JFormattedTextField) cNovo;
@@ -970,6 +981,10 @@ public class ComponentFactory implements Serializable {
                     tempId = par;
                     tempDisplay = par;
                 }
+            } else if (comp instanceof CidadeAlvoPicker) {
+                CidadeAlvoPicker picker = (CidadeAlvoPicker) comp;
+                tempId = picker.getComboId();
+                tempDisplay = picker.getComboDisplay();
             } else if (comp instanceof JTextField) {
                 JTextField par = (JTextField) comp;
                 tempId = par.getText();

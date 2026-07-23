@@ -163,6 +163,17 @@ public final class Toast {
         current.slideIn(owner);
     }
 
+    /** Dismiss the currently shown toast, if any (e.g. once the action it prompted has completed). */
+    public static void dismissCurrent() {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(Toast::dismissCurrent);
+            return;
+        }
+        if (current != null) {
+            current.dismiss();
+        }
+    }
+
     private void slideIn(Window owner) {
         final int x = owner.getX() + MARGIN_X;
         final int targetY = owner.getY() + owner.getHeight() - window.getHeight() - BOTTOM_GAP;

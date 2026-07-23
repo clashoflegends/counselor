@@ -35,6 +35,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import java.util.function.Consumer;
 import javax.swing.SwingUtilities;
 import model.Cenario;
 import model.Exercito;
@@ -65,6 +66,9 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     private MainMapaGui tabGui;
     private DialogTextArea hexInfo;
     private Local localAtual;
+    // One-shot "pick a city on the map" callback (armed by CidadeAlvoPicker). Last-wins; cleared after
+    // the next left-click consumes it, so a stale picker never keeps intercepting map clicks.
+    private Consumer<Local> cityPickCallback;
     private final List<JTable> tables = new ArrayList<>();
     private RadialMenu rmActive;
     private MapMenuManager mapMenuManager;
@@ -232,6 +236,13 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     public void mouseClicked(MouseEvent event) {
         try {
             final Local local = mapaManager.doPositionToCoord(scaleClick(event.getPoint()));
+            if (cityPickCallback != null && SwingUtilities.isLeftMouseButton(event)) {
+                //"pick city on map" mode: consume this left-click, hand the hex to the picker, disarm.
+                final Consumer<Local> cb = cityPickCallback;
+                cityPickCallback = null;
+                cb.accept(local);
+                return;
+            }
             if (SwingUtilities.isRightMouseButton(event) && !SettingsManager.getInstance().isRadialMenu()) {
                 showLocalInfo(local);
             } else if (SwingUtilities.isRightMouseButton(event) && SettingsManager.getInstance().isRadialMenu()) {
@@ -267,6 +278,16 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
 
     @Override
     public void mouseExited(MouseEvent e) {
+    }
+
+    /** Arm one-shot "pick a city on the map": the next left-click on the map calls back with the hex. */
+    public void armCityPick(Consumer<Local> callback) {
+        this.cityPickCallback = callback;
+    }
+
+    /** Cancel an armed city pick (e.g. the picker's map toggle was switched off). */
+    public void cancelCityPick() {
+        this.cityPickCallback = null;
     }
 
     /**
