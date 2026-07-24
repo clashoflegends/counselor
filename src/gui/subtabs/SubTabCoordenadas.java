@@ -11,9 +11,15 @@ import business.MovimentoPersonagem;
 import business.facade.LocalFacade;
 import control.MapaControler;
 import gui.TabBase;
+import gui.services.SvgIcon;
+import gui.services.Toast;
+import java.awt.Window;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.ComboBoxModel;
+import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import model.Local;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +36,7 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
     private static final Log log = LogFactory.getLog(SubTabCoordenadas.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final LocalFacade localFacade = new LocalFacade();
+    private JToggleButton mapBtn;
 
     public SubTabCoordenadas(String vlInicial, Local origem, int range, boolean all, boolean water, int displayCities, MapaControler mapaControl) {
         //water=true, lista todos os hexes, water=false, lista apenas os hexes de terra (nao agua)
@@ -56,6 +63,63 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
             jcLocais.setSelectedIndex(-1);
         }
         jcLocais.setSelectedIndex(index);
+        installMapPick();
+    }
+
+    /** Adds a "pick a hex on the map" button beside the coordinate combo (covers all Coordenada* controls). */
+    private void installMapPick() {
+        mapBtn = new JToggleButton(SvgIcon.themed("map", 16));
+        mapBtn.setToolTipText(labels.getString("COORD.PICK.MAP.TT"));
+        mapBtn.addActionListener(e -> {
+            if (getMapaControler() == null) {
+                return;
+            }
+            if (mapBtn.isSelected()) {
+                Window w = SwingUtilities.getWindowAncestor(this);
+                if (w != null) {
+                    Toast.show(w, labels.getString("COORD.PICK.MAP.HINT"));
+                }
+                getMapaControler().armCityPick(this::onMapPick);
+            } else {
+                getMapaControler().cancelCityPick();
+                Toast.dismissCurrent();
+            }
+        });
+        this.add(mapBtn);
+        javax.swing.GroupLayout gl = new javax.swing.GroupLayout(this);
+        this.setLayout(gl);
+        gl.setHorizontalGroup(gl.createSequentialGroup()
+                .addComponent(jcLocais, 0, 208, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(mapBtn));
+        gl.setVerticalGroup(gl.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                .addComponent(jcLocais)
+                .addComponent(mapBtn));
+    }
+
+    /**
+     * One-shot map click (armed by the map button): select the clicked hex if it's a valid target for
+     * THIS control (present in the combo - i.e. in range and matching the terrain/city filter); else a
+     * brief error toast. Matches on the coordinate display, like the initial-value select in the ctor.
+     */
+    private void onMapPick(Local local) {
+        mapBtn.setSelected(false);        // one-shot; MapaControler already cleared its callback
+        Toast.dismissCurrent();
+        if (!isShowing()) {
+            return;                       // stale widget (param area was rebuilt) - ignore
+        }
+        final String coord = (local == null) ? null : localFacade.getCoordenadas(local);
+        if (coord != null) {
+            ComboBoxModel m = jcLocais.getModel();
+            for (int i = 0; i < m.getSize(); i++) {
+                Object o = m.getElementAt(i);
+                if (o instanceof IBaseModel && coord.equals(((IBaseModel) o).getComboDisplay())) {
+                    jcLocais.setSelectedIndex(i);
+                    return;
+                }
+            }
+        }
+        Toast.showError(labels.getString("COORD.PICK.INVALID"));
     }
 
     /**
