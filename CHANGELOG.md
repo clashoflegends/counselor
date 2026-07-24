@@ -5,9 +5,6 @@
 ### Easier city targeting in orders
 - Choosing a city in an order (like resource transport) is far quicker: **type part of the name OR the coordinate** to filter the list, flip the **sort between name and coordinate**, or just **click the city on the map**. No more scrolling hundreds of names to find a hex you already know. (Thanks to the player who suggested it.)
 
-### Windows installer: no admin rights needed
-- The Windows installer (.msi) now installs **per-user** - **no administrator rights or IT approval required**, which is ideal for locked-down work laptops. It installs just for your Windows account (in your user folder), and file associations and the Start-menu shortcut still work. If you previously installed an older version *with* admin, uninstall that one first so you do not end up with two copies.
-
 ### Windows portable: antivirus-safe launcher
 - The Windows portable download now includes **run-portable.bat**. If your antivirus wrongly flags or deletes **Counselor.exe** (a known false positive on the unsigned launcher), just double-click **run-portable.bat** instead - it starts Counselor using the bundled, code-signed Java runtime. No reinstall and no separate Java install needed.
 
