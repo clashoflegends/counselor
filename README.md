@@ -103,6 +103,10 @@ The Counselor shows you the full map, your generals, wizards, and rogues, enemy 
 
 Counselor is released under the [MIT License](LICENSE). © 2004-2026 Clash of Legends.
 
+## Privacy
+
+Counselor talks only to the game's own server and uses no third-party tracking. See [PRIVACY.md](PRIVACY.md) for the full privacy policy.
+
 ---
 
 ## Code signing policy
