@@ -1,5 +1,13 @@
 # What's New in Counselor
 
+## 23-JUL-2026 - v2.1.908
+
+### Point any order at the map
+- The **click-the-map** button now works for **coordinate and hex targets** too - movement, spells, and any order that asks for a location. Hit the map button, click the hex, done. Combined with the city pickers from the last update, you can now aim almost any order straight from the map - or type a name or coordinate to filter the list instead of scrolling hundreds of entries.
+
+### Website (clashlegends.com)
+- **The wild lands have teeth now.** Barbarians mass on the borders they share with real players, press the nearest threats first, scale to the size of the world, and now build docks to reach once-untouchable island nests. Watch out for those raiders.
+
 ## 22-JUL-2026 - v2.1.907
 
 ### Easier city targeting in orders
