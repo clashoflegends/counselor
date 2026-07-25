@@ -58,6 +58,10 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
     }
 
     private void doRemoveAction() {
+        if (getTabGui().isReadOnly()) {
+            //segregation: never mutate a non-mine (allied/NPC) actor's orders, whatever the UI state
+            return;
+        }
         getTabGui().setValueAt(getTabGui().getActor().doOrderClear(indexModelOrdem), indexModelOrdem);
         if (SettingsManager.getInstance().isAutoSaveActions()) {
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_AUTOSAVE, this.getTabGui());
@@ -81,6 +85,10 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
 
     private void doSalvaAction(int index) {
         if (index < 0) {
+            return;
+        }
+        if (getTabGui().isReadOnly()) {
+            //segregation: never persist orders onto a non-mine (allied/NPC) actor, whatever the UI state
             return;
         }
         final PersonagemOrdem po = getTabGui().getOrdemQuadro();

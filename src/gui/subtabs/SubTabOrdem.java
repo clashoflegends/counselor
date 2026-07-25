@@ -57,6 +57,10 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     private final List<Component> parametrosCombos = new ArrayList();
     private final List<JLabel> parametrosLabels = new ArrayList();
     private ActorInterface actor;
+    // True when the loaded actor is NOT owned by the active player (allied/NPC/double-agent). Its orders
+    // may be viewed (list + detail panel + map render) but never edited or saved. Enforced here (edit
+    // controls off) AND at the save chokepoints in OrdemControler. Players never hold enemies' orders.
+    private boolean readOnly;
     private final JDialog dAjuda = new JDialog(new JFrame(), false);
     private final JDialog dOrdem = new JDialog(new JFrame(), false);
     private final SubTabTextArea stAjuda = new SubTabTextArea();
@@ -554,7 +558,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
                 parametrosCombos.set(nn, cNovo);
             }
             this.setLastHelp(ordemControl.getOrdemAjuda(ordemSelecionada));
-            jbOk.setEnabled(true);
+            jbOk.setEnabled(!readOnly);
         } catch (NullPointerException ex) {
             doDisableFields();
             setOrdensModel(null);
@@ -805,32 +809,29 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
             allowOrders = false;
         }
 
+        //Ownership drives edit vs view. Set independently of allowOrders so OverrideElimination can never
+        //make a non-mine actor editable.
+        this.readOnly = !jogadorFacade.isMine(getActor().getNacao(), WorldFacadeCounselor.getInstance().getJogadorAtivo());
+
         if (SettingsManager.getInstance().getConfig("OverrideElimination", "0").equals("1")) {
             allowOrders = true;
         } else if (WorldFacadeCounselor.getInstance().isGameOver()
                 || WorldFacadeCounselor.getInstance().isJogadorAtivoEliminado(WorldFacadeCounselor.getInstance().getJogadorAtivo())) {
             allowOrders = false;
-        } else if (!jogadorFacade.isMine(getActor().getNacao(), WorldFacadeCounselor.getInstance().getJogadorAtivo())) {
-            //Show list, but do not allow orders
-            //clear first
-            doOrdemClear();
-            //show list
-            setOrdensModel(getActor().getOrdemTableModel());
-            //quit
-            return;
         }
 
-        if (allowOrders) {
-            //can receive orders
+        if (allowOrders || readOnly) {
+            //mine+active: edit. non-mine: view only (readOnly gates the edit controls + save chokepoints).
+            //Either way, load the list and select row 0 so doMudaOrdem builds the detail panel and draws
+            //the map path - the render John wants for allied actions.
             this.getMapaControler().remMovementTag();
-            //ordens do actor
             setOrdensModel(getActor().getOrdemTableModel());
             //trigger selection and doMudaOrdem(0)
             if (!doFindNextActionSlot()) {
                 jtListaOrdens.getSelectionModel().setSelectionInterval(0, 0);
             }
         } else {
-            //eh gameover?
+            //mine but eliminated/gameover: nothing to show
             //forca selecao para vazio, limpando quadro de parametros
             doOrdemClear();
         }
@@ -878,13 +879,20 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     }
 
     private void doEnableFields() {
+        //List + order/param combos stay clickable so selecting rows renders the map + detail panel, even
+        //when read-only (John: "read only controls, but still clickable for the map renders"). Only the
+        //write actions (Save/Clear/Repeat, jbOk in setOrdemParametrosQuadro) are gated on ownership.
         jtListaOrdens.setEnabled(true);
         this.cbOrdem.setEnabled(true);
         this.cbOrdersAll.setEnabled(true);
-        jbRepeat.setEnabled(true);
+        jbRepeat.setEnabled(!readOnly);
         jbHelp.setEnabled(true);
-        jbClear.setEnabled(true);
+        jbClear.setEnabled(!readOnly);
         jbDetach.setEnabled(true);
+    }
+
+    public boolean isReadOnly() {
+        return readOnly;
     }
 
     private Component getParametroComponent(String controle, String vlParametro, Ordem ordemSelecionada, PersonagemOrdem ordemGravada, int nuParametro) {
