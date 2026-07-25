@@ -12,6 +12,9 @@
 ### Website (clashlegends.com)
 - **Plus-addressed emails now accepted.** Addresses with a **`+` tag** (like `you+clash@gmail.com`) now work at signup and in the **My Games** CC list.
 
+### Counselor is open source
+- Counselor is free and **open source**, and now has a proper project page with screenshots, a feature tour, and full download and build instructions. Take a look, report a bug or suggest a feature, and if you enjoy the client a **GitHub star** genuinely helps: [github.com/clashoflegends/counselor](https://github.com/clashoflegends/counselor).
+
 ## 23-JUL-2026 - v2.1.908
 
 ### Point any order at the map
