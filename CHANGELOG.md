@@ -6,6 +6,12 @@
 - Click an **allied character** - or an allied **city** or **nation** - and you now see their orders the same way you see your own: **army movement paths and destinations drawn on the map**, and the **full action details** in the orders panel (including long ones like magic-item transfers). Ideal for coordinating a team turn or checking a plan before the deadline.
 - It's **strictly view-only**: you can follow along and read every detail, but you can never change or submit another player's orders - by accident or otherwise. Your own actions stay fully editable, exactly as before.
 
+### Faster order submission
+- **Submitting your orders is now much faster.** Counselor confirms the moment your orders are accepted - watch for the green **"orders synced"** indicator - instead of waiting while the confirmation email is built and sent. Your **receipt email now arrives a few minutes later** (usually within **5 minutes**), sent once **the Judge has actually registered your orders**, so it is a stronger "the Judge has them" guarantee. It still lists your orders and attaches your turn file.
+
+### Website (clashlegends.com)
+- **Plus-addressed emails now accepted.** Addresses with a **`+` tag** (like `you+clash@gmail.com`) now work at signup and in the **My Games** CC list.
+
 ## 23-JUL-2026 - v2.1.908
 
 ### Point any order at the map
