@@ -64,7 +64,10 @@ public final class Toast {
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(0x0f2647)),
                 BorderFactory.createEmptyBorder(10, 16, 10, 16)));
-        JLabel label = new JLabel(message);
+        // A message with embedded newlines renders as multiple lines (HTML); single-line stays plain.
+        JLabel label = new JLabel(message.indexOf('\n') >= 0
+                ? "<html>" + escapeHtml(message).replace("\n", "<br>") + "</html>"
+                : message);
         label.setForeground(Color.WHITE);
         if (icon != null) {
             label.setIcon(icon);
@@ -75,7 +78,7 @@ public final class Toast {
         window.pack();
         if (window.getWidth() > MAX_WIDTH) {
             // Long message (e.g. a list of missing actions): wrap it instead of a screen-wide toast.
-            label.setText("<html><body style='width:" + (MAX_WIDTH - 56) + "px'>" + escapeHtml(message) + "</body></html>");
+            label.setText("<html><body style='width:" + (MAX_WIDTH - 56) + "px'>" + escapeHtml(message).replace("\n", "<br>") + "</body></html>");
             window.pack();
         }
         MouseAdapter clickHandler = new MouseAdapter() {

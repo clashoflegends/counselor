@@ -1459,7 +1459,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 this.getGui().setStatusMsg(msg);
                 if (SettingsManager.getInstance().getConfig("SendOrderConfirmationPopUp", "1").equals("1")) {
                     // Non-modal toast instead of a blocking dialog: confirms the post without interrupting work.
-                    Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this.getGui()), msg);
+                    // Second line sets the receipt expectation (KI-020: the receipt is sent by ServerSync at
+                    // Judge-ingest, not in the upload response, so it lands a few minutes later).
+                    Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this.getGui()),
+                            msg + "\n" + labels.getString("POST.DONE.RECEIPT"));
                 }
                 // The orders just uploaded are now what the server holds -> flip the indicator to SENT
                 // without a round-trip (the hash sent == the current local hash).
