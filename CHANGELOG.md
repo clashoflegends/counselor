@@ -1,5 +1,11 @@
 # What's New in Counselor
 
+## 24-JUL-2026 - v2.1.909
+
+### See your allies' plans, right on the map
+- Click an **allied character** - or an allied **city** or **nation** - and you now see their orders the same way you see your own: **army movement paths and destinations drawn on the map**, and the **full action details** in the orders panel (including long ones like magic-item transfers). Ideal for coordinating a team turn or checking a plan before the deadline.
+- It's **strictly view-only**: you can follow along and read every detail, but you can never change or submit another player's orders - by accident or otherwise. Your own actions stay fully editable, exactly as before.
+
 ## 23-JUL-2026 - v2.1.908
 
 ### Point any order at the map
