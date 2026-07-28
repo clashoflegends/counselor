@@ -1,5 +1,12 @@
 # What's New in Counselor
 
+## 28-JUL-2026 - v2.1.910
+
+### Sending orders works again
+- **Submitting orders, signing in to fetch your token, and the orders-synced light all work again.** From the evening of 27-JUL every one of them failed with a **"403 Forbidden"** message. Nothing was wrong with your orders, your login or your turn file - the website's host tightened a web-server rule that rejected the way Counselor packages what it sends, and the request was turned away before the site ever saw it. Counselor now packages it the way the rule expects.
+- **Please re-send any orders you submitted during the outage.** Nothing that failed with a 403 ever reached the site, so those turns still need sending.
+- This affected **every player**, on every version - so if a teammate is still seeing 403s, point them at this update.
+
 ## 24-JUL-2026 - v2.1.909
 
 ### See your allies' plans, right on the map
