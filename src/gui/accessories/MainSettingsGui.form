@@ -588,16 +588,20 @@
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="copyActionsPopUpCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="keepPopUpCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="fogOfWarCheckBox" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="minimizeWindowCheckBox" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Component id="colorDifficultyCheckBox" min="-2" max="-2" attributes="0"/>
                               </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="copyActionsPopUpCheckBox" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
+                                  <Component id="fogOfWarCheckBox" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Component id="AutoSaveOnMapPick" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="59" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -668,6 +672,7 @@
                   <Group type="103" groupAlignment="2" attributes="0">
                       <Component id="tableColumnCheckBox" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Component id="copyActionsPopUpCheckBox" alignment="2" min="-2" max="-2" attributes="0"/>
+                      <Component id="fogOfWarCheckBox" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="2" attributes="0">
@@ -677,7 +682,7 @@
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="autoMoveCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="fogOfWarCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="AutoSaveOnMapPick" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -934,6 +939,17 @@
         <Component class="javax.swing.JCheckBox" name="autoDownloadPortraitsCheck">
           <Properties>
             <Property name="text" type="java.lang.String" value="autoDownloadPortraits"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="AutoSaveOnMapPick">
+          <Properties>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.GAME.AUTOSAVEONMAPPICK" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.GAME.AUTOSAVEONMAPPICK.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="autoSaveOnMapPick"/>
           </Properties>
         </Component>
       </SubComponents>

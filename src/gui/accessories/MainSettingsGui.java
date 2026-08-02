@@ -81,6 +81,8 @@ public class MainSettingsGui extends JPanel {
         overEliminCheckBox2.addActionListener(settingsControler);
         sendConfirmPopUpCheckBox.addActionListener(settingsControler);
         sendOrderRequestCheckBox.addActionListener(settingsControler);
+        AutoSaveOnMapPick.addActionListener(settingsControler);
+        AutoSaveOnMapPick.setSelected(isAutoSaveOnMapPickSelected());
 
         initFilterRadiobutton();
         initSortOrdersRadiobutton();
@@ -209,6 +211,7 @@ public class MainSettingsGui extends JPanel {
         portraitFolderNameTextField = new javax.swing.JTextField();
         colorDifficultyCheckBox = new javax.swing.JCheckBox();
         autoDownloadPortraitsCheck = new javax.swing.JCheckBox();
+        AutoSaveOnMapPick = new javax.swing.JCheckBox();
         mapPanel = new javax.swing.JPanel();
         hexTagStyleLabel = new javax.swing.JLabel();
         armyPathLabel = new javax.swing.JLabel();
@@ -579,6 +582,10 @@ public class MainSettingsGui extends JPanel {
 
         autoDownloadPortraitsCheck.setText("autoDownloadPortraits");
 
+        AutoSaveOnMapPick.setText(bundle.getString("SETTINGS.GAME.AUTOSAVEONMAPPICK")); // NOI18N
+        AutoSaveOnMapPick.setToolTipText(bundle.getString("SETTINGS.GAME.AUTOSAVEONMAPPICK.TOOLTIP")); // NOI18N
+        AutoSaveOnMapPick.setActionCommand("autoSaveOnMapPick");
+
         javax.swing.GroupLayout displayPanelLayout = new javax.swing.GroupLayout(displayPanel);
         displayPanel.setLayout(displayPanelLayout);
         displayPanelLayout.setHorizontalGroup(
@@ -594,14 +601,17 @@ public class MainSettingsGui extends JPanel {
                             .addComponent(autoMoveCheckBox))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(copyActionsPopUpCheckBox)
                             .addComponent(keepPopUpCheckBox)
-                            .addComponent(fogOfWarCheckBox)
                             .addGroup(displayPanelLayout.createSequentialGroup()
                                 .addComponent(minimizeWindowCheckBox)
                                 .addGap(18, 18, 18)
-                                .addComponent(colorDifficultyCheckBox)))
-                        .addGap(59, 59, 59))
+                                .addComponent(colorDifficultyCheckBox))
+                            .addGroup(displayPanelLayout.createSequentialGroup()
+                                .addComponent(copyActionsPopUpCheckBox)
+                                .addGap(25, 25, 25)
+                                .addComponent(fogOfWarCheckBox))
+                            .addComponent(AutoSaveOnMapPick))
+                        .addGap(41, 41, 41))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, displayPanelLayout.createSequentialGroup()
                         .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(sortOrdersLabel)
@@ -655,7 +665,8 @@ public class MainSettingsGui extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(tableColumnCheckBox)
-                    .addComponent(copyActionsPopUpCheckBox))
+                    .addComponent(copyActionsPopUpCheckBox)
+                    .addComponent(fogOfWarCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(copyOrdersCheckBox)
@@ -663,7 +674,7 @@ public class MainSettingsGui extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(autoMoveCheckBox)
-                    .addComponent(fogOfWarCheckBox))
+                    .addComponent(AutoSaveOnMapPick))
                 .addGap(12, 12, 12)
                 .addGroup(displayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(portraitsFolderLabel)
@@ -817,6 +828,7 @@ public class MainSettingsGui extends JPanel {
     }//GEN-LAST:event_portraitFolderNameTextFieldActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox AutoSaveOnMapPick;
     private javax.swing.JRadioButton allFiltroRadioButton;
     private javax.swing.JRadioButton alphabeticOrderButton;
     private javax.swing.JComboBox armyPathComboBox;
@@ -949,6 +961,10 @@ public class MainSettingsGui extends JPanel {
 
     private boolean isSaveOrdersNoPromptSelected() {
         return settingsManager.getConfig("SaveOrdersNoPrompt", "0").equals("1");
+    }
+
+    private boolean isAutoSaveOnMapPickSelected() {
+        return settingsManager.getConfig("AutoSaveOnMapPick", "0").equals("1");
     }
 
     private boolean isLoadActionsBehaviorSelected() {
