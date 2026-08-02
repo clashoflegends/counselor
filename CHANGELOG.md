@@ -1,5 +1,13 @@
 # What's New in Counselor
 
+## 02-AUG-2026 - v2.1.911
+
+### Auto-confirm an order when you pick its hex from the map
+- A new **optional** setting: when you use the **click-the-map** button to set an order's target, and that order only needs the hex (like moving a character), Counselor can **save the order and jump to the next one automatically** - no need to press the confirm button. One click on the map and you're done.
+- It's **off by default** - turn it on in **Settings** ("Auto-confirm order on map hex-pick") if you'd like the quicker flow.
+- It only kicks in when the hex is the order's **only** field. Orders with more to fill in - a resource transfer, or naming a new city at a location - still wait for you to finish and confirm as usual.
+- Thanks to the player who suggested it!
+
 ## 28-JUL-2026 - v2.1.910
 
 ### Sending orders works again
