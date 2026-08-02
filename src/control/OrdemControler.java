@@ -83,6 +83,19 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         }
     }
 
+    /**
+     * Save the current order and advance to the next slot, exactly as pressing the save (jbOk) button /
+     * ENTER does. Used by the optional "auto-confirm on map hex-pick" feature (AutoSaveOnMapPick) for
+     * single-parameter orders. Guarded by isReadOnly (never persists onto a non-mine actor).
+     */
+    public void doSaveFromMapPick() {
+        if (getTabGui().isReadOnly()) {
+            return;
+        }
+        doSalvaAction();
+        getTabGui().resetOrdersAllOnSave();
+    }
+
     private void doSalvaAction(int index) {
         if (index < 0) {
             return;

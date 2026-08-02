@@ -958,6 +958,22 @@ public class ComponentFactory implements Serializable {
         if (cNovo instanceof JLabel && ((JLabel) cNovo).getText().equals(labels.getString("CONTROLE.NAO.IMPLEMENTADO"))) {
             log.fatal(labels.getString("CONTROLE.NAO.IMPLEMENTADO") + controle);
         }
+        // Player request: for a single-parameter order whose only parameter IS this map-pickable target, let the
+        // map hex-pick also save the order and advance (when AutoSaveOnMapPick is on). Guarded on THREE conditions:
+        //   - the order has exactly one parameter (getParametrosIdeQtd() == 1) - excludes resource transfers etc.;
+        //   - this call is building THAT parameter (controle == the order's param 0) - excludes the recursive
+        //     coordinate sub-build of a composite name+coordinate order (NOVACIDADE5/8), which is qtd==1 but must
+        //     NOT auto-save while its name field is still empty;
+        //   - the built widget is actually a map-pick widget (instanceof).
+        // Spell/Variado path passes a null ordemSelecionada -> excluded. Config is re-checked at pick time.
+        if (ordemSelecionada != null && ordemSelecionada.getParametrosIdeQtd() == 1
+                && controle.equals(ordemSelecionada.getParametroIde(0))) {
+            if (cNovo instanceof SubTabCoordenadas) {
+                ((SubTabCoordenadas) cNovo).setAutoSaveOnPick(() -> getOrdemControl().doSaveFromMapPick());
+            } else if (cNovo instanceof CidadeAlvoPicker) {
+                ((CidadeAlvoPicker) cNovo).setAutoSaveOnPick(() -> getOrdemControl().doSaveFromMapPick());
+            }
+        }
         return cNovo;
     }
 

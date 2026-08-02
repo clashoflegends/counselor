@@ -57,6 +57,14 @@ public class CidadeAlvoPicker extends JPanel {
     private final String mapHintKey;   // label key for the mode-specific "click on the map" hint
     private boolean sortByCoord;
     private IBaseModel lastValid;
+    // Optional auto-save (player request): set by ComponentFactory only when this city target is the SOLE
+    // parameter of the order; a successful map-pick then saves+advances if AutoSaveOnMapPick is on. Null otherwise.
+    private Runnable autoSaveOnPick;
+
+    /** Wire the map-pick to also save the order + advance (single-parameter orders only). See ComponentFactory. */
+    public void setAutoSaveOnPick(Runnable autoSaveOnPick) {
+        this.autoSaveOnPick = autoSaveOnPick;
+    }
 
     public CidadeAlvoPicker(ComboBoxModel model, MapaControler mapaControler, String mapHintKey) {
         super(new BorderLayout(4, 0));
@@ -194,10 +202,19 @@ public class CidadeAlvoPicker extends JPanel {
         for (IBaseModel o : master) {
             if (o.getComboId().equals(coord)) {
                 setSelectedById(coord);
+                maybeAutoSave();
                 return;
             }
         }
         Toast.showError(labels.getString("CITY.PICK.INVALID"));
+    }
+
+    /** If this city target is the order's only parameter and AutoSaveOnMapPick is on, save+advance after the
+     *  pick (deferred so the combo selection / listeners settle first). */
+    private void maybeAutoSave() {
+        if (autoSaveOnPick != null && SettingsManager.getInstance().isAutoSaveOnMapPick()) {
+            SwingUtilities.invokeLater(autoSaveOnPick);
+        }
     }
 
     // --- selection API: used by ComponentFactory init-select and value read ---

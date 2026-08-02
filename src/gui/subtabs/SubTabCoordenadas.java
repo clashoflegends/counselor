@@ -37,6 +37,14 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final LocalFacade localFacade = new LocalFacade();
     private JToggleButton mapBtn;
+    // Optional auto-save (player request): set by ComponentFactory only when this coordinate is the SOLE
+    // parameter of the order; a successful map-pick then saves+advances if AutoSaveOnMapPick is on. Null otherwise.
+    private Runnable autoSaveOnPick;
+
+    /** Wire the map-pick to also save the order + advance (single-parameter orders only). See ComponentFactory. */
+    public void setAutoSaveOnPick(Runnable autoSaveOnPick) {
+        this.autoSaveOnPick = autoSaveOnPick;
+    }
 
     public SubTabCoordenadas(String vlInicial, Local origem, int range, boolean all, boolean water, int displayCities, MapaControler mapaControl) {
         //water=true, lista todos os hexes, water=false, lista apenas os hexes de terra (nao agua)
@@ -115,11 +123,20 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
                 Object o = m.getElementAt(i);
                 if (o instanceof IBaseModel && coord.equals(((IBaseModel) o).getComboDisplay())) {
                     jcLocais.setSelectedIndex(i);
+                    maybeAutoSave();
                     return;
                 }
             }
         }
         Toast.showError(labels.getString("COORD.PICK.INVALID"));
+    }
+
+    /** If this coordinate is the order's only parameter and AutoSaveOnMapPick is on, save+advance after the
+     *  pick (deferred so the combo selection / listeners settle first). */
+    private void maybeAutoSave() {
+        if (autoSaveOnPick != null && SettingsManager.getInstance().isAutoSaveOnMapPick()) {
+            SwingUtilities.invokeLater(autoSaveOnPick);
+        }
     }
 
     /**
