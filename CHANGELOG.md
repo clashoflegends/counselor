@@ -8,6 +8,9 @@
 - It only kicks in when the hex is the order's **only** field. Orders with more to fill in - a resource transfer, or naming a new city at a location - still wait for you to finish and confirm as usual.
 - Thanks to the player who suggested it!
 
+### Incomplete orders no longer slip through
+- If an order needs a **target hex or city** and it's left blank (for example after ticking **ALL**), Counselor now **stops the save and tells you**, instead of quietly accepting a broken order that the Judge would only reject later.
+
 ## 28-JUL-2026 - v2.1.910
 
 ### Sending orders works again

@@ -10,12 +10,14 @@ import control.services.AcaoConverter;
 import control.services.CenarioConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
+import gui.services.Toast;
 import gui.subtabs.SubTabOrdem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.Serializable;
+import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -105,6 +107,13 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             return;
         }
         final PersonagemOrdem po = getTabGui().getOrdemQuadro();
+        if (hasBlankTarget(po)) {
+            // KI-017: don't serialize an order whose required hex/city target is blank (ticking ALL swaps the
+            // target picker for an empty 4-digit box; a blank one produced a malformed action that later
+            // NPE-crashed the results-EGF render). Tell the player and abort this save.
+            Toast.showError(labels.getString("ORDEM.ALVO.AUSENTE"));
+            return;
+        }
         getTabGui().getActor().doOrderSave(index, po);
         if (SettingsManager.getInstance().isAutoSaveActions()) {
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_AUTOSAVE, this.getTabGui());
@@ -114,6 +123,34 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         //draw orders on map
         getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
         getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_COUNT);
+    }
+
+    /**
+     * KI-017: true when a required city/hex TARGET parameter is blank. Scoped to the Cidade_ and Coordenada_
+     * token families (the transfer/transport orders where ticking ALL replaces the never-empty target picker
+     * with an empty box). Only checks when the collected param ids are index-aligned with the order's params
+     * (no param was hidden), so it never false-rejects an order that legitimately omits a parameter. Treats
+     * both an empty string and a single space (the null-combo sentinel from ComponentFactory) as blank.
+     */
+    private boolean hasBlankTarget(PersonagemOrdem po) {
+        if (po == null || po.getOrdem() == null || po.getParametrosId() == null) {
+            return false;
+        }
+        final Ordem ord = po.getOrdem();
+        final List<String> ids = po.getParametrosId();
+        if (ids.size() != ord.getParametrosIdeQtd()) {
+            return false; // a param was hidden -> indices don't align; don't risk a false reject
+        }
+        for (int nn = 0; nn < ids.size(); nn++) {
+            final String controle = ord.getParametroIde(nn);
+            if (controle != null && (controle.startsWith("Cidade") || controle.startsWith("Coordenada"))) {
+                final String id = ids.get(nn);
+                if (id == null || id.trim().isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void doRepeatAction() {
