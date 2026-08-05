@@ -1,6 +1,6 @@
 # What's New in Counselor
 
-## 02-AUG-2026 - v2.1.911
+## 04-AUG-2026 - v2.1.911
 
 ### Auto-confirm an order when you pick its hex from the map
 - A new **optional** setting: when you use the **click-the-map** button to set an order's target, and that order only needs the hex (like moving a character), Counselor can **save the order and jump to the next one automatically** - no need to press the confirm button. One click on the map and you're done.
@@ -10,6 +10,11 @@
 
 ### Incomplete orders no longer slip through
 - If an order needs a **target hex or city** and it's left blank (for example after ticking **ALL**), Counselor now **stops the save and tells you**, instead of quietly accepting a broken order that the Judge would only reject later.
+
+### Website (clashlegends.com)
+- **Relive your finished games:** every finished game now has a public **Chronicle** - a turn-by-turn saga capped with a Hall of Fame - reachable from **My Games** (next to each past game) and linked in your final turn-results email.
+- **Order receipts are now optional:** turn the "orders received" email on or off under **Order handling** on **My Config**.
+- **My Games upgrades:** each **past game** now shows its **result** (who won, your final rank); the team and own-nation order lights list **when each order set arrived** (and who sent it, on an on-behalf submission); and the **CC list** is now an inline box you edit right there.
 
 ## 28-JUL-2026 - v2.1.910
 
