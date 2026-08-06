@@ -78,8 +78,9 @@ public class FinancasConverter implements Serializable {
      */
     public GenericoTableModel getProjecaoTableModel(Nacao nacao, Set<PersonagemOrdem> listPo) {
         String[] colNames = new String[]{labels.getString("NOME"), labels.getString("VALOR")};
-        //SIZE covers the fixed rows, +3 the decay/final block (always shown), +listPo.size()+2 the pending-orders block.
-        final int tableSize = SIZE + 3 + (listPo.isEmpty() ? 0 : listPo.size() + 2);
+        //SIZE covers the fixed rows, +4 the decay/final block (always shown, one row of slack), +listPo.size()+2 the
+        //pending-orders block. Any new row added below must be counted here or the model overflows.
+        final int tableSize = SIZE + 4 + (listPo.isEmpty() ? 0 : listPo.size() + 2);
         Object[][] dados = new Object[tableSize][colNames.length];
         if (nacao == null) {
             throw new UnsupportedOperationException(labels.getString("NOT.IMPLEMENTED"));

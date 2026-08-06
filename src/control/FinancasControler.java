@@ -123,9 +123,9 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
 
         //if cost changed, then recalculate
         if (refresh) {
-            //FIXME: How to refresh the Cost of Orders in the main table?
             //only repaint the forecast when the order belongs to the nation on display; a save for another nation
             //(team or on-behalf orders) used to overwrite the selected nation's forecast with the other nation's.
+            //FIXME: the Cost of Orders column in the main nations table is still not refreshed from here.
             if (tabGui.getNacaoSelecionada() == nation) {
                 tabGui.setProjecaoModel(getProjecaoTableModel(nation));
             }
