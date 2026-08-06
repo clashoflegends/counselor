@@ -24,7 +24,7 @@ import model.PersonagemOrdem;
  * {@link WorldFacadeCounselor} is a singleton over a static world, so the world is loaded once and
  * each test takes a clean actor via {@link #freshPersonagem}.
  */
-final class TestWorld {
+public final class TestWorld {
 
     static final String FIXTURE = "/egf/game_88_20.rr.egf";
 
@@ -35,7 +35,7 @@ final class TestWorld {
     }
 
     /** Opens the fixture turn file once (what the Open dialog does) and returns the loaded facade. */
-    static synchronized WorldFacadeCounselor load() throws Exception {
+    public static synchronized WorldFacadeCounselor load() throws Exception {
         WorldFacadeCounselor wfc = WorldFacadeCounselor.getInstance();
         if (!loaded) {
             URL url = TestWorld.class.getResource(FIXTURE);
@@ -49,7 +49,7 @@ final class TestWorld {
     }
 
     /** Every actor the active player may act with, in a stable order. */
-    static List<BaseModel> ownedActors(WorldFacadeCounselor wfc) {
+    public static List<BaseModel> ownedActors(WorldFacadeCounselor wfc) {
         List<BaseModel> ret = new ArrayList<>();
         for (BaseModel actor : wfc.getActors()) {
             if (actor.getCodigo() != null && ordemFacade.isAtivo(wfc.getJogadorAtivo(), actor)) {
@@ -64,7 +64,7 @@ final class TestWorld {
      * A character of the active player with no orders on it. The world is shared across tests, so the
      * actor is wiped before it is handed out; callers must not assume which character they get.
      */
-    static BaseModel freshPersonagem(WorldFacadeCounselor wfc) {
+    public static BaseModel freshPersonagem(WorldFacadeCounselor wfc) {
         for (BaseModel actor : ownedActors(wfc)) {
             if (actor.isPersonagem()) {
                 actor.remAcoes();
@@ -79,7 +79,7 @@ final class TestWorld {
      * by, e.g. 1555). Note the scenario map is keyed by the per-scenario {@code getCodigo()} ("555"),
      * which is also what a saved orders file carries, so tests assert against {@code getCodigo()}.
      */
-    static Ordem ordem(WorldFacadeCounselor wfc, int numero) {
+    public static Ordem ordem(WorldFacadeCounselor wfc, int numero) {
         for (Ordem ordem : wfc.getPartida().getCenario().getOrdens().values()) {
             if (ordem.getNumero() == numero) {
                 return ordem;
@@ -89,7 +89,7 @@ final class TestWorld {
     }
 
     /** Builds a saved order the way {@code SubTabOrdem.getOrdemQuadro} does on the confirm button. */
-    static PersonagemOrdem buildOrder(BaseModel actor, Ordem ordem, String... parametros) {
+    public static PersonagemOrdem buildOrder(BaseModel actor, Ordem ordem, String... parametros) {
         PersonagemOrdem po = new PersonagemOrdem();
         po.setNome(actor.getNome());
         po.setOrdem(ordem);
@@ -100,11 +100,12 @@ final class TestWorld {
     }
 
     /**
-     * Assembles the submission for a single actor, mirroring the per-actor loop of
-     * {@code WorldControler.doSaveActorActions}. Scoped to one actor so tests stay independent of the
-     * shared world; when that method is extracted into a service the tests should call it directly.
+     * Assembles the submission for a SINGLE actor, so a test can assert on one actor's orders without
+     * depending on what other tests left on the shared world. The full multi-actor assembly that the
+     * client actually runs is production code and is driven directly by
+     * {@code control.ComandoAssemblyTest}.
      */
-    static Comando buildComando(WorldFacadeCounselor wfc, BaseModel actor) {
+    public static Comando buildComando(WorldFacadeCounselor wfc, BaseModel actor) {
         Comando comando = new Comando();
         comando.setInfos(wfc.getPartida());
         for (int index = 0; index < ordemFacade.getOrdemMax(actor); index++) {

@@ -114,11 +114,13 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private int actionsCount = 0;
     private File currentResultsFile = null; // the EGF currently open (both manual-open and autoload paths); source for "set autoload to current"
     private MainResultWindowGui gui = null;
-    private final AcaoFacade acaoFacade = new AcaoFacade();
-    private final OrdemFacade ordemFacade = new OrdemFacade();
+    // Static so the order-assembly below can be exercised without building a WorldControler (which needs
+    // the GUI). All three are stateless helpers; every other caller keeps using them unchanged.
+    private static final AcaoFacade acaoFacade = new AcaoFacade();
+    private static final OrdemFacade ordemFacade = new OrdemFacade();
     private final CidadeFacade cidadeFacade = new CidadeFacade();
     private final NacaoFacade nacaoFacade = new NacaoFacade();
-    private final CenarioFacade cenarioFacade = new CenarioFacade();
+    private static final CenarioFacade cenarioFacade = new CenarioFacade();
     private final PersonagemFacade personagemFacade = new PersonagemFacade();
     private static final WorldFacadeCounselor WFC = WorldFacadeCounselor.getInstance();
 
@@ -1358,7 +1360,16 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         }
     }
 
-    private String doSaveActorActions(Jogador jogadorAtivo, Comando comando) {
+    /**
+     * Fills {@code comando} with every order the active player has entered, and returns the
+     * missing-actions warning (empty when nothing is missing).
+     * <p>
+     * This is the assembly step of the submission: whatever lands here is what the Judge is asked to
+     * run, and the {@code isAtivo} gate below is what keeps another player's orders out of it. Static
+     * and package-private (rather than private) purely so the happy-path tests can drive the real
+     * assembly instead of a copy of it - it touches no GUI and no instance state.
+     */
+    static String doSaveActorActions(Jogador jogadorAtivo, Comando comando) {
         //lista todos os actors, carregando para o xml
         final int nationPackagesLimit = WFC.getNationPackagesLimit();
         String ret = "";
