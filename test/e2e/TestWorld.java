@@ -23,6 +23,12 @@ import model.PersonagemOrdem;
  * <p>
  * {@link WorldFacadeCounselor} is a singleton over a static world, so the world is loaded once and
  * each test takes a clean actor via {@link #freshPersonagem}.
+ * <p>
+ * <b>Shared-world hazard:</b> that world is shared by every test class in the JVM, and JUnit gives no
+ * cross-class ordering guarantee - {@code ComandoAssemblyTest} wipes the orders of EVERY actor before
+ * each of its methods. Nothing currently holds order state across methods within a class, which is why
+ * this is safe today; a test that sets orders up in {@code @BeforeAll} and asserts on them later would
+ * break here, so set orders up per method.
  */
 public final class TestWorld {
 
