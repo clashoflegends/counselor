@@ -1,5 +1,12 @@
 # What's New in Counselor
 
+## 05-AUG-2026 - v2.1.912
+
+### Next-turn costs are no longer doubled
+- The **next-turn forecast** could show **every order's cost twice** (and the gold figure in the status bar with it), so a turn looked far more expensive than it was. It happened whenever the same orders were read in more than once: loading an orders file over the set you already had open, or opening a turn with **team orders** on where two files carried the same nation. Your orders themselves were always correct and were never charged twice by the Judge - only the forecast was wrong. Fixed.
+- The forecast now also **stays on the nation you have selected**: saving an order for another nation (a teammate's, or one you send on behalf of) no longer swaps the panel to that nation's numbers.
+- **Gold decay and the final total** are now always shown in the forecast, instead of disappearing whenever you had no orders entered yet.
+
 ## 04-AUG-2026 - v2.1.911
 
 ### Auto-confirm an order when you pick its hex from the map

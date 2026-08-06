@@ -39,6 +39,7 @@ public class TabFinancesGui extends TabBase implements Serializable {
     private final SubTabBaseList stForecast = new SubTabBaseList();
     private final SubTabBaseList stBalance = new SubTabBaseList();
     private final SubTabBaseList stResources = new SubTabBaseList();
+    private Nacao nacaoSelecionada;
 
     public TabFinancesGui(String titulo, String dica, MapaControler mapaControl) {
         initComponents();
@@ -251,7 +252,15 @@ public class TabFinancesGui extends TabBase implements Serializable {
         }
     }
 
+    /**
+     * @return the nation currently displayed in the details sub-tabs, null before the first selection.
+     */
+    public Nacao getNacaoSelecionada() {
+        return nacaoSelecionada;
+    }
+
     public void doMudaNacao(Nacao nacao) {
+        this.nacaoSelecionada = nacao;
         try {
             getMapaControler().printTag(nacaoFacade.getLocal(nacao));
         } catch (NullPointerException ex) {

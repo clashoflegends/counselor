@@ -1183,6 +1183,13 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         for (ComandoDetail comandoDetail : comando.getOrdens()) {
             BaseModel actor = actors.get(comandoDetail.getActorCodigo());
             try {
+                //drop the actor's current orders from the finances forecast BEFORE wiping them. The forecast keeps a
+                //parallel set fed by dispatch, so in the default "append" mode a second load of the same orders
+                //(autoload + manual load, or two team files carrying the same nation) counted every cost twice.
+                final Nacao nationBefore = WFC.getNacao(comandoDetail.getNacaoCodigo());
+                for (PersonagemOrdem po : actor.getAcoes().values()) {
+                    getDispatchManager().sendDispatchForChar(nationBefore, po, null);
+                }
                 actor.remAcoes();
             } catch (NullPointerException ex) {
                 //nao faz nada, ordens nao disponiveis...

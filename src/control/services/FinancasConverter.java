@@ -78,12 +78,8 @@ public class FinancasConverter implements Serializable {
      */
     public GenericoTableModel getProjecaoTableModel(Nacao nacao, Set<PersonagemOrdem> listPo) {
         String[] colNames = new String[]{labels.getString("NOME"), labels.getString("VALOR")};
-        final int tableSize;
-        if (listPo.isEmpty()) {
-            tableSize = SIZE;
-        } else {
-            tableSize = SIZE + listPo.size() + 5;
-        }
+        //SIZE covers the fixed rows, +3 the decay/final block (always shown), +listPo.size()+2 the pending-orders block.
+        final int tableSize = SIZE + 3 + (listPo.isEmpty() ? 0 : listPo.size() + 2);
         Object[][] dados = new Object[tableSize][colNames.length];
         if (nacao == null) {
             throw new UnsupportedOperationException(labels.getString("NOT.IMPLEMENTED"));
@@ -143,17 +139,19 @@ public class FinancasConverter implements Serializable {
                 }
                 dados[ii][0] = labels.getString("FINANCAS.COST.ACTIONS");
                 dados[ii++][1] = valorAcoes;
-                //skip one row
-                dados[ii][0] = " ";
-                dados[ii++][1] = null;
-                final int decay = nacaoFacade.getGoldDecay(nacao, moneyFinal + valorAcoes, cenario) * -1;
-                if (decay != 0) {
-                    dados[ii][0] = labels.getString("FINANCAS.FORECAST.DECAY");
-                    dados[ii++][1] = decay;
-                }
-                dados[ii][0] = labels.getString("FINANCAS.FORECAST.FINAL");
-                dados[ii++][1] = moneyFinal + valorAcoes + decay;
             }
+            //gold decay and the final total apply whether or not there are pending orders: gating them on pending
+            //orders left the reserve row above as the last line, silently omitting decay.
+            //skip one row
+            dados[ii][0] = " ";
+            dados[ii++][1] = null;
+            final int decay = nacaoFacade.getGoldDecay(nacao, moneyFinal + valorAcoes, cenario) * -1;
+            if (decay != 0) {
+                dados[ii][0] = labels.getString("FINANCAS.FORECAST.DECAY");
+                dados[ii++][1] = decay;
+            }
+            dados[ii][0] = labels.getString("FINANCAS.FORECAST.FINAL");
+            dados[ii++][1] = moneyFinal + valorAcoes + decay;
         }
         GenericoTableModel model = new GenericoTableModel(colNames, dados,
                 new Class[]{java.lang.String.class, java.lang.Integer.class});
