@@ -1303,7 +1303,13 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     public void receiveDispatch(int msgName, String msg) {
         switch (msgName) {
             case DispatchManager.SET_LABEL_MONEY:
-                final Nacao nacao = WFC.getNacao(msg);
+                // The dispatch carries whichever nation's order just changed, which during a team-order
+                // load is an ALLY - and the label is about YOUR turn. So it is resolved from the nations
+                // the active player owns, never from the message, and shows the costliest of them.
+                final Nacao nacao = WFC.getNacaoTopOrderCost();
+                if (nacao == null) {
+                    break; //no nation of the active player in this world: nothing to report
+                }
                 int actionCost = WFC.getNacaoOrderCost(nacao);
                 final String labelActionsCost = String.format(labels.getString("MENU.ACTION.COST"), nacaoFacade.getNome(nacao), actionCost);
                 getGui().setLabelMoney(labelActionsCost);

@@ -337,6 +337,29 @@ public class WorldFacadeCounselor implements Serializable {
         return cost;
     }
 
+    /**
+     * The nation whose saved orders commit the most gold this turn, among the ones the active player
+     * actually owns; null when they own none.
+     * <p>
+     * Ownership is tested by OWNER identity, like the Team Actions filter - {@code Jogador.isNacao}
+     * leaks once allies' turn files merge into the shared world through team-order autoload, which is
+     * precisely how the status-bar cost label came to name an ally's nation instead of the player's.
+     * With one nation this is simply that nation; with several, the costliest is the one at risk of
+     * overspending.
+     */
+    public Nacao getNacaoTopOrderCost() {
+        Nacao ret = null;
+        int top = 0;
+        for (Nacao mine : getNacoesJogadorAtivo()) {
+            final int cost = getNacaoOrderCost(mine);
+            if (ret == null || cost > top) {
+                ret = mine;
+                top = cost;
+            }
+        }
+        return ret;
+    }
+
     public int getOrderCost(PersonagemOrdem po, Nacao nacao) {
         return acaoFacade.getCusto(po, nacao, this.getCenario(), this.getMercado());
     }
