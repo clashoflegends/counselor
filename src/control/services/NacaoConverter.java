@@ -92,7 +92,7 @@ public class NacaoConverter implements Serializable {
         }
         final int cost = WFC.getNacaoOrderCost(nacao) * -1;
         boolean ret = setCell(model, row, labels.getString("FINANCAS.COST.ACTIONS"), cost);
-        ret |= setCell(model, row, labels.getString("TREASURY.PROJECTED"), nacaoFacade.getMoneySaldo(nacao) + cost);
+        ret |= setCell(model, row, labels.getString("FINANCAS.FORECAST.FINAL"), FinancasConverter.getForecastBalance(nacao));
         return ret;
     }
 
@@ -144,7 +144,7 @@ public class NacaoConverter implements Serializable {
         final int custoOrdens = WFC.getNacaoOrderCost(nacao) * -1;
         cArray[ii++] = treasury;
         cArray[ii++] = custoOrdens;
-        cArray[ii++] = treasury + custoOrdens;
+        cArray[ii++] = FinancasConverter.getForecastBalance(nacao);
         cArray[ii++] = nacaoFacade.getImpostos(nacao);
         Produto[] produtos = cenarioFacade.listProdutos(cenario, 1);
         for (Produto produto : produtos) {
@@ -191,7 +191,7 @@ public class NacaoConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("FINANCAS.COST.ACTIONS"));
         classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("TREASURY.PROJECTED"));
+        colNames.add(labels.getString("FINANCAS.FORECAST.FINAL"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("IMPOSTOS"));
         classes.add(java.lang.Integer.class);

@@ -4,8 +4,8 @@
 
 ### See what your orders will cost, as you enter them
 - The **action's cost** readout in the top right now always reports **your own nation**. It could previously show an **ally's** total instead - whichever order set was loaded last - which was misleading when checking your own spend. If you hold more than one nation it shows the costliest.
-- The nations table on the **Finances** tab now shows **Total orders cost** and **Balance after orders** next to your treasury, and both **update the moment you save or clear an order** - no more clicking to another nation and back to make the numbers move.
-- Treasury still means the gold you hold **right now**; the new columns show what this turn's orders have committed and what would be left.
+- The nations table on the **Finances** tab now shows **Total orders cost** and **Forecast balance after actions** next to your treasury, and both **update the moment you save or clear an order** - no more clicking to another nation and back to make the numbers move.
+- Treasury still means the gold you hold **right now**. The forecast balance is the same bottom-line number as the **Next turn forecast** panel: your gold plus revenue, minus upkeep, minus what your orders commit.
 
 ### Do it again: bring back last turn's orders
 - A new button in the actions panel fills a character's (or city's) **empty action slots with the orders it ran last turn**, so a turn that mostly repeats itself no longer has to be typed from scratch.

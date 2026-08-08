@@ -79,10 +79,11 @@ class NationCostColumnTest {
         addCostlyOrder(nacao);
         NacaoConverter.refreshOrderCostCells(model, rows, nacao);
 
-        final int cost = ((Number) model.getValueAt(0, columnOf(model, "FINANCAS.COST.ACTIONS"))).intValue();
-        final int projected = ((Number) model.getValueAt(0, columnOf(model, "TREASURY.PROJECTED"))).intValue();
-        assertEquals(treasury + cost, projected, "balance after orders must be treasury plus the spend");
-        assertNotEquals(treasury, projected, "with a costed order the two columns cannot be equal");
+        final int projected = ((Number) model.getValueAt(0, columnOf(model, "FINANCAS.FORECAST.FINAL"))).intValue();
+        assertEquals(control.services.FinancasConverter.getForecastBalance(nacao), projected,
+                "the column must be the same number the forecast's bottom line shows");
+        assertNotEquals(treasury, projected,
+                "the forecast balance folds in upkeep and revenue, so it cannot equal bare treasury");
     }
 
     @Test

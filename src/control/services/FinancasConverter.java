@@ -10,9 +10,11 @@ import business.facade.CenarioFacade;
 import business.facade.NacaoFacade;
 import control.facade.WorldFacadeCounselor;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import model.Cenario;
+import model.Exercito;
 import model.ExtratoDetail;
 import model.Mercado;
 import model.Nacao;
@@ -76,6 +78,31 @@ public class FinancasConverter implements Serializable {
      Resultado esperado para o próximo turno 	-500
      Reservas de Ouro 	49.500
      */
+    /**
+     * The bottom line of the next-turn forecast for a nation: treasury, plus revenue, minus upkeep,
+     * minus what this turn's saved orders commit, minus gold decay.
+     * <p>
+     * Single source for that number, so the nations-table column and the forecast's own final row
+     * cannot drift apart - a column showing only "treasury minus orders" was misleading, since upkeep
+     * and revenue dwarf the order costs.
+     */
+    public static int getForecastBalance(Nacao nacao) {
+        final Cenario cenario = WFC.getCenario();
+        final ListFactory lf = new ListFactory();
+        final Collection<Exercito> exercitosAll = lf.listExercitos().values();
+        final int exercitos = nacaoFacade.getCustoExercitoNacao(nacao, exercitosAll) * -1;
+        final int exeBonus = nacaoFacade.getDescontoExercitoNacao(nacao, exercitosAll);
+        final int cidadesUpkeep = nacaoFacade.getCustoCidades(nacao, cenario) * -1;
+        final int personagens = nacaoFacade.getCustoPersonagens(nacao, cenario) * -1;
+        final int arrecadacao = nacaoFacade.getArrecadacao(nacao);
+        final int ouroProd = nacaoFacade.getProducao(nacao, cenario.getMoney(), cenario, WFC.getTurno());
+        final int custos = exercitos + cidadesUpkeep + personagens + exeBonus;
+        final int moneyFinal = (arrecadacao + ouroProd) + custos + nacaoFacade.getMoney(nacao);
+        final int valorAcoes = WFC.getNacaoOrderCost(nacao) * -1;
+        final int decay = nacaoFacade.getGoldDecay(nacao, moneyFinal + valorAcoes, cenario) * -1;
+        return moneyFinal + valorAcoes + decay;
+    }
+
     public GenericoTableModel getProjecaoTableModel(Nacao nacao, Set<PersonagemOrdem> listPo) {
         String[] colNames = new String[]{labels.getString("NOME"), labels.getString("VALOR")};
         //SIZE covers the fixed rows, +4 the decay/final block (always shown, one row of slack), +listPo.size()+2 the
@@ -152,7 +179,8 @@ public class FinancasConverter implements Serializable {
                 dados[ii++][1] = decay;
             }
             dados[ii][0] = labels.getString("FINANCAS.FORECAST.FINAL");
-            dados[ii++][1] = moneyFinal + valorAcoes + decay;
+            //same source as the nations-table column, so the two always agree
+            dados[ii++][1] = getForecastBalance(nacao);
         }
         GenericoTableModel model = new GenericoTableModel(colNames, dados,
                 new Class[]{java.lang.String.class, java.lang.Integer.class});
