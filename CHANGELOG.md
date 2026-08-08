@@ -2,6 +2,9 @@
 
 ## 05-AUG-2026 - v2.1.912
 
+### Typing a troop quantity no longer crashes the client
+- Entering a number in the **troops quantity** column and then clicking away could **close Counselor outright**, losing anything unsaved. The out-of-range warning was being raised while the table was still closing the cell you had typed in. It now waits for the cell to close and keeps your entry open until you answer.
+
 ### Next-turn costs are no longer doubled
 - The **next-turn forecast** could show **every order's cost twice** (and the gold figure in the status bar with it), so a turn looked far more expensive than it was. It happened whenever the same orders were read in more than once: loading an orders file over the set you already had open, or opening a turn with **team orders** on where two files carried the same nation. Your orders themselves were always correct and were never charged twice by the Judge - only the forecast was wrong. Fixed.
 - The forecast now also **stays on the nation you have selected**: saving an order for another nation (a teammate's, or one you send on behalf of) no longer swaps the panel to that nation's numbers.
