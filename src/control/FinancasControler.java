@@ -62,7 +62,7 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
 
     public GenericoTableModel getMainTableModel(GenericoComboObject filtro) {
         listaExibida = NacaoConverter.listaByFiltro(filtro.getComboId());
-        this.mainTableModel = NacaoConverter.getNacaoModel(listaExibida);
+        this.mainTableModel = NacaoConverter.getNacaoModel(listaExibida, NacaoConverter.Layout.FINANCES);
         return this.mainTableModel;
     }
 

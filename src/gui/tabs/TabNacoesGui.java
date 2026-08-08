@@ -255,8 +255,9 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         //set model
         this.jtMainLista.setModel(model);
         //confid red background
-        if (WorldFacadeCounselor.getInstance().isNationPackages()) {
-            jtMainLista.getColumnModel().getColumn(NacaoConverter.ORDEM_COL_INDEX_START).setCellRenderer(ltcr);
+        final int startupCol = NacaoConverter.getStartupPointsColumn(model);
+        if (WorldFacadeCounselor.getInstance().isNationPackages() && startupCol >= 0) {
+            jtMainLista.getColumnModel().getColumn(startupCol).setCellRenderer(ltcr);
         }
         //auto adjust columns
         this.doConfigTableColumns(jtMainLista);
@@ -330,9 +331,13 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
     public void setValueAt(ActorAction actorAction, int ordIndex, int openSlotsQt) {
         //set how many points were selected
         final int points = acaoFacade.getPointsSetup(stOrdens.getActor().getNacao());
+        final int startupCol = NacaoConverter.getStartupPointsColumn(this.jtMainLista.getModel());
+        if (startupCol < 0) {
+            return; //no startup-package column on display: nothing to update
+        }
         this.jtMainLista.getModel().setValueAt(points,
                 nacaoControl.getModelRowIndex(),
-                NacaoConverter.ORDEM_COL_INDEX_START);
+                startupCol);
     }
 
     private void setResults(Nacao nacao) {

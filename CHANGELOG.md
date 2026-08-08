@@ -2,6 +2,11 @@
 
 ## 05-AUG-2026 - v2.1.912
 
+### Finances and Nations tables, reorganised
+- Both tables now read in a deliberate order: **who they are** first on the Nations tab, **money** first on Finances. Same facts, arranged for what you go to each tab to do.
+- On the **Finances** tab the resource columns now show **what selling them would fetch** at current market prices - the same figure the Market sub-tab totals - instead of a unit count, so every column on that tab is gold.
+- The turn-0 **startup package points** column now sits right after the nation name while you are spending them, and no longer appears on Finances.
+
 ### See what your orders will cost, as you enter them
 - The **action's cost** readout in the top right now always reports **your own nation**. It could previously show an **ally's** total instead - whichever order set was loaded last - which was misleading when checking your own spend. If you hold more than one nation it shows the costliest.
 - The nations table on the **Finances** tab now shows **Total orders cost** and **Forecast Balance** next to your treasury, and both **update the moment you save or clear an order** - no more clicking to another nation and back to make the numbers move.

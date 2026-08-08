@@ -20,6 +20,7 @@ import model.Cenario;
 import model.Exercito;
 import model.Jogador;
 import model.Local;
+import model.Mercado;
 import model.Nacao;
 import model.Produto;
 import model.TipoTropa;
@@ -35,7 +36,6 @@ import persistenceCommons.SysApoio;
  */
 public class NacaoConverter implements Serializable {
 
-    public static final int ORDEM_COL_INDEX_START = 5;
     private static final Log log = LogFactory.getLog(NacaoConverter.class);
     private static final NacaoFacade nacaoFacade = new NacaoFacade();
     private static final AcaoFacade acaoFacade = new AcaoFacade();
@@ -62,13 +62,169 @@ public class NacaoConverter implements Serializable {
         return model;
     }
 
+    /** Which tab a nations table is being built for; they show the same facts in a different order. */
+    public enum Layout {
+        /** Nations tab: everything, resources as QUANTITY, startup-package points right after the name. */
+        NATIONS,
+        /** Finances tab: money first, resources as the GOLD they would fetch, no startup-package column. */
+        FINANCES
+    }
+
+    /** One table column: its header, its type, and how to read it off a nation. */
+    private static final class Col {
+
+        private final String header;
+        private final Class<?> type;
+        private final java.util.function.Function<Nacao, Object> value;
+
+        Col(String header, Class<?> type, java.util.function.Function<Nacao, Object> value) {
+            this.header = header;
+            this.type = type;
+            this.value = value;
+        }
+    }
+
     public static GenericoTableModel getNacaoModel(List<Nacao> lista) {
-        List<Class> classes = new ArrayList<Class>(30);
-        GenericoTableModel nacaoModel = new GenericoTableModel(
-                getNacaoColNames(classes),
-                getNacoesAsArray(lista),
-                classes.toArray(new Class[0]));
-        return nacaoModel;
+        return getNacaoModel(lista, Layout.NATIONS);
+    }
+
+    public static GenericoTableModel getNacaoModel(List<Nacao> lista, Layout layout) {
+        final List<Col> cols = columns(layout);
+        final String[] names = new String[cols.size()];
+        final Class[] classes = new Class[cols.size()];
+        for (int cc = 0; cc < cols.size(); cc++) {
+            names[cc] = cols.get(cc).header;
+            classes[cc] = cols.get(cc).type;
+        }
+        final Object[][] data = new Object[lista.size()][cols.size()];
+        for (int rr = 0; rr < lista.size(); rr++) {
+            for (int cc = 0; cc < cols.size(); cc++) {
+                data[rr][cc] = cols.get(cc).value.apply(lista.get(rr));
+            }
+        }
+        return new GenericoTableModel(names, data, classes);
+    }
+
+    /**
+     * The columns of a nations table, in display order.
+     * <p>
+     * Two are conditional on the scenario: the turn-0 startup-package points (only while nation orders
+     * are open, and only on the Nations tab - the Finances tab has no use for them) and the capital
+     * coordinates (only in scenarios with capitals). Everything else is always present, so a layout is
+     * just a different order over the same list.
+     */
+    private static List<Col> columns(Layout layout) {
+        final Cenario cenario = WFC.getCenario();
+        final boolean hasStartupPoints = cenarioFacade.hasOrdensNacao(WFC.getPartida());
+        final boolean hasCapitals = WFC.hasCapitals();
+
+        final Col name = new Col(labels.getString("NOME"), String.class, n -> nacaoFacade.getNome(n));
+        final Col startup = new Col(labels.getString("STARTUP.POINTS"), Integer.class, n -> acaoFacade.getPointsSetup(n));
+        final Col alliance = new Col(labels.getString("ALIANCA"), String.class, n -> nacaoFacade.getTeamFlag(n));
+        final Col culture = new Col(labels.getString("RACA"), String.class, n -> nacaoFacade.getRacaNome(n));
+        final Col active = new Col(labels.getString("ATIVA"), String.class,
+                n -> SysApoio.iif(nacaoFacade.isAtiva(n), labels.getString("ATIVA"), labels.getString("INATIVA")));
+        final Col capital = new Col(labels.getString("CIDADE.CAPITAL"), Local.class, n -> nacaoFacade.getCoordenadasCapital(n));
+        final Col charSlots = new Col(labels.getString("PERSONAGENS.SLOT"), Integer.class, n -> nacaoFacade.getPersonagensSlot(n, cenario));
+        final Col charKnown = new Col(labels.getString("PERSONAGENS.KNOWN"), Integer.class, n -> nacaoFacade.getPersonagens(n));
+        final Col loyalty = new Col(labels.getString("LEALDADE"), Integer.class, n -> nacaoFacade.getLealdade(n));
+        final Col loyaltyVar = new Col(labels.getString("LEALDADE.VARIACAO"), Integer.class, n -> nacaoFacade.getLealdadeAnterior(n));
+        final Col troops = new Col(labels.getString("TROPAS"), Integer.class, n -> nacaoFacade.getTropasQt(n, WFC.getExercitos()));
+        final Col victory = new Col(labels.getString("PONTOS.VITORIA"), Integer.class, n -> nacaoFacade.getPointVictory(n));
+        final Col domination = new Col(labels.getString("PONTOS.DOMINATION"), Integer.class, n -> nacaoFacade.getPointsDomination(n));
+        final Col taxes = new Col(labels.getString("IMPOSTOS"), Integer.class, n -> nacaoFacade.getImpostos(n));
+        final Col treasury = new Col(labels.getString("TREASURY"), Integer.class, n -> nacaoFacade.getMoneySaldo(n));
+        // Refreshed cell-by-cell as orders are entered - see refreshOrderCostCells. Zero for nations
+        // that are not yours, the only ones you cannot enter orders for.
+        final Col ordersCost = new Col(labels.getString("FINANCAS.COST.ACTIONS"), Integer.class, n -> WFC.getNacaoOrderCost(n) * -1);
+        final Col forecast = new Col(labels.getString("FINANCAS.FORECAST.COLUMN"), Integer.class, n -> FinancasConverter.getForecastBalance(n));
+        final Col player = new Col(labels.getString("JOGADOR"), String.class, n -> nacaoFacade.getJogadorDisplay(n));
+        final Col email = new Col(labels.getString("JOGADOR.EMAIL"), String.class, n -> nacaoFacade.getJogadorEmail(n));
+
+        final List<Col> ret = new ArrayList<>(30);
+        if (layout == Layout.FINANCES) {
+            ret.add(name);
+            ret.add(alliance);
+            ret.add(taxes);
+            ret.add(treasury);
+            ret.add(ordersCost);
+            ret.add(forecast);
+            ret.addAll(resourceColumns(layout, cenario));
+            ret.add(loyalty);
+            ret.add(loyaltyVar);
+            ret.add(troops);
+            ret.add(victory);
+            ret.add(domination);
+            ret.add(culture);
+            ret.add(active);
+            if (hasCapitals) {
+                ret.add(capital);
+            }
+            ret.add(charSlots);
+            ret.add(charKnown);
+        } else {
+            ret.add(name);
+            if (hasStartupPoints) {
+                //turn-0 spending sits where the player looks first, and only while it is being spent
+                ret.add(startup);
+            }
+            ret.add(alliance);
+            ret.add(culture);
+            ret.add(active);
+            if (hasCapitals) {
+                ret.add(capital);
+            }
+            ret.add(charSlots);
+            ret.add(charKnown);
+            ret.add(loyalty);
+            ret.add(loyaltyVar);
+            ret.add(troops);
+            ret.add(victory);
+            ret.add(domination);
+            ret.add(taxes);
+            ret.add(treasury);
+            ret.add(ordersCost);
+            ret.add(forecast);
+            ret.addAll(resourceColumns(layout, cenario));
+        }
+        ret.add(player);
+        ret.add(email);
+        return ret;
+    }
+
+    /**
+     * One column per tradeable resource. The Nations tab counts units (stock plus expected production);
+     * the Finances tab is about money, so it shows what selling all of them would fetch at the current
+     * market price - the same figure the Market sub-tab totals per resource. Falls back to units in a
+     * scenario with no market to price them against.
+     */
+    private static List<Col> resourceColumns(Layout layout, Cenario cenario) {
+        final List<Col> ret = new ArrayList<>(10);
+        final Mercado mercado = WFC.getMercado();
+        final boolean asGold = layout == Layout.FINANCES && mercado != null;
+        for (Produto produto : cenarioFacade.listProdutos(cenario, 1)) {
+            final Produto p = produto;
+            ret.add(new Col(p.getNome(), Integer.class, n -> {
+                final int units = nacaoFacade.getProducao(n, p, cenario, WFC.getTurno()) + nacaoFacade.getEstoque(n, p);
+                return asGold ? units * mercado.getProdutoVlVenda(p) : units;
+            }));
+        }
+        return ret;
+    }
+
+    /**
+     * Model index of the startup-package points column, or -1 when it is not displayed. Resolved by
+     * header rather than a constant: it is only present while nation orders are open, and it sits in a
+     * different place per layout, so a fixed index would paint or overwrite the wrong column.
+     */
+    public static int getStartupPointsColumn(javax.swing.table.TableModel model) {
+        final String header = labels.getString("STARTUP.POINTS");
+        for (int col = 0; model != null && col < model.getColumnCount(); col++) {
+            if (header.equals(model.getColumnName(col))) {
+                return col;
+            }
+        }
+        return -1;
     }
 
     /**
@@ -117,117 +273,6 @@ public class NacaoConverter implements Serializable {
         return false;
     }
 
-    private static Object[] toArray(Nacao nacao) {
-        int ii = 0;
-        Object[] cArray = new Object[getNacaoColNames(new ArrayList<Class>(30)).length];
-        cArray[ii++] = nacaoFacade.getNome(nacao);
-        cArray[ii++] = nacaoFacade.getRacaNome(nacao);
-        cArray[ii++] = nacaoFacade.getPointVictory(nacao);
-        cArray[ii++] = nacaoFacade.getPointsDomination(nacao);
-        cArray[ii++] = SysApoio.iif(nacaoFacade.isAtiva(nacao), labels.getString("ATIVA"), labels.getString("INATIVA"));
-        if (cenarioFacade.hasOrdensNacao(WFC.getPartida())) {
-            cArray[ii++] = acaoFacade.getPointsSetup(nacao);
-        }
-        if (WFC.hasCapitals()) {
-            cArray[ii++] = nacaoFacade.getCoordenadasCapital(nacao);
-        }
-        final Cenario cenario = WFC.getCenario();
-        final Collection<Exercito> exercitos = WFC.getExercitos();
-        cArray[ii++] = nacaoFacade.getPersonagens(nacao);
-        cArray[ii++] = nacaoFacade.getPersonagensSlot(nacao, cenario);
-        cArray[ii++] = nacaoFacade.getTropasQt(nacao, exercitos);
-        // Treasury is gold NOW (orders are paid next turn), so it is paired with what this turn's saved
-        // orders have committed and what would be left. Both are refreshed cell-by-cell as orders are
-        // entered - see FinancasControler.refreshOrderCostCells. Zero for nations that are not yours,
-        // which are the only ones you cannot enter orders for.
-        final int treasury = nacaoFacade.getMoneySaldo(nacao);
-        final int custoOrdens = WFC.getNacaoOrderCost(nacao) * -1;
-        cArray[ii++] = treasury;
-        cArray[ii++] = custoOrdens;
-        cArray[ii++] = FinancasConverter.getForecastBalance(nacao);
-        cArray[ii++] = nacaoFacade.getImpostos(nacao);
-        Produto[] produtos = cenarioFacade.listProdutos(cenario, 1);
-        for (Produto produto : produtos) {
-            int prod = nacaoFacade.getProducao(nacao, produto, cenario, WorldFacadeCounselor.getInstance().getTurno());
-            int est = nacaoFacade.getEstoque(nacao, produto);
-            cArray[ii++] = prod + est;
-        }
-        cArray[ii++] = nacaoFacade.getLealdade(nacao);
-        cArray[ii++] = nacaoFacade.getLealdadeAnterior(nacao);
-        cArray[ii++] = nacaoFacade.getTeamFlag(nacao);
-        cArray[ii++] = nacaoFacade.getJogadorDisplay(nacao);
-        cArray[ii++] = nacaoFacade.getJogadorEmail(nacao);
-        return cArray;
-    }
-
-    private static String[] getNacaoColNames(List<Class> classes) {
-        List<String> colNames = new ArrayList<String>(30);
-        colNames.add(labels.getString("NOME"));
-        classes.add(java.lang.String.class);
-        colNames.add(labels.getString("RACA"));
-        classes.add(java.lang.String.class);
-        colNames.add(labels.getString("PONTOS.VITORIA"));
-        classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("PONTOS.DOMINATION"));
-        classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("ATIVA"));
-        classes.add(java.lang.String.class);
-        if (cenarioFacade.hasOrdensNacao(WFC.getPartida())) {
-            //add if for startup points here.
-            colNames.add(labels.getString("STARTUP.POINTS"));
-            classes.add(java.lang.Integer.class);
-        }
-        if (WFC.hasCapitals()) {
-            colNames.add(labels.getString("CIDADE.CAPITAL"));
-            classes.add(Local.class);
-        }
-        colNames.add(labels.getString("PERSONAGENS.KNOWN"));
-        classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("PERSONAGENS.SLOT"));
-        classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("TROPAS"));
-        classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("TREASURY"));
-        classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("FINANCAS.COST.ACTIONS"));
-        classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("FINANCAS.FORECAST.COLUMN"));
-        classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("IMPOSTOS"));
-        classes.add(java.lang.Integer.class);
-        final Cenario cenario = WFC.getCenario();
-        Produto[] produtos = cenarioFacade.listProdutos(cenario, 1);
-        for (Produto produto : produtos) {
-            colNames.add(produto.getNome());
-            classes.add(java.lang.Integer.class);
-        }
-        colNames.add(labels.getString("LEALDADE"));
-        classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("LEALDADE.VARIACAO"));
-        classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("ALIANCA"));
-        classes.add(java.lang.String.class);
-        colNames.add(labels.getString("JOGADOR"));
-        classes.add(java.lang.String.class);
-        colNames.add(labels.getString("JOGADOR.EMAIL"));
-        classes.add(java.lang.String.class);
-        return (colNames.toArray(new String[0]));
-    }
-
-    private static Object[][] getNacoesAsArray(List<Nacao> listaExibir) {
-        if (listaExibir.isEmpty()) {
-            Object[][] ret = {{"", ""}};
-            return (ret);
-        } else {
-            int ii = 0;
-            Object[][] ret = new Object[listaExibir.size()][getNacaoColNames(new ArrayList<Class>(1)).length];
-            for (Nacao nacao : listaExibir) {
-                // Converte um Nacao para um Array[] 
-                ret[ii++] = NacaoConverter.toArray(nacao);
-            }
-            return (ret);
-        }
-    }
 
     public static GenericoTableModel getTropaModel(Nacao nacao) {
         GenericoTableModel model = new GenericoTableModel(getTropaColNames(),
