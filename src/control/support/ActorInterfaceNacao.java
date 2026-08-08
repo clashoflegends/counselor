@@ -163,6 +163,12 @@ public class ActorInterfaceNacao extends ActorInterface {
     }
 
     @Override
+    public java.util.Collection<PersonagemOrdem> getOrdensExecutadas() {
+        final java.util.SortedMap<Integer, PersonagemOrdem> ret = ordemFacade.getOrdensExecutadas(getNacao());
+        return ret == null ? java.util.Collections.emptyList() : ret.values();
+    }
+
+    @Override
     public PersonagemOrdem getPersonagemOrdem(int indexOrdem) {
         return ordemFacade.getPersonagemOrdem(getNacao(), indexOrdem);
     }

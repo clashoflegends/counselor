@@ -89,6 +89,10 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         jbClear.setIcon(gui.services.SvgIcon.themed("eraser", sz));
         jbDetach.setIcon(gui.services.SvgIcon.themed("external-link", sz));
         jbRepeat.setIcon(gui.services.SvgIcon.themed("repeat", sz));
+        // Distinct from jbRepeat (which stamps the CURRENT order into every empty slot): this one brings
+        // back what the actor did last turn, so it reads as "history", not "repeat".
+        jbDoagain.setIcon(gui.services.SvgIcon.themed("history", sz));
+        jbDoagain.setToolTipText(labels.getString("DOAGAIN.TOOLTIP"));
         jbHelp.setIcon(gui.services.SvgIcon.themed("help", sz));
     }
 
@@ -123,6 +127,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         jbDetach = new javax.swing.JToggleButton();
         jbRepeat = new javax.swing.JButton();
         jbHelp = new javax.swing.JButton();
+        jbDoagain = new javax.swing.JButton();
         cbOrdersAll = new javax.swing.JCheckBox();
         jspListaOrdens = new javax.swing.JScrollPane();
         jtListaOrdens = new javax.swing.JTable();
@@ -203,6 +208,11 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         jbHelp.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
         jbHelp.setFocusable(false);
 
+        jbDoagain.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/submit.png"))); // NOI18N
+        jbDoagain.setToolTipText(labels.getString("REPEAT.AJUDA.TOOLTIP")); // NOI18N
+        jbDoagain.setBorder(javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3));
+        jbDoagain.setFocusable(false);
+
         cbOrdersAll.setText(labels.getString("ALL")); // NOI18N
         cbOrdersAll.setToolTipText(labels.getString("PERSONAGEM.ORDENSALL.TOOLTIP")); // NOI18N
         cbOrdersAll.setActionCommand("cbOrdersAll"); // NOI18N
@@ -240,62 +250,68 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jbOk)
-                    .addComponent(cbOrdersAll)
-                    .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(jpOrdensLayout.createSequentialGroup()
-                            .addComponent(jbDetach, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jbHelp))
-                        .addGroup(jpOrdensLayout.createSequentialGroup()
+                    .addGroup(jpOrdensLayout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jbRepeat)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jbClear))))
-                .addContainerGap())
+                            .addComponent(jbDoagain))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jbDetach, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jbClear)
+                            .addComponent(jbHelp)))
+                    .addComponent(cbOrdersAll, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
         jpOrdensLayout.setVerticalGroup(
             jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpOrdensLayout.createSequentialGroup()
-                .addComponent(cbOrdem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbPar11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlPar11))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jlPar12)
-                    .addComponent(cbPar12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jpOrdensLayout.createSequentialGroup()
+                        .addComponent(cbOrdem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbPar11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jlPar11))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jlPar12)
+                            .addComponent(cbPar12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jpOrdensLayout.createSequentialGroup()
+                        .addComponent(jbOk)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jbClear)
+                            .addComponent(jbRepeat))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jbDetach, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jbDoagain))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cbPar13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlPar13))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbPar14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlPar14))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbPar15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlPar15))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbPar16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlPar16))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbPar17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jlPar17)))
-            .addGroup(jpOrdensLayout.createSequentialGroup()
-                .addComponent(jbOk)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jbClear)
-                    .addComponent(jbRepeat))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jbDetach, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jbHelp))
-                .addGap(4, 4, 4)
-                .addComponent(cbOrdersAll))
+                    .addGroup(jpOrdensLayout.createSequentialGroup()
+                        .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cbPar13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jlPar13))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbPar14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jlPar14))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbPar15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jlPar15))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbPar16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jlPar16))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jpOrdensLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbPar17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jlPar17)))
+                    .addGroup(jpOrdensLayout.createSequentialGroup()
+                        .addComponent(jbHelp)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbOrdersAll))))
         );
 
         jspListaOrdens.setBorder(null);
@@ -371,6 +387,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     private javax.swing.JScrollPane detOrdens;
     private javax.swing.JButton jbClear;
     private javax.swing.JToggleButton jbDetach;
+    private javax.swing.JButton jbDoagain;
     private javax.swing.JButton jbHelp;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbRepeat;
@@ -449,6 +466,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         cbOrdersAll.setActionCommand("cbOrdersAll");
         jbHelp.setActionCommand("jbHelp");
         jbRepeat.setActionCommand("jbRepeat");
+        jbDoagain.setActionCommand("jbDoagain");
         jbClear.setActionCommand("jbClear");
         jbDetach.setActionCommand("jbDetach");
 
@@ -461,6 +479,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         jbOk.addActionListener(ordemControl);
         cbOrdersAll.addItemListener(ordemControl);
         jbRepeat.addActionListener(ordemControl);
+        jbDoagain.addActionListener(ordemControl);
         jbHelp.addActionListener(ordemControl);
         jbClear.addActionListener(ordemControl);
         jbDetach.addItemListener(ordemControlFloater);
@@ -878,6 +897,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         this.cbOrdem.setEnabled(false);
         this.cbOrdersAll.setEnabled(false);
         jbRepeat.setEnabled(false);
+        jbDoagain.setEnabled(false);
         jbHelp.setEnabled(false);
         jbClear.setEnabled(false);
         jbDetach.setEnabled(false);
@@ -894,6 +914,11 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         this.cbOrdem.setEnabled(true);
         this.cbOrdersAll.setEnabled(true);
         jbRepeat.setEnabled(!readOnly);
+        // Off when there is nothing to bring back: the server records executed orders per actor, so an
+        // actor with no orders last turn (or a type the server does not record) has nothing to repeat.
+        final boolean canDoAgain = !readOnly && ordemControl.hasLastTurnOrders();
+        jbDoagain.setEnabled(canDoAgain);
+        jbDoagain.setToolTipText(labels.getString(canDoAgain ? "DOAGAIN.TOOLTIP" : "DOAGAIN.TOOLTIP.NONE"));
         jbHelp.setEnabled(true);
         jbClear.setEnabled(!readOnly);
         jbDetach.setEnabled(true);

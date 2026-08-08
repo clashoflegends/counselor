@@ -157,6 +157,12 @@ public class ActorInterfaceCidade extends ActorInterface {
     }
 
     @Override
+    public java.util.Collection<PersonagemOrdem> getOrdensExecutadas() {
+        final java.util.SortedMap<Integer, PersonagemOrdem> ret = ordemFacade.getOrdensExecutadas(getCidade());
+        return ret == null ? java.util.Collections.emptyList() : ret.values();
+    }
+
+    @Override
     public PersonagemOrdem getPersonagemOrdem(int indexOrdem) {
         return ordemFacade.getPersonagemOrdem(getCidade(), indexOrdem);
     }
