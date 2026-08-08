@@ -138,6 +138,10 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
     }
 
     protected void doConfigTableColumns(JTable table) {
+        //Whole numbers: grouped thousands + a red tint on negatives, everywhere. Set as the CLASS
+        //default, so a column with its own renderer (loyalty, loyalty delta, difficulty, startup
+        //points) keeps it - Swing asks the column first and only then falls back to this.
+        table.setDefaultRenderer(Integer.class, new gui.services.NumberTableCellRenderer());
         //set renders for Action columns
         table.setDefaultRenderer(ActorAction.class, new ActorActionTableCellRenderer(table));
         //set renders for Open Slot columns

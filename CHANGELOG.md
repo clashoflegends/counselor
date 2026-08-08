@@ -2,6 +2,10 @@
 
 ## 05-AUG-2026 - v2.1.912
 
+### Numbers you can read at a glance
+- Every whole number in every table now uses **thousands separators** (123,456), so a six-figure treasury no longer has to be counted digit by digit.
+- **Negative numbers are tinted red** wherever they appear - upkeep, losses, order costs, a forecast in the red - using the same palette as the city loyalty colours, in both light and dark themes.
+
 ### Finances and Nations tables, reorganised
 - Both tables now read in a deliberate order: **who they are** first on the Nations tab, **money** first on Finances. Same facts, arranged for what you go to each tab to do.
 - On the **Finances** tab the resource columns now show **what selling them would fetch** at current market prices - the same figure the Market sub-tab totals - instead of a unit count, so every column on that tab is gold. They are marked **Food $**, **Leather $** and so on, so a price is never read as a quantity.
