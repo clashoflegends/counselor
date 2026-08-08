@@ -50,6 +50,10 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
         this.tabGui = tabGui;
         registerDispatchManager();
         registerDispatchManagerForMsg(DispatchManager.CLEAR_FINANCES_FORECAST);
+        // An order FILE has just been loaded (or cleared). The nations table model is built during tab
+        // construction, which on an EGF open happens BEFORE the orders are loaded, so its cost columns
+        // would otherwise sit at zero all session - the Nations tab rebuilds on this same signal.
+        registerDispatchManagerForMsg(DispatchManager.ACTIONS_RELOAD);
     }
 
     public GenericoTableModel getExtratoTableModel(Nacao nacao) {
@@ -131,50 +135,22 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
             }
             //the nations table keeps showing its own row for every nation, so its order-cost cells are
             //refreshed whatever is selected - this is what used to force a click away and back.
-            refreshOrderCostCells(nation);
+            NacaoConverter.refreshOrderCostCells(mainTableModel, listaExibida, nation);
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SET_LABEL_MONEY, nation.getId() + "");
-        }
-    }
-
-    /**
-     * Updates the order-cost and balance-after-orders cells for one nation in the nations table, in
-     * place. The table model is built once (on tab construction or a filter change) and never rebuilt,
-     * so without this the two columns only changed when the player clicked away and back.
-     * <p>
-     * The column is resolved by header name rather than a constant: the column set is conditional
-     * (nation orders, capitals, one column per product), so a fixed index would hit a different column
-     * in some scenarios. Silent no-op when the nation is filtered out of the current view.
-     */
-    private void refreshOrderCostCells(Nacao nation) {
-        if (mainTableModel == null || listaExibida == null || nation == null) {
-            return;
-        }
-        final int row = listaExibida.indexOf(nation);
-        if (row < 0) {
-            return;
-        }
-        final int cost = WFC.getNacaoOrderCost(nation) * -1;
-        setCell(row, labels.getString("FINANCAS.COST.ACTIONS"), cost);
-        setCell(row, labels.getString("TREASURY.PROJECTED"), nacaoFacade.getMoneySaldo(nation) + cost);
-    }
-
-    /** Sets a cell by column header, if that column is present. DefaultTableModel repaints itself. */
-    private void setCell(int row, String columnHeader, Object value) {
-        for (int col = 0; col < mainTableModel.getColumnCount(); col++) {
-            if (columnHeader.equals(mainTableModel.getColumnName(col))) {
-                mainTableModel.setValueAt(value, row, col);
-                return;
-            }
         }
     }
 
     @Override
     public void receiveDispatch(int msgName, String idNation) {
+        if (msgName == DispatchManager.ACTIONS_RELOAD) {
+            NacaoConverter.refreshOrderCostCells(mainTableModel, listaExibida);
+        }
         if (msgName == DispatchManager.CLEAR_FINANCES_FORECAST) {
             for (Set<PersonagemOrdem> lists : WFC.getMapPersonagemOrdens().values()) {
                 //clear each array, no need to clear the array itself.
                 lists.clear();
             }
+            NacaoConverter.refreshOrderCostCells(mainTableModel, listaExibida);
         }
     }
 }

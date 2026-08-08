@@ -71,6 +71,52 @@ public class NacaoConverter implements Serializable {
         return nacaoModel;
     }
 
+    /**
+     * Refreshes the order-cost and balance-after-orders cells for one nation, in place.
+     * <p>
+     * The nations table model is a SNAPSHOT: it is built once (tab construction or a filter change)
+     * and never rebuilt, and on an EGF open it is built BEFORE the orders file is loaded - so without
+     * this the two columns sit at zero for the whole session. Columns are matched by header name
+     * because the column set is conditional (nation orders, capitals, one per product), so a fixed
+     * index would hit a different column in some scenarios.
+     *
+     * @return true when a cell was actually updated
+     */
+    public static boolean refreshOrderCostCells(GenericoTableModel model, List<Nacao> rows, Nacao nacao) {
+        if (model == null || rows == null || nacao == null) {
+            return false;
+        }
+        final int row = rows.indexOf(nacao);
+        if (row < 0 || row >= model.getRowCount()) {
+            return false; //nation filtered out of the current view
+        }
+        final int cost = WFC.getNacaoOrderCost(nacao) * -1;
+        boolean ret = setCell(model, row, labels.getString("FINANCAS.COST.ACTIONS"), cost);
+        ret |= setCell(model, row, labels.getString("TREASURY.PROJECTED"), nacaoFacade.getMoneySaldo(nacao) + cost);
+        return ret;
+    }
+
+    /** Refreshes every displayed row, for when a whole order set has just been loaded or cleared. */
+    public static void refreshOrderCostCells(GenericoTableModel model, List<Nacao> rows) {
+        if (rows == null) {
+            return;
+        }
+        for (Nacao nacao : rows) {
+            refreshOrderCostCells(model, rows, nacao);
+        }
+    }
+
+    /** Sets a cell by column header, if that column is present. DefaultTableModel repaints itself. */
+    private static boolean setCell(GenericoTableModel model, int row, String columnHeader, Object value) {
+        for (int col = 0; col < model.getColumnCount(); col++) {
+            if (columnHeader.equals(model.getColumnName(col))) {
+                model.setValueAt(value, row, col);
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static Object[] toArray(Nacao nacao) {
         int ii = 0;
         Object[] cArray = new Object[getNacaoColNames(new ArrayList<Class>(30)).length];
