@@ -2,6 +2,11 @@
 
 ## 05-AUG-2026 - v2.1.912
 
+### Do it again: bring back last turn's orders
+- A new button in the actions panel fills a character's (or city's) **empty action slots with the orders it ran last turn**, so a turn that mostly repeats itself no longer has to be typed from scratch.
+- It **never touches an order you have already entered** this turn, and it skips anything that is no longer available to that actor - it tells you how many it filled and how many it skipped.
+- The orders come back **exactly as you sent them**, targets and all, so check them before submitting: a destination you already reached, or a target who has since died, is yours to correct.
+
 ### Typing a troop quantity no longer crashes the client
 - Entering a number in the **troops quantity** column and then clicking away could **close Counselor outright**, losing anything unsaved. The out-of-range warning was being raised while the table was still closing the cell you had typed in. It now waits for the cell to close and keeps your entry open until you answer.
 
