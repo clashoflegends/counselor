@@ -731,6 +731,14 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         detOrdens.setViewportView(jpDetOrdens);
     }
 
+    /**
+     * The orders selectable for a given slot, built exactly as the order combo is (same ALL-checkbox
+     * state), so a caller outside the panel judges availability the same way the player sees it.
+     */
+    public GenericoComboBoxModel getOrdemComboModel(int slot) {
+        return getActor().getOrdemComboModel(slot, isAllSelected());
+    }
+
     public int getNextActionSlot() {
         //testa se slot next actor
         for (int ii = 0; ii < this.jtListaOrdens.getModel().getRowCount(); ii++) {

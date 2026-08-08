@@ -193,6 +193,15 @@ public abstract class ActorInterface extends ControlBase implements Serializable
 
     public abstract PersonagemOrdem getPersonagemOrdem(int indexOrdem);
 
+    /**
+     * The orders this actor actually ran LAST turn, as carried inside the turn file. The server only
+     * records them for characters, so every other actor type has none and the "do it again" action is
+     * simply unavailable there. Never null.
+     */
+    public java.util.Collection<PersonagemOrdem> getOrdensExecutadas() {
+        return java.util.Collections.emptyList();
+    }
+
     public abstract String getParametroDisplay(int indexOrdem, int indexParametro);
 
     public abstract GenericoTableModel getOrdemTableModel();

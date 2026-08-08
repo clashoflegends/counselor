@@ -160,6 +160,12 @@ public class ActorInterfacePersonagem extends ActorInterface {
     }
 
     @Override
+    public java.util.Collection<PersonagemOrdem> getOrdensExecutadas() {
+        final java.util.SortedMap<Integer, PersonagemOrdem> ret = ordemFacade.getOrdensExecutadas(getPersonagem());
+        return ret == null ? java.util.Collections.emptyList() : ret.values();
+    }
+
+    @Override
     public PersonagemOrdem getPersonagemOrdem(int indexOrdem) {
         return ordemFacade.getPersonagemOrdem(getPersonagem(), indexOrdem);
     }

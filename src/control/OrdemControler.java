@@ -8,6 +8,7 @@ import baseLib.GenericoComboObject;
 import business.facade.OrdemFacade;
 import control.services.AcaoConverter;
 import control.services.CenarioConverter;
+import control.services.LastTurnOrders;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.services.Toast;
@@ -99,20 +100,27 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
     }
 
     private void doSalvaAction(int index) {
-        if (index < 0) {
-            return;
+        doSaveOrder(index, index < 0 ? null : getTabGui().getOrdemQuadro());
+    }
+
+    /**
+     * Saves an order into a slot: the one chokepoint every order goes through, whether it was composed
+     * in the panel or repeated from last turn. Returns false when nothing was saved.
+     */
+    private boolean doSaveOrder(int index, PersonagemOrdem po) {
+        if (index < 0 || po == null) {
+            return false;
         }
         if (getTabGui().isReadOnly()) {
             //segregation: never persist orders onto a non-mine (allied/NPC) actor, whatever the UI state
-            return;
+            return false;
         }
-        final PersonagemOrdem po = getTabGui().getOrdemQuadro();
         if (hasBlankTarget(po)) {
             // KI-017: don't serialize an order whose required hex/city target is blank (ticking ALL swaps the
             // target picker for an empty 4-digit box; a blank one produced a malformed action that later
             // NPE-crashed the results-EGF render). Tell the player and abort this save.
             Toast.showError(labels.getString("ORDEM.ALVO.AUSENTE"));
-            return;
+            return false;
         }
         getTabGui().getActor().doOrderSave(index, po);
         if (SettingsManager.getInstance().isAutoSaveActions()) {
@@ -123,6 +131,60 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         //draw orders on map
         getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
         getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_COUNT);
+        return true;
+    }
+
+    /**
+     * "Do it again": refills this actor's EMPTY order slots with the orders it ran last turn, read from
+     * the turn file itself (see {@link LastTurnOrders}). Orders the actor can no longer choose are
+     * skipped, existing entries are never touched, and the player reviews every repeated order in the
+     * panel before submitting - the parameters are last turn's, so a target that has since died or
+     * moved is theirs to correct.
+     */
+    private void doDoAgainAction() {
+        if (getTabGui().isReadOnly()) {
+            return;
+        }
+        final java.util.Collection<PersonagemOrdem> executed = getTabGui().getActor().getOrdensExecutadas();
+        if (!LastTurnOrders.hasAny(executed)) {
+            Toast.show(labels.getString("DOAGAIN.NONE"), null);
+            return;
+        }
+        int slot = getTabGui().getNextActionSlot();
+        if (slot < 0) {
+            Toast.show(labels.getString("DOAGAIN.NOSLOT"), null);
+            return;
+        }
+        // Availability is per slot, and follows the ALL checkbox exactly as the order combo does.
+        final List<Integer> availableNow = LastTurnOrders.availableNumbers(getTabGui().getOrdemComboModel(slot));
+        final List<PersonagemOrdem> repeatable =
+                LastTurnOrders.listRepeatable(executed, getTabGui().getActor().getNome(), availableNow);
+        final int unavailable = LastTurnOrders.countUnavailable(executed, availableNow);
+
+        int saved = 0;
+        for (PersonagemOrdem po : repeatable) {
+            if (slot < 0) {
+                break; //out of empty slots: what is already in the turn stays as the player left it
+            }
+            if (doSaveOrder(slot, po)) {
+                saved++;
+            }
+            slot = getTabGui().getNextActionSlot();
+        }
+        final int notPlaced = repeatable.size() - saved;
+        if (saved == 0 && notPlaced == 0 && unavailable > 0) {
+            Toast.show(String.format(labels.getString("DOAGAIN.NONEVALID"), unavailable), null);
+        } else if (unavailable + notPlaced > 0) {
+            Toast.show(String.format(labels.getString("DOAGAIN.DONE.PARTIAL"), saved, unavailable + notPlaced), null);
+        } else {
+            Toast.show(String.format(labels.getString("DOAGAIN.DONE"), saved), null);
+        }
+        getTabGui().doFindNextActionSlot();
+    }
+
+    /** True when the actor has orders from last turn to repeat (drives the button's enabled state). */
+    public boolean hasLastTurnOrders() {
+        return LastTurnOrders.hasAny(getTabGui().getActor().getOrdensExecutadas());
     }
 
     /**
@@ -200,6 +262,8 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
                 getTabGui().resetOrdersAllOnSave();
             } else if ("jbRepeat".equals(button.getActionCommand())) {
                 doRepeatAction();
+            } else if ("jbDoagain".equals(button.getActionCommand())) {
+                doDoAgainAction();
             } else if ("jbClear".equals(button.getActionCommand())) {
                 doRemoveAction();
             } else if ("jbHelp".equals(button.getActionCommand())) {
