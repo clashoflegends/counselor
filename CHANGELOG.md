@@ -2,6 +2,10 @@
 
 ## 05-AUG-2026 - v2.1.912
 
+### See what your orders will cost, as you enter them
+- The nations table on the **Finances** tab now shows **Total orders cost** and **Balance after orders** next to your treasury, and both **update the moment you save or clear an order** - no more clicking to another nation and back to make the numbers move.
+- Treasury still means the gold you hold **right now**; the new columns show what this turn's orders have committed and what would be left.
+
 ### Do it again: bring back last turn's orders
 - A new button in the actions panel fills a character's (or city's) **empty action slots with the orders it ran last turn**, so a turn that mostly repeats itself no longer has to be typed from scratch.
 - It **never touches an order you have already entered** this turn, and it skips anything that is no longer available to that actor - it tells you how many it filled and how many it skipped.

@@ -90,12 +90,15 @@ public class NacaoConverter implements Serializable {
         cArray[ii++] = nacaoFacade.getPersonagens(nacao);
         cArray[ii++] = nacaoFacade.getPersonagensSlot(nacao, cenario);
         cArray[ii++] = nacaoFacade.getTropasQt(nacao, exercitos);
-//        int valorAcoes = 0;
-//        for (PersonagemOrdem po : WFC.getMapPersonagemOrdens(nacao)) {
-//            valorAcoes -= acaoFacade.getCusto(po);
-//        }
-//        cArray[ii++] = valorAcoes;
-        cArray[ii++] = nacaoFacade.getMoneySaldo(nacao);
+        // Treasury is gold NOW (orders are paid next turn), so it is paired with what this turn's saved
+        // orders have committed and what would be left. Both are refreshed cell-by-cell as orders are
+        // entered - see FinancasControler.refreshOrderCostCells. Zero for nations that are not yours,
+        // which are the only ones you cannot enter orders for.
+        final int treasury = nacaoFacade.getMoneySaldo(nacao);
+        final int custoOrdens = WFC.getNacaoOrderCost(nacao) * -1;
+        cArray[ii++] = treasury;
+        cArray[ii++] = custoOrdens;
+        cArray[ii++] = treasury + custoOrdens;
         cArray[ii++] = nacaoFacade.getImpostos(nacao);
         Produto[] produtos = cenarioFacade.listProdutos(cenario, 1);
         for (Produto produto : produtos) {
@@ -138,9 +141,11 @@ public class NacaoConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("TROPAS"));
         classes.add(java.lang.Integer.class);
-//        colNames.add(labels.getString("FINANCAS.COST.ACTIONS"));
-//        classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("TREASURY"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("FINANCAS.COST.ACTIONS"));
+        classes.add(java.lang.Integer.class);
+        colNames.add(labels.getString("TREASURY.PROJECTED"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("IMPOSTOS"));
         classes.add(java.lang.Integer.class);

@@ -42,6 +42,7 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
     private final TabFinancesGui tabGui;
     private List<Nacao> listaExibida;
     private final AcaoFacade acaoFacade = new AcaoFacade();
+    private final business.facade.NacaoFacade nacaoFacade = new business.facade.NacaoFacade();
     private static final WorldFacadeCounselor WFC = WorldFacadeCounselor.getInstance();
     private final FinancasConverter finConv = new FinancasConverter();
 
@@ -125,11 +126,45 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
         if (refresh) {
             //only repaint the forecast when the order belongs to the nation on display; a save for another nation
             //(team or on-behalf orders) used to overwrite the selected nation's forecast with the other nation's.
-            //FIXME: the Cost of Orders column in the main nations table is still not refreshed from here.
             if (tabGui.getNacaoSelecionada() == nation) {
                 tabGui.setProjecaoModel(getProjecaoTableModel(nation));
             }
+            //the nations table keeps showing its own row for every nation, so its order-cost cells are
+            //refreshed whatever is selected - this is what used to force a click away and back.
+            refreshOrderCostCells(nation);
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SET_LABEL_MONEY, nation.getId() + "");
+        }
+    }
+
+    /**
+     * Updates the order-cost and balance-after-orders cells for one nation in the nations table, in
+     * place. The table model is built once (on tab construction or a filter change) and never rebuilt,
+     * so without this the two columns only changed when the player clicked away and back.
+     * <p>
+     * The column is resolved by header name rather than a constant: the column set is conditional
+     * (nation orders, capitals, one column per product), so a fixed index would hit a different column
+     * in some scenarios. Silent no-op when the nation is filtered out of the current view.
+     */
+    private void refreshOrderCostCells(Nacao nation) {
+        if (mainTableModel == null || listaExibida == null || nation == null) {
+            return;
+        }
+        final int row = listaExibida.indexOf(nation);
+        if (row < 0) {
+            return;
+        }
+        final int cost = WFC.getNacaoOrderCost(nation) * -1;
+        setCell(row, labels.getString("FINANCAS.COST.ACTIONS"), cost);
+        setCell(row, labels.getString("TREASURY.PROJECTED"), nacaoFacade.getMoneySaldo(nation) + cost);
+    }
+
+    /** Sets a cell by column header, if that column is present. DefaultTableModel repaints itself. */
+    private void setCell(int row, String columnHeader, Object value) {
+        for (int col = 0; col < mainTableModel.getColumnCount(); col++) {
+            if (columnHeader.equals(mainTableModel.getColumnName(col))) {
+                mainTableModel.setValueAt(value, row, col);
+                return;
+            }
         }
     }
 
