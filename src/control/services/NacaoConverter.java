@@ -92,7 +92,7 @@ public class NacaoConverter implements Serializable {
         }
         final int cost = WFC.getNacaoOrderCost(nacao) * -1;
         boolean ret = setCell(model, row, labels.getString("FINANCAS.COST.ACTIONS"), cost);
-        ret |= setCell(model, row, labels.getString("FINANCAS.FORECAST.FINAL"), FinancasConverter.getForecastBalance(nacao));
+        ret |= setCell(model, row, labels.getString("FINANCAS.FORECAST.COLUMN"), FinancasConverter.getForecastBalance(nacao));
         return ret;
     }
 
@@ -191,7 +191,7 @@ public class NacaoConverter implements Serializable {
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("FINANCAS.COST.ACTIONS"));
         classes.add(java.lang.Integer.class);
-        colNames.add(labels.getString("FINANCAS.FORECAST.FINAL"));
+        colNames.add(labels.getString("FINANCAS.FORECAST.COLUMN"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("IMPOSTOS"));
         classes.add(java.lang.Integer.class);

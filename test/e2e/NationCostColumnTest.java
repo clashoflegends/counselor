@@ -79,7 +79,7 @@ class NationCostColumnTest {
         addCostlyOrder(nacao);
         NacaoConverter.refreshOrderCostCells(model, rows, nacao);
 
-        final int projected = ((Number) model.getValueAt(0, columnOf(model, "FINANCAS.FORECAST.FINAL"))).intValue();
+        final int projected = ((Number) model.getValueAt(0, columnOf(model, "FINANCAS.FORECAST.COLUMN"))).intValue();
         assertEquals(control.services.FinancasConverter.getForecastBalance(nacao), projected,
                 "the column must be the same number the forecast's bottom line shows");
         assertNotEquals(treasury, projected,
