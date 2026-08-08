@@ -78,12 +78,39 @@ class NationTableLayoutTest {
 
     @Test
     void bothLayoutsCarryTheSameColumnsApartFromStartup() {
-        final List<String> nations = new ArrayList<>(headersOf(NacaoConverter.Layout.NATIONS));
-        final List<String> finances = headersOf(NacaoConverter.Layout.FINANCES);
+        final List<String> nations = new ArrayList<>(stripGoldMarker(headersOf(NacaoConverter.Layout.NATIONS)));
+        final List<String> finances = stripGoldMarker(headersOf(NacaoConverter.Layout.FINANCES));
         nations.remove(label("STARTUP.POINTS"));
 
         assertTrue(nations.containsAll(finances) && finances.containsAll(nations),
                 "a column present on one tab and missing from the other is a reordering mistake");
+    }
+
+    /** Finances marks its resource columns "<name> $" because they hold gold, not units. */
+    @Test
+    void financesMarksResourceColumnsAsMoney() {
+        final List<String> finances = headersOf(NacaoConverter.Layout.FINANCES);
+        final List<String> nations = headersOf(NacaoConverter.Layout.NATIONS);
+        final List<String> marked = new ArrayList<>();
+        for (String header : finances) {
+            if (header.endsWith(" $")) {
+                marked.add(header.substring(0, header.length() - 2));
+            }
+        }
+        assertFalse(marked.isEmpty(), "no resource column is marked as money");
+        for (String resource : marked) {
+            assertTrue(nations.contains(resource),
+                    "the marker must only be added, never rename the column: " + resource);
+        }
+    }
+
+    /** Compares layouts on the underlying column, ignoring the Finances money marker. */
+    private static List<String> stripGoldMarker(List<String> headers) {
+        final List<String> ret = new ArrayList<>(headers.size());
+        for (String header : headers) {
+            ret.add(header.endsWith(" $") ? header.substring(0, header.length() - 2) : header);
+        }
+        return ret;
     }
 
     @Test

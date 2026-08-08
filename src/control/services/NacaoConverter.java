@@ -204,7 +204,9 @@ public class NacaoConverter implements Serializable {
         final boolean asGold = layout == Layout.FINANCES && mercado != null;
         for (Produto produto : cenarioFacade.listProdutos(cenario, 1)) {
             final Produto p = produto;
-            ret.add(new Col(p.getNome(), Integer.class, n -> {
+            //"Food $" reads as money at a glance, so a gold column is never mistaken for a unit count
+            final String header = asGold ? p.getNome() + " $" : p.getNome();
+            ret.add(new Col(header, Integer.class, n -> {
                 final int units = nacaoFacade.getProducao(n, p, cenario, WFC.getTurno()) + nacaoFacade.getEstoque(n, p);
                 return asGold ? units * mercado.getProdutoVlVenda(p) : units;
             }));

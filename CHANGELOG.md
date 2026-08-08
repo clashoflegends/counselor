@@ -4,7 +4,7 @@
 
 ### Finances and Nations tables, reorganised
 - Both tables now read in a deliberate order: **who they are** first on the Nations tab, **money** first on Finances. Same facts, arranged for what you go to each tab to do.
-- On the **Finances** tab the resource columns now show **what selling them would fetch** at current market prices - the same figure the Market sub-tab totals - instead of a unit count, so every column on that tab is gold.
+- On the **Finances** tab the resource columns now show **what selling them would fetch** at current market prices - the same figure the Market sub-tab totals - instead of a unit count, so every column on that tab is gold. They are marked **Food $**, **Leather $** and so on, so a price is never read as a quantity.
 - The turn-0 **startup package points** column now sits right after the nation name while you are spending them, and no longer appears on Finances.
 
 ### See what your orders will cost, as you enter them
