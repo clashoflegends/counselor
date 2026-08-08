@@ -13,13 +13,14 @@
 
 ### See what your orders will cost, as you enter them
 - The **action's cost** readout in the top right now always reports **your own nation**. It could previously show an **ally's** total instead - whichever order set was loaded last - which was misleading when checking your own spend. If you hold more than one nation it shows the costliest.
-- The nations table on the **Finances** tab now shows **Total orders cost** and **Forecast Balance** next to your treasury, and both **update the moment you save or clear an order** - no more clicking to another nation and back to make the numbers move.
+- The nations table on the **Finances** tab now shows **Total orders cost** and **Forecast Balance** next to your treasury. Both are right **as soon as a turn or an orders file is loaded** (they used to show zero for every nation until you clicked away and back), and both **update the moment you save or clear an order**.
 - Treasury still means the gold you hold **right now**. The forecast balance is the same bottom-line number as the **Next turn forecast** panel: your gold plus revenue, minus upkeep, minus what your orders commit.
 
 ### Do it again: bring back last turn's orders
-- A new button in the actions panel fills a character's (or city's) **empty action slots with the orders it ran last turn**, so a turn that mostly repeats itself no longer has to be typed from scratch.
+- A new button in the actions panel fills a character's **empty action slots with the orders it ran last turn**, so a turn that mostly repeats itself no longer has to be typed from scratch.
 - It **never touches an order you have already entered** this turn, and it skips anything that is no longer available to that actor - it tells you how many it filled and how many it skipped.
 - The orders come back **exactly as you sent them**, targets and all, so check them before submitting: a destination you already reached, or a target who has since died, is yours to correct.
+- **Cities too, from your next turn onwards** - in games that give cities their own orders. City orders only started being recorded this week, so the button stays greyed out on a city until a turn has run since.
 
 ### Typing a troop quantity no longer crashes the client
 - Entering a number in the **troops quantity** column and then clicking away could **close Counselor outright**, losing anything unsaved. The out-of-range warning was being raised while the table was still closing the cell you had typed in. It now waits for the cell to close and keeps your entry open until you answer.
