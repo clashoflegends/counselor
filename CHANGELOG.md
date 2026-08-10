@@ -1,5 +1,13 @@
 # What's New in Counselor
 
+## 09-AUG-2026 - v2.1.913
+
+### New places on the map will not break your client any more
+- When we add a new landmark to a scenario, older Counselors used to **fail to open the turn file at all** - every new site was effectively a forced upgrade. Now an unrecognised site simply draws as a **generic marker**, and Counselor tells you once that your version predates it. Your map keeps working; update when it suits you.
+
+### The legend now explains the landmarks
+- The **Map legend** never covered landmarks - eight icons appeared on every map with nothing to identify them. They are all listed now, along with the **Weirwood** and the generic marker for a site your build does not know yet.
+
 ## 07-AUG-2026 - v2.1.912
 
 ### Numbers you can read at a glance
