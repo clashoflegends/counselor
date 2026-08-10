@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.HyperlinkEvent;
 import org.apache.commons.logging.Log;
@@ -77,6 +78,13 @@ public class PbmApplication extends Application implements Serializable {
         // Pre-warm the shared image cache (idempotent singleton) so its eager load
         // is timed separately from the GUI build below instead of hiding inside it.
         ImageManager.getInstance();
+        // A landmark this build does not know still draws (the generic "unknown site" marker) instead of
+        // breaking the map render - see ImageManager.getFeature. Tell the player why the map has a marker
+        // it cannot name: their Counselor predates the content. Fires once per unknown code per session,
+        // from the render thread, so hop to the EDT. Server-side renderers register nothing and stay silent.
+        ImageManager.getInstance().setUnknownFeatureListener(code -> SwingUtilities.invokeLater(()
+                -> gui.services.Toast.show(
+                        SettingsManager.getInstance().getBundleManager().getString("MAP.FEATURE.UNKNOWN"), null)));
         final long tImages = System.currentTimeMillis();
 
         // App-wide right-click Cut/Copy/Paste/Select All + Ctrl+C on every text component (one global

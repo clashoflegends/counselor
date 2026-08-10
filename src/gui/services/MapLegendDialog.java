@@ -87,6 +87,19 @@ public final class MapLegendDialog extends JDialog {
         {"MAPLEGEND.CAT.UNITS", "/images/hex_path_army.png", "MAPLEGEND.ARMYPATH", "Army path", "MAPLEGEND.ARMYPATH.D", "A planned army movement"},
         {"MAPLEGEND.CAT.UNITS", "/images/hex_path_pj.png", "MAPLEGEND.CHARPATH", "Character path", "MAPLEGEND.CHARPATH.D", "A planned character movement"},
 
+        // Landmarks: rendered on the map since forever but never explained here until 2026-08-09.
+        // "Unknown" is the fallback marker for a site added server-side that this build predates.
+        {"MAPLEGEND.CAT.SITES", "/images/mapa/feature_cave.gif", "MAPLEGEND.CAVE", "Caverns", "MAPLEGEND.SITE.D", "A landmark - a character can Search it once for a discovery"},
+        {"MAPLEGEND.CAT.SITES", "/images/mapa/feature_henges.gif", "MAPLEGEND.HENGE", "Henge", "MAPLEGEND.SITE.D", "A landmark - a character can Search it once for a discovery"},
+        {"MAPLEGEND.CAT.SITES", "/images/mapa/feature_igloo.gif", "MAPLEGEND.SNOWHALL", "Snowhalls", "MAPLEGEND.SITE.D", "A landmark - a character can Search it once for a discovery"},
+        {"MAPLEGEND.CAT.SITES", "/images/mapa/feature_lake.gif", "MAPLEGEND.LAKESITE", "Lakes", "MAPLEGEND.SITE.D", "A landmark - a character can Search it once for a discovery"},
+        {"MAPLEGEND.CAT.SITES", "/images/mapa/feature_liths.gif", "MAPLEGEND.LITH", "Liths", "MAPLEGEND.SITE.D", "A landmark - a character can Search it once for a discovery"},
+        {"MAPLEGEND.CAT.SITES", "/images/mapa/feature_temple.gif", "MAPLEGEND.TEMPLE", "Temple", "MAPLEGEND.SITE.D", "A landmark - a character can Search it once for a discovery"},
+        {"MAPLEGEND.CAT.SITES", "/images/mapa/feature_ruins.gif", "MAPLEGEND.RUINS", "Ruins", "MAPLEGEND.SITE.D", "A landmark - a character can Search it once for a discovery"},
+        {"MAPLEGEND.CAT.SITES", "/images/mapa/feature_tower.gif", "MAPLEGEND.SPIRE", "Tower", "MAPLEGEND.SITE.D", "A landmark - a character can Search it once for a discovery"},
+        {"MAPLEGEND.CAT.SITES", "/images/mapa/feature_weirwood.gif", "MAPLEGEND.WEIRWOOD", "Weirwood", "MAPLEGEND.WEIRWOOD.D", "A heart tree with a carved face (Game of Thrones maps)"},
+        {"MAPLEGEND.CAT.SITES", "/images/mapa/feature_unknown.gif", "MAPLEGEND.UNKNOWNSITE", "Unknown site", "MAPLEGEND.UNKNOWNSITE.D", "A site this version of Counselor does not know - update to see it"},
+
         {"MAPLEGEND.CAT.COLORS", "", "MAPLEGEND.CITYCOLORS", "City colors", "MAPLEGEND.CITYCOLORS.D",
             "Cities are tinted by owner. The map-colors option switches between Regular (owner), Alliance (allies share a color), My enemies (hostiles highlighted) and Border (ownership outlines)."},
     };
