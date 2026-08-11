@@ -379,6 +379,22 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         // x,y are 1x hex pixel coords from MapaManager.doCoordToPosition - scale position + glyph by zoom.
         tagX1x = x; // remember 1x coords so the tag can be re-placed when zoom resolves/changes
         tagY1x = y;
+        if (getJlTag() == null) {
+            /**
+             * The window is not fully built yet, so there is nothing to place. This is reachable
+             * because the constructor publishes `this` to the MapaControler (setTabGui) BEFORE it
+             * creates the tag: setTag() has to run after printMapaGeral, which loads the images
+             * (see the comment on setTag). If the constructor dies in between - a map render
+             * failure, say - the controller is left holding a half-built window, and the next table
+             * sort or row selection arrives here and NPEs on jlTag.
+             *
+             * Bailing out keeps that first, real failure visible in the crash report instead of
+             * burying it under a second, misleading "map tag" crash. The coords above are still
+             * recorded, so the tag lands correctly if the window does finish building.
+             */
+            log.warn("setFocusTag(" + x + "," + y + ") ignored: map window not fully initialised (jlTag null)");
+            return;
+        }
         final Rectangle tagRectangle = new Rectangle(
                 (int) Math.round((x - dx) * zoom), (int) Math.round((y - dy) * zoom),
                 (int) Math.round((ImageManager.HEX_SIZE + 2 * dx) * zoom),
@@ -403,9 +419,12 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     }
 
     public void hidefocusTag() {
-        getJlTag().setVisible(false);
         tagX1x = -1; // no tag to re-place on the next zoom change
         tagY1x = -1;
+        if (getJlTag() == null) {
+            return; // half-built window - same reason as setFocusTag, and nothing to hide anyway
+        }
+        getJlTag().setVisible(false);
     }
 
     /*
