@@ -177,8 +177,9 @@ public class ExercitoConverter implements Serializable {
                             java.lang.String.class, java.lang.String.class, Local.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,
-                            java.lang.Integer.class,
+                            //size (sorts by the numeric size, displays "Vast army"/"Small navy"/"Huge garrison")
                             StringIntSortedCell.class,
+                            java.lang.String.class,
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class,
                             java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class,

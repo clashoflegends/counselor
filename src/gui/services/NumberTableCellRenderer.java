@@ -32,8 +32,14 @@ public class NumberTableCellRenderer extends DefaultTableCellRenderer implements
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         this.setHorizontalAlignment(SwingConstants.RIGHT);
-        final boolean negative = value instanceof Number && ((Number) value).longValue() < 0;
-        if (value instanceof Number) {
+        // Only PLAIN whole numbers are reformatted. A Number subclass that carries its own display
+        // text - StringIntSortedCell, which extends Number purely so a column sorts by size while
+        // showing "Vast army" / "Small navy" - must keep its toString(), or the wording is replaced by
+        // its sort key. That is exactly how the armies table's size column became a bare 1-5.
+        final boolean plain = value instanceof Integer || value instanceof Long
+                || value instanceof Short || value instanceof Byte;
+        final boolean negative = plain && ((Number) value).longValue() < 0;
+        if (plain) {
             setText(FORMAT.format(value));
         }
         if (!isSelected) {

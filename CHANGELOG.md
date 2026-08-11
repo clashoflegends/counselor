@@ -1,5 +1,10 @@
 # What's New in Counselor
 
+## 10-AUG-2026 - unreleased
+
+### Army sizes read as words again
+- The **Size** column on the Armies tab briefly showed a bare number (1-5) instead of **Vast army**, **Small navy**, **Huge garrison**. The wording is back, and the column still sorts by real size rather than alphabetically.
+
 ## 09-AUG-2026 - v2.1.913
 
 ### New places on the map will not break your client any more
