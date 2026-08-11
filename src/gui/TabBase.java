@@ -134,6 +134,9 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
     }
 
     public void doTagHide() {
+        if (this.mapaControler == null) {
+            return; //a tab built without a map (tests, or a tab that never shows one) has no tag to hide
+        }
         this.mapaControler.getTabGui().hidefocusTag();
     }
 

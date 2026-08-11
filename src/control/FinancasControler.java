@@ -115,19 +115,24 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
 
     @Override
     public void receiveDispatch(Nacao nation, PersonagemOrdem before, PersonagemOrdem after) {
-        boolean refresh = false;
-        //retira "antes" da lista
-        if (WFC.getOrderCost(before, nation) > 0 && WFC.remNacaoPersonagemOrdens(nation, before)) {
-            refresh = true;
+        final int costBefore = WFC.getOrderCost(before, nation);
+        final int costAfter = WFC.getOrderCost(after, nation);
+        //keep the forecast set to costed orders only, as before
+        if (costBefore > 0) {
+            WFC.remNacaoPersonagemOrdens(nation, before);
+        }
+        if (costAfter > 0) {
+            WFC.addNacaoPersonagemOrdens(nation, after);
         }
 
-        //receive msg to add to finances forecast
-        if (WFC.getOrderCost(after, nation) > 0 && WFC.addNacaoPersonagemOrdens(nation, after)) {
-            refresh = true;
-        }
-
-        //if cost changed, then recalculate
-        if (refresh) {
+        // Refresh whenever a COSTED order changed - never on "did I win the race to mutate the set".
+        // Every turn-open builds a new Finances tab with a new controller while the previous one is
+        // still registered (receivers are weak, so it lingers until GC). All of them get this dispatch
+        // and all of them run the same add/remove against the SHARED set, so only the FIRST one saw a
+        // state change - and after the first reopen that was the stale, invisible tab. The visible
+        // table then never updated while entering orders, though it looked right after an open because
+        // ACTIONS_RELOAD repaints every row unconditionally.
+        if (costBefore > 0 || costAfter > 0) {
             //only repaint the forecast when the order belongs to the nation on display; a save for another nation
             //(team or on-behalf orders) used to overwrite the selected nation's forecast with the other nation's.
             if (tabGui.getNacaoSelecionada() == nation) {
