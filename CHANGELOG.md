@@ -1,12 +1,18 @@
 # What's New in Counselor
 
-## 10-AUG-2026 - unreleased
+## 10-AUG-2026 - v2.1.914
 
 ### Order costs update as you type them again
 - **Total orders cost** and **Forecast Balance** only refreshed when you opened the turn - entering an order left them unchanged until you reopened. They now update on every order you save or clear, as intended. Thanks to the player who reported it.
 
 ### Army sizes read as words again
 - The **Size** column on the Armies tab briefly showed a bare number (1-5) instead of **Vast army**, **Small navy**, **Huge garrison**. The wording is back, and the column still sorts by real size rather than alphabetically.
+
+### Sorting a table no longer closes the client
+- Clicking a column header to sort could **crash Counselor** while the map was still setting itself up. Fixed.
+
+### Website (clashlegends.com)
+- **Game instructions sit beside the sign-up form.** On the **Sign Up** page a game's instructions now appear in their own column next to the nation picker instead of stretched across the top, so you can read what makes the game special while ordering your preferences. On a phone they stack, instructions first.
 
 ## 09-AUG-2026 - v2.1.913
 
