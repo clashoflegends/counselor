@@ -1345,6 +1345,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     public void saveWorldFile(World world) {
         //salva o arquivo
         try {
+            //never write out a padded direction set - see LocalFacade.normalizeDirections
+            business.facade.LocalFacade.normalizeDirections(world.getLocais().values());
             String filename = PersistFactory.getWorldDao().save(world, fcWorld.getSelectedFile());
             this.getGui().setStatusMsg(String.format(labels.getString("WORLD.SALVAS"), world.getLocais().size(), filename));
             this.savedWorld = true;
