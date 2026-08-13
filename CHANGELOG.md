@@ -1,5 +1,12 @@
 # What's New in Counselor
 
+## 12-AUG-2026 - v2.1.915
+
+### Two ways to close Counselor, both shut
+
+- **Open with nothing selected.** Clearing the file name box in the Open dialog and pressing **Open** anyway would **crash the client** instead of simply doing nothing. It now stays put and waits for a real file.
+- **Battle Simulator on an empty hex.** Pressing **Simulate** on a hex that holds **no city** would **close Counselor** the moment you pressed the button. The simulation now runs: with no city there is no defending nation, so no diplomatic attack modifier applies and the sliders drive the what-if exactly as before. Running a simulation with only **blank armies** in the list (added from the toolbar but never given troops) no longer crashes either.
+
 ## 10-AUG-2026 - v2.1.914
 
 ### Order costs update as you type them again
