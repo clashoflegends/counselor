@@ -372,7 +372,12 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
             //calcula os fatores da media ponderada.
             int forcaBasica = bsf.getArmyAttackBaseLand(army, army.getLocal());
             int forcaPlus = 0;
-            int modRelacionamento = 100 - nacaoFacade.getBonusRelacionamento(city.getNacao(), army.getNacao());
+            //The simulator builds a dummy Cidade when the hex holds no city (the sliders make it a what-if),
+            //and a dummy has no nation: there is no diplomatic modifier to apply. 100 is the neutral value
+            //(dificuldadeBonus[0 + 3] == 0), so no existing simulation changes - only the path that threw.
+            int modRelacionamento = (city.getNacao() == null)
+                    ? 100
+                    : 100 - nacaoFacade.getBonusRelacionamento(city.getNacao(), army.getNacao());
             //aqui entram os bonus da nacao por terreno/tropa
             final int dano = forcaPlus + (forcaBasica * modRelacionamento / 100);
             ataqueTotal += dano;
@@ -385,6 +390,11 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
 
         //distribui a defesa do cp como dano aos atacantes
         for (ArmySim army : armiesList) {
+            if (qtTrops <= 0) {
+                //no troops on either side of the split (a Blank army was added but never given platoons):
+                //there is nothing to distribute, and the ratio below would divide by zero.
+                break;
+            }
             long danoPer = defesa * exercitoFacade.getQtTropasTotal(army) / qtTrops;
 
             //City round %s: %s with an attack of %s inflicted %s of damage to %s with a defense of %s.
