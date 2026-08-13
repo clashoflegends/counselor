@@ -748,6 +748,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @throws HeadlessException
      */
     public void doOpenFile(final File resultsFile) {
+        if (resultsFile == null) {
+            //JFileChooser can answer APPROVE_OPTION with no selection (the file name box was cleared by hand);
+            //the drag-drop and recent-files paths can also hand over nothing. Nothing to open - stay put.
+            log.warn("Open requested with no file selected - ignoring.");
+            return;
+        }
         if (loadingEgf) {
             return; // an open is already in progress; ignore re-entrant menu clicks / drops
         }
