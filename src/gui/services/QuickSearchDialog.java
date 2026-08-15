@@ -258,8 +258,11 @@ public final class QuickSearchDialog extends JDialog {
             }
             table.setRowSelectionInterval(view, view);
             table.scrollRectToVisible(table.getCellRect(view, 0, true));
-            table.requestFocusInWindow();
             centreMap(tab, table.getModel(), e.getModelRow());
+            //Focus LAST and on its own cycle: clearing the tab's search box above makes its
+            //DocumentListener queue an invokeLater that pulls focus back into that box, and a queued
+            //grab beats a synchronous one from this event. Queueing ours behind it lands on the row.
+            SwingUtilities.invokeLater(table::requestFocusInWindow);
         } catch (RuntimeException ex) {
             //A jump is a convenience; never let a stale index take the client down.
             log.warn("Quick search jump failed", ex);

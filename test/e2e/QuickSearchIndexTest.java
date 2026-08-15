@@ -34,15 +34,20 @@ class QuickSearchIndexTest {
     @BeforeAll
     static void buildIndex() {
         index = new ArrayList<>();
+        //The fixture is built so that a query can land in DIFFERENT ranking buckets at once, which is
+        //the only way the bucket order is actually under test: "green" hits one NAME (Greenstone) and
+        //three nation columns; "0904" is the hex of two rows and merely appears in a third's order.
         QuickSearchIndex.indexTable(index, 0, "Characters", new GenericoTableModel(COLS, new Object[][]{
             {"Daemon Targaryen", "Move", hex("1122"), 85, "Blacks"},
             {"Rhaenyra Targaryen", "Recruit troops", hex("0517"), 40, "Blacks"},
             {"Aemond Targaryen", "Move", hex("1122"), 85, "Greens"},
-            {"Ser Criston Cole", "Duel a character", hex("0904"), 72, "Greens"}
+            {"Ser Criston Cole", "Duel a character", hex("0904"), 72, "Greens"},
+            {"Elenda Baratheon", "Move to 0904", hex("1531"), 30, "Blacks"}
         }, CLASSES));
         QuickSearchIndex.indexTable(index, 1, "Cities", new GenericoTableModel(COLS, new Object[][]{
             {"Kings Landing", "Build fortification", hex("0904"), 5, "Greens"},
-            {"Dragonstone", "-", hex("1122"), 4, "Blacks"}
+            {"Dragonstone", "-", hex("1122"), 4, "Blacks"},
+            {"Greenstone", "Build fortification", hex("1531"), 3, "Blacks"}
         }, CLASSES));
     }
 
@@ -54,11 +59,12 @@ class QuickSearchIndexTest {
 
     @Test
     void indexesEveryRowOfEveryTab() {
-        assertEquals(6, index.size(), "every model row of both tabs should be indexed");
+        assertEquals(8, index.size(), "every model row of both tabs should be indexed");
         assertEquals("Daemon Targaryen", index.get(0).getName());
         assertEquals("Characters", index.get(0).getTabTitle());
-        assertEquals("Cities", index.get(4).getTabTitle());
-        assertEquals(0, index.get(4).getModelRow(), "model row is per-tab, not global");
+        assertEquals("Kings Landing", index.get(5).getName());
+        assertEquals("Cities", index.get(5).getTabTitle());
+        assertEquals(0, index.get(5).getModelRow(), "model row is per-tab, not global");
     }
 
     @Test
@@ -110,27 +116,28 @@ class QuickSearchIndexTest {
 
     @Test
     void nameMatchesOutrankIncidentalColumnMatches() {
-        //"cole" is a name; nothing else carries it. "85" is a skill on two rows and a name on none -
-        //the point is that when a query hits BOTH a name and other columns, the name comes first.
-        final List<Entry> hits = QuickSearchIndex.match(index, "dragonstone", 50);
-        assertEquals(1, hits.size());
-        assertEquals("Dragonstone", hits.get(0).getName());
-
-        final List<Entry> mixed = QuickSearchIndex.match(index, "greens", 50);
-        assertFalse(mixed.isEmpty());
-        //Nation column only - no name carries "greens" - so all three land in the catch-all bucket
-        //and stay findable rather than being dropped.
-        assertEquals(3, mixed.size());
+        //"green" is the NAME of one city and the NATION of three other rows. Without the name-above-
+        //the-rest split, the city the player is obviously after sorts wherever the index happened to
+        //put it - here, dead last. This is the property that silently degrades.
+        final List<Entry> hits = QuickSearchIndex.match(index, "green", 50);
+        assertEquals(4, hits.size(), "one name match plus three nation-column matches");
+        assertEquals("Greenstone", hits.get(0).getName(), "the name match must come first");
+        for (int i = 1; i < hits.size(); i++) {
+            assertFalse(hits.get(i).getName().toLowerCase().contains("green"),
+                    "the remaining hits match on a non-name column only");
+        }
     }
 
     @Test
-    void anExactHexRanksAboveEverythingElse() {
-        //"0904" is the hex of Ser Criston Cole and of Kings Landing; both are exact-coordinate hits and
-        //must come before any row that merely contains the digits elsewhere.
+    void anExactHexRanksAboveARowThatMerelyMentionsIt() {
+        //Two rows STAND on 0904; a third only carries it in its order text ("Move to 0904"). Someone
+        //typing a coordinate wants what is there, not what is heading there.
         final List<Entry> hits = QuickSearchIndex.match(index, "0904", 50);
-        assertEquals(2, hits.size());
+        assertEquals(3, hits.size());
         assertEquals("0904", hits.get(0).getCoord());
         assertEquals("0904", hits.get(1).getCoord());
+        assertEquals("Elenda Baratheon", hits.get(2).getName(), "the mention ranks last");
+        assertFalse(hits.get(2).getCoord().equals("0904"));
     }
 
     @Test
