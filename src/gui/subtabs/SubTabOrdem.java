@@ -931,12 +931,18 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     private Component getParametroComponent(String controle, String vlParametro, Ordem ordemSelecionada, PersonagemOrdem ordemGravada, int nuParametro) {
         compFactory.setAllSelected(isAllSelected());
         compFactory.setActor(getActor());
-//        Ordem actorOrdemGravada;
-//        try {
-//            actorOrdemGravada = ordemGravada.getOrdem();
-//        } catch (NullPointerException ex) {
-//            actorOrdemGravada = null;
-//        }
+        //KI-017: the slot's saved parameters are read by POSITION only (OrdemFacade.getParametroDisplay
+        //never looks at which order is selected), so changing the order in a slot that already holds a
+        //saved one used to pour the old value into the new order's widget. Combos shrug it off (the
+        //display is not found and they fall to index 0), but a free-text parameter takes it verbatim:
+        //ComponentFactory does setText(vlInicialDisplay) with no validation and getParametros reads
+        //getText() straight back at save, so a move's hex "0512" became a recruit quantity, a gold
+        //amount, or a 512% percentage. Seed only when the SAVED order declares the same control at this
+        //index - that keeps the useful carry (a hex stays put when you switch between two hex orders)
+        //and drops the mismatched one.
+        if (!isSameParametroTipo(ordemControl.getPersonagemOrdem(), controle, nuParametro)) {
+            return compFactory.getParametroComponent(controle, "", "", ordemSelecionada);
+        }
         String vlDefault;
         try {
             vlDefault = ordemGravada.getParametrosId().get(nuParametro);
@@ -945,6 +951,43 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
             vlDefault = vlParametro;
         }
         return compFactory.getParametroComponent(controle, vlParametro, vlDefault, ordemSelecionada);
+    }
+
+    /**
+     * KI-017: true when the order SAVED in this slot declares the same parameter control as the one being
+     * built, so its value is safe to restore into the widget. "Variado" is pass-through: a spell order
+     * records the placeholder rather than the spell's own parameter key, so type-checking it here would
+     * stop a saved spell parameter from restoring. An empty slot also passes - there is nothing to seed
+     * with, so the seed is "" either way, and a false block would only risk breaking a legitimate restore.
+     * The two TARGET families (Cidade*, Coordenada*) match as a family rather than string-for-string, so
+     * swapping one hex order for another still carries the target across even when the range differs: those
+     * widgets only ever select from their own model, and a value they do not hold falls back to the actor's
+     * hex, so a range-5 picker cannot keep a range-12 target. Same two prefixes the blank-target save guard
+     * uses. Static and public so the rule can be pinned by a test without standing up the panel.
+     */
+    public static boolean isSameParametroTipo(PersonagemOrdem gravada, String controle, int nuParametro) {
+        try {
+            final String salvo = gravada.getOrdem().getParametroIde(nuParametro);
+            if (salvo == null || controle == null) {
+                return false;
+            }
+            return salvo.equalsIgnoreCase("variado")
+                    || salvo.equalsIgnoreCase(controle)
+                    || isSameTargetFamily(salvo, controle);
+        } catch (Exception ex) {
+            return true;
+        }
+    }
+
+    /** True when both controls are hex targets, or both are city targets (see {@link #isSameParametroTipo}). */
+    private static boolean isSameTargetFamily(String salvo, String controle) {
+        for (String familia : new String[]{"Coordenada", "Cidade"}) {
+            if (salvo.regionMatches(true, 0, familia, 0, familia.length())
+                    && controle.regionMatches(true, 0, familia, 0, familia.length())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
