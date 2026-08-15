@@ -1117,6 +1117,7 @@ public class ComponentFactory implements Serializable {
             if (w instanceof ChartBar || w instanceof ChartLine || w instanceof ChartPie
                     || w instanceof ChartGauge || w instanceof gui.charts.ChartRadar
                     || w instanceof gui.charts.ChartGrowth
+                    || w instanceof QuickSearchDialog
                     || w instanceof VictoryDashboardDialog) {
                 w.dispose();
             }

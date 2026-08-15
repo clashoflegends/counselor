@@ -41,6 +41,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private final WorldControler wc = new WorldControler(this);
     private TabPersonagensGui tabPersonagem;
+    private MainDadosGui dadosGui; // held so quick search can index + select across the data tabs
     private JLabelGradient jlActionCounter;
     private javax.swing.JButton jbRecent; // recent-files dropdown, built in code (not the .form)
 
@@ -118,8 +119,28 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar2.revalidate();
         jToolBar2.repaint();
 
+        installQuickSearch();
+
         wc.doAutoLoad(autoLoad);
         EgfDropHandler.install(this, this);
+    }
+
+    /**
+     * Ctrl+P (Cmd+P on macOS) opens the quick-search box: type any part of a name, a hex coordinate or
+     * an order and jump straight to that row in its tab. Uses the platform menu-shortcut mask for the
+     * same reason the map zoom does (KI-005), and a WHEN_IN_FOCUSED_WINDOW binding so it fires wherever
+     * focus happens to be. Registered once, at construction; it no-ops until a turn is open.
+     */
+    private void installQuickSearch() {
+        final int shortcut = java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(
+                javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, shortcut), "quickSearch");
+        getActionMap().put("quickSearch", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                gui.services.QuickSearchDialog.show(MainResultWindowGui.this, dadosGui, labels);
+            }
+        });
     }
 
     private static final int TOOLBAR_ICON_SIZE = 20;
@@ -759,9 +780,9 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         //Monta área do mapa
         this.splitMainPanel.setRightComponent(mapaGui);
         // Monta tabbed panel para dados
-        MainDadosGui dadosGui = new MainDadosGui();
-        this.splitMainPanel.setLeftComponent(dadosGui);
-        this.tabPersonagem = dadosGui.getTabPersonagem();
+        this.dadosGui = new MainDadosGui();
+        this.splitMainPanel.setLeftComponent(this.dadosGui);
+        this.tabPersonagem = this.dadosGui.getTabPersonagem();
 
         //habilita o toolbar
         jbLoad.setEnabled(true);

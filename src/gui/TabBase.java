@@ -44,6 +44,7 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
     private ImageIcon icone;
     private MapaControler mapaControler;
     private int filtroDefault = -9999;
+    private JTextField mainSearchField;
 
     /**
      * Creates new form TabBase
@@ -356,6 +357,9 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
     }
 
     protected final void addDocumentListener(JTextField searchField) {
+        //Remember the tab's own search box so quick-search can clear a filter that is hiding the row
+        //it wants to jump to (see clearSearchFilter).
+        this.mainSearchField = searchField;
         //add listener to search field for filtering.
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -387,5 +391,18 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
     public JTable getMainLista() {
         log.fatal("Can't use getMainLista() here. Needs to override int he tab.");
         return null;
+    }
+
+    /**
+     * Clear this tab's own search box, which drops the row filter it applies to the main list.
+     * Quick-search calls this when the row it wants to select is hidden by a filter the player left
+     * typed in. Clearing the TEXT (rather than the sorter's filter directly) is deliberate: the box's
+     * DocumentListener would otherwise re-apply the stale text on the player's next keystroke.
+     * No-op for a tab with no search box (TabOrdensGui) or with the box already empty.
+     */
+    public final void clearSearchFilter() {
+        if (this.mainSearchField != null && !this.mainSearchField.getText().isEmpty()) {
+            this.mainSearchField.setText("");
+        }
     }
 }

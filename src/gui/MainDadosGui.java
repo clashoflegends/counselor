@@ -134,4 +134,13 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
     public TabPersonagensGui getTabPersonagem() {
         return this.tabPersonagem;
     }
+
+    /**
+     * The data tabs themselves. Quick-search walks these to index every listed row and to select the
+     * tab it jumps to. The tab set varies per game/turn (Spells, Startup packages and Locations are
+     * conditional), so callers must read it live rather than cache it.
+     */
+    public javax.swing.JTabbedPane getTabbedPane() {
+        return this.jTabbedPane1;
+    }
 }
