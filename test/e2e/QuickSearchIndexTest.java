@@ -6,7 +6,6 @@ import gui.services.QuickSearchIndex.Entry;
 import java.util.ArrayList;
 import java.util.List;
 import model.Local;
-import model.Personagem;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -157,26 +156,26 @@ class QuickSearchIndexTest {
     }
 
     @Test
-    void indexesTheTurnResultTextOfTheRowsEntity() {
-        //Result text lives on the model object, not in any cell - it is the reason the index needs a
-        //parallel actor list at all. Searching the narrative is the point ("who was ambushed?").
-        final Personagem pc = new Personagem();
-        pc.setNome("Harwin Strong");
-        pc.setResultados("Ambushed on the kingsroad and left for dead.");
+    void indexesTheResultsPanelTextOfTheRow() {
+        //The turn narrative is in no table cell - each tab composes it for its own type, which is why
+        //the index takes a per-row text supplier. Searching it is the point ("who was ambushed?").
         final List<Entry> out = new ArrayList<>();
         QuickSearchIndex.indexTable(out, 0, "Characters", new GenericoTableModel(COLS, new Object[][]{
             {"Harwin Strong", "Move", hex("1122"), 60, "Blacks"}
-        }, CLASSES), java.util.Collections.singletonList(pc));
+        }, CLASSES), r -> "Ambushed on the kingsroad and left for dead. Wizard skill increased.");
 
         assertEquals(1, out.size());
         assertEquals(1, QuickSearchIndex.match(out, "ambushed", 50).size(),
-                "a word that appears only in the turn result must find the row");
+                "a word that appears only in the results panel must find the row");
         assertEquals("Harwin Strong", QuickSearchIndex.match(out, "kingsroad", 50).get(0).getName());
+        //The character panel is more than the raw results field - it also carries skills and where the
+        //character was and is. Indexing only the raw field silently missed all of that.
+        assertEquals(1, QuickSearchIndex.match(out, "wizard skill", 50).size());
     }
 
     @Test
-    void aTabWithNoActorListStillIndexesItsCells() {
-        //Catalogue tabs (Actions, Troops, Game) have no backing entity list; they must not be dropped.
+    void aTabWithNoResultsPanelStillIndexesItsCells() {
+        //Catalogue tabs (Actions, Troops, Game) compose no results text; they must not be dropped.
         final List<Entry> out = new ArrayList<>();
         QuickSearchIndex.indexTable(out, 0, "Actions", new GenericoTableModel(COLS, new Object[][]{
             {"Build fortification", "-", hex("0101"), 1, "-"}
@@ -186,15 +185,17 @@ class QuickSearchIndexTest {
     }
 
     @Test
-    void aShortActorListDoesNotBreakTheRemainingRows() {
-        //Defensive: the actor list is only as parallel as the tab keeps it. A mismatch must cost the
-        //result text for those rows, not the rows themselves.
+    void aRowWhoseResultsTextIsMissingIsStillIndexed() {
+        //A tab's list is only as parallel to its table as the tab keeps it, so the supplier can come
+        //back empty or null for a row. That must cost the row its narrative, never the row itself.
         final List<Entry> out = new ArrayList<>();
         QuickSearchIndex.indexTable(out, 0, "Characters", new GenericoTableModel(COLS, new Object[][]{
             {"Alpha", "Move", hex("0101"), 1, "Blacks"},
             {"Beta", "Move", hex("0202"), 2, "Blacks"}
-        }, CLASSES), java.util.Collections.emptyList());
-        assertEquals(2, out.size(), "rows survive an actor list that is too short");
+        }, CLASSES), r -> r == 0 ? "scouted the pass" : null);
+        assertEquals(2, out.size(), "both rows survive");
+        assertEquals(1, QuickSearchIndex.match(out, "scouted", 50).size());
+        assertEquals(1, QuickSearchIndex.match(out, "beta", 50).size(), "the null-text row is still findable");
     }
 
     @Test

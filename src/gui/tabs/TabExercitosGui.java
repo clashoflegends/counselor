@@ -345,9 +345,12 @@ public class TabExercitosGui extends TabBase implements Serializable {
         return this.comboFiltro.getModel().getSize();
     }
 
-    /** {@inheritDoc} Rows here are backed by the controller's displayed list, in model-row order. */
+
+    /** {@inheritDoc} Armies have no results panel today; index the raw field so they light up if
+     *  they ever get one. */
     @Override
-    public java.util.List<?> getIndexableActors() {
-        return this.exercitoControl == null ? null : this.exercitoControl.getListaExibida();
+    public String getIndexableText(int modelRow) {
+        final Object army = actorAt(this.exercitoControl == null ? null : this.exercitoControl.getListaExibida(), modelRow);
+        return (army instanceof baseLib.BaseModel) ? new business.facade.OrdemFacade().getResultado((baseLib.BaseModel) army) : "";
     }
 }

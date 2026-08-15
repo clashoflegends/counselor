@@ -359,9 +359,11 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
         }
     }
 
-    /** {@inheritDoc} Rows here are backed by the controller's displayed list, in model-row order. */
+
+    /** {@inheritDoc} A hex's panel text: everything the Locations results tab reports about it. */
     @Override
-    public java.util.List<?> getIndexableActors() {
-        return this.locationControl == null ? null : this.locationControl.getListaExibida();
+    public String getIndexableText(int modelRow) {
+        final Object hex = actorAt(this.locationControl == null ? null : this.locationControl.getListaExibida(), modelRow);
+        return (hex instanceof model.Local) ? this.locationControl.getResultados((model.Local) hex) : "";
     }
 }

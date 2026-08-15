@@ -436,9 +436,11 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         return this.comboFiltro.getModel().getSize();
     }
 
-    /** {@inheritDoc} Rows here are backed by the controller's displayed list, in model-row order. */
+
+    /** {@inheritDoc} A character's panel text: order outcomes, where it was and is, and its skills. */
     @Override
-    public java.util.List<?> getIndexableActors() {
-        return this.personagemControl == null ? null : this.personagemControl.getListaExibida();
+    public String getIndexableText(int modelRow) {
+        final Object pc = actorAt(this.personagemControl == null ? null : this.personagemControl.getListaExibida(), modelRow);
+        return (pc instanceof Personagem) ? PersonagemConverter.getResultado((Personagem) pc) : "";
     }
 }

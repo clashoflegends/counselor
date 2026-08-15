@@ -1,11 +1,10 @@
 package gui.services;
 
-import baseLib.BaseModel;
-import business.facade.OrdemFacade;
 import gui.TabBase;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.IntFunction;
 import javax.swing.JTable;
 import javax.swing.JTabbedPane;
 import javax.swing.table.TableModel;
@@ -27,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 public final class QuickSearchIndex {
 
     private static final Log log = LogFactory.getLog(QuickSearchIndex.class);
-    private static final OrdemFacade ORDEM_FACADE = new OrdemFacade();
     /** Above this, an index build is worth a log line the player can be asked for. */
     private static final long SLOW_BUILD_MS = 300;
 
@@ -137,7 +135,7 @@ public final class QuickSearchIndex {
             if (table == null || table.getModel() == null) {
                 continue;
             }
-            indexTable(out, t, tabs.getTitleAt(t), table.getModel(), actorsOf(tab));
+            indexTable(out, t, tabs.getTitleAt(t), table.getModel(), extraTextOf(tab));
         }
         //Building is the only per-open cost (searching is sub-millisecond). Rendering each row's turn
         //result text runs a label lookup per line, so on a very large turn this could grow; say so in
@@ -151,49 +149,34 @@ public final class QuickSearchIndex {
         return out;
     }
 
-    /** The tab's backing entity list, or null. Never let one tab's failure lose the whole index. */
-    private static List<?> actorsOf(TabBase tab) {
-        try {
-            return tab.getIndexableActors();
-        } catch (RuntimeException ex) {
-            log.debug("Quick search: no actor list for " + tab.getTitle() + " - " + ex);
-            return null;
-        }
+    /**
+     * The tab's per-row results text, as the tab itself composes it. Wrapped so a half-built actor
+     * costs that row its extra text, never the row - and never the whole index.
+     */
+    private static IntFunction<String> extraTextOf(final TabBase tab) {
+        return row -> {
+            try {
+                final String s = tab.getIndexableText(row);
+                return (s == null) ? "" : s;
+            } catch (RuntimeException ex) {
+                log.debug("Quick search: no results text for " + tab.getTitle() + " row " + row + " - " + ex);
+                return "";
+            }
+        };
     }
 
-    /** Index a table with no backing entity list (cell text only). */
+    /** Index a table with no results panel (cell text only). */
     public static void indexTable(List<Entry> out, int tabIndex, String tabTitle, TableModel model) {
         indexTable(out, tabIndex, tabTitle, model, null);
     }
 
     /**
-     * The turn RESULT text for one row, rendered the same way the detail panel renders it, or empty.
-     * This is what makes the narrative searchable ("who was ambushed?"), and it is the only part of a
-     * row that is not already in a cell. Rendering costs a label lookup per line, so it is done once
-     * here at index time rather than per keystroke.
-     */
-    private static String resultTextOf(List<?> actors, int row) {
-        if (actors == null || row >= actors.size()) {
-            return "";
-        }
-        final Object o = actors.get(row);
-        if (!(o instanceof BaseModel)) {
-            return "";
-        }
-        try {
-            final String s = ORDEM_FACADE.getResultado((BaseModel) o);
-            return (s == null) ? "" : s;
-        } catch (RuntimeException ex) {
-            return ""; //a half-built actor must not cost the whole index
-        }
-    }
-
-    /**
      * Index one tab's table model into {@code out}. Split from {@link #build} so it is testable.
-     * {@code actors} is the tab's parallel entity list (may be null); each row's turn result text is
-     * folded into that row's searchable haystack.
+     * {@code extraText} supplies each row's results-panel text (may be null); it is folded into that
+     * row's searchable haystack.
      */
-    public static void indexTable(List<Entry> out, int tabIndex, String tabTitle, TableModel model, List<?> actors) {
+    public static void indexTable(List<Entry> out, int tabIndex, String tabTitle, TableModel model,
+            IntFunction<String> extraText) {
         final int cols = model.getColumnCount();
         for (int r = 0; r < model.getRowCount(); r++) {
             String name = "";
@@ -230,9 +213,11 @@ public final class QuickSearchIndex {
             if (name.isEmpty()) {
                 continue; //blank placeholder row of an empty tab
             }
-            final String results = resultTextOf(actors, r);
-            if (!results.isEmpty()) {
-                hay.append(results);
+            if (extraText != null) {
+                final String results = extraText.apply(r);
+                if (results != null && !results.isEmpty()) {
+                    hay.append(results);
+                }
             }
             out.add(new Entry(tabIndex, tabTitle, r, name, coord, hay.toString().toLowerCase()));
         }

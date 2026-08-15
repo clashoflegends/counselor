@@ -394,14 +394,33 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
     }
 
     /**
-     * The entities behind {@link #getMainLista()}'s rows, in the SAME order as the table model - the
-     * pairing every tab's selection listener already relies on ({@code listaExibida.get(modelRow)}).
-     * Quick search uses it to index each row's turn RESULT text, which lives on the model object and
-     * appears in no table cell. Default null: a tab without a backing entity list (catalogues, game
-     * info, finances) is still indexed on its cell text, just not on results.
+     * Extra searchable text for one model row: what this tab's RESULTS panel would show if the player
+     * selected that row. Quick search folds it into the row's search text, so the turn narrative is
+     * findable ("who was ambushed?") even though none of it is in a table cell.
+     *
+     * <p>Deliberately per-tab rather than one generic accessor: each type composes a DIFFERENT result
+     * text, and only the tab knows which. A character's panel is not just its raw
+     * {@code getResultados()} - it adds where it was, where it is now, and its skills - and a nation's
+     * is built from its abilities plus rumours and encounters. Indexing the generic field alone
+     * silently missed all of that.
+     *
+     * <p>{@code modelRow} indexes the table MODEL (not the view). Default empty: a tab with no results
+     * panel is still indexed on its cell text.
      */
-    public java.util.List<?> getIndexableActors() {
-        return null;
+    public String getIndexableText(int modelRow) {
+        return "";
+    }
+
+    /**
+     * The entity a tab's displayed list holds for {@code modelRow}, or null. The list is only as
+     * parallel to the table as the tab keeps it, so a stale or short list must cost the extra search
+     * text for that row, never the row itself.
+     */
+    protected static Object actorAt(java.util.List<?> lista, int modelRow) {
+        if (lista == null || modelRow < 0 || modelRow >= lista.size()) {
+            return null;
+        }
+        return lista.get(modelRow);
     }
 
     /**

@@ -271,9 +271,11 @@ public class TabArtefatosGui extends TabBase implements Serializable {
         return this.comboFiltro.getModel().getSize();
     }
 
-    /** {@inheritDoc} Rows here are backed by the controller's displayed list, in model-row order. */
+
+    /** {@inheritDoc} Magic items have no results panel today; index the raw field regardless. */
     @Override
-    public java.util.List<?> getIndexableActors() {
-        return this.artefatoControl == null ? null : this.artefatoControl.getListaExibida();
+    public String getIndexableText(int modelRow) {
+        final Object item = actorAt(this.artefatoControl == null ? null : this.artefatoControl.getListaExibida(), modelRow);
+        return (item instanceof baseLib.BaseModel) ? new business.facade.OrdemFacade().getResultado((baseLib.BaseModel) item) : "";
     }
 }

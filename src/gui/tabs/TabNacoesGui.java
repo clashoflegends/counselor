@@ -424,9 +424,33 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         return null;
     }
 
-    /** {@inheritDoc} Rows here are backed by the controller's displayed list, in model-row order. */
+
+    private static final String NL = "\n";
+
+    /** {@inheritDoc} A nation's panel text: its special abilities plus rumours and encounters. */
     @Override
-    public java.util.List<?> getIndexableActors() {
-        return this.nacaoControl == null ? null : this.nacaoControl.getListaExibida();
+    public String getIndexableText(int modelRow) {
+        final Object n = actorAt(this.nacaoControl == null ? null : this.nacaoControl.getListaExibida(), modelRow);
+        if (!(n instanceof model.Nacao)) {
+            return "";
+        }
+        final model.Nacao nacao = (model.Nacao) n;
+        final StringBuilder sb = new StringBuilder(128);
+        for (model.HabilidadeNacao h : nacaoFacade.getHabilidadesNacao(nacao)) {
+            sb.append(h.getNome()).append(NL);
+        }
+        for (model.Habilidade h : nacaoFacade.getHabilidades(nacao)) {
+            if (h != null && !h.isFilter()) {
+                sb.append(h.getNome()).append(NL);
+            }
+        }
+        try {
+            for (String msg : nacaoFacade.getMensagensResultsRumoresEncontros(nacao)) {
+                sb.append(msg).append(NL);
+            }
+        } catch (NullPointerException ex) {
+            //a nation with no message block - nothing to add
+        }
+        return sb.toString();
     }
 }
