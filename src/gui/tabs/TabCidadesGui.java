@@ -350,4 +350,10 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     protected int getComboFiltroSize() {
         return this.comboFiltro.getModel().getSize();
     }
+
+    /** {@inheritDoc} Rows here are backed by the controller's displayed list, in model-row order. */
+    @Override
+    public java.util.List<?> getIndexableActors() {
+        return this.cidadeControl == null ? null : this.cidadeControl.getListaExibida();
+    }
 }

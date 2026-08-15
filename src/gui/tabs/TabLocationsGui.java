@@ -358,4 +358,10 @@ public class TabLocationsGui extends TabBase implements Serializable, IAcaoGui {
             }
         }
     }
+
+    /** {@inheritDoc} Rows here are backed by the controller's displayed list, in model-row order. */
+    @Override
+    public java.util.List<?> getIndexableActors() {
+        return this.locationControl == null ? null : this.locationControl.getListaExibida();
+    }
 }

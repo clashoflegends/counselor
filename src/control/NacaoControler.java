@@ -121,4 +121,13 @@ public class NacaoControler extends ControlBase implements Serializable, ActionL
             //lista vazia?
         }
     }
+
+    /**
+     * The entities behind the main list, in the SAME order as the table model's rows - the pairing
+     * every selection listener here already relies on. Quick search uses it to reach each row's turn
+     * result text, which is not in any table cell. Null before the first model is built.
+     */
+    public java.util.List<?> getListaExibida() {
+        return this.listaExibida;
+    }
 }

@@ -344,4 +344,10 @@ public class TabExercitosGui extends TabBase implements Serializable {
     protected int getComboFiltroSize() {
         return this.comboFiltro.getModel().getSize();
     }
+
+    /** {@inheritDoc} Rows here are backed by the controller's displayed list, in model-row order. */
+    @Override
+    public java.util.List<?> getIndexableActors() {
+        return this.exercitoControl == null ? null : this.exercitoControl.getListaExibida();
+    }
 }

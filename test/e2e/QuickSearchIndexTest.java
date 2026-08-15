@@ -6,6 +6,7 @@ import gui.services.QuickSearchIndex.Entry;
 import java.util.ArrayList;
 import java.util.List;
 import model.Local;
+import model.Personagem;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -149,10 +150,51 @@ class QuickSearchIndexTest {
 
     @Test
     void respectsTheDisplayCapButStillReportsTheRealTotal() {
-        //The dialog shows "... and N more" off countMatches, so the cap must not distort the count.
-        final List<Entry> capped = QuickSearchIndex.match(index, "targaryen", 2);
-        assertEquals(2, capped.size());
-        assertEquals(3, QuickSearchIndex.countMatches(index, "targaryen"));
+        //The dialog shows "... and N more" from the same single pass, so the cap must not distort it.
+        final QuickSearchIndex.Matches m = QuickSearchIndex.search(index, "targaryen", 2);
+        assertEquals(2, m.getHits().size(), "capped for display");
+        assertEquals(3, m.getTotal(), "but the real total is reported");
+    }
+
+    @Test
+    void indexesTheTurnResultTextOfTheRowsEntity() {
+        //Result text lives on the model object, not in any cell - it is the reason the index needs a
+        //parallel actor list at all. Searching the narrative is the point ("who was ambushed?").
+        final Personagem pc = new Personagem();
+        pc.setNome("Harwin Strong");
+        pc.setResultados("Ambushed on the kingsroad and left for dead.");
+        final List<Entry> out = new ArrayList<>();
+        QuickSearchIndex.indexTable(out, 0, "Characters", new GenericoTableModel(COLS, new Object[][]{
+            {"Harwin Strong", "Move", hex("1122"), 60, "Blacks"}
+        }, CLASSES), java.util.Collections.singletonList(pc));
+
+        assertEquals(1, out.size());
+        assertEquals(1, QuickSearchIndex.match(out, "ambushed", 50).size(),
+                "a word that appears only in the turn result must find the row");
+        assertEquals("Harwin Strong", QuickSearchIndex.match(out, "kingsroad", 50).get(0).getName());
+    }
+
+    @Test
+    void aTabWithNoActorListStillIndexesItsCells() {
+        //Catalogue tabs (Actions, Troops, Game) have no backing entity list; they must not be dropped.
+        final List<Entry> out = new ArrayList<>();
+        QuickSearchIndex.indexTable(out, 0, "Actions", new GenericoTableModel(COLS, new Object[][]{
+            {"Build fortification", "-", hex("0101"), 1, "-"}
+        }, CLASSES), null);
+        assertEquals(1, out.size());
+        assertEquals(1, QuickSearchIndex.match(out, "fortification", 50).size());
+    }
+
+    @Test
+    void aShortActorListDoesNotBreakTheRemainingRows() {
+        //Defensive: the actor list is only as parallel as the tab keeps it. A mismatch must cost the
+        //result text for those rows, not the rows themselves.
+        final List<Entry> out = new ArrayList<>();
+        QuickSearchIndex.indexTable(out, 0, "Characters", new GenericoTableModel(COLS, new Object[][]{
+            {"Alpha", "Move", hex("0101"), 1, "Blacks"},
+            {"Beta", "Move", hex("0202"), 2, "Blacks"}
+        }, CLASSES), java.util.Collections.emptyList());
+        assertEquals(2, out.size(), "rows survive an actor list that is too short");
     }
 
     @Test
@@ -165,10 +207,13 @@ class QuickSearchIndexTest {
 
     @Test
     void theRenderedRowNamesTheEntityItsHexAndItsTab() {
-        final String html = index.get(0).toString();
-        assertNotNull(html);
-        assertTrue(html.contains("Daemon Targaryen"), html);
-        assertTrue(html.contains("1122"), html);
-        assertTrue(html.contains("Characters"), html);
+        final String row = index.get(0).toString();
+        assertNotNull(row);
+        assertTrue(row.contains("Daemon Targaryen"), row);
+        assertTrue(row.contains("1122"), row);
+        assertTrue(row.contains("Characters"), row);
+        //Plain text, never HTML: a JList measures every row, and measuring HTML is ~130x dearer -
+        //that was the whole of the original typing lag. Guard against it creeping back.
+        assertFalse(row.toLowerCase().contains("<html"), row);
     }
 }

@@ -44,6 +44,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private MainDadosGui dadosGui; // held so quick search can index + select across the data tabs
     private JLabelGradient jlActionCounter;
     private javax.swing.JButton jbRecent; // recent-files dropdown, built in code (not the .form)
+    private javax.swing.JButton jbFind;   // quick-search entry point, built in code (not the .form)
 
     private final SettingsManager settingsManager;
 
@@ -108,6 +109,20 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar1.revalidate();
         jToolBar1.repaint();
 
+        // Find button, next to Recent on the main toolbar. A keyboard-only feature nobody knows about
+        // is a feature nobody uses, so quick search gets a visible entry point; the tooltip teaches
+        // the shortcut. Same handler as Ctrl+P.
+        jbFind = new javax.swing.JButton();
+        jbFind.setIcon(svgIcon("search"));
+        jbFind.setText(labels.getString("SEARCH.QUICK.TITLE"));
+        jbFind.setToolTipText(String.format("%s (%s)",
+                labels.getString("SEARCH.QUICK.HINT"), quickSearchShortcutName()));
+        jbFind.setFocusable(false);
+        jbFind.addActionListener(e -> gui.services.QuickSearchDialog.show(this, dadosGui, labels));
+        jToolBar1.add(jbFind, 2);
+        jToolBar1.revalidate();
+        jToolBar1.repaint();
+
         // Map legend button, placed right after the display-portrait toggle on the map-toggles toolbar
         // (jToolBar2). Icon-only to match the toggles; positioned by toggleDisplayPortrait's index so it
         // survives toolbar reordering. Opens the non-modal legend.
@@ -131,6 +146,12 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
      * same reason the map zoom does (KI-005), and a WHEN_IN_FOCUSED_WINDOW binding so it fires wherever
      * focus happens to be. Registered once, at construction; it no-ops until a turn is open.
      */
+    /** "Ctrl+P" / "Cmd+P" - what to actually tell this player to press. */
+    private static String quickSearchShortcutName() {
+        return (java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()
+                == java.awt.event.InputEvent.META_DOWN_MASK) ? "Cmd+P" : "Ctrl+P";
+    }
+
     private void installQuickSearch() {
         final int shortcut = java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(

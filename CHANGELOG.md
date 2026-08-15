@@ -4,8 +4,9 @@
 
 ### Find anything, from anywhere - press Ctrl+P
 
-- Press **Ctrl+P** (**Cmd+P** on a Mac) anywhere in Counselor and a **Find** box opens. Type any part of a name, a **hex coordinate**, or an **order**, and press **Enter**: Counselor switches to the right tab, selects the row, and centres the map on its hex.
+- Press **Ctrl+P** (**Cmd+P** on a Mac) anywhere in Counselor, or use the new **Find** button on the toolbar, and a search box opens. Type any part of a name, a **hex coordinate**, or an **order**, and press **Enter**: Counselor switches to the right tab, selects the row, and centres the map on its hex.
 - It searches **everything you have listed** - characters, cities, armies, magic items, locations, nations, troops, the actions catalogue - all at once. Typing `1122` lists everything standing on that hex. Typing `recruit` lists everyone you have given that order to.
+- It also searches **this turn's results text**. Something happened and you cannot remember who it happened to? Type a word from the report - `ambush`, `plague`, the name of a ship - and Counselor lists every character, city, army or nation whose results mention it.
 - Several words narrow rather than widen: `targaryen 1122` finds only the Targaryens on that hex.
 - **Up/Down** move through the results without leaving the box, **Enter** jumps, **Esc** closes. Double-clicking a result works too.
 - If the row you picked was hidden by the **Filter by** box on its tab, Counselor clears that box so you land on it. Rows excluded by the tab's **List** dropdown (for example a tab showing only your own) are not searched - switch that dropdown to **All** to reach them.

@@ -4,6 +4,7 @@ import gui.MainDadosGui;
 import gui.TabBase;
 import gui.services.QuickSearchIndex.Entry;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -33,8 +34,8 @@ import persistenceCommons.BundleManager;
 
 /**
  * Quick search / jump-to: one keystroke (Ctrl+P, Cmd+P on macOS) opens a search box over the main
- * window; type any part of a name, a hex coordinate or an order, and Enter jumps straight to that row
- * in its tab with the map centred on its hex.
+ * window; type any part of a name, a hex coordinate, an order, or anything from a row's turn RESULT
+ * text, and Enter jumps straight to that row in its tab with the map centred on its hex.
  *
  * <p>The index ({@link QuickSearchIndex}) is rebuilt every time the box opens, so it always matches
  * what the player currently has listed, needs no per-tab code, and picks up any tab added later for
@@ -49,8 +50,11 @@ import persistenceCommons.BundleManager;
 public final class QuickSearchDialog extends JDialog {
 
     private static final Log log = LogFactory.getLog(QuickSearchDialog.class);
-    /** Rendered result rows. Well past any real game (a big turn lists a few hundred entities). */
-    private static final int MAX_RESULTS = 300;
+    /**
+     * Rendered result rows. A jump box you scroll sixty rows in has already failed - the status line
+     * says how many more there are, and the answer is to type another word, not to scroll.
+     */
+    private static final int MAX_RESULTS = 60;
 
     private final BundleManager labels;
     private final MainDadosGui dados;
@@ -86,8 +90,12 @@ public final class QuickSearchDialog extends JDialog {
     }
 
     private void buildContent() {
-        final String hint = tx("SEARCH.QUICK.HINT", "Name, hex coordinate or order - Enter to jump");
+        final String hint = tx("SEARCH.QUICK.HINT", "Name, hex coordinate, order or result - Enter to jump");
         query.setToolTipText(hint);
+        //Searching on every keystroke with no debounce is deliberate: a full pass over ~1,800 indexed
+        //rows costs well under a millisecond even with a turn's narrative folded into each haystack
+        //(measured 0.17-0.49ms), so a coalescing delay would only add latency to a result list that
+        //is already instant. The lag this box originally had was HTML cell measurement, not the search.
         query.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -106,6 +114,11 @@ public final class QuickSearchDialog extends JDialog {
         });
 
         results.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        results.setCellRenderer(new HitRenderer());
+        //Without a fixed height a JList measures EVERY row to size itself. That measurement was the
+        //whole of the original typing lag (165ms per keystroke for 300 HTML rows); pinning the height
+        //means it measures none of them.
+        results.setFixedCellHeight(new JLabel("Wg").getPreferredSize().height + 6);
         results.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -199,7 +212,7 @@ public final class QuickSearchDialog extends JDialog {
         results.ensureIndexIsVisible(i);
     }
 
-    /** Re-rank on every keystroke. */
+    /** Re-rank after the typing pause. */
     private void refresh() {
         shown.clear();
         final String raw = query.getText().trim();
@@ -207,19 +220,64 @@ public final class QuickSearchDialog extends JDialog {
             status.setText(tx("SEARCH.QUICK.TYPE", "Start typing to search"));
             return;
         }
-        for (Entry e : QuickSearchIndex.match(index, raw, MAX_RESULTS)) {
-            shown.addElement(e);
-        }
+        final QuickSearchIndex.Matches m = QuickSearchIndex.search(index, raw, MAX_RESULTS);
+        shown.addAll(m.getHits()); //one ListDataEvent, not one per row
         if (shown.isEmpty()) {
             status.setText(tx("SEARCH.QUICK.EMPTY", "Nothing found"));
             return;
         }
         results.setSelectedIndex(0);
         results.ensureIndexIsVisible(0);
-        final int total = QuickSearchIndex.countMatches(index, raw);
-        status.setText(total > shown.size()
-                ? String.format(tx("SEARCH.QUICK.MORE", "... and %d more"), total - shown.size())
+        status.setText(m.getTotal() > shown.size()
+                ? String.format(tx("SEARCH.QUICK.MORE", "... and %d more"), m.getTotal() - shown.size())
                 : " ");
+    }
+
+    /**
+     * Name on the left, hex + tab dimmed on the right. Two plain labels rather than one HTML label:
+     * same look, none of the HTML parsing that made the list slow to size.
+     */
+    private static final class HitRenderer extends JPanel implements javax.swing.ListCellRenderer<Entry> {
+
+        private final JLabel name = new JLabel();
+        private final JLabel where = new JLabel();
+
+        HitRenderer() {
+            super(new BorderLayout(12, 0));
+            setBorder(BorderFactory.createEmptyBorder(1, 6, 1, 6));
+            name.setFont(name.getFont().deriveFont(Font.BOLD));
+            add(name, BorderLayout.WEST);
+            add(where, BorderLayout.EAST);
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList<? extends Entry> list, Entry value,
+                int i, boolean selected, boolean focused) {
+            name.setText(value.getName());
+            //On the Locations tab the row's name IS its hex, so showing the coordinate again just
+            //prints it twice.
+            final String coord = value.getCoord();
+            where.setText(coord.isEmpty() || coord.equals(value.getName())
+                    ? value.getTabTitle() : coord + "   " + value.getTabTitle());
+            final Color bg = selected ? list.getSelectionBackground() : list.getBackground();
+            final Color fg = selected ? list.getSelectionForeground() : list.getForeground();
+            setBackground(bg);
+            setOpaque(true);
+            name.setForeground(fg);
+            //Dim the secondary text, but stay readable on the selection colour in either theme.
+            where.setForeground(selected ? fg : blend(fg, bg, 0.45f));
+            return this;
+        }
+
+        /** {@code ratio} of the way from {@code a} to {@code b}. Theme-agnostic: derived from the
+         *  list's own colours, so it dims correctly on light and FlatLaf dark alike. */
+        private static Color blend(Color a, Color b, float ratio) {
+            final float r = Math.max(0f, Math.min(1f, ratio));
+            return new Color(
+                    Math.round(a.getRed() * (1 - r) + b.getRed() * r),
+                    Math.round(a.getGreen() * (1 - r) + b.getGreen() * r),
+                    Math.round(a.getBlue() * (1 - r) + b.getBlue() * r));
+        }
     }
 
     private void jumpToSelected() {

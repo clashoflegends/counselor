@@ -394,6 +394,17 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
     }
 
     /**
+     * The entities behind {@link #getMainLista()}'s rows, in the SAME order as the table model - the
+     * pairing every tab's selection listener already relies on ({@code listaExibida.get(modelRow)}).
+     * Quick search uses it to index each row's turn RESULT text, which lives on the model object and
+     * appears in no table cell. Default null: a tab without a backing entity list (catalogues, game
+     * info, finances) is still indexed on its cell text, just not on results.
+     */
+    public java.util.List<?> getIndexableActors() {
+        return null;
+    }
+
+    /**
      * Clear this tab's own search box, which drops the row filter it applies to the main list.
      * Quick-search calls this when the row it wants to select is hidden by a filter the player left
      * typed in. Clearing the TEXT (rather than the sorter's filter directly) is deliberate: the box's

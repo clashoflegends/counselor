@@ -1,5 +1,7 @@
 package gui.services;
 
+import baseLib.BaseModel;
+import business.facade.OrdemFacade;
 import gui.TabBase;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +27,9 @@ import org.apache.commons.logging.LogFactory;
 public final class QuickSearchIndex {
 
     private static final Log log = LogFactory.getLog(QuickSearchIndex.class);
+    private static final OrdemFacade ORDEM_FACADE = new OrdemFacade();
+    /** Above this, an index build is worth a log line the player can be asked for. */
+    private static final long SLOW_BUILD_MS = 300;
 
     private QuickSearchIndex() {
     }
@@ -69,18 +74,36 @@ public final class QuickSearchIndex {
             return coord;
         }
 
+        /**
+         * Plain text, deliberately NOT HTML. A JList measures every row to size itself, and an HTML
+         * label costs ~0.55ms to measure against ~0.004ms for plain text - with a few hundred hits
+         * that alone made typing visibly lag (measured: 165ms vs 1.3ms for 300 rows). The two-tone
+         * look lives in the dialog's cell renderer instead, which pays nothing extra.
+         */
         @Override
         public String toString() {
-            final StringBuilder sb = new StringBuilder("<html><b>").append(esc(name)).append("</b>");
-            if (!coord.isEmpty()) {
-                sb.append(" &nbsp;<font color=\"gray\">").append(esc(coord)).append("</font>");
-            }
-            sb.append(" &nbsp;&ndash;&nbsp;<font color=\"gray\">").append(esc(tabTitle)).append("</font></html>");
-            return sb.toString();
+            return coord.isEmpty() ? name + "  -  " + tabTitle : name + "  " + coord + "  -  " + tabTitle;
+        }
+    }
+
+    /** Ranked hits plus the true total, so the caller never has to run the search twice to count. */
+    public static final class Matches {
+
+        private final List<Entry> hits;
+        private final int total;
+
+        Matches(List<Entry> hits, int total) {
+            this.hits = hits;
+            this.total = total;
         }
 
-        private static String esc(String s) {
-            return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+        public List<Entry> getHits() {
+            return hits;
+        }
+
+        /** Total matches ignoring the display cap - drives the "and N more" line. */
+        public int getTotal() {
+            return total;
         }
     }
 
@@ -92,6 +115,7 @@ public final class QuickSearchIndex {
      * row an empty tab carries, contribute nothing.
      */
     public static List<Entry> build(JTabbedPane tabs) {
+        final long started = System.currentTimeMillis();
         final List<Entry> out = new ArrayList<>();
         if (tabs == null) {
             return out;
@@ -113,13 +137,63 @@ public final class QuickSearchIndex {
             if (table == null || table.getModel() == null) {
                 continue;
             }
-            indexTable(out, t, tabs.getTitleAt(t), table.getModel());
+            indexTable(out, t, tabs.getTitleAt(t), table.getModel(), actorsOf(tab));
+        }
+        //Building is the only per-open cost (searching is sub-millisecond). Rendering each row's turn
+        //result text runs a label lookup per line, so on a very large turn this could grow; say so in
+        //the log when it does, rather than leaving a slow-to-open box with nothing to point at.
+        final long ms = System.currentTimeMillis() - started;
+        if (ms > SLOW_BUILD_MS) {
+            log.info("Quick search index: " + out.size() + " rows in " + ms + "ms");
+        } else {
+            log.debug("Quick search index: " + out.size() + " rows in " + ms + "ms");
         }
         return out;
     }
 
-    /** Index one tab's table model into {@code out}. Split from {@link #build} so it is testable. */
+    /** The tab's backing entity list, or null. Never let one tab's failure lose the whole index. */
+    private static List<?> actorsOf(TabBase tab) {
+        try {
+            return tab.getIndexableActors();
+        } catch (RuntimeException ex) {
+            log.debug("Quick search: no actor list for " + tab.getTitle() + " - " + ex);
+            return null;
+        }
+    }
+
+    /** Index a table with no backing entity list (cell text only). */
     public static void indexTable(List<Entry> out, int tabIndex, String tabTitle, TableModel model) {
+        indexTable(out, tabIndex, tabTitle, model, null);
+    }
+
+    /**
+     * The turn RESULT text for one row, rendered the same way the detail panel renders it, or empty.
+     * This is what makes the narrative searchable ("who was ambushed?"), and it is the only part of a
+     * row that is not already in a cell. Rendering costs a label lookup per line, so it is done once
+     * here at index time rather than per keystroke.
+     */
+    private static String resultTextOf(List<?> actors, int row) {
+        if (actors == null || row >= actors.size()) {
+            return "";
+        }
+        final Object o = actors.get(row);
+        if (!(o instanceof BaseModel)) {
+            return "";
+        }
+        try {
+            final String s = ORDEM_FACADE.getResultado((BaseModel) o);
+            return (s == null) ? "" : s;
+        } catch (RuntimeException ex) {
+            return ""; //a half-built actor must not cost the whole index
+        }
+    }
+
+    /**
+     * Index one tab's table model into {@code out}. Split from {@link #build} so it is testable.
+     * {@code actors} is the tab's parallel entity list (may be null); each row's turn result text is
+     * folded into that row's searchable haystack.
+     */
+    public static void indexTable(List<Entry> out, int tabIndex, String tabTitle, TableModel model, List<?> actors) {
         final int cols = model.getColumnCount();
         for (int r = 0; r < model.getRowCount(); r++) {
             String name = "";
@@ -156,6 +230,10 @@ public final class QuickSearchIndex {
             if (name.isEmpty()) {
                 continue; //blank placeholder row of an empty tab
             }
+            final String results = resultTextOf(actors, r);
+            if (!results.isEmpty()) {
+                hay.append(results);
+            }
             out.add(new Entry(tabIndex, tabTitle, r, name, coord, hay.toString().toLowerCase()));
         }
     }
@@ -168,14 +246,20 @@ public final class QuickSearchIndex {
      * some column. A blank query matches nothing (the dialog shows a prompt instead).
      */
     public static List<Entry> match(List<Entry> index, String query, int max) {
+        return search(index, query, max).getHits();
+    }
+
+    /** As {@link #match}, but also reports the uncapped total in the same pass. */
+    public static Matches search(List<Entry> index, String query, int max) {
         final List<Entry> exact = new ArrayList<>();
         final List<Entry> byName = new ArrayList<>();
         final List<Entry> other = new ArrayList<>();
         final String raw = (query == null) ? "" : query.trim().toLowerCase();
         if (raw.isEmpty()) {
-            return new ArrayList<>();
+            return new Matches(new ArrayList<>(), 0);
         }
         final String[] tokens = raw.split("\\s+");
+        int total = 0;
         for (Entry e : index) {
             boolean all = true;
             for (String tk : tokens) {
@@ -187,28 +271,34 @@ public final class QuickSearchIndex {
             if (!all) {
                 continue;
             }
+            total++;
+            //Keep at most `max` per bucket: the ranked output never takes more than that from any one
+            //bucket, so storing the rest is pure waste. On a broad query ("a" matches nearly every row
+            //of a big turn) this is the difference between collecting ~1,800 entries per keystroke and
+            //collecting ~180. `total` still counts every match, so the "and N more" line stays honest.
             if (e.coord.equalsIgnoreCase(raw)) {
-                exact.add(e);
+                addCapped(exact, e, max);
             } else if (e.name.toLowerCase().contains(tokens[0])) {
-                byName.add(e);
+                addCapped(byName, e, max);
             } else {
-                other.add(e);
+                addCapped(other, e, max);
             }
         }
-        final List<Entry> ranked = new ArrayList<>();
+        final List<Entry> ranked = new ArrayList<>(Math.min(max, total));
         for (List<Entry> bucket : Arrays.asList(exact, byName, other)) {
             for (Entry e : bucket) {
                 if (ranked.size() >= max) {
-                    return ranked;
+                    return new Matches(ranked, total);
                 }
                 ranked.add(e);
             }
         }
-        return ranked;
+        return new Matches(ranked, total);
     }
 
-    /** Total matches for {@code query}, ignoring the display cap - drives the "and N more" line. */
-    public static int countMatches(List<Entry> index, String query) {
-        return match(index, query, Integer.MAX_VALUE).size();
+    private static void addCapped(List<Entry> bucket, Entry e, int max) {
+        if (bucket.size() < max) {
+            bucket.add(e);
+        }
     }
 }
