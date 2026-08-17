@@ -378,6 +378,19 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
                 break;
             }
+            case "RangeColorButton": {
+                //border drawn round the hexes an order parameter may target (see MapaControler.showRangeOutline).
+                //Resolve through MapaControler so the dialog and the map agree on a malformed config value.
+                Color picked = JColorChooser.showDialog(this.settingsGui, "Choose",
+                        MapaControler.getRangeOutlineColor());
+                if (picked == null) {
+                    break;
+                }
+                SettingsManager.getInstance().setConfigAndSaveToFile("ColorHexRange", ColorFactory.getColorBd(picked));
+                ((JButton) e.getSource()).setBackground(picked);
+                DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+                break;
+            }
             case "UnknownColorButton": {
                 Color before = ColorFactory.getColorBd(SettingsManager.getInstance().getConfig("ColorUnknown", "AAAAAA"));
                 Color picked = JColorChooser.showDialog(this.settingsGui, "Choose", before);

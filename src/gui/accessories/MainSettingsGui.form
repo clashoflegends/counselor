@@ -997,6 +997,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="unknownColorButton" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <Component id="rangeColorButton" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="207" max="-2" attributes="0"/>
               </Group>
@@ -1033,7 +1034,9 @@
                       <Component id="barbarianColorButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="unknownColorButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" pref="133" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="rangeColorButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="100" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -1178,6 +1181,14 @@
               <ResourceString bundle="labels.properties" key="SETTINGS.MAP.COLORUNKNOWN" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="UnknownColorButton"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="rangeColorButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="labels.properties" key="SETTINGS.MAP.COLORHEXRANGE" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="RangeColorButton"/>
           </Properties>
         </Component>
       </SubComponents>

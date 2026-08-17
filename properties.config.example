@@ -57,3 +57,16 @@
 #MoveTagTransparency=0
 #ShowCharacterPortraits=1
 #PortraitsFolder=/path/to/portraits
+
+# Map colours. All are 6-digit hex, no leading '#', and all are set from Settings > Map with a colour
+# picker - edit them here only if you want a value the picker will not give you.
+# Colour of the border drawn around the hexes an order may target when it has a limited range
+# (Settings > Map > Hex Range Color). Default white; an under-stroke of the opposite shade is added
+# automatically so the border stays readable over any terrain.
+#ColorHexRange=FFFFFF
+# Colourblind aids: override the map fill for barbarian-held and unknown-owner cities. Unset = the
+# scenario palette's own colours.
+#ColorBarbarian=
+#ColorUnknown=
+# Base tint of the mountain/coordinate map tiles.
+#MapColorCoordinate=efefef

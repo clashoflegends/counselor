@@ -609,6 +609,18 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         this.mapaLabel.repaint();
     }
 
+    /** Thick border around the hexes the active order parameter may target; null clears it. */
+    public void setRangeOutline(java.awt.Shape outline) {
+        mapIcon.setRangeOutline(outline);
+        this.mapaLabel.repaint();
+    }
+
+    /** Player-chosen colour for that border (Settings / properties.config ColorHexRange). */
+    public void setRangeOutlineColor(java.awt.Color color) {
+        mapIcon.setRangeColor(color);
+        this.mapaLabel.repaint();
+    }
+
     public void addRadialMenu(RadialMenu aRadialMenu) {
         if (this.radialMenu != null) {
             jLayeredPane1.remove(this.radialMenu);

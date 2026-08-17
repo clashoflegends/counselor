@@ -40,6 +40,10 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
     // Optional auto-save (player request): set by ComponentFactory only when this coordinate is the SOLE
     // parameter of the order; a successful map-pick then saves+advances if AutoSaveOnMapPick is on. Null otherwise.
     private Runnable autoSaveOnPick;
+    // What this picker may target, for the map's range border. Null origem = unbounded (ALL ticked), which
+    // draws nothing; MapaControler also ignores the 9999 range the unbounded Coordenada* controls pass.
+    private Local rangeOrigem;
+    private int range;
 
     /** Wire the map-pick to also save the order + advance (single-parameter orders only). See ComponentFactory. */
     public void setAutoSaveOnPick(Runnable autoSaveOnPick) {
@@ -51,6 +55,9 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
         initComponents();
         //define o controler
         this.setMapaControler(mapaControl);
+        //remember what this picker may target, so the map can outline it (see addNotify)
+        this.rangeOrigem = all ? null : origem;
+        this.range = range;
         //liga actionlisteners para a combo
         jcLocais.addItemListener(mapaControl);
         jcLocais.setActionCommand("Coordenadas");
@@ -72,6 +79,37 @@ public class SubTabCoordenadas extends TabBase implements Serializable {
         }
         jcLocais.setSelectedIndex(index);
         installMapPick();
+        installRangeOutline();
+    }
+
+    /**
+     * Show the range border while this picker is actually on screen, and take it down when it is not.
+     * <p>
+     * Driven by {@code SHOWING_CHANGED} rather than {@code addNotify}/{@code removeNotify}, because the
+     * data tabs all live in one {@code JTabbedPane} and are never removed from the hierarchy - measured,
+     * a tab switch fires NEITHER notify, only the hierarchy event. Hanging this on the notifies left the
+     * border on the map, anchored to an actor no longer selected anywhere, until the player returned to
+     * the tab and changed order. The hierarchy event covers tab switches AND removal (the rebuild of the
+     * parameter panel on actor/order change, and EGF load), so it is the whole protocol.
+     * <p>
+     * Fires more than once for a single switch, so both calls must be idempotent - they are: the show
+     * path hits the cached shape, and the clear is guarded on ownership identity.
+     * <p>
+     * Deliberately NOT hooked to clearMovementTags - that fires on every hex selection, i.e. while the
+     * player is still choosing, which is exactly when the border must stay up.
+     */
+    private void installRangeOutline() {
+        addHierarchyListener(e -> {
+            if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) == 0
+                    || getMapaControler() == null) {
+                return;
+            }
+            if (isShowing()) {
+                getMapaControler().showRangeOutline(this, rangeOrigem, range);
+            } else {
+                getMapaControler().clearRangeOutline(this); // by identity - see clearRangeOutline
+            }
+        });
     }
 
     /** Adds a "pick a hex on the map" button beside the coordinate combo (covers all Coordenada* controls). */

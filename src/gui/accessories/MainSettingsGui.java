@@ -5,6 +5,7 @@
  */
 package gui.accessories;
 
+import control.MapaControler;
 import control.SettingsControler;
 import java.io.File;
 import javax.swing.ComboBoxModel;
@@ -116,6 +117,10 @@ public class MainSettingsGui extends JPanel {
         mountainColorButton.addActionListener(settingsControler);
         barbarianColorButton.addActionListener(settingsControler);
         unknownColorButton.addActionListener(settingsControler);
+        rangeColorButton.addActionListener(settingsControler);
+        //show the colour it is currently set to, so reopening Settings tells you what you picked.
+        //Same resolver the map uses, so a malformed config cannot show one colour here and another there.
+        rangeColorButton.setBackground(MapaControler.getRangeOutlineColor());
         colorDifficultyCheckBox.setText(settingsManager.getBundleManager().getString("SETTINGS.DISPLAY.COLORDIFFICULTY"));
         colorDifficultyCheckBox.setToolTipText(settingsManager.getBundleManager().getString("SETTINGS.DISPLAY.COLORDIFFICULTY.TOOLTIP"));
         colorDifficultyCheckBox.setActionCommand("colorDifficulty");
@@ -225,6 +230,7 @@ public class MainSettingsGui extends JPanel {
         mountainColorButton = new javax.swing.JButton();
         barbarianColorButton = new javax.swing.JButton();
         unknownColorButton = new javax.swing.JButton();
+        rangeColorButton = new javax.swing.JButton();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("labels"); // NOI18N
         gamePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("SETTINGS.TITLE.GAME"))); // NOI18N
@@ -732,6 +738,9 @@ public class MainSettingsGui extends JPanel {
         unknownColorButton.setText(bundle.getString("SETTINGS.MAP.COLORUNKNOWN")); // NOI18N
         unknownColorButton.setActionCommand("UnknownColorButton");
 
+        rangeColorButton.setText(bundle.getString("SETTINGS.MAP.COLORHEXRANGE")); // NOI18N
+        rangeColorButton.setActionCommand("RangeColorButton");
+
         javax.swing.GroupLayout mapPanelLayout = new javax.swing.GroupLayout(mapPanel);
         mapPanel.setLayout(mapPanelLayout);
         mapPanelLayout.setHorizontalGroup(
@@ -757,7 +766,8 @@ public class MainSettingsGui extends JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(barbarianColorButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(unknownColorButton)))
+                        .addComponent(unknownColorButton))
+                    .addComponent(rangeColorButton))
                 .addGap(207, 207, 207))
         );
         mapPanelLayout.setVerticalGroup(
@@ -786,7 +796,9 @@ public class MainSettingsGui extends JPanel {
                     .addComponent(mountainColorButton)
                     .addComponent(barbarianColorButton)
                     .addComponent(unknownColorButton))
-                .addGap(133, 133, 133))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rangeColorButton)
+                .addGap(100, 100, 100))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -884,6 +896,7 @@ public class MainSettingsGui extends JPanel {
     private javax.swing.JTextField playerTokenTextField;
     private javax.swing.JTextField portraitFolderNameTextField;
     private javax.swing.JLabel portraitsFolderLabel;
+    private javax.swing.JButton rangeColorButton;
     private javax.swing.JButton saveDirButton;
     private javax.swing.JLabel saveDirLabel;
     private javax.swing.JTextField saveDirTextField;

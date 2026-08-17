@@ -19,9 +19,14 @@ import control.support.DispatchManager;
 import gui.MainMapaGui;
 import gui.accessories.DialogHexView;
 import gui.components.DialogTextArea;
+import business.converter.ColorFactory;
 import gui.services.ComponentFactory;
+import gui.services.HexRangeOutline;
 import gui.services.IPopupTabGui;
+import gui.services.ScaledMapIcon;
+import java.awt.Color;
 import java.awt.Point;
+import java.awt.Shape;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -29,6 +34,7 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.ImageIcon;
@@ -70,6 +76,15 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     // the next left-click consumes it, so a stale picker never keeps intercepting map clicks.
     private Consumer<Local> cityPickCallback;
     private final List<JTable> tables = new ArrayList<>();
+    // Hex-range border for the active order parameter, cached on (origem, range) - see showRangeOutline.
+    // ComponentFactory passes 9999 for the unbounded Coordenada* controls; that draws nothing.
+    private static final int RANGE_UNBOUNDED = 999;
+    /** properties.config ColorHexRange default - white, what the feature shipped with. */
+    public static final String RANGE_COLOR_DEFAULT_HEX = "FFFFFF";
+    private Object rangeOutlineOwner; // the picker that put the border up; identity, see clearRangeOutline
+    private Local rangeOutlineOrigem;
+    private int rangeOutlineRange;
+    private Shape rangeOutlineShape;
     private RadialMenu rmActive;
     private MapMenuManager mapMenuManager;
     private DialogHexView hexView;
@@ -82,6 +97,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
     public final void initialize(JPanel form) {
         this.jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
         listFactory = new ListFactory();
+        clearRangeOutline(); // reused across EGF loads (MainResultWindowGui), so drop the previous world's border
         exercitoFacade = new ExercitoFacade();
         final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         mapaManager = new MapaManager(cenario, form);
@@ -345,6 +361,87 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         addMovementTagRange(localInRange);
     }
 
+    /**
+     * Draw a thick border around every hex within {@code range} of {@code origem}, so a player filling a
+     * hex parameter can see how far the order reaches without reading the combo. Unbounded ranges
+     * (COORDENADA*, or the ALL checkbox) draw nothing - the whole map is in range and a border round the
+     * map edge tells nobody anything.
+     * <p>
+     * The hex set comes from {@code getLocalRange}, i.e. the SAME distance function
+     * {@code SubTabCoordenadas} filters its combo with, so the border can never disagree with the
+     * picker's own idea of what is in range. It is a pure DISTANCE ring: a hex inside the border may
+     * still be rejected on terrain grounds (water, cities-only), exactly as the combo already rejects it.
+     * <p>
+     * Cached on (origem, range): the union is a few hundred polygon merges and the parameter panel is
+     * rebuilt on every actor/order click.
+     */
+    public void showRangeOutline(Object owner, Local origem, int range) {
+        if (origem == null || range <= 0 || range >= RANGE_UNBOUNDED || getTabGui() == null) {
+            // an unbounded picker owns no border, so it must not take down somebody else's: an order
+            // carrying both a bounded and an unbounded coordinate would otherwise blank the map
+            clearRangeOutline(owner);
+            return;
+        }
+        rangeOutlineOwner = owner;
+        if (origem.equals(rangeOutlineOrigem) && range == rangeOutlineRange && rangeOutlineShape != null) {
+            getTabGui().setRangeOutlineColor(getRangeOutlineColor());
+            getTabGui().setRangeOutline(rangeOutlineShape); // same ask, reuse the built shape
+            return;
+        }
+        final Collection<Local> inRange
+                = localFacade.getLocalRange(origem, range, false, listFactory.listLocais()).keySet();
+        rangeOutlineShape = HexRangeOutline.build(inRange);
+        rangeOutlineOrigem = origem;
+        rangeOutlineRange = range;
+        getTabGui().setRangeOutlineColor(getRangeOutlineColor());
+        getTabGui().setRangeOutline(rangeOutlineShape);
+    }
+
+    /**
+     * Border colour from properties.config {@code ColorHexRange} (6-hex, no '#'), defaulting to the white
+     * the feature shipped with. The hex is validated here rather than leaning on ColorFactory, which
+     * answers null for an empty string but DARK_GRAY for anything unparseable - a typo in a hand-edited
+     * config would otherwise silently hand the player a grey border and no clue why.
+     * <p>
+     * Public and static because the Settings swatch and its colour picker must resolve it the SAME way:
+     * reading the raw config in those two places instead showed a hand-edited {@code #FFAA00} as dark
+     * grey in the dialog while the map drew white.
+     */
+    public static Color getRangeOutlineColor() {
+        final String hex = SettingsManager.getInstance().getConfig("ColorHexRange", RANGE_COLOR_DEFAULT_HEX);
+        if (hex == null || !hex.matches("(?i)[0-9a-f]{6}")) {
+            return ScaledMapIcon.RANGE_COLOR_DEFAULT;
+        }
+        return ColorFactory.getColorBd(hex);
+    }
+
+    /**
+     * Clear the border only if {@code owner} is still the picker that put it up.
+     * <p>
+     * Ownership is by IDENTITY, not by (origem, range). A rebuilt parameter panel can add the incoming
+     * picker before Swing tears the outgoing one down - measured, both orders happen: {@code removeAll()}
+     * then {@code add()} gives {@code -old +new}, while {@code add()} then {@code remove()} gives
+     * {@code +new -old}. In that second order a (origem, range) test MATCHES whenever the two pickers
+     * share them, which is the ordinary case of swapping between two range-8 orders on the same actor,
+     * so the outgoing widget would wipe the border the incoming one just drew.
+     */
+    public void clearRangeOutline(Object owner) {
+        if (owner != null && owner == rangeOutlineOwner) {
+            clearRangeOutline();
+        }
+    }
+
+    /** Remove the hex-range border (order/actor changed, picker gone, map cleared). */
+    public void clearRangeOutline() {
+        rangeOutlineOwner = null;
+        rangeOutlineOrigem = null;
+        rangeOutlineRange = 0;
+        rangeOutlineShape = null;
+        if (getTabGui() != null) {
+            getTabGui().setRangeOutline(null);
+        }
+    }
+
     @Override
     public void receiveDispatch(int msgName, Local local) {
         if (msgName == DispatchManager.LOCAL_MAP_REDRAW) {
@@ -357,6 +454,9 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         switch (msgName) {
             case DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES:
                 tabGui.doMapa(this.refreshMapaGeral());
+                // the map colour buttons in Settings all fire this; re-read ours so a colour change
+                // applies at once instead of waiting for the next parameter-panel rebuild
+                tabGui.setRangeOutlineColor(getRangeOutlineColor());
                 break;
             case DispatchManager.ACTIONS_MAP_REDRAW:
                 tabGui.doActionsOnMap(this.printActionsOnMap());
