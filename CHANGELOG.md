@@ -1,5 +1,37 @@
 # What's New in Counselor
 
+## 16-AUG-2026 - v2.1.917
+
+### See how far an order reaches, right on the map
+
+- Many orders can only target a hex **within a certain distance** - move a character, map an area, pick up an item. Until now the only way to know what was in reach was to open the drop-down and read the list.
+- Now the map **draws a thick border around every hex the order can reach**, the moment you pick that order. Movement orders show a wide ring, short-ranged ones a tight one, and the border follows the edge of the map where the range runs off it.
+- **Choose your own colour** in **Settings > Map > Hex Range Color**. It defaults to white, and whatever you choose is outlined in the opposite shade so it stays readable over dark sea as well as pale desert. It stays the same thickness however far you zoom in or out.
+- The border shows how far the order **reaches**. A hex inside it can still be refused for other reasons - dry land for a ship, a city where the order needs one - exactly as the drop-down already refuses it.
+
+### Changing an order no longer leaves the old order's number behind
+
+- If you picked an order, saved it, then changed that slot to a **different** order, the previous order's value could be carried into the new order's box - a movement's hex **0512** turning up as a recruit **quantity**, a **gold** amount, or a **512%** figure. Counselor now only carries a value across when the new order genuinely expects the same kind of thing, so a hex target still survives when you swap one hex order for another.
+
+### Startup packages you cannot buy are no longer offered
+
+- On turn 0, the package list included packages restricted to another scenario or another nation, which the Judge would then refuse. The list now offers only what your nation can actually take. Ticking **ALL** still shows everything, and anything already saved in a slot stays listed.
+
+### Smaller things
+
+- On orders with many parameters, the **ALL** checkbox and the order buttons no longer get pushed to the bottom of the panel.
+
+### Website (clashlegends.com)
+
+- **Watch the whole war play out on a map.** The **Chronicle** of a finished game now opens with the game's own map and **replays it turn by turn** - terrain, every city in its owner's colours, armies standing where they stood, markers where the great battles fell, and a line tracing each army's march from the hex it left. Press play, or drag the scrubber to any turn. Pan, zoom, toggle the layers, hover anything to read it, and every turn heading has an **on the map** link that takes you from the story straight to that moment.
+- **My War: your own house's story.** Pick a house above the replay and the board becomes its war - its cities, armies and marches stay full strength while the rest of the world fades to a wash, drawn larger so you can pick them out on a crowded board. A readout follows what it held each turn - cities, forces, troops - and **Follow** keeps it in view as the turns run. Territory is shaded by the nearest city, so you can watch a realm swell and shrink.
+- **New records in the Hall of Fame.** A capital put to the torch now **names the house that did it**, and a new **Put to the Torch** record tracks it.
+- All of this is built from the games you have already played, so **every finished game already has it** - nothing to wait for.
+- **Sort the open games however you like.** On **Open Games**, click any column heading to sort by it - name, scenario, type, frequency, starting day, max turn, minimum rank, status or open positions. Click again to reverse, and a small arrow shows which column is in effect.
+- **Scores now stop counting at turn 50.** Punctorum and the Hall of Fame count only what you earn in a game's first 50 turns. A very long game used to keep paying out score turn after turn, which rewarded playing forever over playing well. Everything up to turn 50 counts exactly as before, the Hall of Fame still shows your true max turn played, and it feeds the seniority order for handing out nations, so a long campaign no longer buys an earlier pick.
+- **See for yourself whether the die is fair.** A new **Die Fairness** page on the Links page, open to everyone. Nearly every action is settled by a 1-100 roll against a target the Judge works out; this page lines up every roll ever made, in every game, against how often that die should have succeeded. Chart, table, a plain-language verdict, and you can narrow it to a single game.
+- **Your orders and live-game Chronicles stay private.** Turn files and in-progress Chronicles can only be read by the players entitled to see them. The Chronicle of a finished game is unchanged and still open to everyone.
+
 ## 14-AUG-2026 - v2.1.916
 
 ### Find anything, from anywhere - press Ctrl+P
