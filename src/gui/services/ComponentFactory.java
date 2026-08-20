@@ -1088,7 +1088,8 @@ public class ComponentFactory implements Serializable {
     }
 
     public static DialogHexView showDialogHexView(Component relativeTo) {
-        DialogHexView hexViewDialog = new DialogHexView(false);
+        java.awt.Window owner = relativeTo == null ? null : javax.swing.SwingUtilities.getWindowAncestor(relativeTo);
+        DialogHexView hexViewDialog = new DialogHexView(owner, false);
         //load configs
         int width = SettingsManager.getInstance().getConfigAsInt("GuiHexViewSizeWidth", "500");
         int height = SettingsManager.getInstance().getConfigAsInt("GuiHexViewSizeHeight", "400");

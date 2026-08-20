@@ -10,7 +10,6 @@ import gui.services.IPopupTabGui;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.Serializable;
-import javax.swing.JFrame;
 import model.Local;
 import model.Nacao;
 import model.PersonagemOrdem;
@@ -32,10 +31,13 @@ public class DialogHexView extends javax.swing.JDialog implements IDispatchRecei
     private javax.swing.JTextArea jtaTextArea;
     // End of variables declaration
 
-    public DialogHexView(boolean modal) {
-        super(new JFrame(), modal);
+    public DialogHexView(java.awt.Window owner, boolean modal) {
+        // Owned by the main window (not a throwaway JFrame) and deliberately NOT alwaysOnTop: an
+        // always-on-top utility window paints ABOVE modal dialogs while the modal still blocks all input,
+        // which trapped the standby-submit prompt behind this view (player report, game 892). Ownership
+        // keeps it floating above the main window, and a modal owned by that same window now appears above it.
+        super(owner, modal ? java.awt.Dialog.ModalityType.APPLICATION_MODAL : java.awt.Dialog.ModalityType.MODELESS);
         gui.services.AppIcon.applyTo(this);
-        this.setAlwaysOnTop(true);
         initComponents();
     }
 
