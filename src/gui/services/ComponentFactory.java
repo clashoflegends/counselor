@@ -1098,7 +1098,9 @@ public class ComponentFactory implements Serializable {
         if (relativeTo != null && !SettingsManager.getInstance().isKeyExist("GuiHexViewPositionY")) {
             hexViewDialog.setLocationRelativeTo(relativeTo);
         } else {
-            hexViewDialog.setLocation(posX, posY);
+            //Undocking a laptop leaves the remembered spot on a screen that no longer exists, so the
+            //dialog would open where nobody can reach it. Falls back over the main window.
+            WindowGeometry.restoreLocation(hexViewDialog, posX, posY, width, height, relativeTo);
         }
         hexViewDialog.setPreferredSize(new Dimension(width, height));
         hexViewDialog.pack();

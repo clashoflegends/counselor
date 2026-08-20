@@ -155,7 +155,9 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, IDispatchRecei
         if (!SettingsManager.getInstance().isKeyExist(getGuiConfig() + "PositionY")) {
             dPopup.setLocationRelativeTo(jMaster);
         } else {
-            dPopup.setLocation(posX, posY);
+            //See WindowGeometry: a position remembered on a monitor that has since been unplugged
+            //would put this popup out of reach. Falls back over the tab that owns it.
+            gui.services.WindowGeometry.restoreLocation(dPopup, posX, posY, width, height, jMaster);
         }
         dPopup.setPreferredSize(new Dimension(width, height));
         dPopup.pack();
