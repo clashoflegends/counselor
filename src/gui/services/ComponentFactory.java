@@ -1110,6 +1110,40 @@ public class ComponentFactory implements Serializable {
     }
 
     /**
+     * Re-own a floating popup dialog to the main window so modal dialogs can appear above it.
+     * These popups were built as new JDialog(new JFrame(), false) + setAlwaysOnTop(true); the phantom
+     * owner gives no z-order, so alwaysOnTop did the "float above the app" job - and that traps any
+     * modal behind them (the Hex View deadlock, KI-043). A JDialog owner is immutable, so this rebuilds
+     * it owned by the main window (ancestor of ref), carrying over the content pane, title, name and
+     * listeners. Idempotent + lazy: returns the same dialog if already owned or the window is not
+     * realized yet, so call it right before the first show. Owner+no-alwaysOnTop lets ownership keep it
+     * floating above the main window while a modal owned by that window appears above it.
+     */
+    public static javax.swing.JDialog reownToAncestor(javax.swing.JDialog d, Component ref) {
+        final java.awt.Window owner = javax.swing.SwingUtilities.getWindowAncestor(ref);
+        if (owner == null || d.getOwner() == owner) {
+            return d;
+        }
+        final java.awt.Window phantom = d.getOwner();
+        final javax.swing.JDialog nd = new javax.swing.JDialog(owner, d.getTitle(), java.awt.Dialog.ModalityType.MODELESS);
+        nd.setName(d.getName());
+        nd.setContentPane(d.getContentPane());
+        nd.setPreferredSize(d.getPreferredSize());
+        nd.setLocation(d.getLocation());
+        for (java.awt.event.ComponentListener cl : d.getComponentListeners()) {
+            nd.addComponentListener(cl);
+        }
+        for (java.awt.event.WindowListener wl : d.getWindowListeners()) {
+            nd.addWindowListener(wl);
+        }
+        d.dispose();
+        if (phantom instanceof javax.swing.JFrame && !phantom.isVisible()) {
+            phantom.dispose();
+        }
+        return nd;
+    }
+
+    /**
      * Close the transient graph/dashboard windows (charts + Victory Dashboard).
      * Called when a different game/turn is opened so those snapshots don't
      * linger showing stale data. Leaves the main window and the map (which

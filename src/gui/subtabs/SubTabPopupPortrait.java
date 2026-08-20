@@ -34,7 +34,7 @@ public class SubTabPopupPortrait extends TabBase implements IPopupTabGui, Serial
 
     private static final Log log = LogFactory.getLog(SubTabPopupPortrait.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private final JDialog dPopup = new JDialog(new JFrame(), false);
+    private JDialog dPopup = new JDialog(new JFrame(), false);
     private final SubTabTextArea stContent = new SubTabTextArea();
 
     /**
@@ -95,7 +95,6 @@ public class SubTabPopupPortrait extends TabBase implements IPopupTabGui, Serial
         final OrdemControlerFloater ordemControlFloater = new OrdemControlerFloater(this);
         gui.services.AppIcon.applyTo(dPopup);
         dPopup.setTitle(labels.getString("INFORMATION.TITLE"));
-        dPopup.setAlwaysOnTop(true);
         dPopup.setPreferredSize(new Dimension(400, 500));
         dPopup.addComponentListener(ordemControlFloater);
         dPopup.setName("dPopup");
@@ -141,6 +140,7 @@ public class SubTabPopupPortrait extends TabBase implements IPopupTabGui, Serial
     @Override
     public void doDetachPopup() {
         //monta a floating window para ordens
+        dPopup = gui.services.ComponentFactory.reownToAncestor(dPopup, this);
         dPopup.add(stContent);
         dPopup.pack();
         dPopup.setLocationRelativeTo(jMaster);

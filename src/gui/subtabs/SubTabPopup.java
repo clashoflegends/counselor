@@ -39,7 +39,7 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, IDispatchRecei
 
     private static final Log log = LogFactory.getLog(SubTabPopup.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private final JDialog dPopup = new JDialog(new JFrame(), false);
+    private JDialog dPopup = new JDialog(new JFrame(), false);
     private final SubTabTextArea stContent = new SubTabTextArea();
     private String guiConfig = "";
 
@@ -101,7 +101,6 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, IDispatchRecei
         final OrdemControlerFloater ordemControlFloater = new OrdemControlerFloater(this);
         gui.services.AppIcon.applyTo(dPopup);
         dPopup.setTitle(labels.getString("INFORMATION.TITLE"));
-        dPopup.setAlwaysOnTop(true);
         dPopup.addComponentListener(ordemControlFloater);
         dPopup.setName("dPopup");
         jbDetach.setActionCommand("jbDetach");
@@ -145,6 +144,7 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, IDispatchRecei
     @Override
     public void doDetachPopup() {
         //monta a floating window para ordens
+        dPopup = gui.services.ComponentFactory.reownToAncestor(dPopup, this);
         dPopup.add(stContent);
         //load configs
         int width = SettingsManager.getInstance().getConfigAsInt(getGuiConfig() + "SizeWidth", "500");

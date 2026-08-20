@@ -61,8 +61,8 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     // may be viewed (list + detail panel + map render) but never edited or saved. Enforced here (edit
     // controls off) AND at the save chokepoints in OrdemControler. Players never hold enemies' orders.
     private boolean readOnly;
-    private final JDialog dAjuda = new JDialog(new JFrame(), false);
-    private final JDialog dOrdem = new JDialog(new JFrame(), false);
+    private JDialog dAjuda = new JDialog(new JFrame(), false);
+    private JDialog dOrdem = new JDialog(new JFrame(), false);
     private final SubTabTextArea stAjuda = new SubTabTextArea();
     private final IAcaoGui parentTab;
     private final JogadorFacade jogadorFacade = new JogadorFacade();
@@ -453,13 +453,11 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         dAjuda.add(stAjuda);
         gui.services.AppIcon.applyTo(dAjuda);
         dAjuda.setTitle(labels.getString("AJUDA"));
-        dAjuda.setAlwaysOnTop(true);
         dAjuda.setPreferredSize(new Dimension(300, 600));
         dAjuda.setLocationRelativeTo(this.jtListaOrdens);
         //monta a floating window para ordens
         gui.services.AppIcon.applyTo(dOrdem);
         dOrdem.setTitle(labels.getString("ACOES.DISPONIVEL"));
-        dOrdem.setAlwaysOnTop(true);
         dOrdem.setPreferredSize(new Dimension(400, 500));
         final OrdemControlerFloater ordemControlFloater = new OrdemControlerFloater(this);
         dOrdem.addComponentListener(ordemControlFloater);
@@ -720,6 +718,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     public void doDisplayAjuda() {
         //stAjuda.setTextBackground(new Color(236, 233, 216));
         //monta a floating window para ajuda
+        dAjuda = gui.services.ComponentFactory.reownToAncestor(dAjuda, this);
         dAjuda.pack();
         dAjuda.setVisible(true);
     }
@@ -742,6 +741,7 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     @Override
     public void doDetachPopup() {
         //monta a floating window para ordens
+        dOrdem = gui.services.ComponentFactory.reownToAncestor(dOrdem, this);
         dOrdem.add(this.jpDetOrdens);
         dOrdem.pack();
         dOrdem.setLocationRelativeTo(this.detOrdens);
