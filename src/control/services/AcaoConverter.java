@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import model.Ordem;
 import business.converter.TitleFactory;
+import control.facade.WorldFacadeCounselor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -87,7 +88,8 @@ public class AcaoConverter implements Serializable {
     }
 
     public static String getAjuda(Ordem ordem) {
-        return TitleFactory.getOrdemDisplay(ordem);
+        //pass the open game: the guard orders read differently under ;GAG;
+        return TitleFactory.getOrdemDisplay(ordem, WorldFacadeCounselor.getInstance().getPartida());
     }
 
     public static List<Ordem> listaByFiltro(String filtro) {
