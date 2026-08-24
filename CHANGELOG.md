@@ -1,5 +1,18 @@
 # What's New in Counselor
 
+## 23-AUG-2026 - v2.1.918
+
+### Dialogs can no longer hide behind a floating window
+
+- With **Hex View** open, pressing submit could show the confirmation dialog **behind** it. The dialog blocked every click, but you could not reach it, and you could not close the Hex View either because the dialog had priority. The only way out was to kill Counselor. Reported from game 892.
+- The same trap applied to every other window you can float: **detached data tabs**, the **portrait popup**, and the **order help** and **order picker** popups. Any of them could swallow a dialog the same way.
+- All of them now sit above the main window without sitting above dialogs, so a dialog always comes to the front where you can answer it. Detaching, re-docking and re-opening behave exactly as before.
+
+### Windows come back on screen after you undock a laptop
+
+- Drag **Hex View** or a detached **Results** popup onto a second monitor, close Counselor so the position is remembered, then undock. On the next launch the remembered position named a screen that no longer existed, so the window opened somewhere you could not see or drag it, while still taking focus.
+- Counselor now checks the remembered spot is actually on a screen you have, and falls back to opening over the main window when it is not.
+
 ## 16-AUG-2026 - v2.1.917
 
 ### See how far an order reaches, right on the map
