@@ -716,7 +716,7 @@ public class MainSettingsGui extends JPanel {
         armyPathComboBox.setSelectedIndex(getArmyPathIndexSelected());
         armyPathComboBox.setActionCommand("armyPath");
 
-        mapTilesComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2a", "2b", "2d", "3d" }));
+        mapTilesComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2a", "2b", "2d", "3d", "flat" }));
         mapTilesComboBox.setSelectedItem(settingsManager.getConfig("MapTiles"));
         mapTilesComboBox.setActionCommand("mapTiles");
 

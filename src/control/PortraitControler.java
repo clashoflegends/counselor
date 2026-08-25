@@ -50,9 +50,8 @@ public class PortraitControler extends ControlBase implements Serializable {
     }
 
     public void showPortrait(Personagem personagem) {
-        String portraitFileName = personagem.getPortraitFilename();
-
-        javax.swing.JLabel portrait = new javax.swing.JLabel(ImageManager.getInstance().getPortrait(portraitFileName));
+        //Own portrait, else the default for this character's class and gender, else blank.jpg.
+        javax.swing.JLabel portrait = new javax.swing.JLabel(ImageManager.getInstance().getPortrait(personagem));
         portrait.setBorder(new javax.swing.border.EmptyBorder(0, 5, 0, 0));
         if (portraitPanel.getComponentCount() > 0) {
             portraitPanel.removeAll();
