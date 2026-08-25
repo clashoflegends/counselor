@@ -1,5 +1,19 @@
 # What's New in Counselor
 
+## 24-AUG-2026 - v2.1.919
+
+### Characters finally look like what they are
+
+- Until now, every character without a portrait of their own was drawn as the **same hooded rogue** - your commanders, your emissaries, your wizards, all of them. That image was only ever a placeholder, sitting there since 2017.
+- Now a character without a portrait gets a **default drawn for their class and their gender**: a helmed warrior for commanders, a hooded figure with a staff for wizards, a hooded figure with a dagger for agents, a scribe with quill and book for emissaries.
+- If a character has several skills, the portrait follows their **strongest natural skill**, so a commander who dabbles in magic still looks like a commander.
+- Characters with their own portrait are unaffected, and the artwork arrives with your portraits pack - Counselor picks it up automatically if you have **Auto-download portrait updates** ticked, or offers it once next time you start.
+
+### A new, cleaner map style
+
+- **Settings > Map > tileset** has a new option: **flat**. Terrain is drawn in flat colour with no texture, using the same palette as the **Chronicle** replay map on the website, so the two now read alike.
+- Easier on the eye at low zoom, and it makes armies, cities and order markers stand out more than the textured sets do. The other four tilesets are unchanged - switch back any time from the same dropdown.
+
 ## 23-AUG-2026 - v2.1.918
 
 ### Dialogs can no longer hide behind a floating window
