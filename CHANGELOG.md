@@ -1,5 +1,11 @@
 # What's New in Counselor
 
+## 25-AUG-2026 - v2.1.920
+
+### Landmarks on the map are drawn properly now
+
+- The ten landmark icons - **cave, henge, igloo, lake, standing stones, ruins, temple, tower, weirwood** and the unknown-site marker - were flat black-and-white line drawings that got lost against the terrain. They are all redrawn **in colour**, same size, same places.
+
 ## 24-AUG-2026 - v2.1.919
 
 ### Characters finally look like what they are
