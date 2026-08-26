@@ -1,5 +1,23 @@
 # What's New in Counselor
 
+## 25-AUG-2026 - v2.1.921
+
+### Default portraits now match the world you are playing in
+
+- Last release gave every character without a portrait a **default drawn for their class and gender**. Those defaults were the same everywhere, so a Greek strategos and a Westerosi knight were drawn identically.
+- Now each scenario can carry **its own set of default art**. **Greek** scenarios get a Spartan crimson set and **Fire & Dragons** gets a Targaryen black set, both new this release. **Game of Thrones** scenarios are wired up too and keep the standard art for the moment, with their own set to follow.
+- Nothing changes for a character who already has a portrait, and if your portraits pack is not up to date you simply keep seeing the standard defaults until it is.
+
+### Fog of war is easy to see again on the flat map
+
+- The new **flat** tileset borrowed its fog-of-war tile from another set, and the pale grey it used sat too close to the terrain colours, so the edge between explored and unexplored ground was hard to pick out.
+- Fog now has its **own dark tile** on the flat set, so unexplored hexes read clearly at any zoom.
+
+### The portraits pack is less than half the size
+
+- The portrait artwork was stored far heavier than it needed to be. It has all been re-encoded, so the **portraits download drops from 12.2 MB to 5.0 MB**, and the images look the same.
+- Your **turn PDF gets smaller too** - the biggest ones were running close to the size limit some mail providers enforce, and they now land well under it.
+
 ## 25-AUG-2026 - v2.1.920
 
 ### Landmarks on the map are drawn properly now
