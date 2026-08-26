@@ -49,9 +49,25 @@ public class PortraitControler extends ControlBase implements Serializable {
         }
     }
 
+    /**
+     * The open game's Cenario, or null when no game is loaded yet. PbmCommons cannot reach
+     * WorldManager (it lives here in PbmCounselor), so the scenario is passed down from this side.
+     */
+    private model.Cenario getCenarioOrNull() {
+        try {
+            return WorldFacadeCounselor.getInstance().getCenario();
+        } catch (RuntimeException ex) {
+            //no game open yet: no scenario portrait set to apply
+            return null;
+        }
+    }
+
     public void showPortrait(Personagem personagem) {
-        //Own portrait, else the default for this character's class and gender, else blank.jpg.
-        javax.swing.JLabel portrait = new javax.swing.JLabel(ImageManager.getInstance().getPortrait(personagem));
+        //Own portrait, else this scenario's default for the character's class and gender, else the
+        //generic class default, else blank.jpg. The Cenario carries the variante's ;SJ_; portrait-set
+        //flag; it is null before a game is open, which simply skips the scenario step.
+        javax.swing.JLabel portrait = new javax.swing.JLabel(
+                ImageManager.getInstance().getPortrait(personagem, getCenarioOrNull()));
         portrait.setBorder(new javax.swing.border.EmptyBorder(0, 5, 0, 0));
         if (portraitPanel.getComponentCount() > 0) {
             portraitPanel.removeAll();
