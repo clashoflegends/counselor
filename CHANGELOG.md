@@ -15,7 +15,7 @@
 
 ### The portraits pack is less than half the size
 
-- The portrait artwork was stored far heavier than it needed to be. It has all been re-encoded, so the **portraits download drops from 12.2 MB to 5.0 MB**, and the images look the same.
+- The portrait artwork was stored far heavier than it needed to be. It has all been re-encoded, so the **portraits download drops from 10.2 MB to 6.8 MB** even with 24 new images added, and the artwork looks the same.
 - Your **turn PDF gets smaller too** - the biggest ones were running close to the size limit some mail providers enforce, and they now land well under it.
 
 ## 25-AUG-2026 - v2.1.920
