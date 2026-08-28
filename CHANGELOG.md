@@ -1,5 +1,24 @@
 # What's New in Counselor
 
+## 27-AUG-2026 - v2.1.922
+
+### Characters without a portrait now look like your house
+
+- Until now every character without a portrait of their own was drawn from a small set of flat blue silhouettes, identical in every game.
+- They are now **hand-drawn portraits**, one per class and gender, and each is **painted in your nation's colour** - a Lannister commander and a Stark commander no longer look the same. The cloak and background take the house colour while faces, armour and weapons stay as drawn.
+- Each portrait is also **framed in your nation's border colour**, the same colour your cities carry on the map, so allies and rivals read at a glance.
+- Characters with a portrait of their own are completely unaffected.
+
+### No two of them look alike
+
+- Two characters of the same class, gender and nation used to be drawn **pixel-identical**, so a court of ten looked like one person repeated ten times.
+- Each character now gets its own **framing** - mirrored or not, and closer or wider - fixed for that character, so it never changes from turn to turn.
+
+### An anonymous figure for those you cannot identify
+
+- A character whose class you cannot see - an **enemy scouted at a distance**, or one who has **died** - used to fall back to a hooded figure with a dagger, which quietly suggested a class you had no way of knowing.
+- Those now show a **deliberately anonymous hooded figure** instead. It still carries the nation's colour and frame, so you know whose it is, without being told anything you should not know.
+
 ## 25-AUG-2026 - v2.1.921
 
 ### Default portraits now match the world you are playing in
