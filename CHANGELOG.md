@@ -1,5 +1,21 @@
 # What's New in Counselor
 
+## 30-AUG-2026 - v2.1.924
+
+### The Greek world is hand-painted now
+
+- Every one of the **91 characters** in the Greek scenario has a **new hand-painted portrait**, in a warm fresco style. Leonidas, Xerxes, Pyrrhus, Orpheus, the muses - all of them, replacing the flat two-tone faces.
+- Characters **without** a portrait of their own are painted too: the eight class-and-gender defaults for Greek games now match the same style, so nobody is left as a silhouette in a room full of paintings.
+- Get them by refreshing your portraits pack. It downloads separately from the Counselor.
+
+### Knowing the rules before you spend the action
+
+- In games that limit which cities can change hands, **Transfer Ownership of City now tells you the size limit up front**, in the order help. Before, you found out from the turn results after the action was already spent.
+
+### Website (clashlegends.com)
+
+- **Choose how fast your game runs** when you request one. **Run at deadline** is the classic behaviour; **Accelerated** runs the turn the moment the last player submits, so nobody waits on an empty clock. A second accelerated option runs early **but keeps the original schedule**, so the next deadline does not creep forward.
+
 ## 29-AUG-2026 - v2.1.923
 
 ### Domination scoring now shows up where it belongs
