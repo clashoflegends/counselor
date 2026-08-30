@@ -1,5 +1,19 @@
 # What's New in Counselor
 
+## 29-AUG-2026 - v2.1.923
+
+### Domination scoring now shows up where it belongs
+
+- Some **team** games are won on **city domination points** instead of victory points. The Counselor now recognises those games: the **domination chart** is available, and the **Victory Dashboard** ranks you on the same measure the Judge actually uses to pick the winner.
+- Until now only Battle Royale games got this, so a team game scored on domination quietly showed you the wrong number.
+
+### Website (clashlegends.com)
+
+- **Every game type is now explained on the page.** The New Games list ends with a short definition of each one, and the same explanation follows the type box when you request a game, updating as you change your pick. "Gun Boat" and "Battle Royale" are no longer names you have to already know.
+- **Hidden Team is now its own type**, instead of sharing the Gun Boat entry. Gun Boat is a Death Match with hidden identities; Hidden Team is Locked Teams with hidden identities.
+- **Fixed sides is now part of Locked Teams** - it was never a different kind of game, just a different way of picking your nation. Games like War of Dwarves and Orcs work exactly as before.
+- **Requesting a game got clearer**: name your own game, sort the base-game list by any column, pick Landmarks and New or Classic rules, and a player count the scenario actually supports. Email updates on your requests are now on by default.
+
 ## 27-AUG-2026 - v2.1.922
 
 ### Characters without a portrait now look like your house
