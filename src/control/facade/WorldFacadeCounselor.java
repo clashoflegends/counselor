@@ -250,6 +250,11 @@ public class WorldFacadeCounselor implements Serializable {
         return WorldManager.getInstance().getPartida().isBattleRoyal();
     }
 
+    /** @see model.Partida#isVictoryByCityPoints() */
+    public boolean isVictoryByCityPoints() {
+        return WorldManager.getInstance().getPartida().isVictoryByCityPoints();
+    }
+
     public boolean isStartupPackages() {
         return WorldManager.getInstance().getPartida().isStartupPackages();
     }

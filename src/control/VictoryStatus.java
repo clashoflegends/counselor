@@ -112,7 +112,8 @@ public final class VictoryStatus {
         public boolean isTeam;
         public int turno;
         public int turnoMax;
-        public boolean battleRoyale;
+        /** Scored on city domination points rather than victory points (;GBR; or ;VCP;). */
+        public boolean victoryByCityPoints;
         public String leaderName;
         public int leaderValue;
         public boolean leaderIsMe;
@@ -137,7 +138,7 @@ public final class VictoryStatus {
         a.gameId = partida.getId();
         a.turno = partida.getTurno();
         a.turnoMax = partida.getTurnoMax();
-        a.battleRoyale = wfc.isBattleRoyal();
+        a.victoryByCityPoints = wfc.isVictoryByCityPoints();
         // client isTeam mirrors PartidaControl.isTeam() = isTeamLocked() || isTeamWithLord() (GLA/GSL)
         a.isTeam = partida.isTeamLocked() || partida.isTeamWithLord();
 
@@ -185,7 +186,7 @@ public final class VictoryStatus {
                 continue;
             }
             count++;
-            final int val = turnLimitMetric(nation, a.battleRoyale);
+            final int val = turnLimitMetric(nation, a.victoryByCityPoints);
             if (nation == myNation) {
                 myVal = val;
             }
@@ -195,7 +196,7 @@ public final class VictoryStatus {
             }
         }
         for (Nacao nation : wfc.getNacoes().values()) {
-            if (nacaoFacade.isAtivaPC(nation) && turnLimitMetric(nation, a.battleRoyale) > myVal) {
+            if (nacaoFacade.isAtivaPC(nation) && turnLimitMetric(nation, a.victoryByCityPoints) > myVal) {
                 rank++;
             }
         }
@@ -207,8 +208,8 @@ public final class VictoryStatus {
         a.nationCount = count;
     }
 
-    private int turnLimitMetric(Nacao nation, boolean battleRoyale) {
-        return battleRoyale ? nacaoFacade.getPointsDomination(nation) : nacaoFacade.getPointVictory(nation);
+    private int turnLimitMetric(Nacao nation, boolean byCityPoints) {
+        return byCityPoints ? nacaoFacade.getPointsDomination(nation) : nacaoFacade.getPointVictory(nation);
     }
 
     // ---- authoritative (per-unit) conditions: Score, Supremacy ----------------------------------

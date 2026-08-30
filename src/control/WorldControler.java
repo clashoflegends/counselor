@@ -1759,6 +1759,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         return WFC.isBattleRoyal();
     }
 
+    /** @see model.Partida#isVictoryByCityPoints() */
+    public boolean isVictoryByCityPoints() {
+        return WFC.isVictoryByCityPoints();
+    }
+
     private void doDataKeyCityPerTeam() {
         List<DataSetForChart> dataSet = new ArrayList<>();
         final PointsFacade pf = new PointsFacade();
@@ -1932,7 +1937,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         doDataVictoryPointHistoryAllTurns();
     }
 
-    /** Launches the Battle Royale (domination) chart; only meaningful when {@code isBattleRoyal()}. */
+    /** Launches the Battle Royale (domination) chart; only meaningful when {@code isVictoryByCityPoints()}. */
     public void showBattleRoyaleChart() {
         doGraphBattleRoyale();
     }

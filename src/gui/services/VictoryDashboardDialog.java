@@ -131,7 +131,7 @@ public final class VictoryDashboardDialog extends JDialog {
                     e -> wc.showNationPowerChart()));
             bar.add(toolButton("trending-up", tx("VDASH.CHART.GROW", "What should I grow? (you vs game average)"),
                     e -> wc.showGrowthChart()));
-            if (a.battleRoyale) {
+            if (a.victoryByCityPoints) {
                 bar.add(toolButton("chart-pie", withHint(tx("VDASH.CHART.BATTLEROYALE", "Battle Royale (domination points)"),
                         tx("VDASH.HINT.DOMINATION", "Domination points: points from a city's size and importance.")),
                         e -> wc.showBattleRoyaleChart()));
@@ -336,7 +336,7 @@ public final class VictoryDashboardDialog extends JDialog {
 
         // turn-limit card (always)
         sb.append("<hr>");
-        final String metric = a.battleRoyale
+        final String metric = a.victoryByCityPoints
                 ? tx("VDASH.METRIC.CITY", "city (domination) points")
                 : tx("VDASH.METRIC.VP", "victory points");
         sb.append("<p style='margin:4px 0;'><b>").append(esc(tx("VDASH.TURNLIMIT", "Turn limit"))).append("</b> - ");
@@ -580,7 +580,7 @@ public final class VictoryDashboardDialog extends JDialog {
         sb.append('\n');
 
         // turn limit
-        final String metric = a.battleRoyale
+        final String metric = a.victoryByCityPoints
                 ? tx("VDASH.METRIC.CITY", "city (domination) points")
                 : tx("VDASH.METRIC.VP", "victory points");
         sb.append(tx("VDASH.TURNLIMIT", "Turn limit")).append(" - ")

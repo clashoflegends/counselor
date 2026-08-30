@@ -820,7 +820,8 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbScoreGraph.setEnabled(true);
         jbScoreGraph1.setEnabled(true); // repurposed: Victory Dashboard
         jbScoreGraph2.setEnabled(true);
-        jbScoreGraph3.setEnabled(wc.isBattleRoyal());
+        //the domination chart is about the SCORING, so a locked-team game on ;VCP; gets it too
+        jbScoreGraph3.setEnabled(wc.isVictoryByCityPoints());
         jbScoreGraph4.setEnabled(true);
         jbScoreGraph5.setEnabled(false);
         jbScoreGraph6.setEnabled(true);
