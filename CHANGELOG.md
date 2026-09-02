@@ -1,5 +1,13 @@
 # What's New in Counselor
 
+## 01-SEP-2026 - v2.1.925
+
+### Attack Enemy is back in the Commands list
+
+- **Attack Enemy stopped being offered** to a commander standing on an enemy army, garrison or navy. It has been missing since 2.924, and ticking **All** was the only way to reach it.
+- The new "there has to be something here to attack" check was reading the *other* nation's diplomacy - which your Counselor is never sent - so it decided every enemy was a neutral. It now reads **your own** diplomacy, the same view the Diplomacy tab shows you.
+- If you lost an attack this week because the order would not appear, this is why. Sorry about that.
+
 ## 30-AUG-2026 - v2.1.924
 
 ### The Greek world is hand-painted now
