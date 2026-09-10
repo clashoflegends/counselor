@@ -92,9 +92,13 @@ public class BattleSimPlatoonCasualtyControlerNew implements Serializable, ListS
     }
 
     public GenericoTableModel getPlatoonTableModel(String filtro, Terreno terrain) {
-        if (getExercito().getTatica() == 2) {
+        if (getExercito() == null) {
+            //no army picked yet: the tab's combos still fire, so show an empty platoon list rather than crash
             listaExibida = new ArrayList<>();
-        } else if (getExercito() == null) {
+            indexOfPlatoon = -1;
+            return ExercitoConverter.getPelotaoModel(listaExibida, null);
+        }
+        if (getExercito().getTatica() == 2) {
             listaExibida = new ArrayList<>();
         } else {
             listaExibida = FiltroConverter.listaByFiltroCasualty(filtro, getExercito().getPelotoes().values());
