@@ -1,5 +1,27 @@
 # What's New in Counselor
 
+## 09-SEP-2026 - v2.1.926
+
+### Muster Armies was charging for troops it never raised
+
+- **Muster Armies could take the full price in mounts and leather from a city and then raise a handful of troops.** One report had three cities each pay for 400 or 500 rangers and receive **eight**.
+- The cause: the order worked out what each city could raise from **that city's** stores, then quietly re-checked the number against the stores of the city **your commander was standing in**, and cut the count without cutting the bill. When your capital was briefly short of mounts, every city in the muster was cut to whatever the capital had left.
+- Fixed. Each city is now measured, capped and charged against its **own** stores throughout, and the bill always matches the troops that actually arrive.
+- The player who reported it has had the missing troops added to the cities in question.
+
+### Muster now charges what it always should have
+
+Three costs came out of the same fix, so you may see a muster cost more than it used to:
+
+- **Iron, bronze, steel and food are now deducted** when you muster a troop that needs them - scorpions, warships and the First Age types. The order was already refusing to raise more than your stores allowed, but it never took the payment.
+- In **New rules** games, troop types that use several recruiting slots each now **consume the slots they should**. Muster was charging a fraction of them, leaving the pool open for a second recruit the same turn.
+- **Wood** is measured against the city doing the recruiting, like everything else.
+- If your nation has a power that lets a city recruit cavalry without spending mounts or leather - the capital, or a city in the desert - **that power now works during a muster**, in the city it applies to. It never used to.
+
+### Battle Simulator no longer disappears on you
+
+- Opening the Battle Simulator and changing the **nation**, **tactic** or **filter** before picking an army crashed the tab. Pick the army first or afterwards, either way it holds up now.
+
 ## 01-SEP-2026 - v2.1.925
 
 ### Attack Enemy is back in the Commands list
