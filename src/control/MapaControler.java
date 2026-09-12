@@ -24,6 +24,7 @@ import gui.services.ComponentFactory;
 import gui.services.HexRangeOutline;
 import gui.services.IPopupTabGui;
 import gui.services.ScaledMapIcon;
+import gui.services.MoveConvergence;
 import gui.services.ScoutFootprint;
 import java.awt.Color;
 import java.awt.Point;
@@ -104,6 +105,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         // whole previous World graph. Leaving it set would pin that graph for every turn opened in one
         // window - the heap problem DispatchManager already guards against with weak receivers.
         ScoutFootprint.setCurrent(null);
+        MoveConvergence.setCurrent(null);
         exercitoFacade = new ExercitoFacade();
         final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         mapaManager = new MapaManager(cenario, form);
@@ -188,6 +190,53 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
             return;
         }
         getTabGui().setScoutOverlay(mine, ally, overlap);
+    }
+
+    /**
+     * Recompute the converging-moves overlay: the movement paths of characters that two different
+     * PLAYERS are both sending into the same empty hex, so a marker can slide along each toward the
+     * hex they are about to duplicate work on.
+     * <p>
+     * Rides the paths the map already draws rather than redrawing them, so it honours the same
+     * {@code drawPcPath} setting - a marker on a path that is not on screen would be nonsense. The
+     * detection itself still runs when the markers are hidden, because the hex-info panel answers from
+     * the same picture.
+     */
+    private void refreshConvergeOverlay() {
+        // A key called "warn..." has to silence the WARNING, markers and hex-info line alike - not just
+        // the drawing. So it short-circuits before anything is computed or cached.
+        if (!SettingsManager.getInstance().isConfig("warnConvergingMoves", "1", "1")) {
+            MoveConvergence.setCurrent(null);
+            getTabGui().setConvergeOverlay(null);
+            return;
+        }
+        final MoveConvergence.Result result = MoveConvergence.compute(
+                listFactory.listPersonagens(), getJogadorAtivo(), listFactory.listLocais());
+        MoveConvergence.setCurrent(result);
+        // The markers ride the order paths, so with those hidden there is nothing to ride; the
+        // hex-info line still answers, which is why the detection above is not skipped for this.
+        final boolean pathsDrawn = SettingsManager.getInstance().isConfig("drawPcPath", "1", "1")
+                || SettingsManager.getInstance().isConfig("drawPcPath", "3", "1");
+        if (result.isEmpty() || !pathsDrawn) {
+            getTabGui().setConvergeOverlay(null);
+            return;
+        }
+        // One list, one colour: the marker is the client's annotation, not part of the order drawing,
+        // so it wears the same magenta as a scout footprint. Whose move it is stays readable from the
+        // blue or cyan line it rides.
+        final List<Shape> paths = new ArrayList<>();
+        try {
+            for (List<MoveConvergence.Mover> movers : result.getByHex().values()) {
+                for (MoveConvergence.Mover mover : movers) {
+                    paths.add(mover.getPath());
+                }
+            }
+        } catch (RuntimeException ex) {
+            log.warn("Converging-moves overlay skipped: " + ex);
+            getTabGui().setConvergeOverlay(null);
+            return;
+        }
+        getTabGui().setConvergeOverlay(paths);
     }
 
     public ImageIcon printMapaGeral() {
@@ -525,6 +574,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
             case DispatchManager.ACTIONS_MAP_REDRAW:
                 tabGui.doActionsOnMap(this.printActionsOnMap());
                 refreshScoutOverlay();
+                refreshConvergeOverlay();
 //                if (SettingsManager.getInstance().isConfig("drawPcPath", "1", "1") || SettingsManager.getInstance().isConfig("drawPcPath", "3", "1")) {
 //                    tabGui.doActionsOnMap(this.printActionsOnMap());
 //                } else {

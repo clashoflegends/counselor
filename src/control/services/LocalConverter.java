@@ -12,6 +12,7 @@ import business.facade.PersonagemFacade;
 import business.services.ComparatorFactory;
 import control.facade.WorldFacadeCounselor;
 import java.io.Serializable;
+import gui.services.MoveConvergence;
 import gui.services.ScoutFootprint;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -115,7 +116,40 @@ public class LocalConverter implements Serializable {
             }
         }
         addScoutCoverage(ret, local);
+        addConvergingMoves(ret, local);
         return ret.getText();
+    }
+
+    /**
+     * "BOTH MOVING HERE - ..." when two different players are each sending a character into this empty
+     * hex. The map animates it; this is the half that is still here after the animation has been looked
+     * away from, and after picking a hex has saved the order and moved focus on.
+     * <p>
+     * Names carry their nation, because the whole point is that the other one is not yours.
+     */
+    private static void addConvergingMoves(StringRet ret, Local local) {
+        final List<MoveConvergence.Mover> movers = MoveConvergence.getCurrent().getMoversAt(local);
+        if (movers.isEmpty()) {
+            return;
+        }
+        // One character can hold two movement orders resolving to the same hex; naming them twice
+        // reads as a bug rather than as advice - same guard as addScoutCoverage below.
+        final List<String> named = new ArrayList<>();
+        for (MoveConvergence.Mover mover : movers) {
+            final String entry = String.format("%s (%s)", mover.getActorName(), mover.getNationName());
+            if (!named.contains(entry)) {
+                named.add(entry);
+            }
+        }
+        final StringBuilder joined = new StringBuilder();
+        for (String entry : named) {
+            if (joined.length() > 0) {
+                joined.append(", ");
+            }
+            joined.append(entry);
+        }
+        ret.addLinebreak();
+        ret.add(String.format(labels.getString("CONVERGE.MOVES"), joined.toString()));
     }
 
     /**

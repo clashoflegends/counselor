@@ -9,6 +9,7 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.Icon;
@@ -55,6 +56,33 @@ public class ScaledMapIcon implements Icon {
      * drawn afterwards.
      */
     private static final Color SCOUT_COLOR_OVERLAP = new Color(235, 40, 225, 70);
+    /**
+     * Markers riding the last stretch of a movement path, for two players walking into the same hex.
+     * <p>
+     * The SAME magenta as a scout footprint, on purpose: magenta is not a thing on the map, it is the
+     * client pointing at possible wasted effort, and it should mean that one thing wherever it appears.
+     * The marker therefore carries no own/ally colour of its own - the line it rides is already blue or
+     * cyan, so whose it is comes from underneath it, and the hex-info panel names both characters.
+     */
+    private static final Color CONVERGE_COLOR = SCOUT_COLOR;
+    /**
+     * How much of the path end the marker slides along, in 1x units, and how big it is.
+     * <p>
+     * Only the tail is animated on purpose. A move can span twelve hexes, and the repaint bounds are a
+     * single rectangle - animating whole paths scattered across the map would union to most of it and
+     * re-run the bicubic rescale of the base image every frame. Confining the motion to the last
+     * stretch keeps the dirty rect small and puts the movement where the meaning is: at the hex both
+     * players are converging on.
+     */
+    private static final double CONVERGE_TAIL_1X = 70.0;
+    private static final double CONVERGE_MARKER_PX = 9.0;
+    /**
+     * Where the sweep stops, as a fraction of the tail. NOT 1.0: the curve deliberately ends 12px PAST
+     * the hex, and over its last few percent the heading swings to the same angle whatever direction it
+     * came from - so a marker taken all the way would finish beyond the hex pointing off it. Stopping
+     * short keeps every marker aimed at the hex it is warning about.
+     */
+    private static final double CONVERGE_SWEEP_END = 0.85;
     /** Marching-ants offset, advanced by the map's animation timer. 1x units. */
     private float dashPhase = 0f;
     /** Where paintIcon last drew, so the animation can repaint just the footprints. */
@@ -70,6 +98,10 @@ public class ScaledMapIcon implements Icon {
     private List<Shape> scoutMine = Collections.emptyList();
     private List<Shape> scoutAlly = Collections.emptyList();
     private List<Shape> scoutOverlap = Collections.emptyList();
+    // Converging movement paths; the marker position along each is derived from the phase at paint
+    // time, so what is stored is the path itself, not a precomputed marker.
+    private List<Shape> convergePaths = Collections.emptyList();
+    private List<Rectangle> convergeTailBoxes = Collections.emptyList();
     private double zoom = 1.0;
 
     public void setBase(Image base) {
@@ -94,6 +126,23 @@ public class ScaledMapIcon implements Icon {
         this.scoutMine = (mine == null) ? Collections.<Shape>emptyList() : mine;
         this.scoutAlly = (ally == null) ? Collections.<Shape>emptyList() : ally;
         this.scoutOverlap = (overlap == null) ? Collections.<Shape>emptyList() : overlap;
+    }
+
+    /**
+     * Movement paths of characters two different players are both sending into the same empty hex. A
+     * marker slides along the end of each toward that hex. Pass empty lists to clear.
+     */
+    public void setConvergeOverlay(List<Shape> paths) {
+        this.convergePaths = (paths == null) ? Collections.<Shape>emptyList() : paths;
+        // Computed once here, not per frame: tailBounds re-flattens the whole curve nine times, and the
+        // box only changes when the overlay does.
+        this.convergeTailBoxes = new ArrayList<>(this.convergePaths.size());
+        for (Shape p : this.convergePaths) {
+            final Rectangle box = tailBounds(p);
+            if (box != null) {
+                this.convergeTailBoxes.add(box);
+            }
+        }
     }
 
     /** Player-chosen border colour (properties.config ColorHexRange); null restores the default. */
@@ -148,6 +197,7 @@ public class ScaledMapIcon implements Icon {
                 g2.drawImage(actions, 0, 0, c);
             }
             paintScouts(g2);
+            paintConverging(g2);
             if (rangeOutline != null) {
                 // Drawn INSIDE the scale transform so the 1x geometry lands on the right hexes, but with the
                 // stroke width divided by the zoom so the border keeps a constant on-screen thickness - at the
@@ -219,6 +269,117 @@ public class ScaledMapIcon implements Icon {
     }
 
     /**
+     * Slide a marker along the last stretch of each converging path, pointing the way it is going, so
+     * two players heading for one empty hex can see themselves meeting there.
+     * <p>
+     * Walked by cumulative arc length over the flattened curve, not by segment index: the flattened
+     * segments are not equal lengths, so indexing would make the marker stall on the straight parts and
+     * lurch through the bend.
+     */
+    private void paintConverging(Graphics2D g2) {
+        if (convergePaths.isEmpty()) {
+            return;
+        }
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        // the phase loops over 64; map it to a 0..1 sweep along the tail
+        final double t = (dashPhase % 64f) / 64.0 * CONVERGE_SWEEP_END;
+        for (Shape path : convergePaths) {
+            final double[] at = pointAlongTail(path, t);
+            if (at == null) {
+                continue;
+            }
+            // Size divided by zoom for the same reason every stroke here is: constant on screen, rather
+            // than sub-pixel at the 0.5 floor and bloated at 2.0.
+            final Shape marker = chevronAt(at[0], at[1], at[2], CONVERGE_MARKER_PX / zoom);
+            // contrasting edge first, so magenta reads over a blue or cyan path line and over any tileset
+            g2.setStroke(new BasicStroke((float) (2.0 / zoom), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2.setColor(haloFor(CONVERGE_COLOR));
+            g2.draw(marker);
+            g2.setColor(CONVERGE_COLOR);
+            g2.fill(marker);
+        }
+    }
+
+    /**
+     * @return {x, y, headingRadians} at fraction {@code t} through the final {@link #CONVERGE_TAIL_1X}
+     *         of the path, or null if the path is too short to place a marker on.
+     */
+    private static double[] pointAlongTail(Shape path, double t) {
+        final java.awt.geom.PathIterator it = new java.awt.geom.FlatteningPathIterator(
+                path.getPathIterator(null), 1.0);
+        final double[] seg = new double[6];
+        final List<double[]> pts = new ArrayList<>();
+        while (!it.isDone()) {
+            final int type = it.currentSegment(seg);
+            if (type == java.awt.geom.PathIterator.SEG_MOVETO || type == java.awt.geom.PathIterator.SEG_LINETO) {
+                pts.add(new double[]{seg[0], seg[1]});
+            }
+            it.next();
+        }
+        if (pts.size() < 2) {
+            return null;
+        }
+        // cumulative length from the START, so the tail is everything past (total - CONVERGE_TAIL_1X)
+        final double[] cum = new double[pts.size()];
+        for (int ii = 1; ii < pts.size(); ii++) {
+            cum[ii] = cum[ii - 1] + Math.hypot(
+                    pts.get(ii)[0] - pts.get(ii - 1)[0],
+                    pts.get(ii)[1] - pts.get(ii - 1)[1]);
+        }
+        final double total = cum[cum.length - 1];
+        if (total <= 0) {
+            return null;
+        }
+        // a short path (adjacent hexes) simply animates over the whole of itself
+        final double tailStart = Math.max(0, total - CONVERGE_TAIL_1X);
+        final double want = tailStart + (total - tailStart) * t;
+        for (int ii = 1; ii < cum.length; ii++) {
+            if (cum[ii] < want) {
+                continue;
+            }
+            final double span = cum[ii] - cum[ii - 1];
+            final double f = (span <= 0) ? 0 : (want - cum[ii - 1]) / span;
+            final double[] a = pts.get(ii - 1), b = pts.get(ii);
+            return new double[]{
+                a[0] + (b[0] - a[0]) * f,
+                a[1] + (b[1] - a[1]) * f,
+                Math.atan2(b[1] - a[1], b[0] - a[0])};
+        }
+        return null;
+    }
+
+    /** 1x bounding box of the stretch of {@code path} the marker actually sweeps, or null. */
+    private static Rectangle tailBounds(Shape path) {
+        Rectangle box = null;
+        for (int ii = 0; ii <= 8; ii++) {
+            final double[] at = pointAlongTail(path, ii / 8.0);
+            if (at == null) {
+                continue;
+            }
+            final Rectangle r = new Rectangle((int) at[0], (int) at[1], 1, 1);
+            box = (box == null) ? r : box.union(r);
+        }
+        if (box != null) {
+            // room for the marker itself around each sampled centre
+            box.grow((int) Math.ceil(CONVERGE_MARKER_PX) + 2, (int) Math.ceil(CONVERGE_MARKER_PX) + 2);
+        }
+        return box;
+    }
+
+    /** A small filled arrowhead pointing along {@code heading}. */
+    private static Shape chevronAt(double x, double y, double heading, double size) {
+        final java.awt.geom.Path2D.Double tip = new java.awt.geom.Path2D.Double();
+        tip.moveTo(size, 0);
+        tip.lineTo(-size * 0.6, size * 0.6);
+        tip.lineTo(-size * 0.25, 0);
+        tip.lineTo(-size * 0.6, -size * 0.6);
+        tip.closePath();
+        final java.awt.geom.AffineTransform tx = java.awt.geom.AffineTransform.getTranslateInstance(x, y);
+        tx.rotate(heading);
+        return tx.createTransformedShape(tip);
+    }
+
+    /**
      * Advance the marching ants. Driven by the map's timer rather than a timer in here, because an Icon
      * has no repaint handle of its own.
      */
@@ -231,22 +392,35 @@ public class ScaledMapIcon implements Icon {
      * null when there is nothing to animate. Lets the animation repaint a few hexes instead of the whole
      * map - on a zoomed map a full repaint means bicubically rescaling the entire base image every frame.
      */
-    public Rectangle getScoutRepaintBounds() {
-        Rectangle union = null;
+    public List<Rectangle> getOverlayRepaintRects() {
+        final List<Rectangle> ret = new ArrayList<>();
+        // Scout footprints are compact discs, so one union over them is fine.
+        Rectangle scouts = null;
         for (List<Shape> group : java.util.Arrays.asList(scoutMine, scoutAlly, scoutOverlap)) {
             for (Shape s : group) {
-                union = (union == null) ? s.getBounds() : union.union(s.getBounds());
+                scouts = (scouts == null) ? s.getBounds() : scouts.union(s.getBounds());
             }
         }
-        if (union == null) {
-            return null;
+        if (scouts != null) {
+            ret.add(toComponent(scouts));
         }
-        // 1x -> component space, then grow by the stroke so the outer edge of the halo is included
+        // Converging markers are NOT unioned: two contested hexes at opposite ends of the map would
+        // union to nearly the whole map, and repainting that at 11 fps re-runs the bicubic rescale of
+        // the entire base image - the very cost this method exists to avoid. One small rect each, and
+        // Swing coalesces them.
+        for (Rectangle box : convergeTailBoxes) {
+            ret.add(toComponent(box));
+        }
+        return ret;
+    }
+
+    /** 1x map box -> the coordinates of the component that paints this icon, with room for the ink. */
+    private Rectangle toComponent(Rectangle box1x) {
         final int pad = (int) Math.ceil(SCOUT_STROKE_PX * 2) + 2;
         return new Rectangle(
-                lastX + (int) Math.floor(union.x * zoom) - pad,
-                lastY + (int) Math.floor(union.y * zoom) - pad,
-                (int) Math.ceil(union.width * zoom) + pad * 2,
-                (int) Math.ceil(union.height * zoom) + pad * 2);
+                lastX + (int) Math.floor(box1x.x * zoom) - pad,
+                lastY + (int) Math.floor(box1x.y * zoom) - pad,
+                (int) Math.ceil(box1x.width * zoom) + pad * 2,
+                (int) Math.ceil(box1x.height * zoom) + pad * 2);
     }
 }

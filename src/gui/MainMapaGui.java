@@ -62,7 +62,8 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     private final gui.services.ScaledMapIcon mapIcon = new gui.services.ScaledMapIcon();
     /** Marching-ants tick. ~11 fps: fast enough to read as motion, slow enough to be free. */
     private static final int SCOUT_ANIMATION_MS = 90;
-    private javax.swing.Timer scoutAnimator;
+    private javax.swing.Timer overlayAnimator;
+    private boolean scoutsPresent = false, convergePresent = false;
     private float scoutDashPhase = 0f;
     private ImageIcon baseTagIcon; // 1x focus-tag glyph, scaled to `zoom` when placed
     private String hexTagStyle = "0"; // selected HexTagStyle, so the focus tag can be re-drawn at zoom
@@ -142,7 +143,7 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
      */
     @Override
     public void removeNotify() {
-        stopScoutAnimation();
+        stopOverlayAnimation();
         super.removeNotify();
     }
 
@@ -643,11 +644,27 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
             java.util.List<java.awt.Shape> overlap) {
         mapIcon.setScoutOverlay(mine, ally, overlap);
         this.mapaLabel.repaint();
-        final boolean anything = (mine != null && !mine.isEmpty()) || (ally != null && !ally.isEmpty());
-        if (anything) {
-            startScoutAnimation();
+        scoutsPresent = (mine != null && !mine.isEmpty()) || (ally != null && !ally.isEmpty());
+        syncOverlayAnimation();
+    }
+
+    /**
+     * Movement paths of characters two different players are both sending into the same empty hex; a
+     * marker slides along the end of each toward that hex.
+     */
+    public void setConvergeOverlay(java.util.List<java.awt.Shape> paths) {
+        mapIcon.setConvergeOverlay(paths);
+        this.mapaLabel.repaint();
+        convergePresent = (paths != null && !paths.isEmpty());
+        syncOverlayAnimation();
+    }
+
+    /** One timer for every animated overlay - two would just fight over the same repaint. */
+    private void syncOverlayAnimation() {
+        if (scoutsPresent || convergePresent) {
+            startOverlayAnimation();
         } else {
-            stopScoutAnimation();
+            stopOverlayAnimation();
         }
     }
 
@@ -660,39 +677,43 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
      * label - at high zoom a full repaint re-runs the bicubic rescale of the entire base map, which is
      * far too expensive to do several times a second.
      * <p>
-     * Switch off with {@code animateScoutBorder=0} in properties.config; the border then simply sits
+     * Switch off with {@code animateMapOverlays=0} in properties.config; the border then simply sits
      * still, which is also what happens for anyone whose window is not showing.
      */
-    private void startScoutAnimation() {
-        if (!persistenceCommons.SettingsManager.getInstance().isConfig("animateScoutBorder", "1", "1")) {
+    private void startOverlayAnimation() {
+        if (!persistenceCommons.SettingsManager.getInstance().isConfig("animateMapOverlays", "1", "1")) {
             return;
         }
-        if (scoutAnimator == null) {
-            scoutAnimator = new javax.swing.Timer(SCOUT_ANIMATION_MS, evt -> {
+        if (overlayAnimator == null) {
+            overlayAnimator = new javax.swing.Timer(SCOUT_ANIMATION_MS, evt -> {
                 if (!mapaLabel.isShowing()) {
                     return; // tab hidden or window minimised - keep the timer, skip the work
                 }
                 // the pattern repeats every (dash + gap); wrapping keeps the float small forever
                 scoutDashPhase = (scoutDashPhase + 1f) % 64f;
                 mapIcon.setDashPhase(scoutDashPhase);
-                final java.awt.Rectangle dirty = mapIcon.getScoutRepaintBounds();
-                if (dirty == null) {
+                final java.util.List<java.awt.Rectangle> dirty = mapIcon.getOverlayRepaintRects();
+                if (dirty.isEmpty()) {
                     mapaLabel.repaint();
-                } else {
-                    mapaLabel.repaint(dirty.x, dirty.y, dirty.width, dirty.height);
+                    return;
+                }
+                // One small rect per overlay rather than their union - Swing coalesces them, and a
+                // union of two distant markers would drag the whole map through a bicubic rescale.
+                for (java.awt.Rectangle r : dirty) {
+                    mapaLabel.repaint(r.x, r.y, r.width, r.height);
                 }
             });
-            scoutAnimator.setRepeats(true);
-            scoutAnimator.setCoalesce(true);
+            overlayAnimator.setRepeats(true);
+            overlayAnimator.setCoalesce(true);
         }
-        if (!scoutAnimator.isRunning()) {
-            scoutAnimator.start();
+        if (!overlayAnimator.isRunning()) {
+            overlayAnimator.start();
         }
     }
 
-    private void stopScoutAnimation() {
-        if (scoutAnimator != null && scoutAnimator.isRunning()) {
-            scoutAnimator.stop();
+    private void stopOverlayAnimation() {
+        if (overlayAnimator != null && overlayAnimator.isRunning()) {
+            overlayAnimator.stop();
         }
     }
 

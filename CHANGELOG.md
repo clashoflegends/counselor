@@ -12,6 +12,15 @@
 - The outlines are magenta and they crawl, so they cannot be confused with rivers, roads or the lines showing where your characters and armies are marching.
 - **The scouts button on the toolbar works properly now.** It used to take its on/off state from the fog-of-war button, so it ignored whatever you had chosen last time.
 
+### When you and an ally are both walking into the same empty hex
+
+- If you and another player are each sending a character to the **same empty hex**, the map now says so: a marker slides along the end of each of your movement paths, both pointing at the hex you are converging on. It is the "we each sent someone to found a camp there" mistake, which costs two actions to do one thing.
+- Click the hex and the information panel names both characters and their nations, so you can see who else is going there after the animation has scrolled out of sight.
+- Only for an **empty** hex. If there is a city, a character or an army waiting there, both of you going is usually the whole point, so nothing is flagged.
+- Only across **different players**. Two of your own characters, or two nations you play yourself, are your own plan and you can already see both sets of orders.
+- As with the scout rings, it is a warning and never a block. Converging on purpose is a perfectly good plan.
+- The markers are the same magenta as the scout borders, so magenta always means the same thing: Counselor thinks you may be paying twice for one result. Your own and your allies' actual orders stay blue and cyan.
+
 ## 09-SEP-2026 - v2.1.926
 
 ### Muster Armies was charging for troops it never raised
