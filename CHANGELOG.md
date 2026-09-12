@@ -1,6 +1,6 @@
 # What's New in Counselor
 
-## 13-SEP-2026 - v2.1.927
+## 12-SEP-2026 - v2.1.927
 
 ### See where your scouts are actually looking - and where they overlap
 
@@ -20,6 +20,10 @@
 - Only across **different players**. Two of your own characters, or two nations you play yourself, are your own plan and you can already see both sets of orders.
 - As with the scout rings, it is a warning and never a block. Converging on purpose is a perfectly good plan.
 - The markers are the same magenta as the scout borders, so magenta always means the same thing: Counselor thinks you may be paying twice for one result. Your own and your allies' actual orders stay blue and cyan.
+
+### Website (clashlegends.com)
+
+- **"Any Nation" is a real draw again.** Asking for ANY nation had quietly become a fixed allocation - the same sign-ups produced the same board every time the page was opened. It is a genuine random draw once more, redrawn each time you look. Games where nobody picks a nation are the ones this fixes most, since every seat in them is an ANY seat. You still will not be handed a nation you have just played.
 
 ## 09-SEP-2026 - v2.1.926
 
