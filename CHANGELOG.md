@@ -1,5 +1,17 @@
 # What's New in Counselor
 
+## 13-SEP-2026 - v2.1.927
+
+### See where your scouts are actually looking - and where they overlap
+
+- **Scout Area, Recon Area and Map Area now draw the ground they will really uncover**: the target hex and the six around it. The map used to mark a scout with a circle that had nothing to do with the area the order covers - for Map Area it was drawn at the target but sized like the diplomat's reach, which is eight hexes wide rather than one.
+- **Ground that two scouts both cover is shaded.** If you queue two scouts close together, the hexes they share light up, so you can see at a glance that you are paying twice for the same look. Move the targets **three hexes apart** and the shading disappears completely - that is the point at which two scouts stop treading on each other.
+- Shading is a warning, never a block. Doubling up on one area is sometimes exactly right - each order rolls separately for spotting armies - so Counselor shows you the cost and leaves the decision to you.
+- **Click any hex and the information panel tells you which scouts cover it**, by name. Useful after the fact: picking a target on the map saves the order and moves you straight to the next one, so this is how you check what you just did.
+- Your own scouts and your allies' are told apart by the pattern of the outline - long dashes are yours, short ticks are an ally's. Allied scouts only appear once you have loaded team orders, and they are worth watching: uncovering the map is shared with your allies, so their scouts count against yours.
+- The outlines are magenta and they crawl, so they cannot be confused with rivers, roads or the lines showing where your characters and armies are marching.
+- **The scouts button on the toolbar works properly now.** It used to take its on/off state from the fog-of-war button, so it ignored whatever you had chosen last time.
+
 ## 09-SEP-2026 - v2.1.926
 
 ### Muster Armies was charging for troops it never raised

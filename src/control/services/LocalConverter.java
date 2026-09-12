@@ -12,6 +12,7 @@ import business.facade.PersonagemFacade;
 import business.services.ComparatorFactory;
 import control.facade.WorldFacadeCounselor;
 import java.io.Serializable;
+import gui.services.ScoutFootprint;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -113,7 +114,46 @@ public class LocalConverter implements Serializable {
                 ret.add(ArtefatoConverter.getInfo(artefato));
             }
         }
+        addScoutCoverage(ret, local);
         return ret.getText();
+    }
+
+    /**
+     * "Scouted this turn by: ..." - which queued scout orders will uncover this hex, named so the
+     * player can go and re-aim one.
+     * <p>
+     * This is the half of the feature that survives the click: choosing a hex on the map saves the
+     * parameter and moves focus to the next slot, so anything shown only while the picker is open is
+     * gone before it can be read. Clicking any hex afterwards still answers the question.
+     * <p>
+     * Two or more names on a hex means that ground is being paid for twice. Sometimes that is
+     * deliberate - army detection is rolled once per order per nation - so this states the fact and
+     * leaves the judgement to the player.
+     */
+    private static void addScoutCoverage(StringRet ret, Local local) {
+        final List<ScoutFootprint.Ring> rings = ScoutFootprint.getCurrent().getRingsAt(local);
+        if (rings.isEmpty()) {
+            return;
+        }
+        // One character can hold two orders that land on the same ground (Recon Area where it stops,
+        // plus Map Area aimed there); listing the name twice reads as a bug rather than as advice.
+        final List<String> names = new ArrayList<>();
+        for (ScoutFootprint.Ring ring : rings) {
+            if (!names.contains(ring.getActorName())) {
+                names.add(ring.getActorName());
+            }
+        }
+        final StringBuilder joined = new StringBuilder();
+        for (String name : names) {
+            if (joined.length() > 0) {
+                joined.append(", ");
+            }
+            joined.append(name);
+        }
+        ret.addLinebreak();
+        ret.add(String.format(
+                labels.getString(rings.size() > 1 ? "SCOUT.COVERAGE.OVERLAP" : "SCOUT.COVERAGE"),
+                joined.toString()));
     }
 
     public static GenericoTableModel getProdutoModel(Local hex) {

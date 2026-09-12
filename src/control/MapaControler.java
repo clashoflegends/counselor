@@ -24,6 +24,7 @@ import gui.services.ComponentFactory;
 import gui.services.HexRangeOutline;
 import gui.services.IPopupTabGui;
 import gui.services.ScaledMapIcon;
+import gui.services.ScoutFootprint;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Shape;
@@ -35,6 +36,7 @@ import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.ImageIcon;
@@ -98,6 +100,10 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         this.jogadorAtivo = WorldFacadeCounselor.getInstance().getPartida().getJogadorAtivo();
         listFactory = new ListFactory();
         clearRangeOutline(); // reused across EGF loads (MainResultWindowGui), so drop the previous world's border
+        // Same reason, and it matters more here: a cached Ring holds Locals, and one Local reaches the
+        // whole previous World graph. Leaving it set would pin that graph for every turn opened in one
+        // window - the heap problem DispatchManager already guards against with weak receivers.
+        ScoutFootprint.setCurrent(null);
         exercitoFacade = new ExercitoFacade();
         final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         mapaManager = new MapaManager(cenario, form);
@@ -124,6 +130,64 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
 
     private ImageIcon printActionsOnMap() {
         return new ImageIcon(mapaManager.printActionsOnMap(listFactory.listLocais().values(), listFactory.listPersonagens(), getJogadorAtivo()));
+    }
+
+    /**
+     * Recompute the scout overlay: one outline per queued scout order, plus a wash over any hex two of
+     * them both uncover.
+     * <p>
+     * Vector rather than part of the actions bitmap, because that bitmap is built at 1x and upscaled
+     * bicubically - a thin outline in it smears at any zoom above 1, while these stay crisp for the
+     * same reason the hex-range border does.
+     * <p>
+     * Honours the same {@code drawScoutOnMap} switch as the toolbar's scouts toggle, so turning the
+     * overlay off turns all of it off.
+     */
+    private void refreshScoutOverlay() {
+        // Computed even when the overlay is switched off: the toggle hides the drawing, but the
+        // hex-info panel still answers "who is already scouting this hex?" from the same picture.
+        final ScoutFootprint.Coverage coverage = ScoutFootprint.compute(
+                listFactory.listPersonagens(), getJogadorAtivo(), listFactory.listLocais());
+        ScoutFootprint.setCurrent(coverage);
+        if (SettingsManager.getInstance().isConfig("drawScoutOnMap", "0", "1")) {
+            getTabGui().setScoutOverlay(null, null, null);
+            return;
+        }
+        if (coverage.isEmpty()) {
+            getTabGui().setScoutOverlay(null, null, null);
+            return;
+        }
+        final List<Shape> mine = new ArrayList<>();
+        final List<Shape> ally = new ArrayList<>();
+        final List<Shape> overlap = new ArrayList<>();
+        // This runs inside the order-save dispatch, which has already mutated the model by the time it
+        // gets here. An exception escaping would leave a half-applied save, so the overlay gives up on
+        // itself rather than on the save - the same bargain the per-action guard in compute() strikes.
+        try {
+            for (ScoutFootprint.Ring ring : coverage.getRings()) {
+                final Shape outline = HexRangeOutline.build(ring.getHexes());
+                if (outline == null) {
+                    continue;
+                }
+                if (ring.isMine()) {
+                    mine.add(outline);
+                } else {
+                    ally.add(outline);
+                }
+            }
+            // one hexagon per shaded hex, never a union - see ScaledMapIcon.paintScouts
+            for (Local hex : coverage.getOverlappedHexes()) {
+                final Shape one = HexRangeOutline.build(Collections.singletonList(hex));
+                if (one != null) {
+                    overlap.add(one);
+                }
+            }
+        } catch (RuntimeException ex) {
+            log.warn("Scout overlay skipped: " + ex);
+            getTabGui().setScoutOverlay(null, null, null);
+            return;
+        }
+        getTabGui().setScoutOverlay(mine, ally, overlap);
     }
 
     public ImageIcon printMapaGeral() {
@@ -460,6 +524,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
                 break;
             case DispatchManager.ACTIONS_MAP_REDRAW:
                 tabGui.doActionsOnMap(this.printActionsOnMap());
+                refreshScoutOverlay();
 //                if (SettingsManager.getInstance().isConfig("drawPcPath", "1", "1") || SettingsManager.getInstance().isConfig("drawPcPath", "3", "1")) {
 //                    tabGui.doActionsOnMap(this.printActionsOnMap());
 //                } else {

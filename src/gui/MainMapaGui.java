@@ -60,6 +60,10 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     private double zoom = 1.0;
     private boolean autoZoomPending = false; // compute the screen-derived default in addNotify (logical GC)
     private final gui.services.ScaledMapIcon mapIcon = new gui.services.ScaledMapIcon();
+    /** Marching-ants tick. ~11 fps: fast enough to read as motion, slow enough to be free. */
+    private static final int SCOUT_ANIMATION_MS = 90;
+    private javax.swing.Timer scoutAnimator;
+    private float scoutDashPhase = 0f;
     private ImageIcon baseTagIcon; // 1x focus-tag glyph, scaled to `zoom` when placed
     private String hexTagStyle = "0"; // selected HexTagStyle, so the focus tag can be re-drawn at zoom
     private int tagX1x = -1, tagY1x = -1; // 1x coords of the current focus tag, so it can be re-placed when zoom changes
@@ -124,6 +128,22 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
             // here (so it lands at 1x). Re-place it at the resolved zoom once layout settles.
             javax.swing.SwingUtilities.invokeLater(this::refreshFocusTag);
         }
+    }
+
+    /**
+     * Stop the marching ants when this map really goes away.
+     * <p>
+     * A new MainMapaGui is built for every EGF opened, so without this the previous one's Timer keeps
+     * firing forever and keeps that whole panel (and its map images) reachable from the Swing timer
+     * queue. This is NOT the tab-switch case that made the hex-range border use SHOWING_CHANGED -
+     * removeNotify does not fire for a tab switch, which is exactly right here: the timer should
+     * survive a tab switch (the isShowing() check inside it already skips the repaint) and die only on
+     * real removal.
+     */
+    @Override
+    public void removeNotify() {
+        stopScoutAnimation();
+        super.removeNotify();
     }
 
     /** Re-place the current focus tag at the active zoom (no-op if none is shown). Used after the
@@ -613,6 +633,67 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     public void setRangeOutline(java.awt.Shape outline) {
         mapIcon.setRangeOutline(outline);
         this.mapaLabel.repaint();
+    }
+
+    /**
+     * The ground each queued scout order will uncover, and the ground more than one of them covers.
+     * Pass empty lists to clear the overlay.
+     */
+    public void setScoutOverlay(java.util.List<java.awt.Shape> mine, java.util.List<java.awt.Shape> ally,
+            java.util.List<java.awt.Shape> overlap) {
+        mapIcon.setScoutOverlay(mine, ally, overlap);
+        this.mapaLabel.repaint();
+        final boolean anything = (mine != null && !mine.isEmpty()) || (ally != null && !ally.isEmpty());
+        if (anything) {
+            startScoutAnimation();
+        } else {
+            stopScoutAnimation();
+        }
+    }
+
+    /**
+     * Marching ants on the scout footprints: the dashes crawl, which separates them from every static
+     * line on the map (rivers, roads, borders) by motion as well as by colour, and makes it obvious the
+     * ring is something you queued rather than terrain.
+     * <p>
+     * Runs ONLY while footprints exist, and repaints just their bounding box rather than the whole
+     * label - at high zoom a full repaint re-runs the bicubic rescale of the entire base map, which is
+     * far too expensive to do several times a second.
+     * <p>
+     * Switch off with {@code animateScoutBorder=0} in properties.config; the border then simply sits
+     * still, which is also what happens for anyone whose window is not showing.
+     */
+    private void startScoutAnimation() {
+        if (!persistenceCommons.SettingsManager.getInstance().isConfig("animateScoutBorder", "1", "1")) {
+            return;
+        }
+        if (scoutAnimator == null) {
+            scoutAnimator = new javax.swing.Timer(SCOUT_ANIMATION_MS, evt -> {
+                if (!mapaLabel.isShowing()) {
+                    return; // tab hidden or window minimised - keep the timer, skip the work
+                }
+                // the pattern repeats every (dash + gap); wrapping keeps the float small forever
+                scoutDashPhase = (scoutDashPhase + 1f) % 64f;
+                mapIcon.setDashPhase(scoutDashPhase);
+                final java.awt.Rectangle dirty = mapIcon.getScoutRepaintBounds();
+                if (dirty == null) {
+                    mapaLabel.repaint();
+                } else {
+                    mapaLabel.repaint(dirty.x, dirty.y, dirty.width, dirty.height);
+                }
+            });
+            scoutAnimator.setRepeats(true);
+            scoutAnimator.setCoalesce(true);
+        }
+        if (!scoutAnimator.isRunning()) {
+            scoutAnimator.start();
+        }
+    }
+
+    private void stopScoutAnimation() {
+        if (scoutAnimator != null && scoutAnimator.isRunning()) {
+            scoutAnimator.stop();
+        }
     }
 
     /** Player-chosen colour for that border (Settings / properties.config ColorHexRange). */

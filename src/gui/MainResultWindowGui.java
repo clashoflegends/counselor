@@ -544,7 +544,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jToolBar2.add(toggleFogWar);
 
         toggleScouts.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/hex_scout.png"))); // NOI18N
-        toggleScouts.setSelected(isFogOfWarSelected());
+        toggleScouts.setSelected(isScoutsSelected());
         toggleScouts.setToolTipText(bundle.getString("SETTINGS.DISPLAY.FILTER.SCOUT.TOOLTIP")); // NOI18N
         toggleScouts.setActionCommand("drawScoutTargets");
         toggleScouts.setEnabled(false);
@@ -1205,12 +1205,18 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     }
 
     /**
-     * Scouts overlay toggle state, persisted by doScoutTargets as
-     * "drawScoutOnMap" (1/0; default off). Was incorrectly initialised from the
-     * fog setting (copy-paste) so the button ignored the saved choice.
+     * Scouts overlay toggle state, persisted by doScoutTargets as "drawScoutOnMap" (1/0).
+     * <p>
+     * The default must be "1" to match the draw side ({@code MapaControler.refreshScoutOverlay} asks
+     * {@code isConfig("drawScoutOnMap", "0", "1")}, i.e. unset means draw). With "0" here the button
+     * read OFF while the overlay was drawing, so the first press appeared to do nothing.
+     * <p>
+     * The button was also initialised from {@link #isFogOfWarSelected()} (copy-paste), which made it
+     * follow the fog setting and ignore the saved choice entirely; that is fixed in the .form as well
+     * as here, otherwise NetBeans regenerates the wrong call the next time the form is opened.
      */
     public boolean isScoutsSelected() {
-        return settingsManager.getConfig("drawScoutOnMap", "0").equals("1");
+        return settingsManager.getConfig("drawScoutOnMap", "1").equals("1");
     }
 
     public boolean isShowCityCapSelected() {

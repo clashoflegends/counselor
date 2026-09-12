@@ -539,7 +539,7 @@
                       <Image iconType="3" name="/images/hex_scout.png"/>
                     </Property>
                     <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="isFogOfWarSelected()" type="code"/>
+                      <Connection code="isScoutsSelected()" type="code"/>
                     </Property>
                     <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                       <ResourceString bundle="labels.properties" key="SETTINGS.DISPLAY.FILTER.SCOUT.TOOLTIP" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
