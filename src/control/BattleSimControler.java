@@ -7,6 +7,7 @@ import business.combat.CombatScenario;
 import business.combat.LayerParticipation;
 import business.combat.ScenarioLoader;
 import business.combat.ScenarioRoster;
+import business.facade.NacaoFacade;
 import control.facade.WorldFacadeCounselor;
 import control.services.BattleSimConverter;
 import java.util.ArrayList;
@@ -51,10 +52,33 @@ public class BattleSimControler {
 
     public BattleSimControler(Local local) {
         final WorldFacadeCounselor world = WorldFacadeCounselor.getInstance();
-        this.scenario = new ScenarioLoader().load(world.getPartida(), local, world.getJogadorAtivo());
+        this.scenario = new ScenarioLoader().load(world.getPartida(), local,
+                world.getJogadorAtivo(), getUnknownCityOwner());
         if (!scenario.getArmies().isEmpty()) {
             this.selected = scenario.getArmies().get(0);
         }
+    }
+
+    /**
+     * Who to stand in as the owner of a city the player cannot see the owner of.
+     *
+     * Every city has an owner and the shared combat code assumes one, so the answer is to supply
+     * the missing input rather than to branch around the shared method. The Barbarians are the
+     * right stand-in: they hold whatever nobody else does, and treating an unknown holder as
+     * barbarian is the same assumption the game already makes elsewhere.
+     *
+     * Finding them is Counselor knowledge, which is why it lives here and not in the loader:
+     * {@code isNacaoBarbarian} is owner id 1 plus the name, and only the client has the nation list
+     * to scan. Null when this world has no barbarians, which simply leaves the city as it was.
+     */
+    private Nacao getUnknownCityOwner() {
+        final NacaoFacade facade = new NacaoFacade();
+        for (Nacao nacao : WorldFacadeCounselor.getInstance().getNacoes().values()) {
+            if (facade.isNacaoBarbarian(nacao)) {
+                return nacao;
+            }
+        }
+        return null;
     }
 
     public CombatScenario getScenario() {
