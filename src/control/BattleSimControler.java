@@ -10,7 +10,10 @@ import business.combat.ScenarioRoster;
 import business.facade.NacaoFacade;
 import control.facade.WorldFacadeCounselor;
 import control.services.BattleSimConverter;
+import business.facade.CenarioFacade;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import javax.swing.table.AbstractTableModel;
@@ -185,8 +188,77 @@ public class BattleSimControler {
 
     // ------------------------------------------------------------------ platoons
 
+    /**
+     * The troop types the player may put in an army: the scenario's whole catalogue.
+     *
+     * Not filtered by race or recruitability, unlike the recruit order's list. This is a what-if
+     * tool and the army being described is usually somebody else's, so the question "could I
+     * recruit this?" is the wrong one - the right one is "what do I think is standing there?"
+     */
+    public List<TipoTropa> getTroopCatalogue() {
+        final List<TipoTropa> ret = new ArrayList<>(new CenarioFacade()
+                .getTipoTropas(WorldFacadeCounselor.getInstance().getCenario()));
+        Collections.sort(ret, new Comparator<TipoTropa>() {
+            @Override
+            public int compare(TipoTropa one, TipoTropa other) {
+                return String.valueOf(one.getNome()).compareToIgnoreCase(
+                        String.valueOf(other.getNome()));
+            }
+        });
+        return ret;
+    }
+
+    /**
+     * Adds a platoon of the first troop type the army does not already hold.
+     *
+     * One platoon per troop type, because {@code Pelotao.getCodigo()} IS its troop type's codigo
+     * and the army's map is keyed on it - a second platoon of the same type would silently replace
+     * the first. The player retypes it afterwards if he wanted a different one.
+     */
+    public Pelotao doAddPlatoon() {
+        if (selected == null) {
+            return null;
+        }
+        for (TipoTropa tipo : getTroopCatalogue()) {
+            if (selected.getPelotoes().containsKey(tipo.getCodigo())) {
+                continue;
+            }
+            final Pelotao ret = new Pelotao();
+            ret.setTipoTropa(tipo);
+            ret.setQtd(0);
+            selected.getPelotoes().put(ret.getCodigo(), ret);
+            return ret;
+        }
+        return null;
+    }
+
+    public void doRemovePlatoon(Pelotao pelotao) {
+        if (selected != null && pelotao != null) {
+            selected.getPelotoes().remove(pelotao.getCodigo());
+        }
+    }
+
+    /**
+     * Retypes a platoon, which REKEYS it: the map is keyed by troop type.
+     *
+     * Refused when the army already holds that type, because the put would drop the platoon the
+     * player was editing. Refusing is the honest answer - the alternative is to merge two platoons
+     * behind his back.
+     */
+    public boolean setPlatoonType(Pelotao pelotao, TipoTropa tipo) {
+        if (selected == null || pelotao == null || tipo == null
+                || selected.getPelotoes().containsKey(tipo.getCodigo())) {
+            return false;
+        }
+        selected.getPelotoes().remove(pelotao.getCodigo());
+        pelotao.setTipoTropa(tipo);
+        selected.getPelotoes().put(pelotao.getCodigo(), pelotao);
+        scenario.setEdited(pelotao);
+        return true;
+    }
+
     public PlatoonTableModel getPlatoonModel() {
-        return new PlatoonTableModel(scenario, selected);
+        return new PlatoonTableModel(scenario, selected, this);
     }
 
     /**
@@ -204,10 +276,16 @@ public class BattleSimControler {
                 COL_WEAPON = 4, COL_ARMOUR = 5, COL_AFTER = 6, COL_LOST = 7;
 
         private final CombatScenario scenario;
+        private final BattleSimControler owner;
         private final List<Pelotao> platoons = new ArrayList<>();
 
         public PlatoonTableModel(CombatScenario scenario, ArmySim army) {
+            this(scenario, army, null);
+        }
+
+        PlatoonTableModel(CombatScenario scenario, ArmySim army, BattleSimControler owner) {
             this.scenario = scenario;
+            this.owner = owner;
             if (army != null) {
                 platoons.addAll(army.getPelotoes().values());
             }
@@ -253,12 +331,15 @@ public class BattleSimControler {
 
         @Override
         public Class<?> getColumnClass(int column) {
+            if (column == COL_TROOP) {
+                return TipoTropa.class;
+            }
             return column >= COL_QTD && column <= COL_ARMOUR ? Integer.class : String.class;
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            return column >= COL_QTD && column <= COL_ARMOUR;
+            return column == COL_TROOP || (column >= COL_QTD && column <= COL_ARMOUR);
         }
 
         @Override
@@ -269,7 +350,7 @@ public class BattleSimControler {
                 case COL_LAYER:
                     return CombatLayer.of(tipo).getBadge();
                 case COL_TROOP:
-                    return tipo == null ? "" : tipo.getNome();
+                    return tipo;
                 case COL_QTD:
                     return pelotao.getQtd();
                 case COL_TRAINING:
@@ -290,6 +371,14 @@ public class BattleSimControler {
          */
         @Override
         public void setValueAt(Object value, int row, int column) {
+            if (column == COL_TROOP) {
+                // retyping REKEYS the platoon, so the owning army has to do it - see setPlatoonType
+                if (owner != null && value instanceof TipoTropa
+                        && owner.setPlatoonType(platoons.get(row), (TipoTropa) value)) {
+                    fireTableRowsUpdated(row, row);
+                }
+                return;
+            }
             if (!(value instanceof Integer)) {
                 return;
             }

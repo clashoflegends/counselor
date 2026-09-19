@@ -152,6 +152,33 @@ public class BattleSimConverter {
     }
 
     /**
+     * "Reported size: Vast army", or nothing when the player can count the troops himself.
+     *
+     * This is the only strength figure he has for an army seen at low visibility, where the server
+     * sends a size band and no platoons at all. It is a LABEL and stays one: the band is what he was
+     * told, and an editable version would invite him to treat a reversed guess as data. What he
+     * types instead is the platoon list, which is his own estimate and is marked as such.
+     */
+    public static String getSizeBandText(ArmySim army) {
+        if (army == null) {
+            return "";
+        }
+        final StringBuilder ret = new StringBuilder();
+        if (!army.getSizeBand().isEmpty()) {
+            ret.append(String.format(labels.getString("BATTLESIM.SIZE.REPORTED"),
+                    army.getSizeBand()));
+        }
+        if (army.getPelotoes().isEmpty()) {
+            // an empty platoon table looks like a bug unless something says what to do about it
+            if (ret.length() > 0) {
+                ret.append("   ");
+            }
+            ret.append(labels.getString("BATTLESIM.PLATOON.NONE"));
+        }
+        return ret.toString();
+    }
+
+    /**
      * The city line: what the attackers face, and whether there is a round 0.
      *
      * Two numbers, not one, because the city layer is TWO rounds. Round 0 is siege engines against

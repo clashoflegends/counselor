@@ -18,6 +18,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -89,6 +90,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private final JLabel armyTitle = new JLabel();
     private final JLabel fightsIn = new JLabel();
     private final JLabel source = new JLabel();
+    private final JLabel sizeBand = new JLabel();
     private final JButton run = new JButton(labels.getString("BATTLESIM.RUN.SIMULATION"));
 
     private final JComboBox<Object> nacao = new JComboBox<>();
@@ -110,6 +112,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     /** Guards the listeners while the editor is being repopulated from the model. */
     private boolean refreshing = false;
+    /** Built once: the catalogue does not change, and this is reattached after every model swap. */
+    private DefaultCellEditor troopTypeEditor;
 
     public BattleSimWindow(Local local) {
         this.controler = new BattleSimControler(local);
@@ -128,6 +132,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         // guarded: setting a combo's model fires an action for the newly selected item, and the
         // listeners are already attached by now - unguarded, building the models would write
         // index 0 back into the first army's tactic and the city's size before the window opened
+        final JComboBox<Object> types = new JComboBox<>(controler.getTroopCatalogue().toArray());
+        types.setRenderer(renderer);
+        troopTypeEditor = new DefaultCellEditor(types);
+
         refreshing = true;
         try {
             buildComboModels();
@@ -390,15 +398,21 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
         // the two derived lines: what this army will actually do, and how much to trust it.
         // Given air above them so they read as a conclusion rather than another field.
-        for (JLabel one : new JLabel[]{fightsIn, source}) {
+        for (JLabel one : new JLabel[]{sizeBand, fightsIn, source}) {
             one.setFont(one.getFont().deriveFont(Font.PLAIN));
         }
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 4;
         gbc.insets = new Insets(10, 4, 1, 4);
-        ret.add(fightsIn, gbc);
+        // the server's own description of how big this army is. A LABEL, never a field: the band
+        // is what the player was told, and turning it into an editable number would invite him to
+        // treat a guess as data. What he types instead is the platoon list below.
+        ret.add(sizeBand, gbc);
         gbc.gridy = 6;
+        gbc.insets = new Insets(1, 4, 1, 4);
+        ret.add(fightsIn, gbc);
+        gbc.gridy = 7;
         gbc.insets = new Insets(1, 4, 4, 4);
         ret.add(source, gbc);
 
@@ -446,9 +460,14 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         platoons.setShowGrid(false);
         platoons.setIntercellSpacing(new Dimension(0, 1));
 
+        final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 2));
+        buttons.add(button("BATTLESIM.PLATOON.ADD", "addPlatoon"));
+        buttons.add(button("BATTLESIM.PLATOON.REMOVE", "removePlatoon"));
+
         final JPanel ret = new JPanel(new BorderLayout());
         ret.setBorder(BorderFactory.createTitledBorder(labels.getString("BATTLESIM.PLATOON.TITLE")));
         ret.add(new JScrollPane(platoons), BorderLayout.CENTER);
+        ret.add(buttons, BorderLayout.SOUTH);
         return ret;
     }
 
@@ -466,6 +485,17 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         for (int ii : new int[]{0, 6, 7}) {
             platoons.getColumnModel().getColumn(ii).setCellRenderer(centred);
         }
+        // the troop type is an object, not a name: it has to be pickable, and the same renderer
+        // that keeps nations out of BaseModel.toString() keeps troop types out of it too
+        platoons.getColumnModel().getColumn(1).setCellEditor(troopTypeEditor);
+        platoons.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void setValue(Object value) {
+                setText(value instanceof BaseModel ? ((BaseModel) value).getNome() : "");
+            }
+        });
     }
 
     /**
@@ -570,6 +600,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         morale.setValue(army.getMoral());
         attackBonus.setValue(army.getAttackBonus());
         defenseBonus.setValue(army.getArmyDefenseBonus());
+        sizeBand.setText(BattleSimConverter.getSizeBandText(army));
         fightsIn.setText(BattleSimConverter.getFightsIn(controler.getParticipation(army)));
         source.setText(String.format(labels.getString("BATTLESIM.SOURCE"),
                 BattleSimConverter.getProvenanceName(
@@ -694,6 +725,17 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             controler.doCloneArmy();
         } else if ("removeArmy".equals(command)) {
             controler.doRemoveArmy();
+        } else if ("addPlatoon".equals(command)) {
+            if (controler.doAddPlatoon() == null) {
+                return;     // nothing selected, or every troop type already present
+            }
+        } else if ("removePlatoon".equals(command)) {
+            final int row = platoons.getSelectedRow();
+            if (row < 0 || !(platoons.getModel() instanceof BattleSimControler.PlatoonTableModel)) {
+                return;
+            }
+            controler.doRemovePlatoon(((BattleSimControler.PlatoonTableModel) platoons.getModel())
+                    .getPlatoon(row));
         } else if ("terreno".equals(command)) {
             controler.setTerreno((Terreno) terreno.getSelectedItem());
         } else if ("city".equals(command)) {

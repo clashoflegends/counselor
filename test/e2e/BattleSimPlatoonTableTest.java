@@ -129,7 +129,9 @@ class BattleSimPlatoonTableTest {
         assertEquals(2, model.getRowCount());
         String ships = null, land = null;
         for (int row = 0; row < model.getRowCount(); row++) {
-            if ("sh".equals(model.getValueAt(row, 1))) {
+            // the Troops column holds the TipoTropa itself, because the player can retype it
+            final TipoTropa tipo = (TipoTropa) model.getValueAt(row, 1);
+            if ("sh".equals(tipo.getCodigo())) {
                 ships = (String) model.getValueAt(row, 0);
             } else {
                 land = (String) model.getValueAt(row, 0);
@@ -152,7 +154,8 @@ class BattleSimPlatoonTableTest {
         assertFalse(model.isCellEditable(0, 6));
         assertFalse(model.isCellEditable(0, 7));
         assertTrue(model.isCellEditable(0, 2), "quantity is the player's to type");
-        assertFalse(model.isCellEditable(0, 1), "the troop type is not retyped in this column");
+        assertTrue(model.isCellEditable(0, 1),
+                "and so is the troop type - an army he cannot see needs one typed in from scratch");
     }
 
     /** No army selected is a real state, not a crash: an empty hex opens the window. */
