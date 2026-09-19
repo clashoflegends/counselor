@@ -141,8 +141,12 @@ public class BattleSimConverter {
      * Why Run is disabled, for the status bar rather than a tooltip.
      *
      * A tooltip on a disabled button is unreliable across platforms, and this is the one message the
-     * player most needs when nothing happens. Returns null when Run should be enabled - which, until
-     * the engine exists, it never is.
+     * player most needs when nothing happens.
+     *
+     * ALWAYS returns a reason, because Run is always disabled: there is no engine. Phase 5 (T-501)
+     * is what gives it an enabled state, and that is where this gains an "everything is ready"
+     * answer. Said explicitly because the javadoc previously claimed a null-means-enabled contract
+     * the method has never had, and T-501 would have been written against it.
      */
     public static String getRunDisabledReason(CombatScenario scenario) {
         if (scenario != null && !scenario.hasCombat()) {
@@ -152,12 +156,18 @@ public class BattleSimConverter {
     }
 
     /**
-     * "Reported size: Vast army", or nothing when the player can count the troops himself.
+     * "Reported size: Vast army" - the server's own word for how big this army is.
      *
-     * This is the only strength figure he has for an army seen at low visibility, where the server
-     * sends a size band and no platoons at all. It is a LABEL and stays one: the band is what he was
-     * told, and an editable version would invite him to treat a reversed guess as data. What he
-     * types instead is the platoon list, which is his own estimate and is marked as such.
+     * Shown for EVERY army, not only the ones the player cannot see into, and the javadoc used to
+     * claim otherwise. The band is server-derived in both cases: for an unscouted enemy it is the
+     * only strength figure there is, and for his own army it is the same sentence his army list
+     * already shows him. Suppressing it on the armies he can count would also take it away exactly
+     * when he starts typing a composition into an unscouted one - which is the moment he most wants
+     * to check his guess against what he was told.
+     *
+     * It is a LABEL and stays one: the band is what he was told, and an editable version would
+     * invite him to treat a reversed guess as data. What he types instead is the platoon list,
+     * which is his own estimate and is marked as such.
      */
     public static String getSizeBandText(ArmySim army) {
         if (army == null) {

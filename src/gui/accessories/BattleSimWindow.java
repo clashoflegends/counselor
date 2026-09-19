@@ -6,6 +6,7 @@ import business.ImageManager;
 import business.combat.ArmySim;
 import business.combat.CombatLevel;
 import business.combat.CombatScenario;
+import business.converter.ConverterFactory;
 import control.BattleSimControler;
 import control.services.BattleSimConverter;
 import java.awt.BorderLayout;
@@ -35,9 +36,12 @@ import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -114,6 +118,38 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private boolean refreshing = false;
     /** Built once: the catalogue does not change, and this is reattached after every model swap. */
     private DefaultCellEditor troopTypeEditor;
+    /**
+     * Built once, reattached after every model swap. Renderers are stateless, and allocating a
+     * fresh pair on each of the dozens of refreshes was pure churn.
+     */
+    private final transient DefaultTableCellRenderer centredCell = centredRenderer();
+    private final transient DefaultTableCellRenderer troopTypeCell = troopTypeRenderer();
+
+    /**
+     * A platoon edit refreshes the window like every other edit, one turn of the event queue later.
+     *
+     * Deferred rather than immediate because this fires from inside {@code setValueAt}, which the
+     * cell editor calls on its way out; {@link #doRefresh} replaces the table's model, and
+     * replacing a model under an editor that has not finished stopping is how a Swing table ends up
+     * writing into the wrong row. {@code invokeLater} lets the edit finish first.
+     */
+    private final transient TableModelListener platoonEdits = new TableModelListener() {
+        @Override
+        public void tableChanged(TableModelEvent event) {
+            if (refreshing || event.getFirstRow() == TableModelEvent.HEADER_ROW
+                    || event.getType() != TableModelEvent.UPDATE) {
+                return;
+            }
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    if (!refreshing) {
+                        doRefresh(false);
+                    }
+                }
+            });
+        }
+    };
 
     public BattleSimWindow(Local local) {
         this.controler = new BattleSimControler(local);
@@ -134,7 +170,30 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         // index 0 back into the first army's tactic and the city's size before the window opened
         final JComboBox<Object> types = new JComboBox<>(controler.getTroopCatalogue().toArray());
         types.setRenderer(renderer);
-        troopTypeEditor = new DefaultCellEditor(types);
+        troopTypeEditor = new DefaultCellEditor(types) {
+            private static final long serialVersionUID = 1L;
+
+            /**
+             * Makes room for a troop type the catalogue does not hold, instead of losing the edit.
+             *
+             * {@code JComboBox.setSelectedItem} REFUSES a value its model does not contain and
+             * keeps the previous selection, and {@code DefaultCellEditor} would then hand that
+             * stale selection back to {@code setValueAt} - silently retyping the platoon to
+             * whatever was picked last. Types outside the catalogue are real: the placeholder
+             * {@code none}/{@code ship} an unscouted enemy arrives with, and {@code ;STS;}
+             * side-loaded specials. Inserting the value is the honest answer; dropping it is not.
+             */
+            @Override
+            public java.awt.Component getTableCellEditorComponent(JTable table, Object value,
+                    boolean isSelected, int row, int column) {
+                final DefaultComboBoxModel<Object> model =
+                        (DefaultComboBoxModel<Object>) types.getModel();
+                if (value != null && model.getIndexOf(value) < 0) {
+                    model.insertElementAt(value, 0);
+                }
+                return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+            }
+        };
 
         refreshing = true;
         try {
@@ -471,6 +530,22 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         return ret;
     }
 
+    /**
+     * Swaps in the selected army's platoons and re-arms the listener that makes an edit count.
+     *
+     * Without the listener the platoon table was the one editor whose changes stopped at its own
+     * row: zero every platoon of an army and the roster still badged it as fighting, the group
+     * totals still counted its troops, and Run still blamed the missing engine rather than the hex
+     * having no combat left in it. {@link #doRefresh}'s own javadoc names retyping a platoon as the
+     * example of an edit that moves something else.
+     */
+    private void setPlatoonModel() {
+        final javax.swing.table.TableModel model = controler.getPlatoonModel();
+        model.addTableModelListener(platoonEdits);
+        platoons.setModel(model);
+        configurePlatoonColumns();
+    }
+
     /** Applied after every model swap, because a new model discards the column settings. */
     private void configurePlatoonColumns() {
         if (platoons.getColumnCount() < 8) {
@@ -480,22 +555,30 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         for (int ii = 0; ii < widths.length; ii++) {
             platoons.getColumnModel().getColumn(ii).setPreferredWidth(widths[ii]);
         }
-        final DefaultTableCellRenderer centred = new DefaultTableCellRenderer();
-        centred.setHorizontalAlignment(SwingConstants.CENTER);
         for (int ii : new int[]{0, 6, 7}) {
-            platoons.getColumnModel().getColumn(ii).setCellRenderer(centred);
+            platoons.getColumnModel().getColumn(ii).setCellRenderer(centredCell);
         }
         // the troop type is an object, not a name: it has to be pickable, and the same renderer
         // that keeps nations out of BaseModel.toString() keeps troop types out of it too
         platoons.getColumnModel().getColumn(1).setCellEditor(troopTypeEditor);
-        platoons.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
+        platoons.getColumnModel().getColumn(1).setCellRenderer(troopTypeCell);
+    }
+
+    private static DefaultTableCellRenderer centredRenderer() {
+        final DefaultTableCellRenderer ret = new DefaultTableCellRenderer();
+        ret.setHorizontalAlignment(SwingConstants.CENTER);
+        return ret;
+    }
+
+    private static DefaultTableCellRenderer troopTypeRenderer() {
+        return new DefaultTableCellRenderer() {
             private static final long serialVersionUID = 1L;
 
             @Override
             protected void setValue(Object value) {
                 setText(value instanceof BaseModel ? ((BaseModel) value).getNome() : "");
             }
-        });
+        };
     }
 
     /**
@@ -532,6 +615,24 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * how a view goes quietly stale, and the whole thing is a few dozen rows.
      */
     private void doRefresh() {
+        doRefresh(true);
+    }
+
+    /**
+     * @param includePlatoons false when the platoon table is the SOURCE of the edit.
+     *
+     * Replacing a JTable's model clears its row selection and drops any editor that has opened
+     * since, so refreshing the platoon table in response to a platoon edit knocked the player out
+     * of the row he was typing in: enter a quantity, press Tab, and the selection vanished before
+     * the next cell could take it. He would have had to re-click for every field of every platoon,
+     * on the exact screen T-420 built for entering a composition by hand.
+     *
+     * Nothing is lost by skipping it. The selected army has not changed, and the model has already
+     * fired its own row update - the platoon table is the one pane that is ALREADY current when
+     * this path runs. Everything downstream of the edit (the roster badges and group totals, the
+     * editor's "Fights in" line, the city line, the assumption count, Run's reason) still moves.
+     */
+    private void doRefresh(boolean includePlatoons) {
         refreshing = true;
         try {
             roster.setModel(controler.getRosterModel());
@@ -539,8 +640,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 roster.expandRow(ii);
             }
             reselectInRoster();
-            platoons.setModel(controler.getPlatoonModel());
-            configurePlatoonColumns();
+            if (includePlatoons) {
+                setPlatoonModel();
+            }
             refreshEditor();
             refreshGround();
             status.setText(BattleSimConverter.getDerivationText(controler.getScenario()));
@@ -586,6 +688,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         }
         if (!any) {
             armyTitle.setText("");
+            sizeBand.setText("");
             fightsIn.setText("");
             source.setText("");
             return;
@@ -663,24 +766,35 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     }
 
     /**
-     * The tactic combo carries {@code GenericoComboObject}s whose id is the tactic number, so the
-     * player picks "Flanking" and the model still gets the integer the engine wants.
+     * The tactic combo carries {@code GenericoComboObject}s whose id is a two-letter CODE, not a
+     * number, so the translation is {@link ConverterFactory}'s and never {@code parseInt}'s.
+     *
+     * This was wrong and it corrupted armies. The ids come from {@code BaseMsgs.taticasGb} and read
+     * {@code "ca"}, {@code "fl"}, {@code "pa"}, {@code "ce"}, {@code "gu"}, {@code "em"};
+     * {@code SysApoio.parseInt} returns its error sentinel {@code -9999} for every one of them. So
+     * selecting an army - not editing it, merely selecting it - wrote {@code setTatica(-9999)}, and
+     * {@link #indexOfTactic} comparing {@code -9999} against a real tactic never matched, so the
+     * combo always displayed the FIRST entry regardless of what the army was actually doing.
+     * {@code TitleFactory.getTaticaNome} then swallows the out-of-range index and answers "Padrao",
+     * which is exactly the silent plausible default that hides a bug for years.
+     *
+     * {@code ConverterFactory.taticaToInt}/{@code taticaToCodigo} are the shared pair that already
+     * knows this mapping, including the four naval tactics the GB list does not carry.
      */
     private int selectedTactic() {
         final Object chosen = tactic.getSelectedItem();
         if (chosen instanceof GenericoComboObject) {
-            return persistenceCommons.SysApoio.parseInt(
-                    ((GenericoComboObject) chosen).getComboId());
+            return ConverterFactory.taticaToInt(((GenericoComboObject) chosen).getComboId());
         }
         return 0;
     }
 
     private int indexOfTactic(int tatica) {
+        final String wanted = ConverterFactory.taticaToCodigo(tatica);
         for (int ii = 0; ii < tactic.getItemCount(); ii++) {
             final Object one = tactic.getItemAt(ii);
             if (one instanceof GenericoComboObject
-                    && persistenceCommons.SysApoio.parseInt(
-                            ((GenericoComboObject) one).getComboId()) == tatica) {
+                    && wanted.equalsIgnoreCase(((GenericoComboObject) one).getComboId())) {
                 return ii;
             }
         }
@@ -695,6 +809,17 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     // ------------------------------------------------------------------ events
 
+    /**
+     * Roster selection. Guarded like every other repopulation, which it was NOT.
+     *
+     * It checked {@code refreshing} on the way in but never raised it, and then called
+     * {@link #refreshEditor}, whose whole job is to push the army's values into eight widgets.
+     * {@code JComboBox.setSelectedItem} fires its action unconditionally, so all four combo
+     * handlers and all four spinner handlers ran as though the PLAYER had just edited them: eight
+     * write-backs and eight full window refreshes for one click on a tree node. Seven wrote a value
+     * back over itself; the eighth wrote the tactic, and with the {@code parseInt} bug above that
+     * meant merely CLICKING an army set its tactic to -9999.
+     */
     @Override
     public void valueChanged(TreeSelectionEvent event) {
         if (refreshing) {
@@ -706,10 +831,14 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         }
         final Object user = ((DefaultMutableTreeNode) node).getUserObject();
         if (user instanceof BattleSimControler.ArmyNode) {
-            controler.setSelected(((BattleSimControler.ArmyNode) user).getArmy());
-            platoons.setModel(controler.getPlatoonModel());
-            configurePlatoonColumns();
-            refreshEditor();
+            refreshing = true;
+            try {
+                controler.setSelected(((BattleSimControler.ArmyNode) user).getArmy());
+                setPlatoonModel();
+                refreshEditor();
+            } finally {
+                refreshing = false;
+            }
         }
     }
 
