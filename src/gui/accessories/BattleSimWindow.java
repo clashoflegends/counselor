@@ -1,5 +1,6 @@
 package gui.accessories;
 
+import baseLib.BaseModel;
 import business.combat.ArmySim;
 import business.combat.CombatLevel;
 import business.combat.CombatScenario;
@@ -17,6 +18,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -108,6 +110,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         add(buildToolbar(), BorderLayout.NORTH);
         add(buildPanes(), BorderLayout.CENTER);
         add(buildStatusBar(), BorderLayout.SOUTH);
+        final BattleSimCellRenderer renderer = new BattleSimCellRenderer();
+        for (JComboBox<?> one : new JComboBox<?>[]{nacao, terreno, combatLevel, target}) {
+            one.setRenderer(renderer);
+        }
         setMinimumSize(new Dimension(900, 560));
         pack();
         doRefresh();
@@ -115,6 +121,34 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     private static JSpinner spinner(int value, int min, int max) {
         return new JSpinner(new SpinnerNumberModel(value, min, max, 1));
+    }
+
+    /**
+     * Renders what goes in every combo here.
+     *
+     * Needed because {@code BaseModel.toString()} answers "Tyrell-model.Nacao@1a2b3c", so a nation
+     * or terrain dropped into a combo unrendered shows its class name and hash to the player. The
+     * old window avoided this by routing everything through {@code GenericoComboBoxModel}; this one
+     * renders at the view instead, which also lets an enum carry a translated name rather than
+     * ATTACK_ARMY.
+     */
+    private static class BattleSimCellRenderer extends DefaultListCellRenderer {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list,
+                Object value, int index, boolean selected, boolean focused) {
+            final Object shown;
+            if (value instanceof CombatLevel) {
+                shown = BattleSimConverter.getCombatLevelName((CombatLevel) value);
+            } else if (value instanceof BaseModel) {
+                shown = ((BaseModel) value).getNome();
+            } else {
+                shown = value;
+            }
+            return super.getListCellRendererComponent(list, shown, index, selected, focused);
+        }
     }
 
     // ------------------------------------------------------------------ layout
