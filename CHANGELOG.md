@@ -1,5 +1,14 @@
 # What's New in Counselor
 
+## 18-SEP-2026 - v2.1.928
+
+### The battle simulator no longer edits your real armies
+
+- **Experimenting in the battle simulator used to change the army you were experimenting with.** Open it on a hex, swap a platoon's troop type to see how the fight would go, and the army in your Armies tab, on the map and in your order lists quietly changed to match. It stayed changed for the rest of the session.
+- **Fixed: the simulator now works on its own private copy.** Change quantities, training, weapons, armour or troop types as much as you like. Nothing you do in there touches the armies in your turn.
+- **Your real armies in the game were never affected.** The orders file Counselor uploads carries your commands, not your army composition, so nothing wrong was ever sent to the server. The damage was to what Counselor showed you afterwards - which still mattered, because you might have planned a turn against numbers the simulator had changed behind you.
+- If you ever avoided the simulator because it seemed to mess things up: it did, and it does not any more.
+
 ## 12-SEP-2026 - v2.1.927
 
 ### See where your scouts are actually looking - and where they overlap
