@@ -40,6 +40,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
+import model.Cidade;
 import model.Local;
 import model.Nacao;
 import model.Terreno;
@@ -93,6 +94,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private final JComboBox<Object> target = new JComboBox<>();
     private final JCheckBox cityParticipates =
             new JCheckBox(labels.getString("BATTLESIM.CITY.PARTICIPATES"));
+    private final JLabel cityText = new JLabel();
+    private final JSpinner cityLoyalty = spinner(0, 0, 100);
+    private final JComboBox<Object> citySize = new JComboBox<>();
+    private final JComboBox<Object> cityFortification = new JComboBox<>();
     private final JComboBox<Object> tactic = new JComboBox<>();
     private final JSpinner commander = spinner(0, 0, 100);
     private final JSpinner morale = spinner(0, 0, 100);
@@ -212,6 +217,26 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         cityParticipates.setActionCommand("city");
         cityParticipates.addActionListener(this);
         ret.add(cityParticipates);
+
+        // A city is passive: it is attacked, it damages the attackers, and it takes the result.
+        // So it gets inputs and a read-out, not orders.
+        ret.add(cityRow(labels.getString("TAMANHO"), citySize, "citySize"));
+        ret.add(cityRow(labels.getString("FORTIFICACOES"), cityFortification, "cityFort"));
+        ret.add(cityRow(labels.getString("LEALDADE"), cityLoyalty, null));
+        cityLoyalty.addChangeListener(this);
+        cityText.setBorder(BorderFactory.createEmptyBorder(4, 4, 2, 4));
+        ret.add(cityText);
+        return ret;
+    }
+
+    private JPanel cityRow(String text, java.awt.Component field, String command) {
+        final JPanel ret = new JPanel(new FlowLayout(FlowLayout.LEADING, 2, 1));
+        ret.add(new JLabel(text));
+        if (command != null && field instanceof JComboBox) {
+            ((JComboBox<?>) field).setActionCommand(command);
+            ((JComboBox<?>) field).addActionListener(this);
+        }
+        ret.add(field);
         return ret;
     }
 
@@ -351,8 +376,43 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         final CombatScenario scenario = controler.getScenario();
         terreno.setModel(new DefaultComboBoxModel<>(terrenos()));
         terreno.setSelectedItem(scenario.getTerreno());
-        cityParticipates.setEnabled(scenario.getCidade() != null);
+
+        final Cidade city = scenario.getCidade();
+        cityParticipates.setEnabled(city != null);
         cityParticipates.setSelected(scenario.isCityParticipates());
+        final boolean editable = scenario.getCidadeAtiva() != null;
+        for (java.awt.Component one : new java.awt.Component[]{citySize, cityFortification,
+            cityLoyalty}) {
+            one.setEnabled(editable);
+        }
+        citySize.setModel(new DefaultComboBoxModel<>(cityLevels(true)));
+        cityFortification.setModel(new DefaultComboBoxModel<>(cityLevels(false)));
+        if (city != null) {
+            citySize.setSelectedIndex(clampIndex(city.getTamanho(), citySize.getItemCount()));
+            cityFortification.setSelectedIndex(
+                    clampIndex(city.getFortificacao(), cityFortification.getItemCount()));
+            cityLoyalty.setValue(city.getLealdade());
+        }
+        cityText.setText(BattleSimConverter.getCityText(scenario));
+    }
+
+    /**
+     * The six size or fortification steps, named.
+     *
+     * Index IS the value - "Ruins" is 0, "Metropolis" is 5 - which is why these are built by
+     * counting rather than from a map: the combo's selected index is what the model wants.
+     */
+    private Object[] cityLevels(boolean size) {
+        final business.facade.CidadeFacade facade = new business.facade.CidadeFacade();
+        final Object[] ret = new Object[6];
+        for (int ii = 0; ii < ret.length; ii++) {
+            ret[ii] = size ? facade.getTamanhoNome(ii) : facade.getFortificacaoNome(ii);
+        }
+        return ret;
+    }
+
+    private static int clampIndex(int value, int count) {
+        return Math.max(0, Math.min(count - 1, value));
     }
 
     /** Nations already present in the scenario. Enough to retype an army, without a world list. */
@@ -441,6 +501,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             controler.setTerreno((Terreno) terreno.getSelectedItem());
         } else if ("city".equals(command)) {
             controler.setCityParticipates(cityParticipates.isSelected());
+        } else if ("citySize".equals(command)) {
+            controler.setCityTamanho(citySize.getSelectedIndex());
+        } else if ("cityFort".equals(command)) {
+            controler.setCityFortificacao(cityFortification.getSelectedIndex());
         } else if ("level".equals(command)) {
             controler.setCombatLevel((CombatLevel) combatLevel.getSelectedItem());
         } else if ("target".equals(command)) {
@@ -458,8 +522,16 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     @Override
     public void stateChanged(ChangeEvent event) {
+        if (refreshing) {
+            return;
+        }
+        if (event.getSource() == cityLoyalty) {
+            controler.setCityLealdade((Integer) cityLoyalty.getValue());
+            doRefresh();
+            return;
+        }
         final ArmySim army = controler.getSelected();
-        if (refreshing || army == null) {
+        if (army == null) {
             return;
         }
         final Object src = event.getSource();

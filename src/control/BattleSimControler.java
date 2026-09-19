@@ -313,4 +313,16 @@ public class BattleSimControler {
     public void setCityParticipates(boolean participates) {
         scenario.setCityParticipates(participates);
     }
+
+    public void setCityLealdade(int lealdade) {
+        scenario.setCityLealdade(lealdade);
+    }
+
+    public void setCityTamanho(int tamanho) {
+        scenario.setCityTamanho(tamanho);
+    }
+
+    public void setCityFortificacao(int fortificacao) {
+        scenario.setCityFortificacao(fortificacao);
+    }
 }

@@ -152,6 +152,27 @@ public class BattleSimConverter {
         return labels.getString("BATTLESIM.RUN.DISABLED.NOENGINE");
     }
 
+    /**
+     * The city line: what the attackers face, and whether there is a round 0.
+     *
+     * Two numbers, not one, because the city layer is TWO rounds. Round 0 is siege engines against
+     * the FORTIFICATION and is fought only when an attacker carries them; round 1 is the single
+     * army-versus-city exchange against the city's DEFENSE. Round 0 comes first and can reduce the
+     * fortification, so collapsing them into one figure would hide the order that decides the
+     * result.
+     */
+    public static String getCityText(CombatScenario scenario) {
+        if (scenario == null || scenario.getCidadeAtiva() == null) {
+            return labels.getString("BATTLESIM.CITY.NONE");
+        }
+        return String.format("%s: %,d   %s: %,d   %s",
+                labels.getString("BATTLESIM.CITY.DEFENSE"), scenario.getCityDefense(),
+                labels.getString("BATTLESIM.CITY.FORTIFICATION.DEFENSE"),
+                scenario.getCityFortificationDefense(),
+                labels.getString(scenario.isSiegeExpected()
+                        ? "BATTLESIM.CITY.SIEGE" : "BATTLESIM.CITY.NOSIEGE"));
+    }
+
     /** The roster leaf: the army's name and its N A C badge. */
     public static String getArmyTitle(ArmySim army, LayerParticipation participation) {
         final String badge = participation == null ? "..." : participation.getBadge();
