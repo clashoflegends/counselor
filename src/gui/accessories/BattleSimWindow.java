@@ -10,14 +10,13 @@ import control.services.BattleSimConverter;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -27,6 +26,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -34,6 +34,7 @@ import javax.swing.JTree;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -83,6 +84,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private final JTree roster = new JTree();
     private final JTable platoons = new JTable();
     private final JLabel status = new JLabel();
+    private final JLabel runReason = new JLabel();
     private final JLabel armyTitle = new JLabel();
     private final JLabel fightsIn = new JLabel();
     private final JLabel source = new JLabel();
@@ -120,8 +122,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         for (JComboBox<?> one : new JComboBox<?>[]{nacao, terreno, combatLevel, target, tactic}) {
             one.setRenderer(renderer);
         }
-        setMinimumSize(new Dimension(900, 560));
+        // pack first so every pane gets its natural height, then enforce a floor: a packed
+        // BattleSim on an empty hex is small enough that the platoon table has nowhere to appear
+        setMinimumSize(new Dimension(860, 560));
         pack();
+        setSize(Math.max(getWidth(), 980), Math.max(getHeight(), 640));
         doRefresh();
     }
 
@@ -159,16 +164,29 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     // ------------------------------------------------------------------ layout
 
+    /**
+     * The army buttons on the left, Run on the right.
+     *
+     * Run is pushed to the far edge rather than sitting in the row because it is the only button
+     * that does something to the whole scenario; the other three act on one army. Grouping by what
+     * a control affects is the cheapest way to make a toolbar readable.
+     */
     private JPanel buildToolbar() {
-        final JPanel ret = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 4));
-        ret.add(button("BATTLESIM.ARMY.ADD", "addArmy"));
-        ret.add(button("BATTLESIM.ARMY.CLONE", "cloneArmy"));
-        ret.add(button("BATTLESIM.ARMY.REMOVE", "removeArmy"));
-        ret.add(Box.createHorizontalStrut(16));
+        final JPanel ret = new JPanel(new BorderLayout());
+        ret.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
+
+        final JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
+        left.add(button("BATTLESIM.ARMY.ADD", "addArmy"));
+        left.add(button("BATTLESIM.ARMY.CLONE", "cloneArmy"));
+        left.add(button("BATTLESIM.ARMY.REMOVE", "removeArmy"));
+        ret.add(left, BorderLayout.LINE_START);
+
         run.setActionCommand("run");
         run.addActionListener(this);
         run.setEnabled(false);
-        ret.add(run);
+        final JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, 4, 0));
+        right.add(run);
+        ret.add(right, BorderLayout.LINE_END);
         return ret;
     }
 
@@ -182,9 +200,16 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private JSplitPane buildPanes() {
         final JSplitPane right = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 buildArmyEditor(), buildPlatoonTable());
+        // the editor is a fixed-height form and the table is the part worth growing, so all the
+        // slack goes to the table
         right.setResizeWeight(0.0);
+        right.setOneTouchExpandable(true);
+        right.setBorder(null);
+
         final JSplitPane ret = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buildLeft(), right);
-        ret.setResizeWeight(0.3);
+        ret.setResizeWeight(0.28);
+        ret.setOneTouchExpandable(true);
+        ret.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
         return ret;
     }
 
@@ -194,50 +219,79 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         roster.setShowsRootHandles(true);
         roster.addTreeSelectionListener(this);
 
-        final JPanel ret = new JPanel(new BorderLayout());
-        ret.add(new JScrollPane(roster), BorderLayout.CENTER);
+        roster.setRowHeight(0);     // let the renderer decide, so it scales with the font
+
+        final JScrollPane scroll = new JScrollPane(roster);
+        scroll.setBorder(BorderFactory.createTitledBorder(labels.getString("BATTLESIM.ARMIES.TITLE")));
+
+        final JPanel ret = new JPanel(new BorderLayout(0, 4));
+        ret.add(scroll, BorderLayout.CENTER);
         ret.add(buildGround(), BorderLayout.SOUTH);
-        ret.setPreferredSize(new Dimension(280, 480));
+        ret.setPreferredSize(new Dimension(300, 480));
+        ret.setMinimumSize(new Dimension(240, 240));
         return ret;
     }
 
-    /** Terrain and the city toggle: the ground both sides are standing on. */
+    /**
+     * Terrain and the city: the ground both sides are standing on.
+     *
+     * One grid rather than a stack of rows, so every label lines up on the same right edge and the
+     * fields on the same left one. The previous version gave each row its own FlowLayout, which
+     * left the labels ragged and made four unrelated-looking controls out of four related ones.
+     */
     private JPanel buildGround() {
-        final JPanel ret = new JPanel();
-        ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
+        final JPanel ret = new JPanel(new GridBagLayout());
         ret.setBorder(BorderFactory.createTitledBorder(labels.getString("BATTLESIM.GROUND.TITLE")));
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(2, 4, 2, 4);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        final JPanel row = new JPanel(new FlowLayout(FlowLayout.LEADING, 2, 2));
-        row.add(new JLabel(labels.getString("TERRENO")));
         terreno.setActionCommand("terreno");
         terreno.addActionListener(this);
-        row.add(terreno);
-        ret.add(row);
+        addRow(ret, gbc, 0, labels.getString("TERRENO"), terreno);
 
         cityParticipates.setActionCommand("city");
         cityParticipates.addActionListener(this);
-        ret.add(cityParticipates);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.weightx = 1;
+        ret.add(cityParticipates, gbc);
 
         // A city is passive: it is attacked, it damages the attackers, and it takes the result.
         // So it gets inputs and a read-out, not orders.
-        ret.add(cityRow(labels.getString("TAMANHO"), citySize, "citySize"));
-        ret.add(cityRow(labels.getString("FORTIFICACOES"), cityFortification, "cityFort"));
-        ret.add(cityRow(labels.getString("LEALDADE"), cityLoyalty, null));
+        citySize.setActionCommand("citySize");
+        citySize.addActionListener(this);
+        cityFortification.setActionCommand("cityFort");
+        cityFortification.addActionListener(this);
         cityLoyalty.addChangeListener(this);
-        cityText.setBorder(BorderFactory.createEmptyBorder(4, 4, 2, 4));
-        ret.add(cityText);
+        addRow(ret, gbc, 2, labels.getString("TAMANHO"), citySize);
+        addRow(ret, gbc, 3, labels.getString("FORTIFICACOES"), cityFortification);
+        addRow(ret, gbc, 4, labels.getString("LEALDADE"), cityLoyalty);
+
+        cityText.setFont(cityText.getFont().deriveFont(Font.PLAIN));
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(6, 4, 2, 4);
+        ret.add(cityText, gbc);
         return ret;
     }
 
-    private JPanel cityRow(String text, java.awt.Component field, String command) {
-        final JPanel ret = new JPanel(new FlowLayout(FlowLayout.LEADING, 2, 1));
-        ret.add(new JLabel(text));
-        if (command != null && field instanceof JComboBox) {
-            ((JComboBox<?>) field).setActionCommand(command);
-            ((JComboBox<?>) field).addActionListener(this);
-        }
-        ret.add(field);
-        return ret;
+    /** One label-and-field row, label right-aligned against the field's left edge. */
+    private void addRow(JPanel panel, GridBagConstraints gbc, int row, String text,
+            java.awt.Component field) {
+        gbc.gridwidth = 1;
+        gbc.gridy = row;
+        gbc.gridx = 0;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.LINE_END;
+        final JLabel label = new JLabel(text);
+        label.setHorizontalAlignment(SwingConstants.TRAILING);
+        panel.add(label, gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        panel.add(field, gbc);
     }
 
     private JPanel buildArmyEditor() {
@@ -249,10 +303,13 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         armyTitle.setHorizontalAlignment(SwingConstants.LEADING);
+        armyTitle.setFont(armyTitle.getFont().deriveFont(Font.BOLD));
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 4;
+        gbc.insets = new Insets(2, 4, 8, 4);
         ret.add(armyTitle, gbc);
+        gbc.insets = new Insets(2, 4, 2, 4);
         gbc.gridwidth = 1;
 
         nacao.setActionCommand("nacao");
@@ -273,11 +330,18 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         target.addActionListener(this);
         addPair(ret, gbc, 4, 2, labels.getString("BATTLESIM.COMBAT.TARGET"), target);
 
+        // the two derived lines: what this army will actually do, and how much to trust it.
+        // Given air above them so they read as a conclusion rather than another field.
+        for (JLabel one : new JLabel[]{fightsIn, source}) {
+            one.setFont(one.getFont().deriveFont(Font.PLAIN));
+        }
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 4;
+        gbc.insets = new Insets(10, 4, 1, 4);
         ret.add(fightsIn, gbc);
         gbc.gridy = 6;
+        gbc.insets = new Insets(1, 4, 4, 4);
         ret.add(source, gbc);
 
         for (JSpinner one : new JSpinner[]{commander, morale, attackBonus, defenseBonus}) {
@@ -286,30 +350,86 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         return ret;
     }
 
+    /**
+     * One label-and-field pair in the army editor's two-column form.
+     *
+     * Labels are right-aligned so both columns present a single edge to the fields. Left-aligned
+     * labels of different lengths are the main reason a form of this shape looks unfinished.
+     */
     private void addPair(JPanel panel, GridBagConstraints gbc, int row, int col, String text,
             java.awt.Component field) {
         gbc.gridy = row;
         gbc.gridx = col;
         gbc.weightx = 0;
-        panel.add(new JLabel(text), gbc);
+        gbc.anchor = GridBagConstraints.LINE_END;
+        final JLabel label = new JLabel(text);
+        label.setHorizontalAlignment(SwingConstants.TRAILING);
+        panel.add(label, gbc);
         gbc.gridx = col + 1;
         gbc.weightx = 1;
+        gbc.anchor = GridBagConstraints.LINE_START;
         panel.add(field, gbc);
         gbc.weightx = 0;
     }
 
+    /**
+     * The platoon table.
+     *
+     * Column widths are set rather than left to divide evenly: eight equal columns truncated the
+     * "Weapons" header while leaving the one-character Lyr column absurdly wide. Lyr, After and Lost
+     * are centred because they hold a marker rather than a quantity; the four editable numbers keep
+     * the default right alignment, which is what makes them scannable as a column.
+     */
     private JPanel buildPlatoonTable() {
         platoons.setFillsViewportHeight(true);
+        platoons.setRowHeight(Math.max(20, platoons.getRowHeight()));
+        platoons.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        platoons.getTableHeader().setReorderingAllowed(false);
+        platoons.setShowGrid(false);
+        platoons.setIntercellSpacing(new Dimension(0, 1));
+
         final JPanel ret = new JPanel(new BorderLayout());
         ret.setBorder(BorderFactory.createTitledBorder(labels.getString("BATTLESIM.PLATOON.TITLE")));
         ret.add(new JScrollPane(platoons), BorderLayout.CENTER);
         return ret;
     }
 
+    /** Applied after every model swap, because a new model discards the column settings. */
+    private void configurePlatoonColumns() {
+        if (platoons.getColumnCount() < 8) {
+            return;
+        }
+        final int[] widths = {34, 150, 70, 70, 70, 70, 60, 60};
+        for (int ii = 0; ii < widths.length; ii++) {
+            platoons.getColumnModel().getColumn(ii).setPreferredWidth(widths[ii]);
+        }
+        final DefaultTableCellRenderer centred = new DefaultTableCellRenderer();
+        centred.setHorizontalAlignment(SwingConstants.CENTER);
+        for (int ii : new int[]{0, 6, 7}) {
+            platoons.getColumnModel().getColumn(ii).setCellRenderer(centred);
+        }
+    }
+
+    /**
+     * Two facts, at opposite ends: how the scenario decided who fights whom, and why Run is off.
+     *
+     * Separated because they answer different questions and were previously run together in one
+     * string, where the second sentence disappeared into the first. Run's reason sits at the edge
+     * nearest the button it is about.
+     */
     private JPanel buildStatusBar() {
+        final JPanel bar = new JPanel(new BorderLayout(12, 0));
+        bar.setBorder(BorderFactory.createEmptyBorder(4, 8, 5, 8));
+        for (JLabel one : new JLabel[]{status, runReason}) {
+            one.setFont(one.getFont().deriveFont(Font.PLAIN));
+        }
+        runReason.setHorizontalAlignment(SwingConstants.TRAILING);
+        bar.add(status, BorderLayout.CENTER);
+        bar.add(runReason, BorderLayout.LINE_END);
+
         final JPanel ret = new JPanel(new BorderLayout());
-        ret.setBorder(BorderFactory.createEmptyBorder(2, 6, 4, 6));
-        ret.add(status, BorderLayout.CENTER);
+        ret.add(new JSeparator(), BorderLayout.NORTH);
+        ret.add(bar, BorderLayout.CENTER);
         return ret;
     }
 
@@ -331,10 +451,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 roster.expandRow(ii);
             }
             platoons.setModel(controler.getPlatoonModel());
+            configurePlatoonColumns();
             refreshEditor();
             refreshGround();
-            status.setText(BattleSimConverter.getDerivationText(controler.getScenario())
-                    + "   " + BattleSimConverter.getRunDisabledReason(controler.getScenario()));
+            status.setText(BattleSimConverter.getDerivationText(controler.getScenario()));
+            runReason.setText(BattleSimConverter.getRunDisabledReason(controler.getScenario()));
         } finally {
             refreshing = false;
         }
@@ -481,6 +602,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         if (user instanceof BattleSimControler.ArmyNode) {
             controler.setSelected(((BattleSimControler.ArmyNode) user).getArmy());
             platoons.setModel(controler.getPlatoonModel());
+            configurePlatoonColumns();
             refreshEditor();
         }
     }
