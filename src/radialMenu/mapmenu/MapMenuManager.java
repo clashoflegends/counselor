@@ -59,6 +59,9 @@ public class MapMenuManager implements Serializable {
             menu = doConfigOption(MapMenuRadialActions.LOCAL_INFO);
             menu = doConfigOption(MapMenuRadialActions.RANGE_PLOT);
             menu = doConfigOption(MapMenuRadialActions.COMBAT_SIMULATOR);
+            if (isBattleSimNew()) {
+                menu = doConfigOption(MapMenuRadialActions.COMBAT_SIMULATOR_NEW);
+            }
             menu = doConfigOption(MapMenuRadialActions.LOCAL_CASUALTIES);
             menu = doConfigOption(MapMenuRadialActions.ARMY_MOVEMENT_SIMULATOR);
             menu = doConfigOption(MapMenuRadialActions.NAVY_MOVEMENT_SIMULATOR);
@@ -111,6 +114,23 @@ public class MapMenuManager implements Serializable {
 //            rmWorldBuilder.add(subMenu);
 //        }
 //    }
+    /**
+     * Is the three-pane BattleSim rebuild on the menu?
+     *
+     * The two windows are deliberately BOTH live so they can be compared on the same hex, but a
+     * player should not be handed an unfinished second BattleSim, so the entry only appears when
+     * {@code battleSimNew=true} is in {@code properties.config}. Default false, and that file is
+     * local and gitignored, so this line IS the shipped behaviour.
+     *
+     * Read here, at menu construction, and nowhere else. Neither window knows it exists, so turning
+     * the flag off removes the entry and changes nothing else. {@code doCanvasReset} drops the built
+     * menu, so the flag is picked up again without a restart.
+     */
+    private boolean isBattleSimNew() {
+        return Boolean.parseBoolean(
+                SettingsManager.getInstance().getConfig("battleSimNew", "false"));
+    }
+
     private RadialButton doConfigOption(MapMenuRadialActions ra) {
         RadialButton menu = new RadialButton(ra);
         menu.setText(labels.getString(ra.getLabel()));

@@ -194,6 +194,9 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
             case COMBAT_SIMULATOR:
                 createBattleSim(rb);
                 break;
+            case COMBAT_SIMULATOR_NEW:
+                createBattleSimNew(rb);
+                break;
             case ARMY_MOVEMENT_SIMULATOR:
                 createArmyMovSim(rb, false);
                 break;
@@ -234,26 +237,24 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
         casualtiesSim.setVisible(true);
     }
 
-    /**
-     * Opens BattleSim, either the Matisse window or the three-pane rebuild.
-     *
-     * The rebuild is a SISTER window, not a replacement: both are live, both read the same
-     * {@code business.combat} model, and `battleSimNew=true` in {@code properties.config} picks the
-     * new one. That makes it a feature flag rather than a fork - the working window is never at
-     * risk, and the two can be compared on the same hex.
-     *
-     * The flag is read HERE and nowhere else. Neither window knows it exists, which is what keeps
-     * the choice reversible. It defaults to false, and {@code properties.config} is local and
-     * gitignored, so the default in this line IS the shipped behaviour.
-     */
+    /** The Matisse window. Untouched by the rebuild and reachable whatever the flag says. */
     private void createBattleSim(RadialButton rb) {
-        final JFrame battleSim;
-        if (Boolean.parseBoolean(
-                SettingsManager.getInstance().getConfig("battleSimNew", "false"))) {
-            battleSim = new BattleSimWindow(rb.getLocal());
-        } else {
-            battleSim = new BattleCasualtySimulatorNew(rb.getLocal());
-        }
+        doShowBattleSim(rb, new BattleCasualtySimulatorNew(rb.getLocal()));
+    }
+
+    /**
+     * The three-pane rebuild, a SISTER window rather than a replacement.
+     *
+     * Both are live and both read the same {@code business.combat} model, so the two can be opened
+     * on the same hex and compared directly. Whether this one reaches the menu at all is decided
+     * once, in {@code MapMenuManager} - nothing here knows about the flag, which is what keeps it a
+     * flag and not a fork.
+     */
+    private void createBattleSimNew(RadialButton rb) {
+        doShowBattleSim(rb, new BattleSimWindow(rb.getLocal()));
+    }
+
+    private void doShowBattleSim(RadialButton rb, JFrame battleSim) {
         battleSim.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         battleSim.setLocationRelativeTo(rb);
         battleSim.setVisible(true);
