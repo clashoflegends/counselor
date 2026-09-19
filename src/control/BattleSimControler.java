@@ -211,7 +211,9 @@ public class BattleSimControler {
                 case COL_TROOP:
                     return labels.getString("TROPA");
                 case COL_QTD:
-                    return labels.getString("TAMANHO");
+                    // "Qty", not TAMANHO/"Size" - army SIZE is a different thing in this game
+                    // (the 1-5 scale in the armies table), and reusing the word here misreads
+                    return labels.getString("BATTLESIM.COL.QTD");
                 case COL_TRAINING:
                     return labels.getString("TREINO");
                 case COL_WEAPON:

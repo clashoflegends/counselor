@@ -1,6 +1,7 @@
 package gui.accessories;
 
 import baseLib.BaseModel;
+import baseLib.GenericoComboObject;
 import business.combat.ArmySim;
 import business.combat.CombatLevel;
 import business.combat.CombatScenario;
@@ -92,9 +93,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private final JComboBox<Object> target = new JComboBox<>();
     private final JCheckBox cityParticipates =
             new JCheckBox(labels.getString("BATTLESIM.CITY.PARTICIPATES"));
+    private final JComboBox<Object> tactic = new JComboBox<>();
     private final JSpinner commander = spinner(0, 0, 100);
     private final JSpinner morale = spinner(0, 0, 100);
-    private final JSpinner tactic = spinner(0, 0, 9);
     private final JSpinner attackBonus = spinner(0, -100, 100);
     private final JSpinner defenseBonus = spinner(0, -100, 100);
 
@@ -111,7 +112,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         add(buildPanes(), BorderLayout.CENTER);
         add(buildStatusBar(), BorderLayout.SOUTH);
         final BattleSimCellRenderer renderer = new BattleSimCellRenderer();
-        for (JComboBox<?> one : new JComboBox<?>[]{nacao, terreno, combatLevel, target}) {
+        for (JComboBox<?> one : new JComboBox<?>[]{nacao, terreno, combatLevel, target, tactic}) {
             one.setRenderer(renderer);
         }
         setMinimumSize(new Dimension(900, 560));
@@ -199,7 +200,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private JPanel buildGround() {
         final JPanel ret = new JPanel();
         ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
-        ret.setBorder(BorderFactory.createTitledBorder(labels.getString("BATTLESIM.LOCAL.TITLE")));
+        ret.setBorder(BorderFactory.createTitledBorder(labels.getString("BATTLESIM.GROUND.TITLE")));
 
         final JPanel row = new JPanel(new FlowLayout(FlowLayout.LEADING, 2, 2));
         row.add(new JLabel(labels.getString("TERRENO")));
@@ -232,6 +233,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         nacao.setActionCommand("nacao");
         nacao.addActionListener(this);
         addPair(ret, gbc, 1, 0, labels.getString("NACAO"), nacao);
+        tactic.setActionCommand("tactic");
+        tactic.addActionListener(this);
         addPair(ret, gbc, 1, 2, labels.getString("TATICA"), tactic);
         addPair(ret, gbc, 2, 0, labels.getString("COMANDANTE"), commander);
         addPair(ret, gbc, 2, 2, labels.getString("MORAL"), morale);
@@ -252,7 +255,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         gbc.gridy = 6;
         ret.add(source, gbc);
 
-        for (JSpinner one : new JSpinner[]{tactic, commander, morale, attackBonus, defenseBonus}) {
+        for (JSpinner one : new JSpinner[]{commander, morale, attackBonus, defenseBonus}) {
             one.addChangeListener(this);
         }
         return ret;
@@ -332,7 +335,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         target.setSelectedItem(army.getTargetNacao() == null
                 ? labels.getString("BATTLESIM.TARGET.ALL") : army.getTargetNacao());
         combatLevel.setSelectedItem(army.getCombatLevel());
-        tactic.setValue(army.getTatica());
+        tactic.setModel(control.services.CenarioConverter.getInstance().getTaticaComboModel());
+        tactic.setSelectedIndex(indexOfTactic(army.getTatica()));
         commander.setValue(army.getComandantePericia());
         morale.setValue(army.getMoral());
         attackBonus.setValue(army.getAttackBonus());
@@ -369,6 +373,31 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             ret.add(one);
         }
         return ret.toArray();
+    }
+
+    /**
+     * The tactic combo carries {@code GenericoComboObject}s whose id is the tactic number, so the
+     * player picks "Flanking" and the model still gets the integer the engine wants.
+     */
+    private int selectedTactic() {
+        final Object chosen = tactic.getSelectedItem();
+        if (chosen instanceof GenericoComboObject) {
+            return persistenceCommons.SysApoio.parseInt(
+                    ((GenericoComboObject) chosen).getComboId());
+        }
+        return 0;
+    }
+
+    private int indexOfTactic(int tatica) {
+        for (int ii = 0; ii < tactic.getItemCount(); ii++) {
+            final Object one = tactic.getItemAt(ii);
+            if (one instanceof GenericoComboObject
+                    && persistenceCommons.SysApoio.parseInt(
+                            ((GenericoComboObject) one).getComboId()) == tatica) {
+                return ii;
+            }
+        }
+        return 0;
     }
 
     private Object[] terrenos() {
@@ -417,6 +446,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         } else if ("target".equals(command)) {
             final Object chosen = target.getSelectedItem();
             controler.setTargetNacao(chosen instanceof Nacao ? (Nacao) chosen : null);
+        } else if ("tactic".equals(command) && controler.getSelected() != null) {
+            controler.getSelected().setTatica(selectedTactic());
         } else if ("nacao".equals(command) && controler.getSelected() != null) {
             controler.getSelected().setNacao((Nacao) nacao.getSelectedItem());
         } else {
@@ -432,9 +463,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             return;
         }
         final Object src = event.getSource();
-        if (src == tactic) {
-            army.setTatica((Integer) tactic.getValue());
-        } else if (src == commander) {
+        if (src == commander) {
             army.setComandante((Integer) commander.getValue());
         } else if (src == morale) {
             army.setMoral((Integer) morale.getValue());
