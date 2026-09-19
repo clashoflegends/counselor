@@ -119,20 +119,19 @@ public class BattleSimConverter {
     public static String getDerivationText(CombatScenario scenario) {
         final RosterDerivation derivation = RosterDerivation.of(scenario);
         final StringBuilder ret = new StringBuilder();
-        switch (derivation.getBasis()) {
-            case GAME_TYPE:
-                ret.append(labels.getString("BATTLESIM.STATUS.GAMETYPE"));
-                break;
-            case PARTLY_ASSUMED:
-                ret.append(String.format(labels.getString("BATTLESIM.STATUS.ASSUMED"),
-                        derivation.getAssumedPairs()));
-                break;
-            default:
-                ret.append(labels.getString("BATTLESIM.STATUS.ALLREAD"));
-                break;
+        // Saying "read from your EGF" says nothing: the EGF is the ONLY source of information the
+        // Counselor has, so every number on this screen came from it. The status bar is for what
+        // the player could NOT be told - pairs nothing could resolve, and his own overrides. When
+        // there is neither, it stays quiet rather than reassuring him about the obvious.
+        if (derivation.getAssumedPairs() > 0) {
+            ret.append(String.format(labels.getString("BATTLESIM.STATUS.ASSUMED"),
+                    derivation.getAssumedPairs()));
         }
         final int edited = scenario == null ? 0 : scenario.getEditedCount();
         if (edited > 0) {
+            if (ret.length() > 0) {
+                ret.append("   ");
+            }
             ret.append(String.format(labels.getString("BATTLESIM.STATUS.EDITED"), edited));
         }
         return ret.toString();
@@ -173,9 +172,24 @@ public class BattleSimConverter {
                         ? "BATTLESIM.CITY.SIEGE" : "BATTLESIM.CITY.NOSIEGE"));
     }
 
-    /** The roster leaf: the army's name and its N A C badge. */
+    /**
+     * The roster leaf: the army's name, and the layers it fights in.
+     *
+     * Only the layers it IS in, with nothing at all when it fights nowhere. The positional badge
+     * {@code N A C} / {@code N \u00b7 \u00b7} is right for a fixed-width column but wrong here: a
+     * JTree's proportional font does not align the slots into columns anyway, so the placeholders
+     * carry no information, and an army in no layer rendered as three dots beside its name, which
+     * every reader takes for a truncated name. The empty case is explained properly in the army
+     * editor's "Fights in:" line, which is where a player is looking when he asks.
+     */
     public static String getArmyTitle(ArmySim army, LayerParticipation participation) {
-        final String badge = participation == null ? "..." : participation.getBadge();
-        return String.format("%s  %s", army.getNome(), badge);
+        if (participation == null || !participation.isInAnyLayer()) {
+            return army.getNome();
+        }
+        final StringBuilder badge = new StringBuilder();
+        for (CombatLayer layer : participation.getLayers()) {
+            badge.append(layer.getBadge());
+        }
+        return String.format("%s  [%s]", army.getNome(), badge);
     }
 }

@@ -2,6 +2,7 @@ package gui.accessories;
 
 import baseLib.BaseModel;
 import baseLib.GenericoComboObject;
+import business.ImageManager;
 import business.combat.ArmySim;
 import business.combat.CombatLevel;
 import business.combat.CombatScenario;
@@ -97,6 +98,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private final JCheckBox cityParticipates =
             new JCheckBox(labels.getString("BATTLESIM.CITY.PARTICIPATES"));
     private final JLabel cityText = new JLabel();
+    private final JComboBox<Object> cityOwner = new JComboBox<>();
     private final JSpinner cityLoyalty = spinner(0, 0, 100);
     private final JComboBox<Object> citySize = new JComboBox<>();
     private final JComboBox<Object> cityFortification = new JComboBox<>();
@@ -119,9 +121,20 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         add(buildPanes(), BorderLayout.CENTER);
         add(buildStatusBar(), BorderLayout.SOUTH);
         final BattleSimCellRenderer renderer = new BattleSimCellRenderer();
-        for (JComboBox<?> one : new JComboBox<?>[]{nacao, terreno, combatLevel, target, tactic}) {
+        for (JComboBox<?> one : new JComboBox<?>[]{nacao, terreno, combatLevel, target, tactic,
+            citySize, cityFortification, cityOwner}) {
             one.setRenderer(renderer);
         }
+        // guarded: setting a combo's model fires an action for the newly selected item, and the
+        // listeners are already attached by now - unguarded, building the models would write
+        // index 0 back into the first army's tactic and the city's size before the window opened
+        refreshing = true;
+        try {
+            buildComboModels();
+        } finally {
+            refreshing = false;
+        }
+        setIconImage(scenarioIcon());
         // pack first so every pane gets its natural height, then enforce a floor: a packed
         // BattleSim on an empty hex is small enough that the platoon table has nowhere to appear
         setMinimumSize(new Dimension(860, 560));
@@ -132,6 +145,48 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     private static JSpinner spinner(int value, int min, int max) {
         return new JSpinner(new SpinnerNumberModel(value, min, max, 1));
+    }
+
+    /**
+     * Fills every combo ONCE, at construction.
+     *
+     * Rebuilding a combo's model on each refresh broke keyboard navigation outright: arrowing
+     * through a closed combo fires an action per step, the action refreshed the window, and the
+     * refresh replaced the model and reset the selection - so the list snapped back on every key.
+     * Models are static data; only the SELECTION follows the scenario.
+     *
+     * The nation lists hold EVERY nation in the world, not just the ones with an army on this hex.
+     * Offering only the nations present made the editor a trap: retype the one enemy to match the
+     * one friend and the hex has a single nation, no combat, and no way to put it back - the
+     * nation that was there is no longer in the list. Adding or cloning an army made it worse,
+     * since everything new inherited the survivor.
+     */
+    private void buildComboModels() {
+        final Object[] nacoes = nacoes();
+        nacao.setModel(new DefaultComboBoxModel<>(nacoes));
+        cityOwner.setModel(new DefaultComboBoxModel<>(nacoes));
+
+        final Object[] targets = new Object[nacoes.length + 1];
+        targets[0] = labels.getString("BATTLESIM.TARGET.ALL");
+        System.arraycopy(nacoes, 0, targets, 1, nacoes.length);
+        target.setModel(new DefaultComboBoxModel<>(targets));
+
+        terreno.setModel(new DefaultComboBoxModel<>(terrenos()));
+        tactic.setModel(control.services.CenarioConverter.getInstance().getTaticaComboModel());
+        citySize.setModel(new DefaultComboBoxModel<>(cityLevels(true)));
+        cityFortification.setModel(new DefaultComboBoxModel<>(cityLevels(false)));
+    }
+
+    /**
+     * The window's taskbar icon: the hex's terrain, as the sibling accessory windows do
+     * ({@code ArmyMoveSimulator}, {@code TroopsCasualtiesList}, and the old BattleSim). Falls back
+     * to the application icon, because a window with no icon gets Java's default coffee cup.
+     */
+    private java.awt.Image scenarioIcon() {
+        final Terreno ground = controler.getScenario().getTerreno();
+        final java.awt.Image ret = ground == null ? null
+                : ImageManager.getInstance().getTerrainImages(ground.getCodigo());
+        return ret == null ? ImageManager.getInstance().getIconApp() : ret;
     }
 
     /**
@@ -264,13 +319,16 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         cityFortification.setActionCommand("cityFort");
         cityFortification.addActionListener(this);
         cityLoyalty.addChangeListener(this);
-        addRow(ret, gbc, 2, labels.getString("TAMANHO"), citySize);
-        addRow(ret, gbc, 3, labels.getString("FORTIFICACOES"), cityFortification);
-        addRow(ret, gbc, 4, labels.getString("LEALDADE"), cityLoyalty);
+        cityOwner.setActionCommand("cityOwner");
+        cityOwner.addActionListener(this);
+        addRow(ret, gbc, 2, labels.getString("NACAO"), cityOwner);
+        addRow(ret, gbc, 3, labels.getString("TAMANHO"), citySize);
+        addRow(ret, gbc, 4, labels.getString("FORTIFICACOES"), cityFortification);
+        addRow(ret, gbc, 5, labels.getString("LEALDADE"), cityLoyalty);
 
         cityText.setFont(cityText.getFont().deriveFont(Font.PLAIN));
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(6, 4, 2, 4);
         ret.add(cityText, gbc);
@@ -450,6 +508,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             for (int ii = 0; ii < roster.getRowCount(); ii++) {
                 roster.expandRow(ii);
             }
+            reselectInRoster();
             platoons.setModel(controler.getPlatoonModel());
             configurePlatoonColumns();
             refreshEditor();
@@ -458,6 +517,33 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             runReason.setText(BattleSimConverter.getRunDisabledReason(controler.getScenario()));
         } finally {
             refreshing = false;
+        }
+    }
+
+    /**
+     * Puts the selection highlight back on the army the editor is showing.
+     *
+     * The roster is rebuilt whole on every refresh, and a rebuilt JTree has nothing selected - so
+     * editing any field silently cleared the highlight and left the player unable to see which army
+     * the form belonged to. Matched by army identity rather than by row, because an edit can move
+     * an army to a different group.
+     */
+    private void reselectInRoster() {
+        final ArmySim wanted = controler.getSelected();
+        if (wanted == null) {
+            return;
+        }
+        for (int row = 0; row < roster.getRowCount(); row++) {
+            final Object node = roster.getPathForRow(row).getLastPathComponent();
+            if (!(node instanceof DefaultMutableTreeNode)) {
+                continue;
+            }
+            final Object user = ((DefaultMutableTreeNode) node).getUserObject();
+            if (user instanceof BattleSimControler.ArmyNode
+                    && ((BattleSimControler.ArmyNode) user).getArmy() == wanted) {
+                roster.setSelectionRow(row);
+                return;
+            }
         }
     }
 
@@ -475,13 +561,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             return;
         }
         armyTitle.setText(army.getNome());
-        nacao.setModel(new DefaultComboBoxModel<>(nacoes()));
         nacao.setSelectedItem(army.getNacao());
-        target.setModel(new DefaultComboBoxModel<>(targets()));
         target.setSelectedItem(army.getTargetNacao() == null
                 ? labels.getString("BATTLESIM.TARGET.ALL") : army.getTargetNacao());
         combatLevel.setSelectedItem(army.getCombatLevel());
-        tactic.setModel(control.services.CenarioConverter.getInstance().getTaticaComboModel());
         tactic.setSelectedIndex(indexOfTactic(army.getTatica()));
         commander.setValue(army.getComandantePericia());
         morale.setValue(army.getMoral());
@@ -495,20 +578,18 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     private void refreshGround() {
         final CombatScenario scenario = controler.getScenario();
-        terreno.setModel(new DefaultComboBoxModel<>(terrenos()));
         terreno.setSelectedItem(scenario.getTerreno());
 
         final Cidade city = scenario.getCidade();
         cityParticipates.setEnabled(city != null);
         cityParticipates.setSelected(scenario.isCityParticipates());
         final boolean editable = scenario.getCidadeAtiva() != null;
-        for (java.awt.Component one : new java.awt.Component[]{citySize, cityFortification,
-            cityLoyalty}) {
+        for (java.awt.Component one : new java.awt.Component[]{cityOwner, citySize,
+            cityFortification, cityLoyalty}) {
             one.setEnabled(editable);
         }
-        citySize.setModel(new DefaultComboBoxModel<>(cityLevels(true)));
-        cityFortification.setModel(new DefaultComboBoxModel<>(cityLevels(false)));
         if (city != null) {
+            cityOwner.setSelectedItem(city.getNacao());
             citySize.setSelectedIndex(clampIndex(city.getTamanho(), citySize.getItemCount()));
             cityFortification.setSelectedIndex(
                     clampIndex(city.getFortificacao(), cityFortification.getItemCount()));
@@ -536,23 +617,17 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         return Math.max(0, Math.min(count - 1, value));
     }
 
-    /** Nations already present in the scenario. Enough to retype an army, without a world list. */
+    /** Every nation in the world, by name. See {@link #buildComboModels} for why not just these. */
     private Object[] nacoes() {
-        final java.util.List<Object> ret = new java.util.ArrayList<>();
-        for (ArmySim army : controler.getScenario().getArmies()) {
-            if (army.getNacao() != null && !ret.contains(army.getNacao())) {
-                ret.add(army.getNacao());
+        final java.util.List<Nacao> ret = new java.util.ArrayList<>(
+                control.facade.WorldFacadeCounselor.getInstance().getNacoes().values());
+        java.util.Collections.sort(ret, new java.util.Comparator<Nacao>() {
+            @Override
+            public int compare(Nacao one, Nacao other) {
+                return String.valueOf(one.getNome()).compareToIgnoreCase(
+                        String.valueOf(other.getNome()));
             }
-        }
-        return ret.toArray();
-    }
-
-    private Object[] targets() {
-        final java.util.List<Object> ret = new java.util.ArrayList<>();
-        ret.add(labels.getString("BATTLESIM.TARGET.ALL"));
-        for (Object one : nacoes()) {
-            ret.add(one);
-        }
+        });
         return ret.toArray();
     }
 
@@ -623,6 +698,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             controler.setTerreno((Terreno) terreno.getSelectedItem());
         } else if ("city".equals(command)) {
             controler.setCityParticipates(cityParticipates.isSelected());
+        } else if ("cityOwner".equals(command)) {
+            controler.setCityOwner((Nacao) cityOwner.getSelectedItem());
         } else if ("citySize".equals(command)) {
             controler.setCityTamanho(citySize.getSelectedIndex());
         } else if ("cityFort".equals(command)) {

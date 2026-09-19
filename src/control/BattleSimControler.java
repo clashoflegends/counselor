@@ -338,6 +338,17 @@ public class BattleSimControler {
         scenario.setCityParticipates(participates);
     }
 
+    /**
+     * Who holds the city. Editable because the owner is one of the inputs the player may have to
+     * supply: 27 of the 207 cities in a live EGF arrive with no visible owner, and the combat
+     * formula reads the owner's powers.
+     */
+    public void setCityOwner(Nacao nacao) {
+        if (nacao != null && scenario.getCidade() != null) {
+            scenario.getCidade().setNacao(nacao);
+        }
+    }
+
     public void setCityLealdade(int lealdade) {
         scenario.setCityLealdade(lealdade);
     }
