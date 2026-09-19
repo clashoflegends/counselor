@@ -135,7 +135,7 @@ public class BattleCasualtySimulatorNew extends JFrame implements IBattleSimulat
         jbTacticHelp = new javax.swing.JButton();
         jbAbout = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jpCity.setBorder(javax.swing.BorderFactory.createTitledBorder(labels.getString("BATTLESIM.LOCAL.TITLE"))); // NOI18N
 
