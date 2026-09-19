@@ -9,6 +9,7 @@ import control.support.ControlBase;
 import control.support.DispatchManager;
 import gui.accessories.ArmyMoveSimulator;
 import gui.accessories.BattleCasualtySimulatorNew;
+import gui.accessories.BattleSimWindow;
 import gui.accessories.TroopsCasualtiesList;
 import gui.components.DialogTextArea;
 import gui.services.ComponentFactory;
@@ -233,17 +234,29 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
         casualtiesSim.setVisible(true);
     }
 
+    /**
+     * Opens BattleSim, either the Matisse window or the three-pane rebuild.
+     *
+     * The rebuild is a SISTER window, not a replacement: both are live, both read the same
+     * {@code business.combat} model, and `battleSimNew=true` in {@code properties.config} picks the
+     * new one. That makes it a feature flag rather than a fork - the working window is never at
+     * risk, and the two can be compared on the same hex.
+     *
+     * The flag is read HERE and nowhere else. Neither window knows it exists, which is what keeps
+     * the choice reversible. It defaults to false, and {@code properties.config} is local and
+     * gitignored, so the default in this line IS the shipped behaviour.
+     */
     private void createBattleSim(RadialButton rb) {
-        BattleCasualtySimulatorNew battleSim = new BattleCasualtySimulatorNew(rb.getLocal());
+        final JFrame battleSim;
+        if (Boolean.parseBoolean(
+                SettingsManager.getInstance().getConfig("battleSimNew", "false"))) {
+            battleSim = new BattleSimWindow(rb.getLocal());
+        } else {
+            battleSim = new BattleCasualtySimulatorNew(rb.getLocal());
+        }
         battleSim.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         battleSim.setLocationRelativeTo(rb);
         battleSim.setVisible(true);
-
-        /*    create a blank new FX window.
-            start over Counselor (setLocationRelativeTo)?
-            list armies.
-            go from there.
-         */
     }
 
     private void createArmyMovSim(RadialButton rb, boolean water) {
