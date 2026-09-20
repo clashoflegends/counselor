@@ -107,14 +107,40 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             new JCheckBox(labels.getString("BATTLESIM.CITY.PARTICIPATES"));
     private final JLabel cityText = new JLabel();
     private final JComboBox<Object> cityOwner = new JComboBox<>();
-    private final JSpinner cityLoyalty = spinner(0, 0, 100);
+    /** Loyalty is a percentage and the city model treats it as one. */
+    private final JSpinner cityLoyalty = spinner(0, 0, 100, 1);
     private final JComboBox<Object> citySize = new JComboBox<>();
     private final JComboBox<Object> cityFortification = new JComboBox<>();
     private final JComboBox<Object> tactic = new JComboBox<>();
-    private final JSpinner commander = spinner(0, 0, 100);
-    private final JSpinner morale = spinner(0, 0, 100);
-    private final JSpinner attackBonus = spinner(0, -100, 100);
-    private final JSpinner defenseBonus = spinner(0, -100, 100);
+    /**
+     * Ranges taken from what the GAME can actually produce (T-436), not from a guess.
+     *
+     * <b>Commander skill: 0 and up, with NO ceiling.</b> The natural skill is capped at
+     * {@code PersonagemControl.MAX_PC_SKILL} = 100, raisable per game by {@code ;GSS;} - but
+     * artefacts add on top of that cap through {@code Personagem.sumPericiaComandante}, so the
+     * EFFECTIVE value the EGF carries can exceed it and nothing in the model clamps it. A ceiling
+     * of 100 would have silently edited an artefact-boosted commander DOWN the moment his army was
+     * selected, which is the clamp-on-load trap in its purest form.
+     *
+     * <b>Morale: 0 to 100.</b> The Judge clamps it to 1..100 in {@code ExercitoControl.setMoral},
+     * so 100 is authoritative. The 0 is kept deliberately: an army the player has not scouted
+     * arrives with morale 0 because the server never exported it, and the live EGF confirms it
+     * (189 armies, minimum 0). A floor of 1 would rewrite every unscouted army on load.
+     *
+     * <b>Attack and defence bonus: 0 and up, step 100, no ceiling and NO NEGATIVES.</b> These are
+     * spell effects: {@code Ordem247CombatAttackBonus} adds {@code 20 * getPericia()} and they
+     * stack across casters, so real values run into the thousands - the previous -100..100 was
+     * wrong by two orders of magnitude. Negatives are not offered because the Judge cannot produce
+     * one: {@code ExercitoControl} floors the defence bonus at {@code Math.max(bonusDefesa - dano,
+     * 0)}. Offering one would let the player build a scenario the turn cannot.
+     *
+     * Neither bonus is carried in the EGF at all - {@code model.Exercito.getAttackBonus()} is
+     * hardcoded to return 0 - so they always load as 0 and are purely the player's what-if.
+     */
+    private final JSpinner commander = spinner(0, 0, null, 1);
+    private final JSpinner morale = spinner(0, 0, 100, 1);
+    private final JSpinner attackBonus = spinner(0, 0, null, 100);
+    private final JSpinner defenseBonus = spinner(0, 0, null, 100);
 
     /** Guards the listeners while the editor is being repopulated from the model. */
     private boolean refreshing = false;
@@ -212,8 +238,15 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         doRefresh();
     }
 
-    private static JSpinner spinner(int value, int min, int max) {
-        return new JSpinner(new SpinnerNumberModel(value, min, max, 1));
+    /**
+     * @param max null for no ceiling, which is the right answer whenever a value LOADED from the
+     *            EGF could exceed any bound we invent. A SpinnerNumberModel silently clamps
+     *            {@code setValue} to its bounds, so too low a maximum does not warn - it edits the
+     *            army as the player selects it.
+     */
+    private static JSpinner spinner(int value, int min, Integer max, int step) {
+        return new JSpinner(new SpinnerNumberModel(Integer.valueOf(value), Integer.valueOf(min),
+                max, Integer.valueOf(step)));
     }
 
     /**
