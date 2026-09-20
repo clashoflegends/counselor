@@ -9,6 +9,7 @@ import business.combat.RelationshipMatrix;
 import business.combat.ScenarioLoader;
 import business.combat.ScenarioRoster;
 import business.facade.NacaoFacade;
+import business.services.ComparatorFactory;
 import control.facade.WorldFacadeCounselor;
 import control.services.BattleSimConverter;
 import business.facade.CenarioFacade;
@@ -392,6 +393,7 @@ public class BattleSimControler {
 
         private final CombatScenario scenario;
         private final BattleSimControler owner;
+        private final transient ArmySim army;
         private final List<Pelotao> platoons = new ArrayList<>();
 
         public PlatoonTableModel(CombatScenario scenario, ArmySim army) {
@@ -401,9 +403,54 @@ public class BattleSimControler {
         PlatoonTableModel(CombatScenario scenario, ArmySim army, BattleSimControler owner) {
             this.scenario = scenario;
             this.owner = owner;
-            if (army != null) {
-                platoons.addAll(army.getPelotoes().values());
+            this.army = army;
+            doSort();
+        }
+
+        /**
+         * Puts the platoons in the order they will DIE. The row order is the information.
+         *
+         * John, 2026-09-19: "one important use of the current battlesim is for players to visualize
+         * the sequence of casualties, which they use to select tactics for the army then look at
+         * the sequence of the platoons... in some terrains catapults will die before infantry
+         * unless guerrilla is selected. Which is important as you want to spend the infantry to win
+         * the army combat to use the catapults in the city layer."
+         *
+         * So this is not decoration and not a convenience sort. It was
+         * {@code getPelotoes().values()}, which is a TreeMap keyed by troop-type codigo - in other
+         * words ALPHABETICAL, and alphabetical order looks exactly as authoritative as casualty
+         * order while answering a completely different question.
+         *
+         * {@code ComparatorCasualtiesSorter} is the Judge's own, reached through the same
+         * {@code ComparatorFactory} call the Judge makes inside
+         * {@code ExercitoControlFacade.getTropasTerraSortedCloned}. Sharing is total here, with no
+         * recompose gap to work around: the Judge's overload takes a {@code partidaId} and then
+         * never uses it - both {@code ComparatorFactory} overloads build the identical
+         * {@code new ComparatorCasualtiesSorter(tatica, terreno)}.
+         *
+         * Ships first and unsorted, because they are a different layer with a different question:
+         * the Judge's land sort drops them outright ({@code !isBarcos()}), so ordering them by a
+         * land comparator would be inventing an answer.
+         */
+        private void doSort() {
+            platoons.clear();
+            if (army == null) {
+                return;
             }
+            final List<Pelotao> land = new ArrayList<>();
+            for (Pelotao pelotao : army.getPelotoes().values()) {
+                if (pelotao.getTipoTropa() != null && pelotao.getTipoTropa().isBarcos()) {
+                    platoons.add(pelotao);
+                } else {
+                    land.add(pelotao);
+                }
+            }
+            Terreno terreno = scenario == null ? null : scenario.getTerreno();
+            if (terreno == null) {
+                terreno = army.getTerreno();
+            }
+            ComparatorFactory.getComparatorCasualtiesPelotaoSorter(land, army.getTatica(), terreno);
+            platoons.addAll(land);
         }
 
         public Pelotao getPlatoon(int row) {
@@ -490,7 +537,13 @@ public class BattleSimControler {
                 // retyping REKEYS the platoon, so the owning army has to do it - see setPlatoonType
                 if (owner != null && value instanceof TipoTropa
                         && owner.setPlatoonType(platoons.get(row), (TipoTropa) value)) {
-                    fireTableRowsUpdated(row, row);
+                    // and it MOVES it: the casualty order is by troop type, so a retyped platoon
+                    // belongs somewhere else in the sequence. Re-sorted here rather than left to
+                    // the next refresh, which would have shown a stale order in the meantime -
+                    // and the order is the whole point of this table. Quantity edits do not
+                    // re-sort, because the comparator never looks at a quantity.
+                    doSort();
+                    fireTableDataChanged();
                 }
                 return;
             }
