@@ -216,10 +216,7 @@ public class BattleSimConverter {
      * clipboard export had it backwards and printed the fleet's strength under "Land attack".
      */
     public static String getArmyStrength(ArmySim army) {
-        // No nation, no numbers: BattleSimFacade.getPlatoonDefense dereferences getNacao()
-        // unguarded for the ;PDB; capital-distance bonus, and an army whose owner is unknown is a
-        // real state in this package rather than a bad fixture.
-        if (army == null || army.getNacao() == null) {
+        if (army == null) {
             return "";
         }
         final ExercitoFacade facade = new ExercitoFacade();
@@ -241,7 +238,7 @@ public class BattleSimConverter {
      * and printing "0/0" beside every army would be noise dressed as data.
      */
     public static String getArmyStrengthShort(ArmySim army) {
-        if (army == null || army.getNacao() == null) {
+        if (army == null) {
             return "";
         }
         final ExercitoFacade facade = new ExercitoFacade();

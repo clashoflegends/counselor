@@ -192,26 +192,27 @@ class BattleSimPlatoonTableTest {
     }
 
     /**
-     * An army whose owner is unknown gets "--", not a crash and not a zero.
+     * An army whose owner is unknown gets REAL numbers, not a dash and not a crash.
      *
-     * {@code BattleSimFacade.getPlatoonDefense} dereferences {@code army.getNacao()} unguarded for
-     * the {@code ;PDB;} capital-distance bonus, and a null nation is a REAL state in this package -
-     * {@code HostilityDeriver} handles "an army whose owner is unknown" explicitly, and a blank
-     * army starts without one. These columns are computed for every platoon on every refresh, so
-     * without this guard such an army takes the whole window down.
+     * A null nation is a real state here - {@code HostilityDeriver} handles "an army whose owner is
+     * unknown" by name, and a blank army starts without one. It used to take the window down,
+     * because {@code BattleSimFacade.getPlatoonDefense} dereferenced {@code getNacao()} unguarded;
+     * T-440 fixed that at the source rather than dashing it out here, so everything the client
+     * actually knows - the platoon, the terrain, the troop stats - is still computed.
      *
-     * "--" rather than 0 because they are different claims: 0 is a strength, this is the absence
-     * of one.
+     * The figure can only UNDERSTATE such an army, never overstate it, since the one thing it drops
+     * is a nation bonus that could not be shown to apply. Same pessimistic direction as the
+     * assumed-not-hostile default, and the army is already marked ESTIMATED.
      */
     @Test
-    void anArmyWithNoNationShowsDashesRatherThanCrashing() {
+    void anArmyWithNoNationStillGetsItsNumbers() {
         final CombatScenario scenario = new CombatScenario(null, hex());
         final ArmySim ownerless = new ArmySim(loadedArmy(platoon(troopType("inf", false), 900)));
         scenario.addArmy(ownerless, CombatScenario.Provenance.ESTIMATED);
         final BattleSimControler.PlatoonTableModel model = modelOver(scenario, ownerless);
 
-        assertEquals("--", model.getValueAt(0, 6));
-        assertEquals("--", model.getValueAt(0, 7));
+        assertNotEquals("--", model.getValueAt(0, 6), "no owner is not no strength");
+        assertNotEquals("--", model.getValueAt(0, 7));
     }
 
     /** No army selected is a real state, not a crash: an empty hex opens the window. */

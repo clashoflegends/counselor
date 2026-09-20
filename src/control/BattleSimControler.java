@@ -471,24 +471,21 @@ public class BattleSimControler {
         }
 
         /**
-         * Can these numbers be computed at all? Only with a nation.
+         * The formatted strength. Always a number now, for every army including an ownerless one.
          *
-         * {@code BattleSimFacade.getPlatoonDefense} dereferences {@code army.getNacao()} unguarded
-         * (line 240, for the {@code ;PDB;} capital-distance bonus), and a null nation is a REAL
-         * state here, not a fixture artefact - {@code HostilityDeriver} handles "an army whose
-         * owner is unknown" explicitly, and a blank army starts without one. Adding these columns
-         * computes them for every platoon on every refresh, so an army with no owner would have
-         * taken the window down.
+         * This used to answer "--" when the army had no nation, because
+         * {@code BattleSimFacade.getPlatoonDefense} dereferenced {@code getNacao()} unguarded and
+         * would have taken the window down. T-440 fixed that at the source instead, so the number
+         * is computable for every army: the troop stats, the terrain and the platoon are all known,
+         * and the only thing a nationless army loses is the two nation bonuses it could not be
+         * shown to qualify for anyway.
          *
-         * Answering "--" rather than 0 because the two are different claims: 0 is a strength, and
-         * this is an absence of one. The same dash After and Lost already use for "not known yet".
+         * That direction matters. The figure can UNDERSTATE a hidden nation's army and cannot
+         * overstate it, which is the same pessimistic direction the assumed-not-hostile default
+         * takes, and the army is already marked ESTIMATED.
          */
-        private boolean isComputable() {
-            return army != null && army.getNacao() != null;
-        }
-
         private String strength(int value) {
-            return isComputable() ? String.format("%,d", value) : "--";
+            return String.format("%,d", value);
         }
 
         @Override
@@ -564,11 +561,9 @@ public class BattleSimControler {
                 case COL_ARMOUR:
                     return pelotao.getModDefesa();
                 case COL_ATTACK:
-                    return isComputable()
-                            ? strength(exercitoFacade.getAtaquePelotao(pelotao, army)) : "--";
+                    return strength(exercitoFacade.getAtaquePelotao(pelotao, army));
                 case COL_DEFENSE:
-                    return isComputable()
-                            ? strength(exercitoFacade.getDefesaPelotao(pelotao, army)) : "--";
+                    return strength(exercitoFacade.getDefesaPelotao(pelotao, army));
                 default:
                     return "--";
             }
