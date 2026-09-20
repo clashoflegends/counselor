@@ -8,6 +8,7 @@ import business.combat.LayerParticipation;
 import business.combat.RosterDerivation;
 import business.combat.RunGate;
 import business.combat.ScenarioRoster;
+import business.facade.ExercitoFacade;
 import java.util.List;
 import msgs.BaseMsgs;
 import persistenceCommons.BundleManager;
@@ -202,6 +203,67 @@ public class BattleSimConverter {
     }
 
     /**
+     * The four numbers that answer "who is stronger": land and sea, attack and defence.
+     *
+     * The single biggest thing the three-pane rebuild was missing. The old window's army table
+     * carried these as four columns and they are the reason a player opens the tool at all - it
+     * could say who fights whom and in what order they die, and could not say who would win.
+     *
+     * Computed live off {@code ExercitoFacade}, which already takes {@code IExercito}, so the
+     * simulated army goes straight in and the numbers are the Judge's own - no second
+     * implementation to drift. <b>The boolean is NAVAL, not land</b>:
+     * {@code BattleSimFacade.getArmyAttack} tests {@code naval == tipoTropa.isBarcos()}. The old
+     * clipboard export had it backwards and printed the fleet's strength under "Land attack".
+     */
+    public static String getArmyStrength(ArmySim army) {
+        // No nation, no numbers: BattleSimFacade.getPlatoonDefense dereferences getNacao()
+        // unguarded for the ;PDB; capital-distance bonus, and an army whose owner is unknown is a
+        // real state in this package rather than a bad fixture.
+        if (army == null || army.getNacao() == null) {
+            return "";
+        }
+        final ExercitoFacade facade = new ExercitoFacade();
+        return String.format("<html>%s: %,d &nbsp; %s: %,d<br>%s: %,d &nbsp; %s: %,d</html>",
+                labels.getString("TROPA.ATAQUE.TERRA"), facade.getAtaqueExercito(army, false),
+                labels.getString("TROPA.DEFESA.TERRA"), facade.getDefesaExercito(army, false),
+                labels.getString("TROPA.ATAQUE.NAVAL"), facade.getAtaqueExercito(army, true),
+                labels.getString("TROPA.DEFESA.NAVAL"), facade.getDefesaExercito(army, true));
+    }
+
+    /**
+     * A compact strength for the roster, so armies can be COMPARED without clicking each one.
+     *
+     * The old window's scan surface was a table; this one is a tree, and a detail pane only ever
+     * shows the selected army. Without something on the node itself the player has to click every
+     * army in turn and remember the numbers, which is exactly the job the old table did for him.
+     *
+     * Only the layer the army actually has troops in, because a land host's naval attack is zero
+     * and printing "0/0" beside every army would be noise dressed as data.
+     */
+    public static String getArmyStrengthShort(ArmySim army) {
+        if (army == null || army.getNacao() == null) {
+            return "";
+        }
+        final ExercitoFacade facade = new ExercitoFacade();
+        final StringBuilder ret = new StringBuilder();
+        final int landAttack = facade.getAtaqueExercito(army, false);
+        final int landDefense = facade.getDefesaExercito(army, false);
+        if (landAttack > 0 || landDefense > 0) {
+            ret.append(String.format("%,d/%,d", landAttack, landDefense));
+        }
+        final int seaAttack = facade.getAtaqueExercito(army, true);
+        final int seaDefense = facade.getDefesaExercito(army, true);
+        if (seaAttack > 0 || seaDefense > 0) {
+            if (ret.length() > 0) {
+                ret.append("  ");
+            }
+            ret.append(String.format("%s %,d/%,d",
+                    labels.getString("BATTLESIM.LAYER.NAVY"), seaAttack, seaDefense));
+        }
+        return ret.toString();
+    }
+
+    /**
      * "Reported size: Vast army" - the server's own word for how big this army is.
      *
      * Shown for EVERY army, not only the ones the player cannot see into, and the javadoc used to
@@ -269,13 +331,15 @@ public class BattleSimConverter {
      * editor's "Fights in:" line, which is where a player is looking when he asks.
      */
     public static String getArmyTitle(ArmySim army, LayerParticipation participation) {
+        final String strength = getArmyStrengthShort(army);
         if (participation == null || !participation.isInAnyLayer()) {
-            return army.getNome();
+            return strength.isEmpty() ? army.getNome()
+                    : String.format("%s  -  %s", army.getNome(), strength);
         }
         final StringBuilder badge = new StringBuilder();
         for (CombatLayer layer : participation.getLayers()) {
             badge.append(layer.getBadge());
         }
-        return String.format("%s  [%s]", army.getNome(), badge);
+        return String.format("%s  [%s]  %s", army.getNome(), badge, strength);
     }
 }

@@ -389,11 +389,24 @@ public class BattleSimControler {
         private static final long serialVersionUID = 1L;
         /** Only the four the player may edit are writable; see the ownership boundary. */
         private static final int COL_LAYER = 0, COL_TROOP = 1, COL_QTD = 2, COL_TRAINING = 3,
-                COL_WEAPON = 4, COL_ARMOUR = 5, COL_AFTER = 6, COL_LOST = 7;
+                COL_WEAPON = 4, COL_ARMOUR = 5, COL_ATTACK = 6, COL_DEFENSE = 7, COL_AFTER = 8,
+                COL_LOST = 9;
 
         private final CombatScenario scenario;
         private final BattleSimControler owner;
         private final transient ArmySim army;
+        /**
+         * The per-platoon attack and defence, computed live off the SHARED facade.
+         *
+         * Never cached. Every input the player can edit moves these - quantity, training, weapon,
+         * armour, troop type, and the army's own terrain and nation - so a stored copy would be
+         * stale the moment he typed. They are a handful of multiplications over a handful of rows.
+         *
+         * This is also where the hero-bonus fix (T-425) becomes visible: these were the numbers
+         * silently missing the {@code ;TAH;} bonus while {@code getComandanteModel()} returned null.
+         */
+        private static final business.facade.ExercitoFacade exercitoFacade =
+                new business.facade.ExercitoFacade();
         private final List<Pelotao> platoons = new ArrayList<>();
 
         public PlatoonTableModel(CombatScenario scenario, ArmySim army) {
@@ -457,6 +470,27 @@ public class BattleSimControler {
             return platoons.get(row);
         }
 
+        /**
+         * Can these numbers be computed at all? Only with a nation.
+         *
+         * {@code BattleSimFacade.getPlatoonDefense} dereferences {@code army.getNacao()} unguarded
+         * (line 240, for the {@code ;PDB;} capital-distance bonus), and a null nation is a REAL
+         * state here, not a fixture artefact - {@code HostilityDeriver} handles "an army whose
+         * owner is unknown" explicitly, and a blank army starts without one. Adding these columns
+         * computes them for every platoon on every refresh, so an army with no owner would have
+         * taken the window down.
+         *
+         * Answering "--" rather than 0 because the two are different claims: 0 is a strength, and
+         * this is an absence of one. The same dash After and Lost already use for "not known yet".
+         */
+        private boolean isComputable() {
+            return army != null && army.getNacao() != null;
+        }
+
+        private String strength(int value) {
+            return isComputable() ? String.format("%,d", value) : "--";
+        }
+
         @Override
         public int getRowCount() {
             return platoons.size();
@@ -464,7 +498,7 @@ public class BattleSimControler {
 
         @Override
         public int getColumnCount() {
-            return 8;
+            return 10;
         }
 
         @Override
@@ -484,6 +518,10 @@ public class BattleSimControler {
                     return labels.getString("ARMA");
                 case COL_ARMOUR:
                     return labels.getString("ARMADURA");
+                case COL_ATTACK:
+                    return labels.getString("BATTLESIM.COL.ATTACK");
+                case COL_DEFENSE:
+                    return labels.getString("BATTLESIM.COL.DEFENSE");
                 case COL_AFTER:
                     return labels.getString("BATTLESIM.COL.AFTER");
                 default:
@@ -496,6 +534,10 @@ public class BattleSimControler {
             if (column == COL_TROOP) {
                 return TipoTropa.class;
             }
+            // Atk and Def are STRINGS, not Integers: they are formatted with thousands
+            // separators and they answer "--" for an army whose owner is unknown, which no int can
+            // express. Nothing sorts this table - the row order is the casualty order - so there is
+            // no numeric sort to lose.
             return column >= COL_QTD && column <= COL_ARMOUR ? Integer.class : String.class;
         }
 
@@ -521,6 +563,12 @@ public class BattleSimControler {
                     return pelotao.getModAtaque();
                 case COL_ARMOUR:
                     return pelotao.getModDefesa();
+                case COL_ATTACK:
+                    return isComputable()
+                            ? strength(exercitoFacade.getAtaquePelotao(pelotao, army)) : "--";
+                case COL_DEFENSE:
+                    return isComputable()
+                            ? strength(exercitoFacade.getDefesaPelotao(pelotao, army)) : "--";
                 default:
                     return "--";
             }

@@ -95,6 +95,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private final JLabel fightsIn = new JLabel();
     private final JLabel source = new JLabel();
     private final JLabel sizeBand = new JLabel();
+    private final JLabel strength = new JLabel();
     private final JButton run = new JButton(labels.getString("BATTLESIM.RUN.SIMULATION"));
     private final JButton diplomacy = new JButton(labels.getString("BATTLESIM.DIPLOMACY"));
 
@@ -464,21 +465,28 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
         // the two derived lines: what this army will actually do, and how much to trust it.
         // Given air above them so they read as a conclusion rather than another field.
-        for (JLabel one : new JLabel[]{sizeBand, fightsIn, source}) {
+        for (JLabel one : new JLabel[]{strength, sizeBand, fightsIn, source}) {
             one.setFont(one.getFont().deriveFont(Font.PLAIN));
         }
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 4;
         gbc.insets = new Insets(10, 4, 1, 4);
+        // The four numbers that answer "who is stronger" - the old window's whole reason to
+        // exist, and the one thing this rebuild was still missing. Read-only: they are computed
+        // from the platoons, the terrain and the nation, so the way to change them is to change
+        // those.
+        ret.add(strength, gbc);
+        gbc.gridy = 6;
+        gbc.insets = new Insets(6, 4, 1, 4);
         // the server's own description of how big this army is. A LABEL, never a field: the band
         // is what the player was told, and turning it into an editable number would invite him to
         // treat a guess as data. What he types instead is the platoon list below.
         ret.add(sizeBand, gbc);
-        gbc.gridy = 6;
+        gbc.gridy = 7;
         gbc.insets = new Insets(1, 4, 1, 4);
         ret.add(fightsIn, gbc);
-        gbc.gridy = 7;
+        gbc.gridy = 8;
         gbc.insets = new Insets(1, 4, 4, 4);
         ret.add(source, gbc);
 
@@ -555,14 +563,14 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     /** Applied after every model swap, because a new model discards the column settings. */
     private void configurePlatoonColumns() {
-        if (platoons.getColumnCount() < 8) {
+        if (platoons.getColumnCount() < 10) {
             return;
         }
-        final int[] widths = {34, 150, 70, 70, 70, 70, 60, 60};
+        final int[] widths = {34, 140, 66, 60, 60, 60, 66, 66, 52, 52};
         for (int ii = 0; ii < widths.length; ii++) {
             platoons.getColumnModel().getColumn(ii).setPreferredWidth(widths[ii]);
         }
-        for (int ii : new int[]{0, 6, 7}) {
+        for (int ii : new int[]{0, 8, 9}) {
             platoons.getColumnModel().getColumn(ii).setCellRenderer(centredCell);
         }
         // the troop type is an object, not a name: it has to be pickable, and the same renderer
@@ -702,6 +710,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         }
         if (!any) {
             armyTitle.setText("");
+            strength.setText("");
             sizeBand.setText("");
             fightsIn.setText("");
             source.setText("");
@@ -717,6 +726,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         morale.setValue(army.getMoral());
         attackBonus.setValue(army.getAttackBonus());
         defenseBonus.setValue(army.getArmyDefenseBonus());
+        strength.setText(BattleSimConverter.getArmyStrength(army));
         sizeBand.setText(BattleSimConverter.getSizeBandText(army));
         fightsIn.setText(BattleSimConverter.getFightsIn(controler.getParticipation(army)));
         source.setText(String.format(labels.getString("BATTLESIM.SOURCE"),

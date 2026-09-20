@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -141,7 +142,13 @@ class BattleSimPlatoonTableTest {
         assertEquals("A", land);
     }
 
-    /** After and Lost exist so the engine fills them later. Until then they are not backed. */
+    /**
+     * After and Lost exist so the engine fills them later. Until then they are not backed.
+     *
+     * They sit at 8 and 9 now: T-427 inserted Atk and Def at 6 and 7, which is the one thing the
+     * rebuild was missing against the old window - it could say who fights whom and in what order
+     * they die, and could not say who would win.
+     */
     @Test
     void afterAndLostAreEmptyAndNotEditable() {
         final CombatScenario scenario = new CombatScenario(null, hex());
@@ -149,13 +156,62 @@ class BattleSimPlatoonTableTest {
         scenario.addArmy(army, CombatScenario.Provenance.EXACT);
         final BattleSimControler.PlatoonTableModel model = modelOver(scenario, army);
 
-        assertEquals("--", model.getValueAt(0, 6));
-        assertEquals("--", model.getValueAt(0, 7));
-        assertFalse(model.isCellEditable(0, 6));
-        assertFalse(model.isCellEditable(0, 7));
+        assertEquals(10, model.getColumnCount());
+        assertEquals("--", model.getValueAt(0, 8));
+        assertEquals("--", model.getValueAt(0, 9));
+        assertFalse(model.isCellEditable(0, 8));
+        assertFalse(model.isCellEditable(0, 9));
         assertTrue(model.isCellEditable(0, 2), "quantity is the player's to type");
         assertTrue(model.isCellEditable(0, 1),
                 "and so is the troop type - an army he cannot see needs one typed in from scratch");
+    }
+
+    /**
+     * Attack and defence are computed, shown, and NOT editable.
+     *
+     * Read-only on purpose: they are derived from the platoon, the army's terrain and its nation,
+     * so the way to change them is to change those. An editable cell here would let the player
+     * type a strength his own troop list does not support.
+     */
+    @Test
+    void attackAndDefenceAreComputedAndReadOnly() {
+        final model.Nacao nacao = new model.Nacao();
+        nacao.setCodigo("n");
+        nacao.setNome("Nation");
+        final Exercito loaded = loadedArmy(platoon(troopType("inf", false), 900));
+        loaded.setNacao(nacao);
+        final CombatScenario scenario = new CombatScenario(null, hex());
+        final ArmySim army = new ArmySim(loaded);
+        scenario.addArmy(army, CombatScenario.Provenance.EXACT);
+        final BattleSimControler.PlatoonTableModel model = modelOver(scenario, army);
+
+        assertNotEquals("--", model.getValueAt(0, 6), "attack is computed, not a dash");
+        assertNotEquals("--", model.getValueAt(0, 7), "and so is defence");
+        assertFalse(model.isCellEditable(0, 6), "derived from the troops, not typed over them");
+        assertFalse(model.isCellEditable(0, 7));
+    }
+
+    /**
+     * An army whose owner is unknown gets "--", not a crash and not a zero.
+     *
+     * {@code BattleSimFacade.getPlatoonDefense} dereferences {@code army.getNacao()} unguarded for
+     * the {@code ;PDB;} capital-distance bonus, and a null nation is a REAL state in this package -
+     * {@code HostilityDeriver} handles "an army whose owner is unknown" explicitly, and a blank
+     * army starts without one. These columns are computed for every platoon on every refresh, so
+     * without this guard such an army takes the whole window down.
+     *
+     * "--" rather than 0 because they are different claims: 0 is a strength, this is the absence
+     * of one.
+     */
+    @Test
+    void anArmyWithNoNationShowsDashesRatherThanCrashing() {
+        final CombatScenario scenario = new CombatScenario(null, hex());
+        final ArmySim ownerless = new ArmySim(loadedArmy(platoon(troopType("inf", false), 900)));
+        scenario.addArmy(ownerless, CombatScenario.Provenance.ESTIMATED);
+        final BattleSimControler.PlatoonTableModel model = modelOver(scenario, ownerless);
+
+        assertEquals("--", model.getValueAt(0, 6));
+        assertEquals("--", model.getValueAt(0, 7));
     }
 
     /** No army selected is a real state, not a crash: an empty hex opens the window. */
