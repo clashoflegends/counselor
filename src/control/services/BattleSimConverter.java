@@ -6,6 +6,7 @@ import business.combat.CombatLevel;
 import business.combat.CombatScenario;
 import business.combat.LayerParticipation;
 import business.combat.RosterDerivation;
+import business.combat.RunGate;
 import business.combat.ScenarioRoster;
 import java.util.List;
 import msgs.BaseMsgs;
@@ -26,6 +27,8 @@ import persistenceCommons.SettingsManager;
 public class BattleSimConverter {
 
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
+    /** T-801 flips this. Until then Run is disabled and says so. */
+    private static final boolean ENGINE_EXISTS = false;
 
     private BattleSimConverter() {
     }
@@ -170,21 +173,32 @@ public class BattleSimConverter {
     }
 
     /**
-     * Why Run is disabled, for the status bar rather than a tooltip.
+     * Why Run is disabled, for the status bar rather than a tooltip. R-40.
      *
      * A tooltip on a disabled button is unreliable across platforms, and this is the one message the
-     * player most needs when nothing happens.
+     * player most needs when nothing happens - which is the complaint the whole rebuild started
+     * from.
      *
-     * ALWAYS returns a reason, because Run is always disabled: there is no engine. Phase 5 (T-501)
-     * is what gives it an enabled state, and that is where this gains an "everything is ready"
-     * answer. Said explicitly because the javadoc previously claimed a null-means-enabled contract
-     * the method has never had, and T-501 would have been written against it.
+     * The decision is {@link RunGate}'s, in PbmCommons, where it can be tested without a bundle.
+     * This only names it, and the label keys are the enum constants, so a new state cannot be added
+     * without its sentence. {@link RunGate#READY} maps to an EMPTY string: when Run works, the
+     * status bar has nothing to explain and says nothing.
      */
     public static String getRunDisabledReason(CombatScenario scenario) {
-        if (scenario != null && !scenario.hasCombat()) {
-            return labels.getString("BATTLESIM.RUN.DISABLED.NOCOMBAT");
-        }
-        return labels.getString("BATTLESIM.RUN.DISABLED.NOENGINE");
+        return labels.getString(scenario == null
+                ? "BATTLESIM.RUN.DISABLED.NO_ARMIES"
+                : "BATTLESIM.RUN." + (scenario.getRunGate(ENGINE_EXISTS) == RunGate.READY
+                        ? "READY" : "DISABLED." + scenario.getRunGate(ENGINE_EXISTS).name()));
+    }
+
+    /**
+     * Whether Run may be enabled at all: false until T-801 builds the resolution chain.
+     *
+     * One constant, one call site, so the day the engine lands is a one-line change rather than a
+     * hunt through the model for everything that assumed there was none.
+     */
+    public static boolean isRunnable(CombatScenario scenario) {
+        return scenario != null && scenario.getRunGate(ENGINE_EXISTS).isRunnable();
     }
 
     /**

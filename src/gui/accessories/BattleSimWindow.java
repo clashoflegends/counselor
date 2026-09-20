@@ -657,6 +657,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             diplomacy.setToolTipText(nacoes > 1 ? null
                     : labels.getString("BATTLESIM.DIPLOMACY.EMPTY"));
             status.setText(BattleSimConverter.getDerivationText(controler.getScenario()));
+            // R-40: the button's state and the sentence beside it come from the SAME gate, so
+            // they cannot drift into saying different things.
+            run.setEnabled(BattleSimConverter.isRunnable(controler.getScenario()));
             runReason.setText(BattleSimConverter.getRunDisabledReason(controler.getScenario()));
         } finally {
             refreshing = false;
