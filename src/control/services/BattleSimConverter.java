@@ -61,44 +61,61 @@ public class BattleSimConverter {
     }
 
     /**
-     * The army editor's "Fights in: sea, land" line, or why it takes no part.
+     * The army editor's participation block: a summary line, then ALL THREE layers, each answered.
      *
-     * An army that fights nowhere is the interesting case, and the one a player opens the simulator
-     * to ask about: a fleet that will not defend his city, a garrison that will not sortie. So the
-     * empty answer carries the REASON rather than an empty list.
+     * <h3>Three answers, never one</h3>
+     *
+     * John, 2026-09-19: "The participation is layer by layer. N A C. There are enough edge cases
+     * that there is always a situation that someone will participate of 0 to 3 of them."
+     *
+     * This used to print one reason for the whole army - the first non-FIGHTS answer, asked of the
+     * land layer first - and that was a true sentence standing in for three different ones. Live
+     * example from hex 1141: four Greyjoy armies sitting on a Tully city read "Takes no part in
+     * this battle (no enemy present)". Perfectly true of the LAND layer, and it buried the answer
+     * the player actually needed - the city layer said "not ordered to assault", which he fixes by
+     * changing Combat level to Attack city. The one thing the line exists to tell him was the one
+     * thing it hid.
+     *
+     * So every layer states its own case, in the N A C order the Judge resolves them, including the
+     * ones it fights in. An army in no layer is still the case a player opens the simulator to ask
+     * about - a fleet that will not defend his city, a garrison that will not sortie - and now he
+     * sees which of the three tests stopped it and can act on that one.
      */
     public static String getFightsIn(LayerParticipation participation) {
         if (participation == null) {
             return "";
         }
+        // HTML, because the answer is four short lines rather than one long one.
         final List<CombatLayer> layers = participation.getLayers();
+        final StringBuilder ret = new StringBuilder("<html>");
         if (layers.isEmpty()) {
-            return labels.getString("BATTLESIM.FIGHTS.NONE") + " (" + getWhyNot(participation) + ")";
-        }
-        final StringBuilder ret = new StringBuilder();
-        for (CombatLayer layer : layers) {
-            if (ret.length() > 0) {
-                ret.append(", ");
+            ret.append(labels.getString("BATTLESIM.FIGHTS.NONE"));
+        } else {
+            final StringBuilder named = new StringBuilder();
+            for (CombatLayer layer : layers) {
+                if (named.length() > 0) {
+                    named.append(", ");
+                }
+                named.append(getLayerName(layer));
             }
-            ret.append(getLayerName(layer));
+            ret.append(String.format(labels.getString("BATTLESIM.FIGHTS.IN"), named.toString()));
         }
-        return String.format(labels.getString("BATTLESIM.FIGHTS.IN"), ret.toString());
+        // then ALL THREE layers, in the N A C order the Judge resolves them, each with its own
+        // answer. Never one sentence for the whole army: see the method javadoc.
+        for (CombatLayer layer : new CombatLayer[]{CombatLayer.NAVY, CombatLayer.ARMY,
+            CombatLayer.CITY}) {
+            ret.append("<br>&nbsp;&nbsp;").append(getLayerName(layer)).append(": ")
+                    .append(getReasonName(participation.getReason(layer)));
+        }
+        return ret.append("</html>").toString();
     }
 
-    /**
-     * Why an army fights nowhere, taken from the layer that has the most to say.
-     *
-     * The land layer is asked first because it is the one a player is usually surprised about. Each
-     * reason maps to exactly one test in {@code LayerParticipation}, so this never has to guess.
-     */
-    private static String getWhyNot(LayerParticipation participation) {
-        for (CombatLayer layer : new CombatLayer[]{CombatLayer.ARMY, CombatLayer.NAVY, CombatLayer.CITY}) {
-            final LayerParticipation.Reason reason = participation.getReason(layer);
-            if (reason != null && reason != LayerParticipation.Reason.FIGHTS) {
-                return labels.getString("BATTLESIM.REASON." + reason.name());
-            }
+    /** One layer's answer: "takes part", or the single test that stopped it. */
+    private static String getReasonName(LayerParticipation.Reason reason) {
+        if (reason == null || reason == LayerParticipation.Reason.FIGHTS) {
+            return labels.getString("BATTLESIM.FIGHTS.YES");
         }
-        return "";
+        return labels.getString("BATTLESIM.REASON." + reason.name());
     }
 
     public static String getCombatLevelName(CombatLevel level) {
@@ -216,7 +233,10 @@ public class BattleSimConverter {
         if (scenario == null || scenario.getCidadeAtiva() == null) {
             return labels.getString("BATTLESIM.CITY.NONE");
         }
-        return String.format("%s: %,d   %s: %,d   %s",
+        // Three facts on three lines, not one run-on sentence. Spaced onto one line they ran
+        // past the edge of the Ground panel and the siege clause - the half that says whether there
+        // is a round 0 at all - was the half that got cut off.
+        return String.format("<html>%s: %,d<br>%s: %,d<br>%s</html>",
                 labels.getString("BATTLESIM.CITY.DEFENSE"), scenario.getCityDefense(),
                 labels.getString("BATTLESIM.CITY.FORTIFICATION.DEFENSE"),
                 scenario.getCityFortificationDefense(),
