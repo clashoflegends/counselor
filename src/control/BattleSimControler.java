@@ -5,6 +5,7 @@ import business.combat.CombatLayer;
 import business.combat.CombatLevel;
 import business.combat.CombatScenario;
 import business.combat.LayerParticipation;
+import business.combat.RelationshipMatrix;
 import business.combat.ScenarioLoader;
 import business.combat.ScenarioRoster;
 import business.facade.NacaoFacade;
@@ -255,6 +256,120 @@ public class BattleSimControler {
         selected.getPelotoes().put(pelotao.getCodigo(), pelotao);
         scenario.setEdited(pelotao);
         return true;
+    }
+
+    /**
+     * The diplomacy grid: every nation in the battle as a row AND as a column.
+     *
+     * Square on purpose. A cell is what the ROW nation thinks of the COLUMN nation, which is how
+     * {@code Nacao.getRelacionamento} stores it, and the two halves of a pair genuinely can differ -
+     * a vassal and its lord hold opposite values, and a unilateral declaration of war changes only
+     * the declarer's row. Collapsing it to a triangle would have to pick one of the two to show and
+     * silently discard the other.
+     */
+    public DiplomacyTableModel getDiplomacyModel() {
+        return new DiplomacyTableModel(scenario);
+    }
+
+    /**
+     * The nation-by-nation table, as a Swing model. T-418.
+     *
+     * The matrix is re-derived from the scenario after every edit rather than patched in place,
+     * because an edit can move more than the cell it was typed into: {@code getRelationships}
+     * rebuilds from the EGF and the game type with the overrides laid on top, and the overrides are
+     * the only durable state. Rebuilding is a pass over a handful of nations.
+     */
+    public static class DiplomacyTableModel extends AbstractTableModel {
+
+        private static final long serialVersionUID = 1L;
+
+        private final transient CombatScenario scenario;
+        private final transient List<Nacao> nacoes;
+        private transient RelationshipMatrix matrix;
+
+        public DiplomacyTableModel(CombatScenario scenario) {
+            this.scenario = scenario;
+            this.matrix = scenario == null ? new RelationshipMatrix() : scenario.getRelationships();
+            this.nacoes = new ArrayList<>(matrix.getNacoes());
+        }
+
+        /** The nations, in table order. Column {@code ii + 1} is {@code getNacoes().get(ii)}. */
+        public List<Nacao> getNacoes() {
+            return nacoes;
+        }
+
+        @Override
+        public int getRowCount() {
+            return nacoes.size();
+        }
+
+        /** One leading column for the row's own name, then one per nation. */
+        @Override
+        public int getColumnCount() {
+            return nacoes.size() + 1;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            if (column == 0) {
+                return labels.getString("BATTLESIM.DIPLOMACY.NATION");
+            }
+            return String.valueOf(nacoes.get(column - 1).getNome());
+        }
+
+        @Override
+        public Class<?> getColumnClass(int column) {
+            return column == 0 ? Nacao.class : Integer.class;
+        }
+
+        /** The diagonal is a nation's view of itself, which the model fixes at neutral. */
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return column > 0 && row != column - 1;
+        }
+
+        @Override
+        public Object getValueAt(int row, int column) {
+            if (column == 0) {
+                return nacoes.get(row);
+            }
+            if (row == column - 1) {
+                return null;
+            }
+            return matrix.getValor(nacoes.get(row), nacoes.get(column - 1));
+        }
+
+        @Override
+        public void setValueAt(Object value, int row, int column) {
+            if (!(value instanceof Integer) || !isCellEditable(row, column) || scenario == null) {
+                return;
+            }
+            scenario.setRelacionamento(nacoes.get(row), nacoes.get(column - 1), (Integer) value);
+            // one edit can change what the rest of the table reports, so re-read the whole thing
+            matrix = scenario.getRelationships();
+            fireTableDataChanged();
+        }
+
+        /** Where this cell's answer came from, for the renderer. Null on the diagonal. */
+        public RelationshipMatrix.Origin getOrigin(int row, int column) {
+            if (column <= 0 || row == column - 1) {
+                return null;
+            }
+            return matrix.getOrigin(nacoes.get(row), nacoes.get(column - 1));
+        }
+
+        /** Will these two fight? Asked of the PAIR, so it is true on both sides of the diagonal. */
+        public boolean isHostile(int row, int column) {
+            if (column <= 0 || row == column - 1) {
+                return false;
+            }
+            return matrix.isHostile(nacoes.get(row), nacoes.get(column - 1));
+        }
+    }
+
+    /** Back to what the EGF and the game type say, discarding every override. */
+    public void doResetDiplomacy() {
+        scenario.clearHostilityEdits();
     }
 
     public PlatoonTableModel getPlatoonModel() {

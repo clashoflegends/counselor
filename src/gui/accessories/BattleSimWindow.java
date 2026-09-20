@@ -96,6 +96,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private final JLabel source = new JLabel();
     private final JLabel sizeBand = new JLabel();
     private final JButton run = new JButton(labels.getString("BATTLESIM.RUN.SIMULATION"));
+    private final JButton diplomacy = new JButton(labels.getString("BATTLESIM.DIPLOMACY"));
 
     private final JComboBox<Object> nacao = new JComboBox<>();
     private final JComboBox<Object> terreno = new JComboBox<>();
@@ -301,6 +302,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         left.add(button("BATTLESIM.ARMY.ADD", "addArmy"));
         left.add(button("BATTLESIM.ARMY.CLONE", "cloneArmy"));
         left.add(button("BATTLESIM.ARMY.REMOVE", "removeArmy"));
+        // Diplomacy sits with the army buttons rather than beside Run, because it edits the
+        // scenario like they do. The matrix IS the law for who fights whom (T-418), so this is not
+        // an advanced option tucked away - it is the other half of setting up the battle.
+        left.add(diplomacy);
+        diplomacy.setActionCommand("diplomacy");
+        diplomacy.addActionListener(this);
         ret.add(left, BorderLayout.LINE_START);
 
         run.setActionCommand("run");
@@ -645,6 +652,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             }
             refreshEditor();
             refreshGround();
+            final int nacoes = controler.getScenario().getNacoes().size();
+            diplomacy.setEnabled(nacoes > 1);
+            diplomacy.setToolTipText(nacoes > 1 ? null
+                    : labels.getString("BATTLESIM.DIPLOMACY.EMPTY"));
             status.setText(BattleSimConverter.getDerivationText(controler.getScenario()));
             runReason.setText(BattleSimConverter.getRunDisabledReason(controler.getScenario()));
         } finally {
@@ -854,6 +865,17 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             controler.doCloneArmy();
         } else if ("removeArmy".equals(command)) {
             controler.doRemoveArmy();
+        } else if ("diplomacy".equals(command)) {
+            // the dialog edits the scenario directly and refreshes this window as it closes, so
+            // there is nothing to do here afterwards - and nothing to undo if he cancels, because
+            // "Reset to derived" is the undo and it lives in the dialog
+            new BattleSimDiplomacyDialog(this, controler, new Runnable() {
+                @Override
+                public void run() {
+                    doRefresh();
+                }
+            }).setVisible(true);
+            return;
         } else if ("addPlatoon".equals(command)) {
             if (controler.doAddPlatoon() == null) {
                 return;     // nothing selected, or every troop type already present

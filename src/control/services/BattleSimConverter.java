@@ -8,6 +8,7 @@ import business.combat.LayerParticipation;
 import business.combat.RosterDerivation;
 import business.combat.ScenarioRoster;
 import java.util.List;
+import msgs.BaseMsgs;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 
@@ -106,6 +107,20 @@ public class BattleSimConverter {
 
     public static String getProvenanceName(CombatScenario.Provenance provenance) {
         return labels.getString("BATTLESIM.PROVENANCE." + provenance.name());
+    }
+
+    /**
+     * One of the seven relationship steps, named: "At war enemy", "Ally", "Lord"...
+     *
+     * From {@code BaseMsgs.nacaoRelacionamento}, the array the rest of the game already reads with
+     * the same {@code + 2} offset, so the diplomacy panel invents no vocabulary of its own and a
+     * translator has nothing new to translate. Clamped rather than trusted: the array is seven long
+     * and the value arrives from an EGF, and an out-of-range index here would take the panel down
+     * instead of showing a row.
+     */
+    public static String getRelationshipName(int valor) {
+        final int index = Math.max(0, Math.min(BaseMsgs.nacaoRelacionamento.length - 1, valor + 2));
+        return BaseMsgs.nacaoRelacionamento[index];
     }
 
     /**
