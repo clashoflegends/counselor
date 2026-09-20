@@ -47,6 +47,17 @@ class BattleSimDiplomacyTableTest {
         return ret;
     }
 
+    /** The army needs troops, or LayerParticipation answers NO_TROOPS before diplomacy is asked. */
+    private static model.Pelotao platoon(int qtd) {
+        final model.TipoTropa tipo = new model.TipoTropa();
+        tipo.setCodigo("inf");
+        tipo.setNome("inf");
+        final model.Pelotao ret = new model.Pelotao();
+        ret.setTipoTropa(tipo);
+        ret.setQtd(qtd);
+        return ret;
+    }
+
     private static ArmySim army(String nome, Nacao nacao) {
         final ArmySim ret = new ArmySim(nome, hex().getTerreno(), nacao);
         ret.setCodigo(nome);
@@ -194,5 +205,48 @@ class BattleSimDiplomacyTableTest {
 
         assertEquals(2, model.getRowCount(), "the attacker and the city's owner");
         assertTrue(model.isCellEditable(0, 2), "and the assault is the player's to declare");
+    }
+
+    /**
+     * Declaring war on the city's owner actually puts the army in the CITY layer.
+     *
+     * It did not. getParticipation asked the deriver for the city answer separately, and that call
+     * re-derives from the EGF and the game type WITHOUT the player's overrides - so the grid turned
+     * red, hasCombat() agreed, and the city layer went on reporting NOT_HOSTILE_TO_CITY with a
+     * reason string blaming diplomacy. The army layer honoured his declaration and the city layer
+     * silently did not, which is the precise failure this panel exists to let him fix.
+     */
+    @Test
+    void declaringWarOnTheCityOwnerPutsTheArmyInTheCityLayer() {
+        final Nacao mine = nacao("m", "Mine"), seagard = nacao("s", "Seagard");
+        final Local hex = hex();
+        final model.Cidade cidade = new model.Cidade();
+        cidade.setCodigo("c1");
+        cidade.setNome("Seagard");
+        cidade.setNacao(seagard);
+        cidade.setTamanho(3);
+        hex.setCidade(cidade);
+
+        final CombatScenario scenario = new CombatScenario(null, hex);
+        final ArmySim ours = army("ours", mine);
+        ours.getPelotoes().put("inf", platoon(600));
+        // ordered to storm the walls, so DIPLOMACY is the only thing left deciding it. The default
+        // ATTACK_ARMY deliberately stops short of the city, and leaving it would have made this
+        // test pass for the wrong reason before the edit and fail for the wrong reason after.
+        ours.setCombatLevel(business.combat.CombatLevel.ATTACK_CITY);
+        scenario.addArmy(ours, CombatScenario.Provenance.EXACT);
+        assertFalse(scenario.getParticipation().get(ours).isIn(business.combat.CombatLayer.CITY),
+                "willing to assault, but not at war with the owner");
+        assertEquals(business.combat.LayerParticipation.Reason.NOT_HOSTILE_TO_CITY,
+                scenario.getParticipation().get(ours).getReason(business.combat.CombatLayer.CITY),
+                "and the reason must be the diplomacy, not the order");
+
+        final BattleSimControler.DiplomacyTableModel model = modelOver(scenario);
+        final int seagardColumn = model.getNacoes().get(0) == mine ? 2 : 1;
+        final int mineRow = model.getNacoes().get(0) == mine ? 0 : 1;
+        model.setValueAt(RelationshipMatrix.SWORN_ENEMY, mineRow, seagardColumn);
+
+        assertTrue(scenario.getParticipation().get(ours).isIn(business.combat.CombatLayer.CITY),
+                "his declaration must reach the city layer, not only the army layer");
     }
 }
