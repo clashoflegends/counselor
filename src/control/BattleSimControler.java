@@ -599,12 +599,16 @@ public class BattleSimControler {
                     return labels.getString("BATTLESIM.COL.AFTER");
                 case COL_LOST:
                     return labels.getString("BATTLESIM.COL.LOST");
+                // Short forms: the full labels are "Cargo capacity" / "Capacity required" /
+                // "Ships required", which are long AND easy to confuse with each other. Capacity is
+                // what a hull PROVIDES, Cargo is what a platoon NEEDS, Ships is how many hulls that
+                // takes.
                 case COL_CAPACITY:
-                    return labels.getString("TRANSPORTE.CAPACITY");
+                    return labels.getString("BATTLESIM.COL.CAPACITY");
                 case COL_CARGO:
-                    return labels.getString("TRANSPORTE.CARGOUSED");
+                    return labels.getString("BATTLESIM.COL.CARGO");
                 default:
-                    return labels.getString("TRANSPORTE.MINIMO");
+                    return labels.getString("BATTLESIM.COL.SHIPS");
             }
         }
 

@@ -579,7 +579,13 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         gui.services.TableExportMenu.install(platoons, "battlesim-platoons");
         platoons.setFillsViewportHeight(true);
         platoons.setRowHeight(Math.max(20, platoons.getRowHeight()));
-        platoons.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        // Scroll, do not SQUEEZE. With AUTO_RESIZE_LAST_COLUMN the table is forced to the
+        // viewport width, so a fleet - which gets three extra transport columns (T-428) - crushed
+        // thirteen columns into the pane and truncated the headers to "Trai...", "We...",
+        // "Carg...". Every column now keeps its width and the scroll pane supplies a horizontal
+        // bar when they do not fit, which is the honest answer: the numbers are the point and a
+        // number too narrow to read is worse than one you have to scroll to.
+        platoons.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         platoons.getTableHeader().setReorderingAllowed(false);
         platoons.setShowGrid(false);
         platoons.setIntercellSpacing(new Dimension(0, 1));
@@ -627,7 +633,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         }
         // 10 columns normally, 13 for an army that floats (T-428) - so widths are applied up to
         // whatever the model actually has rather than to a fixed count.
-        final int[] widths = {34, 140, 66, 60, 60, 60, 66, 66, 52, 52, 70, 70, 60};
+        // Wide enough for the HEADER, not just the value - a truncated header is what sent the
+        // player looking for this in the first place. The first ten sum to 640px so a land army
+        // fits the pane at the default window size and never scrolls; a fleet adds 182px of
+        // transport columns and does, which is the case that actually needs the bar.
+        final int[] widths = {34, 130, 56, 68, 70, 58, 60, 60, 54, 50, 72, 58, 52};
         for (int ii = 0; ii < Math.min(widths.length, platoons.getColumnCount()); ii++) {
             platoons.getColumnModel().getColumn(ii).setPreferredWidth(widths[ii]);
         }
