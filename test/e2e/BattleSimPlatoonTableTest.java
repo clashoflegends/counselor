@@ -215,6 +215,32 @@ class BattleSimPlatoonTableTest {
         assertNotEquals("--", model.getValueAt(0, 7));
     }
 
+    /**
+     * The three transport columns appear only for an army that FLOATS or CARRIES. T-428.
+     *
+     * The old window showed capacity, cargo and ships-required for every army, including land hosts
+     * where they are permanently useless - three columns of noise on the widest table in the
+     * window.
+     *
+     * The predicate is "can carry", not "needs lifting". {@code getTransportesMinimo} is
+     * {@code ceil(burden / SHIP_CAPACITY)}, so it is non-zero for EVERY land platoon with weight -
+     * asking that question put the columns back on every army in the game, which is how the first
+     * version of this got it wrong.
+     */
+    @Test
+    void transportColumnsAppearOnlyForAnArmyThatFloats() {
+        final CombatScenario scenario = new CombatScenario(null, hex());
+        final ArmySim land = new ArmySim(loadedArmy(platoon(troopType("inf", false), 900)));
+        scenario.addArmy(land, CombatScenario.Provenance.EXACT);
+        assertEquals(10, modelOver(scenario, land).getColumnCount(),
+                "a land host has nothing to say about cargo");
+
+        final ArmySim fleet = new ArmySim(loadedArmy(platoon(troopType("trireme", true), 46)));
+        scenario.addArmy(fleet, CombatScenario.Provenance.EXACT);
+        assertEquals(13, modelOver(scenario, fleet).getColumnCount(),
+                "a fleet does, and gets capacity, cargo and ships-required");
+    }
+
     /** No army selected is a real state, not a crash: an empty hex opens the window. */
     @Test
     void noSelectedArmyGivesAnEmptyTable() {

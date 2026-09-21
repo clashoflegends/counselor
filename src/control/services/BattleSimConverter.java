@@ -12,6 +12,7 @@ import business.combat.ScenarioRoster;
 import business.facade.ExercitoFacade;
 import java.util.List;
 import model.Cenario;
+import model.Pelotao;
 import msgs.BaseMsgs;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
@@ -202,6 +203,58 @@ public class BattleSimConverter {
      */
     public static boolean isRunnable(CombatScenario scenario) {
         return scenario != null && scenario.getRunGate(ENGINE_EXISTS).isRunnable();
+    }
+
+    /**
+     * Every army and platoon as tab-separated text, for the clipboard. T-430.
+     *
+     * Ported from the old window with its two defects fixed.
+     *
+     * <b>Land and naval were SWAPPED against their headers.</b>
+     * {@code getAtaqueExercito(army, true)} sat under "Land attack", and {@code true} means NAVAL:
+     * {@code BattleSimFacade.getArmyAttack} tests {@code naval == tipoTropa.isBarcos()}. The old
+     * army TABLE had it right, so only anyone who pasted the export was misled - quietly, since
+     * both columns are plausible numbers.
+     *
+     * <b>The headers were hardcoded English</b> in a feature where every other string comes from
+     * the bundle. They come from the bundle now, reusing the keys the army table already uses.
+     */
+    public static String getClipboardText(CombatScenario scenario) {
+        final StringBuilder ret = new StringBuilder();
+        appendRow(ret, labels.getString("COMANDANTE"), labels.getString("NACAO"),
+                labels.getString("MORAL"), labels.getString("TROPA.ATAQUE.TERRA"),
+                labels.getString("TROPA.DEFESA.TERRA"), labels.getString("TROPA.ATAQUE.NAVAL"),
+                labels.getString("TROPA.DEFESA.NAVAL"));
+        final ExercitoFacade facade = new ExercitoFacade();
+        for (ArmySim army : scenario.getArmies()) {
+            appendRow(ret, army.getNome(),
+                    army.getNacao() == null ? "" : String.valueOf(army.getNacao().getNome()),
+                    String.valueOf(army.getMoral()),
+                    // false is LAND, true is NAVAL. The old export had these the other way round.
+                    String.valueOf(facade.getAtaqueExercito(army, false)),
+                    String.valueOf(facade.getDefesaExercito(army, false)),
+                    String.valueOf(facade.getAtaqueExercito(army, true)),
+                    String.valueOf(facade.getDefesaExercito(army, true)));
+            for (Pelotao pelotao : new control.BattleSimControler.PlatoonTableModel(
+                    scenario, army).getPlatoons()) {
+                appendRow(ret, "", pelotao.getTipoTropa() == null ? ""
+                        : String.valueOf(pelotao.getTipoTropa().getNome()),
+                        String.valueOf(pelotao.getQtd()), String.valueOf(pelotao.getTreino()),
+                        String.valueOf(pelotao.getModAtaque()),
+                        String.valueOf(pelotao.getModDefesa()), "");
+            }
+        }
+        return ret.toString();
+    }
+
+    private static void appendRow(StringBuilder to, String... cells) {
+        for (int ii = 0; ii < cells.length; ii++) {
+            if (ii > 0) {
+                to.append('\t');
+            }
+            to.append(cells[ii]);
+        }
+        to.append('\n');
     }
 
     /**

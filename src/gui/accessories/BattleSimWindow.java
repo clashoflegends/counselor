@@ -344,6 +344,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         left.add(diplomacy);
         diplomacy.setActionCommand("diplomacy");
         diplomacy.addActionListener(this);
+        // Reference and export, ported from the old window (T-429, T-430, T-434, T-435). None of
+        // them edits the scenario, which is why they sit apart from the army buttons.
+        left.add(tooltipped(button("TATICA", "tactics"), "BATTLESIM.TATICA.HINT"));
+        left.add(button("TROOPCASUALTIES.BORDER.TITLE", "casualties"));
+        left.add(tooltipped(button("BATTLESIM.COPY", "copy"), "COPIAR.ARMY.ACOES"));
+        left.add(tooltipped(button("MENU.ABOUT", "about"), "BATTLESIM.ABOUT.TOOLTIP"));
         ret.add(left, BorderLayout.LINE_START);
 
         run.setActionCommand("run");
@@ -353,6 +359,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         right.add(run);
         ret.add(right, BorderLayout.LINE_END);
         return ret;
+    }
+
+    private static JButton tooltipped(JButton button, String tooltipKey) {
+        button.setToolTipText(labels.getString(tooltipKey));
+        return button;
     }
 
     private JButton button(String key, String command) {
@@ -562,6 +573,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * the default right alignment, which is what makes them scannable as a column.
      */
     private JPanel buildPlatoonTable() {
+        // Right-click Copy / Export to CSV, as the old window had on both its tables (T-431). Only
+        // the platoon table here: the roster is a JTree, and the armies are already covered by the
+        // toolbar's Copy, which exports them WITH their platoons.
+        gui.services.TableExportMenu.install(platoons, "battlesim-platoons");
         platoons.setFillsViewportHeight(true);
         platoons.setRowHeight(Math.max(20, platoons.getRowHeight()));
         platoons.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
@@ -571,6 +586,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
         final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 2));
         buttons.add(button("BATTLESIM.PLATOON.ADD", "addPlatoon"));
+        buttons.add(tooltipped(button("BATTLESIM.PLATOON.CLONE", "clonePlatoon"),
+                "BATTLESIM.PLATOON.CLONE.HINT"));
         buttons.add(button("BATTLESIM.PLATOON.REMOVE", "removePlatoon"));
 
         // The row order is the casualty sequence - but NOT always, and the label says which.
@@ -608,8 +625,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         if (platoons.getColumnCount() < 10) {
             return;
         }
-        final int[] widths = {34, 140, 66, 60, 60, 60, 66, 66, 52, 52};
-        for (int ii = 0; ii < widths.length; ii++) {
+        // 10 columns normally, 13 for an army that floats (T-428) - so widths are applied up to
+        // whatever the model actually has rather than to a fixed count.
+        final int[] widths = {34, 140, 66, 60, 60, 60, 66, 66, 52, 52, 70, 70, 60};
+        for (int ii = 0; ii < Math.min(widths.length, platoons.getColumnCount()); ii++) {
             platoons.getColumnModel().getColumn(ii).setPreferredWidth(widths[ii]);
         }
         for (int ii : new int[]{0, 8, 9}) {
@@ -936,6 +955,38 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             return;
         } else if ("addPlatoon".equals(command)) {
             if (controler.doAddPlatoon() == null) {
+                return;     // nothing selected, or every troop type already present
+            }
+        } else if ("tactics".equals(command)) {
+            control.support.WindowPopupText.showWindowTable(
+                    control.services.CenarioConverter.getInstance().getTaticaTableModel(),
+                    labels.getString("BATTLESIM.TATICA.HINT"), this);
+            return;
+        } else if ("casualties".equals(command)) {
+            new TroopsCasualtiesList(controler.getScenario().getTerreno()).setVisible(true);
+            return;
+        } else if ("copy".equals(command)) {
+            // ClipboardHelper, not SysApoio directly: it shows a toast if the clipboard refuses,
+            // which a silent no-op would not.
+            gui.services.ClipboardHelper.copy(
+                    BattleSimConverter.getClipboardText(controler.getScenario()));
+            control.support.DispatchManager.getInstance().sendDispatchForMsg(
+                    control.support.DispatchManager.STATUS_BAR_MSG,
+                    labels.getString("COPIAR.ARMY.DETAILS"));
+            return;
+        } else if ("about".equals(command)) {
+            control.support.WindowPopupText.showWindowText(
+                    labels.getString("BATTLESIM.DISCLAIMER.NEW.TEXT"),
+                    labels.getString("BATTLESIM.DISCLAIMER.NEW.TITLE"), this);
+            return;
+        } else if ("clonePlatoon".equals(command)) {
+            final int cloneRow = platoons.getSelectedRow();
+            if (cloneRow < 0
+                    || !(platoons.getModel() instanceof BattleSimControler.PlatoonTableModel)) {
+                return;
+            }
+            if (controler.doClonePlatoon(((BattleSimControler.PlatoonTableModel)
+                    platoons.getModel()).getPlatoon(cloneRow)) == null) {
                 return;     // nothing selected, or every troop type already present
             }
         } else if ("removePlatoon".equals(command)) {

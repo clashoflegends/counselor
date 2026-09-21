@@ -234,6 +234,34 @@ public class BattleSimControler {
         return null;
     }
 
+    /**
+     * Clone platoon: the same four numbers, on the next troop type the army does not hold. T-433.
+     *
+     * The old window called this "Clone" and then forcibly changed the copy's troop type, which is
+     * not what the word means - but it is not a bug either, it is forced by the data: a platoon's
+     * map key IS its troop type codigo ({@code Pelotao.getCodigo()}), so two platoons of one type
+     * cannot coexist and a true clone would silently replace its own original.
+     *
+     * So the behaviour is kept and the NAME is made honest instead, in the tooltip: this copies a
+     * stat profile onto a new type, which is the useful thing it actually did. Returns null when
+     * there is nothing to clone or every catalogue type is already present.
+     */
+    public Pelotao doClonePlatoon(Pelotao source) {
+        if (selected == null || source == null) {
+            return null;
+        }
+        final Pelotao ret = doAddPlatoon();
+        if (ret == null) {
+            return null;
+        }
+        ret.setQtd(source.getQtd());
+        ret.setTreino(source.getTreino());
+        ret.setModAtaque(source.getModAtaque());
+        ret.setModDefesa(source.getModDefesa());
+        scenario.setEdited(ret);
+        return ret;
+    }
+
     public void doRemovePlatoon(Pelotao pelotao) {
         if (selected != null && pelotao != null) {
             selected.getPelotoes().remove(pelotao.getCodigo());
@@ -390,7 +418,9 @@ public class BattleSimControler {
         /** Only the four the player may edit are writable; see the ownership boundary. */
         private static final int COL_LAYER = 0, COL_TROOP = 1, COL_QTD = 2, COL_TRAINING = 3,
                 COL_WEAPON = 4, COL_ARMOUR = 5, COL_ATTACK = 6, COL_DEFENSE = 7, COL_AFTER = 8,
-                COL_LOST = 9;
+                COL_LOST = 9, COL_CAPACITY = 10, COL_CARGO = 11, COL_SHIPS = 12;
+        /** Columns 0..9 always; the three transport ones only for an army that floats. T-428. */
+        private static final int COLS_ALWAYS = 10, COLS_WITH_TRANSPORT = 13;
 
         private final CombatScenario scenario;
         private final BattleSimControler owner;
@@ -470,6 +500,11 @@ public class BattleSimControler {
             return platoons.get(row);
         }
 
+        /** The platoons in casualty order, for anything that needs the whole list. */
+        public List<Pelotao> getPlatoons() {
+            return java.util.Collections.unmodifiableList(platoons);
+        }
+
         /**
          * The formatted strength. Always a number now, for every army including an ownerless one.
          *
@@ -493,9 +528,42 @@ public class BattleSimControler {
             return platoons.size();
         }
 
+        /**
+         * Thirteen columns for an army with ships, ten for everything else. T-428.
+         *
+         * The old window showed capacity, cargo and ships-required for every army, including land
+         * hosts where all three are permanently zero - three columns of noise on the majority of
+         * armies, on a table that is already the widest thing in the window. They appear when the
+         * army actually has something that floats or something that needs lifting, which is the
+         * only time the numbers mean anything.
+         *
+         * Safe to vary per army because the model is rebuilt on every selection change
+         * ({@code setPlatoonModel}) and {@code configurePlatoonColumns} re-applies the widths after
+         * each swap.
+         */
         @Override
         public int getColumnCount() {
-            return 10;
+            return hasTransport() ? COLS_WITH_TRANSPORT : COLS_ALWAYS;
+        }
+
+        /**
+         * Does this army have anything that FLOATS or CARRIES?
+         *
+         * Not "needs lifting": {@code getTransportesMinimo} is {@code ceil(burden / SHIP_CAPACITY)}
+         * and so is non-zero for any land platoon with weight, which is every one of them. Asking
+         * that question showed the transport columns for every army in the game - exactly the noise
+         * this was meant to remove. The three figures only mean something together, and they only
+         * mean something when there is a hull to put the cargo in.
+         */
+        private boolean hasTransport() {
+            for (Pelotao pelotao : platoons) {
+                final TipoTropa tipo = pelotao.getTipoTropa();
+                if (tipo != null && (tipo.isBarcos()
+                        || exercitoFacade.getTransportesCapacity(pelotao) > 0)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         @Override
@@ -521,8 +589,14 @@ public class BattleSimControler {
                     return labels.getString("BATTLESIM.COL.DEFENSE");
                 case COL_AFTER:
                     return labels.getString("BATTLESIM.COL.AFTER");
-                default:
+                case COL_LOST:
                     return labels.getString("BATTLESIM.COL.LOST");
+                case COL_CAPACITY:
+                    return labels.getString("TRANSPORTE.CAPACITY");
+                case COL_CARGO:
+                    return labels.getString("TRANSPORTE.CARGOUSED");
+                default:
+                    return labels.getString("TRANSPORTE.MINIMO");
             }
         }
 
@@ -564,6 +638,12 @@ public class BattleSimControler {
                     return strength(exercitoFacade.getAtaquePelotao(pelotao, army));
                 case COL_DEFENSE:
                     return strength(exercitoFacade.getDefesaPelotao(pelotao, army));
+                case COL_CAPACITY:
+                    return strength(exercitoFacade.getTransportesCapacity(pelotao));
+                case COL_CARGO:
+                    return strength((int) exercitoFacade.getTransportesBurden(pelotao));
+                case COL_SHIPS:
+                    return strength(exercitoFacade.getTransportesMinimo(pelotao));
                 default:
                     return "--";
             }
