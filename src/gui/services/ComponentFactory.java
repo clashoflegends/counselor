@@ -1144,19 +1144,47 @@ public class ComponentFactory implements Serializable {
     }
 
     /**
-     * Close the transient graph/dashboard windows (charts + Victory Dashboard).
-     * Called when a different game/turn is opened so those snapshots don't
-     * linger showing stale data. Leaves the main window and the map (which
-     * rebuild in place) alone.
+     * Window types that hold a SNAPSHOT of one game and turn, and must not outlive it.
+     *
+     * A declared list rather than a chain of {@code instanceof} because the failure mode is
+     * forgetting to add one: the window simply keeps working, showing last game's data, and nothing
+     * says otherwise. {@code ComponentFactoryStaleWindowTest} asserts the membership so a new
+     * snapshot window cannot be added without a decision about this.
+     *
+     * The BattleSim windows joined the list 2026-09-20, reported by John: "these are from different
+     * games. As I opened new EGFs to switch, the BattleSim persisted." Worse than a stale snapshot
+     * in their case - a {@code CombatScenario} holds armies, nations and a Partida from the world
+     * that built it, while the nation and troop-type combos keep reading the CURRENT world. So an
+     * old window offers new-game nations and troop types, and the diplomacy matrix derives against
+     * a Partida the armies never belonged to. Two games mixed in one scenario, silently.
+     */
+    private static final Class<?>[] STALE_ON_NEW_GAME = {
+        ChartBar.class, ChartLine.class, ChartPie.class, ChartGauge.class,
+        gui.charts.ChartRadar.class, gui.charts.ChartGrowth.class,
+        QuickSearchDialog.class, VictoryDashboardDialog.class,
+        gui.accessories.BattleSimWindow.class,
+        gui.accessories.BattleCasualtySimulatorNew.class,
+        gui.accessories.TroopsCasualtiesList.class,
+    };
+
+    /** The types above, for the test that keeps this list honest. */
+    public static Class<?>[] getStaleOnNewGameTypes() {
+        return STALE_ON_NEW_GAME.clone();
+    }
+
+    /**
+     * Close every window that shows a snapshot of the game being replaced.
+     *
+     * Called when a different game or turn is opened so those snapshots do not linger showing stale
+     * data. Leaves the main window and the map alone - they rebuild in place.
      */
     public static void disposeSecondaryWindows() {
         for (java.awt.Window w : java.awt.Window.getWindows()) {
-            if (w instanceof ChartBar || w instanceof ChartLine || w instanceof ChartPie
-                    || w instanceof ChartGauge || w instanceof gui.charts.ChartRadar
-                    || w instanceof gui.charts.ChartGrowth
-                    || w instanceof QuickSearchDialog
-                    || w instanceof VictoryDashboardDialog) {
-                w.dispose();
+            for (Class<?> stale : STALE_ON_NEW_GAME) {
+                if (stale.isInstance(w)) {
+                    w.dispose();
+                    break;
+                }
             }
         }
     }
