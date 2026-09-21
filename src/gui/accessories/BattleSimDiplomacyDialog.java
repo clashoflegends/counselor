@@ -59,9 +59,16 @@ import persistenceCommons.SettingsManager;
  * like a known one once it reaches a number. They are drawn in grey and they are editable, which is
  * the whole answer to "what if he has allies I cannot see".
  *
- * Nothing here extrapolates. Filling the grey by mirroring, by team flag or by transitive alliance
- * is pass two, deliberately: a wrong rule that fills a cell is indistinguishable from read data
- * afterwards.
+ * <h3>What IS inferred, and what still is not</h3>
+ *
+ * Mirroring landed 2026-09-21 on John's call - "all diplomacy is bidirectional (which it is in
+ * almost every case)" - so a cell whose own row is unreadable takes the OTHER direction's value and
+ * is marked MIRRORED, shown in italic. It is an inference and it is labelled as one, which is the
+ * whole difference from the pass-two rules still deliberately unwritten: team flags and transitive
+ * alliance would fill a cell with something no row ever said.
+ *
+ * A pair neither side can read is assumed HOSTILE, also on John's call. The status bar counts those
+ * and says so.
  */
 public class BattleSimDiplomacyDialog extends JDialog implements ActionListener {
 
@@ -79,11 +86,26 @@ public class BattleSimDiplomacyDialog extends JDialog implements ActionListener 
     private final transient Runnable onChange;
 
     /**
-     * @param owner    the BattleSim window, so the dialog is modal to it rather than to the app
-     * @param onChange run on close, so the window repaints against the edited matrix
+     * NON-MODAL, deliberately.
+     *
+     * John, 2026-09-21: "Can we make the Diplomacy window non-modal? I wanted to check the tab
+     * nations to edit and I can't flip between both."
+     *
+     * That is the actual workflow: the answer to "are these two at war?" lives on the Nations tab,
+     * and a modal dialog made the player close the thing he was filling in to go and look it up.
+     * The matrix is also the one panel where an edit is a HYPOTHESIS - "suppose he declares on me" -
+     * so being able to hold it open beside the evidence is the point.
+     *
+     * Because it is non-modal, {@code onChange} fires on every EDIT rather than only on close: the
+     * window behind has to follow along while the player works, not snap to the new answer minutes
+     * later. The caller keeps the instance so a second click raises this dialog instead of stacking
+     * another one, each with its own copy of the grid.
+     *
+     * @param owner    the BattleSim window, which owns this dialog and disposes it
+     * @param onChange run after every edit and again on close, so the window behind stays true
      */
     public BattleSimDiplomacyDialog(Frame owner, BattleSimControler controler, Runnable onChange) {
-        super(owner, labels.getString("BATTLESIM.DIPLOMACY.TITLE"), true);
+        super(owner, labels.getString("BATTLESIM.DIPLOMACY.TITLE"), false);
         this.controler = controler;
         this.onChange = onChange;
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -144,6 +166,12 @@ public class BattleSimDiplomacyDialog extends JDialog implements ActionListener 
             grid.getColumnModel().getColumn(0).setPreferredWidth(160);
             grid.getColumnModel().getColumn(0).setCellRenderer(new NationNameRenderer());
         }
+        // non-modal: the window behind must follow each edit, not wait for the dialog to close
+        model.addTableModelListener(event -> {
+            if (onChange != null) {
+                onChange.run();
+            }
+        });
         final DiplomacyCellRenderer renderer = new DiplomacyCellRenderer(model);
         final DefaultCellEditor editor = new DefaultCellEditor(relationshipCombo());
         for (int ii = 1; ii < grid.getColumnCount(); ii++) {
@@ -228,8 +256,17 @@ public class BattleSimDiplomacyDialog extends JDialog implements ActionListener 
             }
             setText(BattleSimConverter.getRelationshipName((Integer) value));
             setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-            setFont(getFont().deriveFont(
-                    origin == RelationshipMatrix.Origin.PLAYER_EDITED ? Font.BOLD : Font.PLAIN));
+            // bold = the player said so; italic = mirrored from the other direction, which is a
+            // strong inference but still an inference; plain = read or set by the game type
+            final int style;
+            if (origin == RelationshipMatrix.Origin.PLAYER_EDITED) {
+                style = Font.BOLD;
+            } else if (origin == RelationshipMatrix.Origin.MIRRORED) {
+                style = Font.ITALIC;
+            } else {
+                style = Font.PLAIN;
+            }
+            setFont(getFont().deriveFont(style));
             if (origin == RelationshipMatrix.Origin.ASSUMED) {
                 setForeground(ASSUMED);
             } else if (model.isHostile(modelRow, modelColumn)) {

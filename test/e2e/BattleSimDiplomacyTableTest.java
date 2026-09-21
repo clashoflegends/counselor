@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -28,6 +29,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * nothing but {@code getNacaoControl().isInimigo(...)}.
  */
 class BattleSimDiplomacyTableTest {
+
+    private static model.Jogador observer() {
+        final model.Jogador ret = new model.Jogador();
+        ret.setCodigo("j1");
+        ret.setNome("me");
+        return ret;
+    }
+
+    /**
+     * Puts a STATED peace between two factions, read from the observer's own row.
+     *
+     * Needed since 2026-09-21: an unread pair is assumed HOSTILE, so "these two are not fighting"
+     * stopped being the default and became a claim somebody has to make. The observer's own row is
+     * the one the deriver will read, which is why the nation is given an owner.
+     */
+    private static void statePeace(CombatScenario scenario, model.Jogador me, Nacao mine,
+            Nacao other) {
+        mine.setOwner(me);
+        mine.getRelacionamentos().put(other, 0);
+        scenario.setObserver(me);
+    }
 
     private static Nacao nacao(String codigo, String nome) {
         final Nacao ret = new Nacao();
@@ -107,8 +129,9 @@ class BattleSimDiplomacyTableTest {
         final ArmySim ours = army("ours", mine), them = army("them", theirs);
         scenario.addArmy(ours, CombatScenario.Provenance.EXACT);
         scenario.addArmy(them, CombatScenario.Provenance.ESTIMATED);
+        statePeace(scenario, observer(), mine, theirs);
         final BattleSimControler.DiplomacyTableModel model = modelOver(scenario);
-        assertFalse(scenario.getMatrix().isInimigo(ours, them), "nothing said, so nothing fights");
+        assertFalse(scenario.getMatrix().isInimigo(ours, them), "a STATED peace, so nothing fights");
 
         model.setValueAt(RelationshipMatrix.SWORN_ENEMY, 0, 2);
 
@@ -125,19 +148,22 @@ class BattleSimDiplomacyTableTest {
      * faction changed its mind - while the pair is nonetheless hostile.
      */
     @Test
-    void oneSidedWarIsStillAWarAndTheMirrorCellKeepsItsOwnValue() {
+    void oneSidedWarIsStillAWarAndTheMirrorCellKeepsItsOwnOrigin() {
         final Nacao mine = nacao("m", "Mine"), theirs = nacao("t", "Theirs");
         final CombatScenario scenario = new CombatScenario(null, hex());
         scenario.addArmy(army("ours", mine), CombatScenario.Provenance.EXACT);
         scenario.addArmy(army("them", theirs), CombatScenario.Provenance.ESTIMATED);
+        statePeace(scenario, observer(), mine, theirs);
         final BattleSimControler.DiplomacyTableModel model = modelOver(scenario);
 
         model.setValueAt(RelationshipMatrix.SWORN_ENEMY, 0, 2);
 
         assertTrue(model.isHostile(0, 2));
         assertTrue(model.isHostile(1, 1), "the pair fights, seen from either side");
-        assertEquals(RelationshipMatrix.NEUTRAL, model.getValueAt(1, 1),
-                "but his view was never stated and must not be invented");
+        assertEquals(RelationshipMatrix.Origin.PLAYER_EDITED, model.getOrigin(0, 2),
+                "the half he typed is his");
+        assertNotEquals(RelationshipMatrix.Origin.PLAYER_EDITED, model.getOrigin(1, 1),
+                "and the other half is still derived - his edit is not put into their mouth");
     }
 
     /**
@@ -171,12 +197,14 @@ class BattleSimDiplomacyTableTest {
         final ArmySim ours = army("ours", mine), them = army("them", theirs);
         scenario.addArmy(ours, CombatScenario.Provenance.EXACT);
         scenario.addArmy(them, CombatScenario.Provenance.ESTIMATED);
+        statePeace(scenario, observer(), mine, theirs);
         modelOver(scenario).setValueAt(RelationshipMatrix.SWORN_ENEMY, 0, 2);
         assertTrue(scenario.getMatrix().isInimigo(ours, them));
 
         scenario.clearHostilityEdits();
 
-        assertFalse(scenario.getMatrix().isInimigo(ours, them));
+        assertFalse(scenario.getMatrix().isInimigo(ours, them),
+                "back to the peace his own row states");
         assertEquals(0, scenario.getEditedCount());
     }
 
@@ -228,6 +256,7 @@ class BattleSimDiplomacyTableTest {
         hex.setCidade(cidade);
 
         final CombatScenario scenario = new CombatScenario(null, hex);
+        statePeace(scenario, observer(), mine, seagard);
         final ArmySim ours = army("ours", mine);
         ours.getPelotoes().put("inf", platoon(600));
         // ordered to storm the walls, so DIPLOMACY is the only thing left deciding it. The default

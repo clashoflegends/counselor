@@ -181,6 +181,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private boolean refreshing = false;
     /** Built once: the catalogue does not change, and this is reattached after every model swap. */
     private DefaultCellEditor troopTypeEditor;
+    /** The non-modal diplomacy grid, kept so a second click raises it instead of stacking one. */
+    private transient BattleSimDiplomacyDialog diplomacyDialog;
     /**
      * Built once, reattached after every model swap. Renderers are stateless, and allocating a
      * fresh pair on each of the dozens of refreshes was pure churn.
@@ -986,15 +988,23 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         } else if ("removeArmy".equals(command)) {
             controler.doRemoveArmy();
         } else if ("diplomacy".equals(command)) {
-            // the dialog edits the scenario directly and refreshes this window as it closes, so
-            // there is nothing to do here afterwards - and nothing to undo if he cancels, because
-            // "Reset to derived" is the undo and it lives in the dialog
-            new BattleSimDiplomacyDialog(this, controler, new Runnable() {
-                @Override
-                public void run() {
-                    doRefresh();
-                }
-            }).setVisible(true);
+            // The dialog edits the scenario directly and refreshes this window as it goes, so there
+            // is nothing to do here afterwards - and nothing to undo if he closes it, because
+            // "Reset to derived" is the undo and it lives in the dialog.
+            //
+            // It is NON-MODAL (John wants to read the Nations tab while editing), so it is held in
+            // a field: a second click must raise the one that is open rather than stack another
+            // dialog over it, each with its own copy of the grid.
+            if (diplomacyDialog == null || !diplomacyDialog.isDisplayable()) {
+                diplomacyDialog = new BattleSimDiplomacyDialog(this, controler, new Runnable() {
+                    @Override
+                    public void run() {
+                        doRefresh();
+                    }
+                });
+            }
+            diplomacyDialog.setVisible(true);
+            diplomacyDialog.toFront();
             return;
         } else if ("addPlatoon".equals(command)) {
             if (controler.doAddPlatoon() == null) {
