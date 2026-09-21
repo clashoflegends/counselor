@@ -3,6 +3,7 @@ package control.services;
 import business.combat.ArmySim;
 import business.combat.CombatLayer;
 import business.combat.CombatLevel;
+import business.combat.CasualtyMode;
 import business.combat.CombatScenario;
 import business.combat.LayerParticipation;
 import business.combat.RosterDerivation;
@@ -10,6 +11,7 @@ import business.combat.RunGate;
 import business.combat.ScenarioRoster;
 import business.facade.ExercitoFacade;
 import java.util.List;
+import model.Cenario;
 import msgs.BaseMsgs;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
@@ -200,6 +202,49 @@ public class BattleSimConverter {
      */
     public static boolean isRunnable(CombatScenario scenario) {
         return scenario != null && scenario.getRunGate(ENGINE_EXISTS).isRunnable();
+    }
+
+    /**
+     * What the platoon table's ROW ORDER actually means for this army. T-437.
+     *
+     * The table is sorted, and a sorted list of rows looks like a sequence whether or not one
+     * exists - so when it does not, this says so rather than letting the player read a ranking into
+     * it. John, 2026-09-20: "standard tactics splits the damage across all platoons equally, no
+     * specific sequence like the other tactics. So not to mislead players, it hid the sequence."
+     *
+     * The old window hid the whole troop list instead, which was honest about the order and
+     * explained nothing. Saying it in words keeps the list, which the player still needs.
+     *
+     * Covers all three no-sequence cases, not just the obvious one - see {@link CasualtyMode}. An
+     * army with ships gets the extra line, because naval casualties rank even when its land
+     * casualties do not.
+     */
+    public static String getCasualtyModeText(ArmySim army, Cenario cenario) {
+        if (army == null) {
+            return "";
+        }
+        final CasualtyMode land = CasualtyMode.of(army, cenario, CombatLayer.ARMY);
+        final StringBuilder ret = new StringBuilder("<html>");
+        if (land.isSequenced()) {
+            ret.append(labels.getString("BATTLESIM.CASUALTY.RANKED"));
+        } else if (army.getTatica() == CasualtyMode.TATICA_STANDARD) {
+            ret.append(labels.getString("BATTLESIM.CASUALTY.STANDARD"));
+        } else {
+            ret.append(labels.getString("BATTLESIM.CASUALTY.NOTACTICS"));
+        }
+        if (!land.isSequenced() && hasShips(army)) {
+            ret.append("<br>").append(labels.getString("BATTLESIM.CASUALTY.SHIPSRANKED"));
+        }
+        return ret.append("</html>").toString();
+    }
+
+    private static boolean hasShips(ArmySim army) {
+        for (model.Pelotao pelotao : army.getPelotoes().values()) {
+            if (pelotao.getTipoTropa() != null && pelotao.getTipoTropa().isBarcos()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

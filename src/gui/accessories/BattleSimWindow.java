@@ -96,6 +96,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private final JLabel source = new JLabel();
     private final JLabel sizeBand = new JLabel();
     private final JLabel strength = new JLabel();
+    /** What the platoon table's row order means for the selected army. T-437. */
+    private final JLabel casualtyMode = new JLabel();
     private final JButton run = new JButton(labels.getString("BATTLESIM.RUN.SIMULATION"));
     private final JButton diplomacy = new JButton(labels.getString("BATTLESIM.DIPLOMACY"));
 
@@ -571,8 +573,15 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         buttons.add(button("BATTLESIM.PLATOON.ADD", "addPlatoon"));
         buttons.add(button("BATTLESIM.PLATOON.REMOVE", "removePlatoon"));
 
+        // The row order is the casualty sequence - but NOT always, and the label says which.
+        // Above the table rather than below it, because it governs how the rows are to be read and
+        // a caption underneath arrives too late.
+        casualtyMode.setFont(casualtyMode.getFont().deriveFont(Font.PLAIN));
+        casualtyMode.setBorder(BorderFactory.createEmptyBorder(1, 4, 4, 4));
+
         final JPanel ret = new JPanel(new BorderLayout());
         ret.setBorder(BorderFactory.createTitledBorder(labels.getString("BATTLESIM.PLATOON.TITLE")));
+        ret.add(casualtyMode, BorderLayout.NORTH);
         ret.add(new JScrollPane(platoons), BorderLayout.CENTER);
         ret.add(buttons, BorderLayout.SOUTH);
         return ret;
@@ -743,6 +752,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         }
         if (!any) {
             armyTitle.setText("");
+            casualtyMode.setText("");
             strength.setText("");
             sizeBand.setText("");
             fightsIn.setText("");
@@ -759,6 +769,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         morale.setValue(army.getMoral());
         attackBonus.setValue(army.getAttackBonus());
         defenseBonus.setValue(army.getArmyDefenseBonus());
+        casualtyMode.setText(BattleSimConverter.getCasualtyModeText(army,
+                control.facade.WorldFacadeCounselor.getInstance().getCenario()));
         strength.setText(BattleSimConverter.getArmyStrength(army));
         sizeBand.setText(BattleSimConverter.getSizeBandText(army));
         fightsIn.setText(BattleSimConverter.getFightsIn(controler.getParticipation(army)));
