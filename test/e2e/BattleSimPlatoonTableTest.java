@@ -65,11 +65,20 @@ class BattleSimPlatoonTableTest {
         return ret;
     }
 
+    /** Every army has a banner - see T-441. The fixture carries one because reality does. */
+    private static model.Nacao nacao() {
+        final model.Nacao ret = new model.Nacao();
+        ret.setCodigo("n");
+        ret.setNome("House Tyrell");
+        return ret;
+    }
+
     /** A real EGF army, placed on a hex. Codigo before setLocal: the Local keys its index on it. */
     private static Exercito loadedArmy(Pelotao... pelotoes) {
         final Exercito ret = new Exercito();
         ret.setCodigo("a1");
         ret.setNome("Loaded");
+        ret.setNacao(nacao());
         ret.setLocal(hex());
         for (Pelotao pelotao : pelotoes) {
             ret.getPelotoes().put(pelotao.getCodigo(), pelotao);
@@ -175,11 +184,7 @@ class BattleSimPlatoonTableTest {
      */
     @Test
     void attackAndDefenceAreComputedAndReadOnly() {
-        final model.Nacao nacao = new model.Nacao();
-        nacao.setCodigo("n");
-        nacao.setNome("Nation");
         final Exercito loaded = loadedArmy(platoon(troopType("inf", false), 900));
-        loaded.setNacao(nacao);
         final CombatScenario scenario = new CombatScenario(null, hex());
         final ArmySim army = new ArmySim(loaded);
         scenario.addArmy(army, CombatScenario.Provenance.EXACT);
@@ -192,28 +197,15 @@ class BattleSimPlatoonTableTest {
     }
 
     /**
-     * An army whose owner is unknown gets REAL numbers, not a dash and not a crash.
+     * There is no "army with no nation" case here any more, deliberately.
      *
-     * A null nation is a real state here - {@code HostilityDeriver} handles "an army whose owner is
-     * unknown" by name, and a blank army starts without one. It used to take the window down,
-     * because {@code BattleSimFacade.getPlatoonDefense} dereferenced {@code getNacao()} unguarded;
-     * T-440 fixed that at the source rather than dashing it out here, so everything the client
-     * actually knows - the platoon, the terrain, the troop stats - is still computed.
-     *
-     * The figure can only UNDERSTATE such an army, never overstate it, since the one thing it drops
-     * is a nation bonus that could not be shown to apply. Same pessimistic direction as the
-     * assumed-not-hostile default, and the army is already marked ESTIMATED.
+     * T-441 made it impossible: {@code ScenarioLoader} forces a nation onto every army it reads and
+     * the blank-army path falls back to the same stand-in. And T-440 was REVERSED on John's call -
+     * the shared facade dereferences the nation unguarded on purpose, because server-side a
+     * nationless army is corruption and halting is the correct outcome. So the invariant is proven
+     * where it is established ({@code ScenarioLoaderTest.everyLoadedArmyHasANation}), not asserted
+     * again here over a hand-built object that no longer represents anything real.
      */
-    @Test
-    void anArmyWithNoNationStillGetsItsNumbers() {
-        final CombatScenario scenario = new CombatScenario(null, hex());
-        final ArmySim ownerless = new ArmySim(loadedArmy(platoon(troopType("inf", false), 900)));
-        scenario.addArmy(ownerless, CombatScenario.Provenance.ESTIMATED);
-        final BattleSimControler.PlatoonTableModel model = modelOver(scenario, ownerless);
-
-        assertNotEquals("--", model.getValueAt(0, 6), "no owner is not no strength");
-        assertNotEquals("--", model.getValueAt(0, 7));
-    }
 
     /**
      * The three transport columns appear only for an army that FLOATS or CARRIES. T-428.
