@@ -88,7 +88,40 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private final transient BattleSimControler controler;
 
     private final JTree roster = new JTree();
-    private final JTable platoons = new JTable();
+    /**
+     * Fills the pane when the columns fit, scrolls when they do not.
+     *
+     * Neither resize mode alone gets this right. {@code AUTO_RESIZE_LAST_COLUMN} forces the table
+     * to the viewport width always, so a fleet - which carries three extra transport columns
+     * (T-428) - crushed thirteen columns into the pane and truncated the headers to "Trai...",
+     * "We...", "Carg...". {@code AUTO_RESIZE_OFF} fixes that and breaks the common case instead: a
+     * land army's ten columns no longer reach the right edge and leave a band of empty grey.
+     *
+     * {@code getScrollableTracksViewportWidth} is the seam between the two. Answering TRUE hands
+     * the table to the viewport, which is what makes the auto-resize mode spread the columns to
+     * fill; answering FALSE lets the table keep its own width and the scroll pane put a bar under
+     * it. So: true while the columns fit, false once they do not.
+     *
+     * Measured against the columns' PREFERRED widths rather than {@code getPreferredSize()}, which
+     * reports their CURRENT widths - those move every time auto-resize spreads them, and feeding
+     * that back into the decision makes the answer oscillate with the pane. The preferred widths
+     * are set once per model swap in {@link #configurePlatoonColumns} and never drift.
+     */
+    private final JTable platoons = new JTable() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
+            if (getParent() == null) {
+                return true;
+            }
+            int wanted = 0;
+            for (int ii = 0; ii < getColumnModel().getColumnCount(); ii++) {
+                wanted += getColumnModel().getColumn(ii).getPreferredWidth();
+            }
+            return wanted <= getParent().getWidth();
+        }
+    };
     private final JLabel status = new JLabel();
     private final JLabel runReason = new JLabel();
     private final JLabel armyTitle = new JLabel();
@@ -579,13 +612,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         gui.services.TableExportMenu.install(platoons, "battlesim-platoons");
         platoons.setFillsViewportHeight(true);
         platoons.setRowHeight(Math.max(20, platoons.getRowHeight()));
-        // Scroll, do not SQUEEZE. With AUTO_RESIZE_LAST_COLUMN the table is forced to the
-        // viewport width, so a fleet - which gets three extra transport columns (T-428) - crushed
-        // thirteen columns into the pane and truncated the headers to "Trai...", "We...",
-        // "Carg...". Every column now keeps its width and the scroll pane supplies a horizontal
-        // bar when they do not fit, which is the honest answer: the numbers are the point and a
-        // number too narrow to read is worse than one you have to scroll to.
-        platoons.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        // Spreads the slack when the columns fit; the tracksViewportWidth override on the field
+        // is what stops it squeezing when they do not.
+        platoons.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         platoons.getTableHeader().setReorderingAllowed(false);
         platoons.setShowGrid(false);
         platoons.setIntercellSpacing(new Dimension(0, 1));
@@ -639,7 +668,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         // transport columns and does, which is the case that actually needs the bar.
         final int[] widths = {34, 130, 56, 68, 70, 58, 60, 60, 54, 50, 72, 58, 52};
         for (int ii = 0; ii < Math.min(widths.length, platoons.getColumnCount()); ii++) {
+            // BOTH: preferred is what the fit test reads, width is what is on screen right now.
+            // Setting only preferred would leave columns at whatever the last auto-resize spread
+            // them to, so a table that once scrolled would keep its stretched columns afterwards.
             platoons.getColumnModel().getColumn(ii).setPreferredWidth(widths[ii]);
+            platoons.getColumnModel().getColumn(ii).setWidth(widths[ii]);
         }
         for (int ii : new int[]{0, 8, 9}) {
             platoons.getColumnModel().getColumn(ii).setCellRenderer(centredCell);
