@@ -515,7 +515,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
 
         togglePathResources.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/write-document-20x20.png"))); // NOI18N
         togglePathResources.setSelected(isResourcePathSelected());
-        togglePathResources.setToolTipText(bundle.getString("SETTINGS.MAP.PCPATH.TOOLTIP")); // NOI18N
+        togglePathResources.setToolTipText(bundle.getString("SETTINGS.MAP.RESOURCEPATH.TOOLTIP")); // NOI18N
         togglePathResources.setActionCommand("drawPathResources");
         togglePathResources.setEnabled(false);
         togglePathResources.setFocusable(false);
