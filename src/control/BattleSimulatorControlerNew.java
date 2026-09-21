@@ -505,10 +505,17 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
         armyDetail.add(exercitoFacade.getComandanteTitulo(army, WorldFacadeCounselor.getInstance().getCenario()));
         armyDetail.add(army.getComandantePericia() + "");
         armyDetail.add(exercitoFacade.getMoral(army) + "");
-        armyDetail.add(exercitoFacade.getAtaqueExercito(army, true) + "");
-        armyDetail.add(exercitoFacade.getDefesaExercito(army, true) + "");
+        // The boolean is NAVAL, not land: BattleSimFacade.getArmyAttack tests
+        // naval == tipoTropa.isBarcos(). These four were the wrong way round, so every clipboard
+        // export has been printing the FLEET's strength under "Land attack" and the host's under
+        // "Navy attack". John, 2026-09-21: "correct the inverted columns. I think no one complained
+        // because they look at the individual values (i.e. qtd, training) instead of the derived
+        // calculations." Column POSITIONS are untouched - only the values move into the headers
+        // that always named them.
         armyDetail.add(exercitoFacade.getAtaqueExercito(army, false) + "");
         armyDetail.add(exercitoFacade.getDefesaExercito(army, false) + "");
+        armyDetail.add(exercitoFacade.getAtaqueExercito(army, true) + "");
+        armyDetail.add(exercitoFacade.getDefesaExercito(army, true) + "");
         armyDetail.add(exercitoFacade.getTerreno(army));
         return armyDetail;
     }

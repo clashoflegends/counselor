@@ -75,11 +75,38 @@ public class BattleSimDiplomacyDialog extends JDialog implements ActionListener 
     private static final long serialVersionUID = 1L;
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
-    /** Grey for a guess, and it has to survive both themes, so no near-white and no near-black. */
+    /** Grey for a guess. Mid-grey on purpose: it is the one value legible against either theme. */
     private static final Color ASSUMED = new Color(0x88, 0x88, 0x88);
-    /** The one colour that carries meaning: this pair is going to fight. */
-    private static final Color HOSTILE = new Color(0xA3, 0x1D, 0x1D);
-    private static final Color DIAGONAL = new Color(0xE8, 0xE8, 0xE8);
+    /** This pair is going to fight. Two of them, because one red cannot serve both themes. */
+    private static final Color HOSTILE_ON_LIGHT = new Color(0xA3, 0x1D, 0x1D);
+    private static final Color HOSTILE_ON_DARK = new Color(0xFF, 0x6B, 0x6B);
+
+    /**
+     * Is this a dark theme? Perceived luminance, not a plain average - the eye weights green most.
+     *
+     * Asked of the table rather than of a setting, because the table is what the cell is painted
+     * on and a LookAndFeel change does not announce itself to this dialog.
+     */
+    private static boolean isDark(Color background) {
+        return (background.getRed() * 299 + background.getGreen() * 587
+                + background.getBlue() * 114) / 1000 < 128;
+    }
+
+    /**
+     * The "not applicable" shade for the diagonal, DERIVED from the table rather than fixed.
+     *
+     * It was a hardcoded {@code 0xE8E8E8}, which is near-white: on John's dark theme every diagonal
+     * cell came out as a glaring pale block that read as an empty editable field - the opposite of
+     * "there is nothing here to set". A small step from the table's own background toward its
+     * foreground reads as a subtle inset in either theme and as a light box in neither.
+     */
+    private static Color diagonalOf(JTable table) {
+        final Color bg = table.getBackground();
+        final Color fg = table.getForeground();
+        return new Color((bg.getRed() * 7 + fg.getRed()) / 8,
+                (bg.getGreen() * 7 + fg.getGreen()) / 8,
+                (bg.getBlue() * 7 + fg.getBlue()) / 8);
+    }
 
     private final transient BattleSimControler controler;
     private final JTable grid = new JTable();
@@ -249,7 +276,7 @@ public class BattleSimDiplomacyDialog extends JDialog implements ActionListener 
             if (value == null) {
                 // the diagonal: a faction's view of itself, which the model fixes at neutral
                 setText("");
-                setBackground(isSelected ? table.getSelectionBackground() : DIAGONAL);
+                setBackground(isSelected ? table.getSelectionBackground() : diagonalOf(table));
                 setForeground(table.getForeground());
                 setFont(getFont().deriveFont(Font.PLAIN));
                 return this;
@@ -270,7 +297,8 @@ public class BattleSimDiplomacyDialog extends JDialog implements ActionListener 
             if (origin == RelationshipMatrix.Origin.ASSUMED) {
                 setForeground(ASSUMED);
             } else if (model.isHostile(modelRow, modelColumn)) {
-                setForeground(HOSTILE);
+                setForeground(isDark(table.getBackground())
+                        ? HOSTILE_ON_DARK : HOSTILE_ON_LIGHT);
             } else {
                 setForeground(table.getForeground());
             }
