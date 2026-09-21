@@ -176,6 +176,13 @@ public class BattleSimControler {
         this.selected = scenario.getArmies().isEmpty() ? null : scenario.getArmies().get(0);
     }
 
+    /**
+     * A nation for a brand-new army, because an army without one is not allowed to exist.
+     *
+     * Falls through to the Barbarians rather than to null: the loader forces a nation onto every
+     * army it reads ({@code ScenarioLoader.withOwner}), so this is the only other door into the
+     * scenario and it has to hold the same line.
+     */
     private Nacao firstNacao() {
         if (selected != null && selected.getNacao() != null) {
             return selected.getNacao();
@@ -185,7 +192,8 @@ public class BattleSimControler {
                 return army.getNacao();
             }
         }
-        return null;
+        // an empty hex has nobody to copy, so the stand-in owner it is
+        return getUnknownCityOwner();
     }
 
     // ------------------------------------------------------------------ platoons
