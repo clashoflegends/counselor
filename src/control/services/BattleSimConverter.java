@@ -458,15 +458,46 @@ public class BattleSimConverter {
      * editor's "Fights in:" line, which is where a player is looking when he asks.
      */
     public static String getArmyTitle(ArmySim army, LayerParticipation participation) {
+        return getArmyTitle(army, participation, null);
+    }
+
+    /**
+     * @param outcome how the last run ended for this army, or null before one.
+     *
+     * The mark goes at the FRONT, where the eye lands first and where it lines up down the column.
+     * It is the one thing in the roster that answers the question the player actually opened the
+     * window to ask, and reading it should not mean parsing the rest of the row.
+     */
+    public static String getArmyTitle(ArmySim army, LayerParticipation participation,
+            CombatResult.Outcome outcome) {
         final String strength = getArmyStrengthShort(army);
+        final String mark = getOutcomeMark(outcome);
         if (participation == null || !participation.isInAnyLayer()) {
-            return strength.isEmpty() ? army.getNome()
-                    : String.format("%s  -  %s", army.getNome(), strength);
+            return strength.isEmpty() ? mark + army.getNome()
+                    : String.format("%s%s  -  %s", mark, army.getNome(), strength);
         }
         final StringBuilder badge = new StringBuilder();
         for (CombatLayer layer : participation.getLayers()) {
             badge.append(layer.getBadge());
         }
-        return String.format("%s  [%s]  %s", army.getNome(), badge, strength);
+        return String.format("%s%s  [%s]  %s", mark, army.getNome(), badge, strength);
+    }
+
+    /**
+     * The roster mark for a battle result: won, lost, or was never in it.
+     *
+     * Empty before a run, which is the only state that must not look like an answer. The three
+     * glyphs are labels rather than constants precisely because glyph coverage varies by machine:
+     * if a box shows up instead of an emoji, it is one line in {@code labels.properties} and no
+     * rebuild of this class.
+     */
+    public static String getOutcomeMark(CombatResult.Outcome outcome) {
+        return outcome == null ? "" : labels.getString("BATTLESIM.OUTCOME." + outcome.name()) + " ";
+    }
+
+    /** What the mark means, for the roster tooltip. Empty before a run. */
+    public static String getOutcomeHint(CombatResult.Outcome outcome) {
+        return outcome == null ? null
+                : labels.getString("BATTLESIM.OUTCOME." + outcome.name() + ".HINT");
     }
 }

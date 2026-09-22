@@ -87,7 +87,29 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     private final transient BattleSimControler controler;
 
-    private final JTree roster = new JTree();
+    /**
+     * The roster, with a tooltip that explains the battle-result mark on each row.
+     *
+     * An emoji is a guess unless something says what it means, and glyph rendering varies by
+     * machine - so the hover answers in words what the mark says in a picture, and neither depends
+     * on the other being legible.
+     */
+    private final JTree roster = new JTree() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public String getToolTipText(java.awt.event.MouseEvent event) {
+            final javax.swing.tree.TreePath path = getPathForLocation(event.getX(), event.getY());
+            if (path == null
+                    || !(path.getLastPathComponent() instanceof DefaultMutableTreeNode)) {
+                return null;
+            }
+            final Object user =
+                    ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+            return user instanceof BattleSimControler.ArmyNode
+                    ? ((BattleSimControler.ArmyNode) user).getHint() : null;
+        }
+    };
     /**
      * Fills the pane when the columns fit, scrolls when they do not.
      *
@@ -427,6 +449,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private JPanel buildLeft() {
         roster.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         roster.setRootVisible(false);
+        // without this the overridden getToolTipText is never consulted
+        javax.swing.ToolTipManager.sharedInstance().registerComponent(roster);
         roster.setShowsRootHandles(true);
         roster.addTreeSelectionListener(this);
 
