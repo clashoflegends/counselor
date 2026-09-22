@@ -167,6 +167,12 @@ public class BattleSimControler {
         final ArmySim army = new ArmySim(labels.getString("BATTLESIM.ARMY.NEW"),
                 scenario.getTerreno(), firstNacao());
         army.setCodigo("sim" + System.identityHashCode(army));
+        // The hex, which the three-argument constructor does not take. Without it every attack
+        // lookup runs with a null Local, and the shared formula SWALLOWS the resulting NPE and
+        // returns zero - so a nation carrying ;PAB; would have sent a hand-built army into battle
+        // with no attack at all and nothing on screen to say why. Harmless while Run was disabled;
+        // not harmless now.
+        army.setLocal(scenario.getLocal());
         scenario.addArmy(army, CombatScenario.Provenance.MANUAL);
         this.selected = army;
     }
