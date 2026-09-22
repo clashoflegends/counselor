@@ -125,8 +125,8 @@ public class BattleSimControler {
             for (ArmySim army : roster.getArmies(group)) {
                 // lastResult is null until Run has been pressed, and goes back to null on every
                 // edit - so the marks describe the scenario on screen or they are not there at all
-                node.add(new DefaultMutableTreeNode(new ArmyNode(army, participation.get(army),
-                        lastResult == null ? null : lastResult.getOutcome(army))));
+                node.add(new DefaultMutableTreeNode(
+                        new ArmyNode(army, participation.get(army), lastResult)));
             }
             root.add(node);
         }
@@ -140,10 +140,10 @@ public class BattleSimControler {
         private final String text;
         private final String hint;
 
-        ArmyNode(ArmySim army, LayerParticipation participation, CombatResult.Outcome outcome) {
+        ArmyNode(ArmySim army, LayerParticipation participation, CombatResult result) {
             this.army = army;
-            this.text = BattleSimConverter.getArmyTitle(army, participation, outcome);
-            this.hint = BattleSimConverter.getOutcomeHint(outcome);
+            this.text = BattleSimConverter.getArmyTitle(army, participation, result);
+            this.hint = BattleSimConverter.getLayerHint(army, participation, result);
         }
 
         public ArmySim getArmy() {

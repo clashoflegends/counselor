@@ -469,35 +469,78 @@ public class BattleSimConverter {
      * window to ask, and reading it should not mean parsing the rest of the row.
      */
     public static String getArmyTitle(ArmySim army, LayerParticipation participation,
-            CombatResult.Outcome outcome) {
+            CombatResult result) {
         final String strength = getArmyStrengthShort(army);
-        final String mark = getOutcomeMark(outcome);
         if (participation == null || !participation.isInAnyLayer()) {
-            return strength.isEmpty() ? mark + army.getNome()
-                    : String.format("%s%s  -  %s", mark, army.getNome(), strength);
+            return strength.isEmpty() ? army.getNome()
+                    : String.format("%s  -  %s", army.getNome(), strength);
         }
-        final StringBuilder badge = new StringBuilder();
-        for (CombatLayer layer : participation.getLayers()) {
-            badge.append(layer.getBadge());
-        }
-        return String.format("%s%s  [%s]  %s", mark, army.getNome(), badge, strength);
+        return String.format("%s  [%s]  %s", army.getNome(),
+                getLayerMarks(army, participation, result), strength);
     }
 
     /**
-     * The roster mark for a battle result: won, lost, or was never in it.
+     * THREE SLOTS, sea then land then city, and each one says what happened in its own layer.
      *
-     * Empty before a run, which is the only state that must not look like an answer. The three
-     * glyphs are labels rather than constants precisely because glyph coverage varies by machine:
-     * if a box shows up instead of an emoji, it is one line in {@code labels.properties} and no
-     * rebuild of this class.
+     * The slot never moves, which is the whole value of it: the middle mark is always the land
+     * battle whether or not there was a fight at sea, so a column of armies can be read down rather
+     * than parsed one row at a time. A battle is three fights and they can end differently - a fleet
+     * can win at sea and the troops it lands still be destroyed ashore - so one mark per army would
+     * have to pick one of those and hide the rest.
+     *
+     * Four states per slot, and they are four different statements:
+     * <ul>
+     *   <li>a dot - this army is not in that layer at all;</li>
+     *   <li>the layer's letter - it is in it, but no verdict: either no run yet, or a layer the
+     *       engine does not resolve yet, which today is the sea and the city;</li>
+     *   <li>an outcome glyph - it fought and this is how it ended;</li>
+     *   <li>the watching glyph - it was in the layer and never met an enemy there.</li>
+     * </ul>
      */
-    public static String getOutcomeMark(CombatResult.Outcome outcome) {
-        return outcome == null ? "" : labels.getString("BATTLESIM.OUTCOME." + outcome.name()) + " ";
+    public static String getLayerMarks(ArmySim army, LayerParticipation participation,
+            CombatResult result) {
+        final StringBuilder ret = new StringBuilder();
+        for (CombatLayer layer : CombatLayer.values()) {
+            if (ret.length() > 0) {
+                ret.append(' ');
+            }
+            ret.append(markFor(army, participation, result, layer));
+        }
+        return ret.toString();
     }
 
-    /** What the mark means, for the roster tooltip. Empty before a run. */
-    public static String getOutcomeHint(CombatResult.Outcome outcome) {
-        return outcome == null ? null
-                : labels.getString("BATTLESIM.OUTCOME." + outcome.name() + ".HINT");
+    private static String markFor(ArmySim army, LayerParticipation participation,
+            CombatResult result, CombatLayer layer) {
+        if (participation == null || !participation.isIn(layer)) {
+            return labels.getString("BATTLESIM.OUTCOME.NOT_IN_LAYER");
+        }
+        final CombatResult.Outcome outcome = result == null ? null : result.getOutcome(army, layer);
+        return outcome == null ? layer.getBadge()
+                : labels.getString("BATTLESIM.OUTCOME." + outcome.name());
+    }
+
+    /**
+     * The three marks in words, for the roster tooltip.
+     *
+     * An emoji is a guess unless something says what it means. Null before a run and for an army in
+     * no layer at all, so the hover stays silent rather than explaining a row of dots.
+     */
+    public static String getLayerHint(ArmySim army, LayerParticipation participation,
+            CombatResult result) {
+        if (participation == null || !participation.isInAnyLayer() || result == null) {
+            return null;
+        }
+        final StringBuilder ret = new StringBuilder("<html>");
+        for (CombatLayer layer : CombatLayer.values()) {
+            if (!participation.isIn(layer)) {
+                continue;
+            }
+            final CombatResult.Outcome outcome = result.getOutcome(army, layer);
+            ret.append(String.format("%s: %s<br>", labels.getString("BATTLESIM.LAYER."
+                    + layer.name()), outcome == null
+                            ? labels.getString("BATTLESIM.OUTCOME.NOT_RESOLVED.HINT")
+                            : labels.getString("BATTLESIM.OUTCOME." + outcome.name() + ".HINT")));
+        }
+        return ret.append("</html>").toString();
     }
 }
