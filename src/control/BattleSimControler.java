@@ -4,6 +4,8 @@ import business.combat.ArmySim;
 import business.combat.CombatLayer;
 import business.combat.CombatLevel;
 import business.combat.CombatScenario;
+import business.combat.CombatResult;
+import business.combat.LandCombatResolver;
 import business.combat.LayerParticipation;
 import business.combat.RelationshipMatrix;
 import business.combat.ScenarioLoader;
@@ -54,6 +56,7 @@ public class BattleSimControler {
 
     private final CombatScenario scenario;
     private ArmySim selected;
+    private transient CombatResult lastResult;
 
     public BattleSimControler(Local local) {
         final WorldFacadeCounselor world = WorldFacadeCounselor.getInstance();
@@ -404,6 +407,33 @@ public class BattleSimControler {
         }
     }
 
+    /**
+     * Fights the battle and keeps the result, so the platoon table can fill After and Lost.
+     *
+     * The scenario is NOT touched - {@link LandCombatResolver} fights with copies - so Run is a
+     * question the player can ask again after changing a tactic, which is the whole point of
+     * changing one.
+     */
+    public CombatResult doRun() {
+        this.lastResult = new LandCombatResolver().resolve(scenario,
+                WorldFacadeCounselor.getInstance().getCenario());
+        return this.lastResult;
+    }
+
+    /** The last run, or null before Run has been pressed. */
+    public CombatResult getLastResult() {
+        return lastResult;
+    }
+
+    /**
+     * Thrown away whenever the scenario changes, because it describes a battle that no longer
+     * matches what is on screen. After and Lost go back to "--" rather than showing the casualties
+     * of a fight the player has since edited away.
+     */
+    public void clearResult() {
+        this.lastResult = null;
+    }
+
     /** Back to what the EGF and the game type say, discarding every override. */
     public void doResetDiplomacy() {
         scenario.clearHostilityEdits();
@@ -531,6 +561,23 @@ public class BattleSimControler {
             return String.format("%,d", value);
         }
 
+        /**
+         * After and Lost, once a battle has been run. Still "--" when this platoon took no part.
+         *
+         * Absent is not zero, and the distinction matters most exactly here: a ship in a land
+         * battle shows "--" because it was never in the fight, while a platoon that fought and
+         * survived intact shows its full count and a loss of 0. Collapsing them would tell the
+         * player his fleet came through a battle it never entered.
+         */
+        private String afterRun(Pelotao pelotao, boolean survivors) {
+            final CombatResult result = owner == null ? null : owner.getLastResult();
+            if (result == null || !result.has(pelotao)) {
+                return "--";
+            }
+            return String.format("%,d", survivors ? result.getAfter(pelotao)
+                    : result.getLost(pelotao));
+        }
+
         @Override
         public int getRowCount() {
             return platoons.size();
@@ -650,6 +697,10 @@ public class BattleSimControler {
                     return strength(exercitoFacade.getAtaquePelotao(pelotao, army));
                 case COL_DEFENSE:
                     return strength(exercitoFacade.getDefesaPelotao(pelotao, army));
+                case COL_AFTER:
+                    return afterRun(pelotao, true);
+                case COL_LOST:
+                    return afterRun(pelotao, false);
                 case COL_CAPACITY:
                     return strength(exercitoFacade.getTransportesCapacity(pelotao));
                 case COL_CARGO:

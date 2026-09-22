@@ -4,6 +4,7 @@ import business.combat.ArmySim;
 import business.combat.CombatLayer;
 import business.combat.CombatLevel;
 import business.combat.CasualtyMode;
+import business.combat.CombatResult;
 import business.combat.CombatScenario;
 import business.combat.LayerParticipation;
 import business.combat.RosterDerivation;
@@ -31,8 +32,11 @@ import persistenceCommons.SettingsManager;
 public class BattleSimConverter {
 
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    /** T-801 flips this. Until then Run is disabled and says so. */
-    private static final boolean ENGINE_EXISTS = false;
+    /**
+     * The land layer resolves now (T-801), so Run can be enabled. Still ONE constant: the sea and
+     * city layers are not here yet, and when they arrive this stays exactly where it is.
+     */
+    private static final boolean ENGINE_EXISTS = true;
 
     private BattleSimConverter() {
     }
@@ -196,10 +200,11 @@ public class BattleSimConverter {
     }
 
     /**
-     * Whether Run may be enabled at all: false until T-801 builds the resolution chain.
+     * Whether Run may be enabled at all.
      *
-     * One constant, one call site, so the day the engine lands is a one-line change rather than a
-     * hunt through the model for everything that assumed there was none.
+     * One constant, one call site. T-801 landed the land layer and flipped it; the sea and city
+     * layers do not get a second flag, because a scenario that engages on one layer is runnable and
+     * the result says which layers it resolved.
      */
     public static boolean isRunnable(CombatScenario scenario) {
         return scenario != null && scenario.getRunGate(ENGINE_EXISTS).isRunnable();
@@ -356,6 +361,33 @@ public class BattleSimConverter {
                     labels.getString("BATTLESIM.LAYER.NAVY"), seaAttack, seaDefense));
         }
         return ret.toString();
+    }
+
+    /**
+     * What the run did, for the status bar: rounds fought, plus everything it could not do.
+     *
+     * The caveats are not a footnote. A result that omits what it skipped looks complete, and a
+     * player reading casualties off a land-only resolution while a fleet sits on the same hex is
+     * being misled by omission. So the layer limit is stated on EVERY result, not only when
+     * something goes wrong, and the resolver's own notes follow it.
+     */
+    public static String getRunResultText(CombatResult result) {
+        if (result == null) {
+            return "";
+        }
+        final StringBuilder ret = new StringBuilder("<html>");
+        // Zero rounds is NOT a battle resolved in zero rounds, and saying "Resolved in 0 round(s)"
+        // would be a completed simulation of a fight that never happened. It has two causes and
+        // both are real: the hex engages only on the sea or city layer (the run gate says READY for
+        // engagement on ANY layer, by design), or the armies standing on land are not hostile to
+        // each other. Either way the honest sentence is the same one.
+        ret.append(result.getRounds() == 0
+                ? labels.getString("BATTLESIM.RESULT.NOLANDBATTLE")
+                : String.format(labels.getString("BATTLESIM.RESULT.DONE"), result.getRounds()));
+        for (String note : result.getNotes()) {
+            ret.append("<br>").append(labels.getString(note));
+        }
+        return ret.append("</html>").toString();
     }
 
     /**

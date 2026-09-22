@@ -209,7 +209,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 @Override
                 public void run() {
                     if (!refreshing) {
-                        doRefresh(false);
+                        doEdited(false);
                     }
                 }
             });
@@ -740,6 +740,27 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     }
 
     /**
+     * Refreshes after an EDIT, which also throws the last run away.
+     *
+     * A result describes the battle as it was set up when Run was pressed. Change a tactic, a
+     * quantity or a diplomacy cell and it describes something else, so After and Lost go back to
+     * "--" rather than keeping casualties from a fight the player has since edited away. Leaving
+     * them on screen would be the worst kind of wrong: numbers that look live and are not.
+     *
+     * Every path that mutates the scenario comes through here; {@link #doRefresh} is for the two
+     * that do not - building the window, and showing the run itself.
+     */
+    private void doEdited() {
+        doEdited(true);
+    }
+
+    /** @param includePlatoons false when the platoon table is the SOURCE of the edit. */
+    private void doEdited(boolean includePlatoons) {
+        controler.clearResult();
+        doRefresh(includePlatoons);
+    }
+
+    /**
      * @param includePlatoons false when the platoon table is the SOURCE of the edit.
      *
      * Replacing a JTable's model clears its row selection and drops any editor that has opened
@@ -774,7 +795,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             // R-40: the button's state and the sentence beside it come from the SAME gate, so
             // they cannot drift into saying different things.
             run.setEnabled(BattleSimConverter.isRunnable(controler.getScenario()));
-            runReason.setText(BattleSimConverter.getRunDisabledReason(controler.getScenario()));
+            // One label, two jobs, and they can never both apply: before a run it says why Run is
+            // off (empty when it is on), after one it says what the run did and what it could not
+            // do. Both belong at the edge nearest the button they are about.
+            runReason.setText(controler.getLastResult() == null
+                    ? BattleSimConverter.getRunDisabledReason(controler.getScenario())
+                    : BattleSimConverter.getRunResultText(controler.getLastResult()));
         } finally {
             refreshing = false;
         }
@@ -999,7 +1025,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 diplomacyDialog = new BattleSimDiplomacyDialog(this, controler, new Runnable() {
                     @Override
                     public void run() {
-                        doRefresh();
+                        doEdited();
                     }
                 });
             }
@@ -1026,6 +1052,30 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             control.support.DispatchManager.getInstance().sendDispatchForMsg(
                     control.support.DispatchManager.STATUS_BAR_MSG,
                     labels.getString("COPIAR.ARMY.DETAILS"));
+            return;
+        } else if ("run".equals(command)) {
+            // The scenario is not touched: LandCombatResolver fights with copies, so this is a
+            // question the player can ask again after changing a tactic. doRefresh() - NOT
+            // doEdited() - because the result must survive the repaint that shows it.
+            controler.doRun();
+            // doRefresh(false) plus a row update rather than the full refresh: After and Lost are
+            // the only cells that changed, and swapping the table's model would clear the row the
+            // player had selected to watch.
+            doRefresh(false);
+            // GUARDED, and it has to be: platoonEdits listens for UPDATE events and treats one as a
+            // player edit, which would clear the very result this is repainting. The guard is read
+            // synchronously inside the fire, so raising it here stops the listener before it can
+            // schedule anything.
+            refreshing = true;
+            try {
+                if (platoons.getModel() instanceof javax.swing.table.AbstractTableModel
+                        && platoons.getRowCount() > 0) {
+                    ((javax.swing.table.AbstractTableModel) platoons.getModel())
+                            .fireTableRowsUpdated(0, platoons.getRowCount() - 1);
+                }
+            } finally {
+                refreshing = false;
+            }
             return;
         } else if ("about".equals(command)) {
             control.support.WindowPopupText.showWindowText(
@@ -1071,7 +1121,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         } else {
             return;
         }
-        doRefresh();
+        doEdited();
     }
 
     @Override
@@ -1081,7 +1131,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         }
         if (event.getSource() == cityLoyalty) {
             controler.setCityLealdade((Integer) cityLoyalty.getValue());
-            doRefresh();
+            doEdited();
             return;
         }
         final ArmySim army = controler.getSelected();
@@ -1100,6 +1150,6 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         } else {
             return;
         }
-        doRefresh();
+        doEdited();
     }
 }
