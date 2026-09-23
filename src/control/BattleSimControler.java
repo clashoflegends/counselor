@@ -6,6 +6,7 @@ import business.combat.CombatLevel;
 import business.combat.CombatScenario;
 import business.combat.CombatResult;
 import business.combat.LandCombatResolver;
+import business.combat.LayerReport;
 import business.combat.LayerParticipation;
 import business.combat.RelationshipMatrix;
 import business.combat.ScenarioLoader;
@@ -434,6 +435,26 @@ public class BattleSimControler {
         this.lastResult = new LandCombatResolver().resolve(scenario,
                 WorldFacadeCounselor.getInstance().getCenario());
         return this.lastResult;
+    }
+
+    /**
+     * The rounds table for one layer, ready for the results pane.
+     *
+     * Only the land layer resolves, so the other two are built empty and carry a REASON. A layer
+     * that quietly vanished would let a land-only forecast read as a whole battle, which is the one
+     * thing the results pane must never do.
+     */
+    public LayerReport getLayerReport(CombatLayer layer) {
+        if (layer != CombatLayer.ARMY || lastResult == null) {
+            final LayerReport ret = new LayerReport(layer, 0);
+            ret.setNotFoughtReason("BATTLESIM.LAYER.NOTSIMULATED");
+            return ret;
+        }
+        final LayerReport ret = LayerReport.ofLand(scenario, lastResult);
+        if (!ret.isFought()) {
+            ret.setNotFoughtReason("BATTLESIM.LAYER.NOBATTLE");
+        }
+        return ret;
     }
 
     /** The last run, or null before Run has been pressed. */

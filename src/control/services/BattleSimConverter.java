@@ -10,6 +10,7 @@ import business.combat.LayerParticipation;
 import business.combat.RosterDerivation;
 import business.combat.RunGate;
 import business.combat.ScenarioRoster;
+import java.util.ArrayList;
 import business.facade.ExercitoFacade;
 import java.util.List;
 import model.Cenario;
@@ -517,6 +518,86 @@ public class BattleSimConverter {
         final CombatResult.Outcome outcome = result == null ? null : result.getOutcome(army, layer);
         return outcome == null ? layer.getBadge()
                 : labels.getString("BATTLESIM.OUTCOME." + outcome.name());
+    }
+
+    /**
+     * Before, after and lost for one army, or NULL when it took no part.
+     *
+     * Null rather than zeroes, because those are different statements: an army that fought and lost
+     * nobody has three real numbers, and an army that was never in the battle has none. The table
+     * shows "--" for the second.
+     */
+    public static int[] getArmyTotals(ArmySim army, CombatResult result) {
+        int before = 0;
+        int after = 0;
+        boolean any = false;
+        for (Pelotao pelotao : army.getPelotoes().values()) {
+            if (!result.has(pelotao)) {
+                continue;
+            }
+            any = true;
+            before += pelotao.getQtd();
+            after += result.getAfter(pelotao);
+        }
+        return any ? new int[]{before, after, before - after} : null;
+    }
+
+    /**
+     * The verdict, in at most a few lines: who is left holding the hex and what it cost them.
+     *
+     * Built from the OUTCOMES rather than from the casualty numbers, because the two can disagree in
+     * a way that matters: an army that fought and lost nobody and an army that never engaged both
+     * end at full strength, and only the resolver knows which is which.
+     */
+    public static List<String> getVerdictLines(CombatScenario scenario, CombatResult result) {
+        final List<String> ret = new ArrayList<>();
+        if (result.getRounds() == 0) {
+            ret.add(labels.getString("BATTLESIM.VERDICT.NOBATTLE"));
+            return ret;
+        }
+        final List<String> standing = new ArrayList<>();
+        final List<String> destroyed = new ArrayList<>();
+        boolean undecided = false;
+        for (ArmySim army : scenario.getArmies()) {
+            final CombatResult.Outcome outcome = result.getOutcome(army, CombatLayer.ARMY);
+            if (outcome == CombatResult.Outcome.WON) {
+                standing.add(army.getNome());
+            } else if (outcome == CombatResult.Outcome.LOST) {
+                destroyed.add(army.getNome());
+            } else if (outcome == CombatResult.Outcome.UNDECIDED) {
+                undecided = true;
+            }
+        }
+        if (undecided) {
+            ret.add(labels.getString("BATTLESIM.VERDICT.STALEMATE"));
+        } else if (!standing.isEmpty()) {
+            ret.add(String.format(labels.getString("BATTLESIM.VERDICT.HOLDS"),
+                    join(standing)));
+        }
+        if (!destroyed.isEmpty()) {
+            ret.add(String.format(labels.getString("BATTLESIM.VERDICT.DESTROYED"),
+                    join(destroyed)));
+        }
+        for (ArmySim army : scenario.getArmies()) {
+            final int[] totals = getArmyTotals(army, result);
+            if (totals == null || totals[2] <= 0) {
+                continue;
+            }
+            ret.add(String.format(labels.getString("BATTLESIM.VERDICT.COST"), army.getNome(),
+                    totals[2], totals[0], Math.round(100f * totals[2] / totals[0])));
+        }
+        return ret;
+    }
+
+    private static String join(List<String> names) {
+        final StringBuilder ret = new StringBuilder();
+        for (String name : names) {
+            if (ret.length() > 0) {
+                ret.append(", ");
+            }
+            ret.append(name);
+        }
+        return ret.toString();
     }
 
     /**

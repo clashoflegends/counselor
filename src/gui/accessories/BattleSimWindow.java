@@ -73,11 +73,12 @@ import persistenceCommons.SettingsManager;
  * {@link BattleSimConverter}. That is what lets the rules be tested without opening a window, and it
  * is what makes this file boring, which is the point.
  *
- * <h3>Run is disabled, and says why</h3>
+ * <h3>Run says what it did, and what it could not</h3>
  *
- * There is no engine yet. The reason sits in the status bar rather than a tooltip, because a tooltip
- * on a disabled button is unreliable across platforms and this is the one message a player needs
- * when the button does nothing - which is the complaint that started this whole rebuild.
+ * The land layer resolves (T-801) and the numbers land in the platoon table, the roster marks and
+ * the results pane (T-802). When Run is DISABLED the reason sits in the status bar rather than a
+ * tooltip, because a tooltip on a disabled button is unreliable across platforms and this is the one
+ * message a player needs when the button does nothing - the complaint that started this rebuild.
  */
 public class BattleSimWindow extends JFrame implements ActionListener, ChangeListener,
         TreeSelectionListener {
@@ -144,6 +145,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             return wanted <= getParent().getWidth();
         }
     };
+    private final JButton results = new JButton(labels.getString("BATTLESIM.RESULTS.OPEN"));
+    /**
+     * Held, like the diplomacy dialog: a second press must RAISE the open pane rather than stack a
+     * second copy of the same numbers over it, and a re-run must refresh the one already on screen.
+     */
+    private transient BattleSimResultDialog resultDialog;
     private final JLabel status = new JLabel();
     private final JLabel runReason = new JLabel();
     private final JLabel armyTitle = new JLabel();
@@ -413,6 +420,13 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         run.addActionListener(this);
         run.setEnabled(false);
         final JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, 4, 0));
+        // Results sits beside Run because it is what pressing Run is FOR. Disabled until there is
+        // something to show, so it never opens an empty pane.
+        results.setActionCommand("results");
+        results.addActionListener(this);
+        results.setToolTipText(labels.getString("BATTLESIM.RESULTS.OPEN.TOOLTIP"));
+        results.setEnabled(false);
+        right.add(results);
         right.add(run);
         ret.add(right, BorderLayout.LINE_END);
         return ret;
@@ -751,6 +765,20 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     // ------------------------------------------------------------------ refresh
 
+    /** Opens the results pane, or raises and refreshes the one already open. */
+    private void showResults() {
+        if (controler.getLastResult() == null) {
+            return;
+        }
+        if (resultDialog == null || !resultDialog.isDisplayable()) {
+            resultDialog = new BattleSimResultDialog(this, controler);
+        } else {
+            resultDialog.refresh();
+        }
+        resultDialog.setVisible(true);
+        resultDialog.toFront();
+    }
+
     /**
      * Repaints everything from the scenario.
      *
@@ -825,6 +853,13 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             runReason.setText(controler.getLastResult() == null
                     ? BattleSimConverter.getRunDisabledReason(controler.getScenario())
                     : BattleSimConverter.getRunResultText(controler.getLastResult()));
+            results.setEnabled(controler.getLastResult() != null);
+            // An edit throws the result away, so a pane still showing it would be describing a
+            // battle that no longer matches the window. It goes with the numbers.
+            if (controler.getLastResult() == null && resultDialog != null
+                    && resultDialog.isDisplayable()) {
+                resultDialog.dispose();
+            }
         } finally {
             refreshing = false;
         }
@@ -1082,6 +1117,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             // question the player can ask again after changing a tactic. doRefresh() - NOT
             // doEdited() - because the result must survive the repaint that shows it.
             controler.doRun();
+            showResults();
             // doRefresh(false) plus a row update rather than the full refresh: After and Lost are
             // the only cells that changed, and swapping the table's model would clear the row the
             // player had selected to watch.
@@ -1100,6 +1136,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             } finally {
                 refreshing = false;
             }
+            return;
+        } else if ("results".equals(command)) {
+            showResults();
             return;
         } else if ("about".equals(command)) {
             control.support.WindowPopupText.showWindowText(
