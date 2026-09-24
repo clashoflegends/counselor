@@ -203,6 +203,15 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      */
     private final JSpinner commander = spinner(0, 0, null, 1);
     private final JSpinner morale = spinner(0, 0, 100, 1);
+    /**
+     * The Morale label, kept because it has to be able to say the value is NOT KNOWN.
+     *
+     * Zero in this field means one of two very different things - an army that is broken, or an
+     * army the player cannot see - and a number spinner has no way to show the second. Marking the
+     * label puts the answer where he is already looking, rather than only in a footer he reads
+     * after the run has already gone wrong.
+     */
+    private JLabel moraleLabel = new JLabel();
     private final JSpinner attackBonus = spinner(0, 0, null, 100);
     private final JSpinner defenseBonus = spinner(0, 0, null, 100);
 
@@ -571,7 +580,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         tactic.addActionListener(this);
         addPair(ret, gbc, 1, 2, labels.getString("TATICA"), tactic);
         addPair(ret, gbc, 2, 0, labels.getString("COMANDANTE"), commander);
-        addPair(ret, gbc, 2, 2, labels.getString("MORAL"), morale);
+        moraleLabel = addPair(ret, gbc, 2, 2, labels.getString("MORAL"), morale);
         addPair(ret, gbc, 3, 0, labels.getString("BATTLESIM.ATTACK.BONUS"), attackBonus);
         addPair(ret, gbc, 3, 2, labels.getString("BATTLESIM.DEFENSE.BONUS"), defenseBonus);
 
@@ -621,7 +630,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * Labels are right-aligned so both columns present a single edge to the fields. Left-aligned
      * labels of different lengths are the main reason a form of this shape looks unfinished.
      */
-    private void addPair(JPanel panel, GridBagConstraints gbc, int row, int col, String text,
+    private JLabel addPair(JPanel panel, GridBagConstraints gbc, int row, int col, String text,
             java.awt.Component field) {
         gbc.gridy = row;
         gbc.gridx = col;
@@ -635,6 +644,64 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         gbc.anchor = GridBagConstraints.LINE_START;
         panel.add(field, gbc);
         gbc.weightx = 0;
+        return label;
+    }
+
+    /**
+     * Pushes a half-typed spinner into the model BEFORE anything reads or replaces it.
+     *
+     * A {@code JSpinner}'s text is not its value. The editor commits on Enter or on focus loss, so
+     * a number typed and then left by CLICKING SOMETHING ELSE is still only text - and the first
+     * thing a click on the roster does is refresh the editor, which calls {@code setValue} and
+     * overwrites that text with what the army already had. The edit vanishes with no error, and the
+     * player has no way to tell the difference between "saved" and "silently discarded".
+     *
+     * John hit it exactly this way: type a commander skill, Tab, type a morale, click the next army
+     * in the tree, come back, and the morale is gone.
+     *
+     * So every path that changes the selection or acts on the scenario commits first, while
+     * {@link BattleSimControler#getSelected} still points at the army the number was typed for.
+     * Committing to the WRONG army would be worse than losing it.
+     */
+    private boolean commitSpinners() {
+        if (refreshing) {
+            return false;
+        }
+        final ArmySim army = controler.getSelected();
+        if (army == null) {
+            return false;
+        }
+        // The change listener is silenced and the values written by hand, rather than letting
+        // commitEdit fire it. Its handler ends in a full refresh, which REBUILDS THE ROSTER - and a
+        // roster rebuilt in the middle of a tree-selection event re-selects the old army, so the
+        // click that started all this would be swallowed. Writing here keeps the refresh under the
+        // caller's control, after the selection has finished moving.
+        refreshing = true;
+        try {
+            for (JSpinner one : new JSpinner[]{commander, morale, attackBonus, defenseBonus}) {
+                try {
+                    one.commitEdit();
+                } catch (java.text.ParseException ignored) {
+                    // not a number: the next refresh reverts it, which is the right answer
+                }
+            }
+        } finally {
+            refreshing = false;
+        }
+        if (army.getComandantePericia() == (Integer) commander.getValue()
+                && army.getMoral() == (Integer) morale.getValue()
+                && army.getAttackBonus() == (Integer) attackBonus.getValue()
+                && army.getArmyDefenseBonus() == (Integer) defenseBonus.getValue()) {
+            // nothing was typed. Clicking around the roster to READ the numbers must not count as
+            // an edit, or it would throw the last run's results away every time.
+            return false;
+        }
+        army.setComandante((Integer) commander.getValue());
+        army.setMoral((Integer) morale.getValue());
+        army.setBonusAttack((Integer) attackBonus.getValue());
+        army.setBonusDefense((Integer) defenseBonus.getValue());
+        controler.clearResult();
+        return true;
     }
 
     /**
@@ -916,6 +983,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         tactic.setSelectedIndex(indexOfTactic(army.getTatica()));
         commander.setValue(army.getComandantePericia());
         morale.setValue(army.getMoral());
+        final boolean moraleUnknown = controler.getScenario().isMoraleUnknown(army);
+        moraleLabel.setText(labels.getString(moraleUnknown
+                ? "BATTLESIM.MORAL.UNKNOWN" : "MORAL"));
+        morale.setToolTipText(moraleUnknown
+                ? labels.getString("BATTLESIM.MORAL.UNKNOWN.TOOLTIP") : null);
         attackBonus.setValue(army.getAttackBonus());
         defenseBonus.setValue(army.getArmyDefenseBonus());
         casualtyMode.setText(BattleSimConverter.getCasualtyModeText(army,
@@ -1043,6 +1115,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         if (refreshing) {
             return;
         }
+        // BEFORE the selection moves: a number typed and left by clicking here belongs to the army
+        // that is still selected for one more moment. See commitSpinners.
+        final boolean edited = commitSpinners();
         final Object node = roster.getLastSelectedPathComponent();
         if (!(node instanceof DefaultMutableTreeNode)) {
             return;
@@ -1057,6 +1132,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             } finally {
                 refreshing = false;
             }
+            if (edited) {
+                // now the selection has finished moving, so rebuilding the roster lands on the
+                // army the player just clicked and the edited one shows its new strength
+                doRefresh();
+            }
         }
     }
 
@@ -1064,6 +1144,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     public void actionPerformed(ActionEvent event) {
         if (refreshing) {
             return;
+        }
+        if (commitSpinners()) {
+            doRefresh();
         }
         final String command = event.getActionCommand();
         if ("addArmy".equals(command)) {
