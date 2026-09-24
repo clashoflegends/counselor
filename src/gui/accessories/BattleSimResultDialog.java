@@ -64,6 +64,8 @@ public class BattleSimResultDialog extends JDialog {
     private static final long serialVersionUID = 1L;
     private static final BundleManager labels =
             SettingsManager.getInstance().getBundleManager();
+    /** One table row, the unit the whole page is built out of. */
+    private static final int ROW_SCROLL = 16;
 
     private final transient BattleSimControler controler;
 
@@ -72,7 +74,7 @@ public class BattleSimResultDialog extends JDialog {
         this.controler = controler;
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
-        add(new JScrollPane(buildBody()), BorderLayout.CENTER);
+        add(scrolled(buildBody()), BorderLayout.CENTER);
         add(buildButtons(), BorderLayout.SOUTH);
         pack();
         setSize(new Dimension(Math.min(760, Math.max(520, getWidth())),
@@ -83,10 +85,26 @@ public class BattleSimResultDialog extends JDialog {
     /** Rebuilt whole on every Run, because every number in it changes. */
     public void refresh() {
         getContentPane().removeAll();
-        add(new JScrollPane(buildBody()), BorderLayout.CENTER);
+        add(scrolled(buildBody()), BorderLayout.CENTER);
         add(buildButtons(), BorderLayout.SOUTH);
         revalidate();
         repaint();
+    }
+
+    /**
+     * The body in a scroll pane that moves at a readable speed.
+     *
+     * A {@code JScrollPane} over a plain {@code JPanel} scrolls in units of ONE PIXEL - the default
+     * whenever the view does not implement {@code Scrollable} - so a wheel notch moves three pixels
+     * and this page, which is a dozen tables tall, takes hundreds of notches to cross. The unit is a
+     * table row, so a notch is three rows and a page is a screenful.
+     */
+    private static JScrollPane scrolled(JPanel body) {
+        final JScrollPane ret = new JScrollPane(body);
+        ret.getVerticalScrollBar().setUnitIncrement(ROW_SCROLL);
+        ret.getVerticalScrollBar().setBlockIncrement(ROW_SCROLL * 10);
+        ret.getHorizontalScrollBar().setUnitIncrement(ROW_SCROLL);
+        return ret;
     }
 
     private JPanel buildBody() {
