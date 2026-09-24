@@ -127,14 +127,29 @@ public class BattleSimResultDialog extends JDialog {
             ret.add(table(new RoundsModel(report)));
         }
 
-        if (!result.getNotes().isEmpty()) {
+        if (hasNotesToShow(result)) {
             ret.add(gap());
             ret.add(heading(labels.getString("BATTLESIM.RESULTS.NOTES")));
             for (String note : result.getNotes()) {
-                ret.add(left("- " + labels.getString(note)));
+                // The land-only caveat is already the reason printed against LAYER 1 and LAYER 3,
+                // so repeating it here would state the same fact three times on one screen and
+                // make the notes look longer than they are.
+                if (!"BATTLESIM.RESULT.LANDONLY".equals(note)) {
+                    ret.add(left("- " + labels.getString(note)));
+                }
             }
         }
         return ret;
+    }
+
+    /** Whether anything is left once the caveat each layer already states is taken out. */
+    private static boolean hasNotesToShow(CombatResult result) {
+        for (String note : result.getNotes()) {
+            if (!"BATTLESIM.RESULT.LANDONLY".equals(note)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private JPanel buildButtons() {

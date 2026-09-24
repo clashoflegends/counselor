@@ -25,6 +25,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import model.Local;
+import model.Jogador;
 import model.Nacao;
 import model.Pelotao;
 import model.Terreno;
@@ -54,6 +55,15 @@ import persistenceCommons.SettingsManager;
 public class BattleSimControler {
 
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
+    /**
+     * What a hand-added army's first platoon starts at.
+     *
+     * A round, obviously-provisional number rather than zero. Zero is the honest default for a
+     * COUNT the player is about to supply, but it is the wrong default here: an army of nobody
+     * takes part in no layer, so the hex stays un-runnable and nothing on screen explains that the
+     * army he just added is the reason.
+     */
+    private static final int NEW_PLATOON_QTD = 100;
 
     private final CombatScenario scenario;
     private ArmySim selected;
@@ -164,9 +174,26 @@ public class BattleSimControler {
 
     // ------------------------------------------------------------------ armies
 
+    /**
+     * Adds an army that can actually FIGHT, because otherwise the button does not do what it says.
+     *
+     * John, 2026-09-23: "I want to be able to run simulations in any combat. For example, in
+     * Lannisport." At Lannisport four Lannister and allied armies sit on the hex, none hostile to
+     * any other, so there is no battle to resolve and Run is correctly disabled. The tool exists to
+     * ask "what if I attacked this", and getting there used to take three moves whose failure modes
+     * were all silent: the new army inherited the SELECTED army's nation, so it was friendly to
+     * everything already there; it had no platoons, so it had no troops; and a platoon added
+     * afterwards starts at zero, so it still had none.
+     *
+     * So a new army arrives ready to be a battle: the PLAYER'S OWN nation when he is not already on
+     * the hex - which makes it hostile to everyone there, since a foreign army is assumed hostile to
+     * the observer - and one placeholder platoon with a round number in it. Every part of that is
+     * editable and obviously provisional; what it is not is a button that appears to work and
+     * leaves Run dead.
+     */
     public void doAddArmy() {
         final ArmySim army = new ArmySim(labels.getString("BATTLESIM.ARMY.NEW"),
-                scenario.getTerreno(), firstNacao());
+                scenario.getTerreno(), newArmyNacao());
         army.setCodigo("sim" + System.identityHashCode(army));
         // The hex, which the three-argument constructor does not take. Without it every attack
         // lookup runs with a null Local, and the shared formula SWALLOWS the resulting NPE and
@@ -176,6 +203,33 @@ public class BattleSimControler {
         army.setLocal(scenario.getLocal());
         scenario.addArmy(army, CombatScenario.Provenance.MANUAL);
         this.selected = army;
+        final Pelotao platoon = doAddPlatoon();
+        if (platoon != null) {
+            platoon.setQtd(NEW_PLATOON_QTD);
+        }
+    }
+
+    /**
+     * The nation for a new army: the PLAYER'S, when he has none on this hex.
+     *
+     * That is the army a what-if is nearly always about, and it is the one choice that turns a hex
+     * with no battle on it into a hex with one. When he is already here, there is nothing to prove
+     * by adding a second of his own, so it falls back to copying what is selected.
+     */
+    private Nacao newArmyNacao() {
+        final Jogador observer = scenario.getObserver();
+        if (observer == null) {
+            return firstNacao();
+        }
+        for (ArmySim army : scenario.getArmies()) {
+            if (army.getNacao() != null && army.getNacao().getOwner() == observer) {
+                return firstNacao();        // he is already on the hex
+            }
+        }
+        for (Nacao nacao : observer.getNacoes().values()) {
+            return nacao;
+        }
+        return firstNacao();
     }
 
     public void doCloneArmy() {
