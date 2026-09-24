@@ -1133,6 +1133,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         final boolean edited = commitSpinners();
         final Object node = roster.getLastSelectedPathComponent();
         if (!(node instanceof DefaultMutableTreeNode)) {
+            // a group node, or nothing. The edit above still happened and still cleared the result,
+            // so it still has to be painted - returning here left the roster showing the old
+            // strength and a stale result pane until some unrelated refresh came along.
+            if (edited) {
+                doRefresh();
+            }
             return;
         }
         final Object user = ((DefaultMutableTreeNode) node).getUserObject();
@@ -1145,11 +1151,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             } finally {
                 refreshing = false;
             }
-            if (edited) {
-                // now the selection has finished moving, so rebuilding the roster lands on the
-                // army the player just clicked and the edited one shows its new strength
-                doRefresh();
-            }
+        }
+        if (edited) {
+            // after the selection has finished moving, so rebuilding the roster lands on the army
+            // the player just clicked and the edited one shows its new strength
+            doRefresh();
         }
     }
 
@@ -1158,9 +1164,13 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         if (refreshing) {
             return;
         }
-        if (commitSpinners()) {
-            doRefresh();
-        }
+        // COMMIT, but do NOT repaint yet. doRefresh reaches refreshEditor and refreshGround, which
+        // reload the tactic combo, the terrain combo and the four city widgets FROM THE MODEL - and
+        // every branch below then reads its widget. Repainting here overwrites the selection the
+        // player just made, and the branch writes the old value back with nothing to show for it.
+        // That is the same silent edit loss commitSpinners was added to remove, moved from the
+        // spinners to the combos. valueChanged already has this shape: commit, act, then repaint.
+        final boolean edited = commitSpinners();
         final String command = event.getActionCommand();
         if ("addArmy".equals(command)) {
             controler.doAddArmy();
@@ -1278,6 +1288,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         } else if ("nacao".equals(command) && controler.getSelected() != null) {
             controler.getSelected().setNacao((Nacao) nacao.getSelectedItem());
         } else {
+            // nothing here handled it, but a spinner edit may still have been committed above
+            if (edited) {
+                doRefresh();
+            }
             return;
         }
         doEdited();

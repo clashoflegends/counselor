@@ -590,6 +590,9 @@ public class BattleSimConverter {
      */
     public static String getArmyTitle(ArmySim army, LayerParticipation participation,
             CombatResult result) {
+        if (army == null) {
+            return "";
+        }
         final String name = getUnknownMark(army) + army.getNome();
         final String strength = getArmyStrengthShort(army);
         if (participation == null || !participation.isInAnyLayer()) {
@@ -620,7 +623,9 @@ public class BattleSimConverter {
      * are all at zero is equally uncountable and equally blocking.
      */
     private static String getUnknownMark(ArmySim army) {
-        return army != null && new ExercitoFacade().getQtTropasTotal(army) <= 0
+        // no null check: the only caller has already returned for a null army, and a guard here
+        // that the next token defeats reads as protection that is not there
+        return new ExercitoFacade().getQtTropasTotal(army) <= 0
                 ? labels.getString("BATTLESIM.ARMY.UNKNOWN") + " " : "";
     }
 
