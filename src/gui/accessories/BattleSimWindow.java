@@ -130,6 +130,20 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * that back into the decision makes the answer oscillate with the pane. The preferred widths
      * are set once per model swap in {@link #configurePlatoonColumns} and never drift.
      */
+    /**
+     * The smallest the window is worth being, and the size it opens at - both LOGICAL pixels, both
+     * clamped to the screen by {@link #doSizeToScreen}.
+     *
+     * PREFERRED_WIDTH is 1010 rather than the 980 it was, and the 30 pixels are not cosmetic:
+     * {@link #configurePlatoonColumns} sizes the first ten columns to sum to 640 so that a land
+     * army never scrolls, and at 980 the platoon viewport measured 621. Nineteen pixels short, so
+     * every land army got a horizontal scrollbar and the Lost header rendered as "Los" - the exact
+     * truncation the column widths were chosen to prevent.
+     */
+    private static final int MIN_USABLE_WIDTH = 860, MIN_USABLE_HEIGHT = 560;
+    /** Column header, horizontal scrollbar and the scroll pane's own border. */
+    private static final int PLATOON_HEADER_ROOM = 44;
+    private static final int PREFERRED_WIDTH = 1010, PREFERRED_HEIGHT = 640;
     private final JTable platoons = new JTable() {
         private static final long serialVersionUID = 1L;
 
@@ -159,7 +173,41 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private final JLabel sizeBand = new JLabel();
     private final JLabel strength = new JLabel();
     /** What the platoon table's row order means for the selected army. T-437. */
-    private final JLabel casualtyMode = new JLabel();
+    /**
+     * The caption above the platoon table, which is HTML and therefore WRAPS.
+     *
+     * A plain {@code JLabel} asks its HTML view for a preferred span with no width constraint - one
+     * long line - and reports the height of that one line. Inside {@code BorderLayout.NORTH}, which
+     * takes the preferred height and gives the full width, the label is then handed exactly 16px
+     * for text that wraps to two lines, or three for a fleet, and the tail is simply cut. At 100
+     * percent the second line ("to choose who dies first.") was absent entirely.
+     *
+     * Answering in {@code getPreferredSize} rather than from a resize listener is what makes it
+     * reliable: the height is recomputed every time the label is MEASURED, which is every layout
+     * pass, so it is right on the first paint and after every resize without anything having to
+     * fire. A width of zero - before the first layout - falls back to the superclass, which is the
+     * old behaviour and no worse.
+     */
+    private final JLabel casualtyMode = new JLabel() {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public Dimension getPreferredSize() {
+            final Dimension ret = super.getPreferredSize();
+            final javax.swing.text.View view = (javax.swing.text.View)
+                    getClientProperty(javax.swing.plaf.basic.BasicHTML.propertyKey);
+            final Insets insets = getInsets();
+            final int usable = getWidth() - insets.left - insets.right;
+            if (view == null || usable <= 0) {
+                return ret;
+            }
+            view.setSize(usable, 0);
+            ret.height = Math.max(ret.height,
+                    (int) Math.ceil(view.getPreferredSpan(javax.swing.text.View.Y_AXIS))
+                    + insets.top + insets.bottom);
+            return ret;
+        }
+    };
     private final JButton run = new JButton(labels.getString("BATTLESIM.RUN.SIMULATION"));
     private final JButton diplomacy = new JButton(labels.getString("BATTLESIM.DIPLOMACY"));
 
@@ -306,12 +354,44 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             refreshing = false;
         }
         setIconImage(scenarioIcon());
-        // pack first so every pane gets its natural height, then enforce a floor: a packed
-        // BattleSim on an empty hex is small enough that the platoon table has nowhere to appear
-        setMinimumSize(new Dimension(860, 560));
         pack();
-        setSize(Math.max(getWidth(), 980), Math.max(getHeight(), 640));
+        doSizeToScreen();
         doRefresh();
+    }
+
+    /**
+     * A floor big enough to be usable, and a ceiling that is the screen.
+     *
+     * Pack first so every pane gets its natural height, then enforce a floor: a packed BattleSim on
+     * an empty hex is small enough that the platoon table has nowhere to appear.
+     *
+     * <h3>The floor has to be able to lose</h3>
+     *
+     * It used to be a flat {@code setMinimumSize(860, 560)} with a default of 980x640, and those
+     * are LOGICAL pixels - which is the trap, because {@code sun.java2d.uiScale} changes how many
+     * physical pixels a logical one costs without changing the number. On a 1366x768 laptop at 200
+     * percent the whole screen is 683x384 logical, so an 860x560 minimum is a window WIDER AND
+     * TALLER than the display, and no size the player can drag to fits. Measured at 1470x1052
+     * physical for the natural size at 150 percent and 1960x1398 at 200.
+     *
+     * That matters at the scale of the player base rather than as a corner case: John, 2026-09-23,
+     * puts 1366x768 at 10 to 12 percent of players.
+     *
+     * So the floor is now whichever is SMALLER, the comfortable size or the screen, and the
+     * preferred size is clamped the same way. {@code getMaximumWindowBounds} is the work area, so
+     * the taskbar is already subtracted, and it reports logical pixels like everything else here -
+     * the two are comparable without any scaling arithmetic of our own.
+     */
+    private void doSizeToScreen() {
+        final java.awt.Rectangle screen = java.awt.GraphicsEnvironment
+                .getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        // a little back for the frame decoration, so "fits the work area" means it really does
+        final int roomWidth = Math.max(MIN_USABLE_WIDTH / 2, screen.width - 24);
+        final int roomHeight = Math.max(MIN_USABLE_HEIGHT / 2, screen.height - 24);
+        setMinimumSize(new Dimension(Math.min(MIN_USABLE_WIDTH, roomWidth),
+                Math.min(MIN_USABLE_HEIGHT, roomHeight)));
+        setSize(Math.min(Math.max(getWidth(), PREFERRED_WIDTH), roomWidth),
+                Math.min(Math.max(getHeight(), PREFERRED_HEIGHT), roomHeight));
     }
 
     /**
@@ -408,7 +488,13 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         final JPanel ret = new JPanel(new BorderLayout());
         ret.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
 
-        final JPanel left = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
+        // WRAPPING, and in CENTER rather than LINE_START. BorderLayout hands LINE_START its full
+        // preferred width and still pins LINE_END to the right edge, so below about 912 logical
+        // pixels the two intersected and the army buttons - added first, painted last - hid Run and
+        // Results entirely. The window's own minimum was 860, so that was reachable on any monitor
+        // at any scale just by dragging narrow. CENTER gets what is left over instead, and
+        // WrapLayout is what makes the toolbar grow a second row instead of drawing over itself.
+        final JPanel left = new JPanel(new gui.services.WrapLayout(FlowLayout.LEADING, 4, 0));
         left.add(button("BATTLESIM.ARMY.ADD", "addArmy"));
         left.add(button("BATTLESIM.ARMY.CLONE", "cloneArmy"));
         left.add(button("BATTLESIM.ARMY.REMOVE", "removeArmy"));
@@ -424,7 +510,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         left.add(button("TROOPCASUALTIES.BORDER.TITLE", "casualties"));
         left.add(tooltipped(button("BATTLESIM.COPY", "copy"), "COPIAR.ARMY.ACOES"));
         left.add(tooltipped(button("MENU.ABOUT", "about"), "BATTLESIM.ABOUT.TOOLTIP"));
-        ret.add(left, BorderLayout.LINE_START);
+        ret.add(left, BorderLayout.CENTER);
 
         run.setActionCommand("run");
         run.addActionListener(this);
@@ -442,6 +528,19 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         return ret;
     }
 
+    /**
+     * Sets a status label and puts the SAME text in its tooltip.
+     *
+     * A belt to the wrapping layout's braces: a sentence that still does not fit its row is
+     * ellipsised by Swing with no way to read the rest, and these two labels carry the only
+     * explanation of why Run is disabled. An empty string clears the tooltip rather than leaving a
+     * blank one hovering.
+     */
+    private static void setLabelWithTooltip(JLabel label, String text) {
+        label.setText(text);
+        label.setToolTipText(text == null || text.isEmpty() ? null : text);
+    }
+
     private static JButton tooltipped(JButton button, String tooltipKey) {
         button.setToolTipText(labels.getString(tooltipKey));
         return button;
@@ -455,10 +554,25 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     }
 
     private JSplitPane buildPanes() {
+        // The EDITOR scrolls, the table does not. Resize weight 0 sends all the SLACK to the table,
+        // which is what you want while the window grows - and all the SHRINK to it as well, which
+        // is not. At the window's own minimum height the table was left with ZERO pixels: caption
+        // and buttons on screen, not one row of the thing the window exists to show. Something has
+        // to give at 560px and it should be the form, which a player can scroll through, rather
+        // than the table, which is the answer he came for. A floor on the platoon panel alone could
+        // not fix it - when a split is shorter than both minimums together, one child loses anyway.
+        final JScrollPane editor = new JScrollPane(buildArmyEditor(),
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        editor.setBorder(null);
+        // Width matters as much as height here: the horizontal split shares slack by resize weight,
+        // and a right-hand pane that claims it needs only 280px lets the roster take 44px that the
+        // platoon table needs to show its 640px of columns without a scrollbar. This is what the
+        // form is actually worth, so the divider settles where the table fits.
+        editor.setMinimumSize(new Dimension(600, 96));
+        editor.getVerticalScrollBar().setUnitIncrement(16);
         final JSplitPane right = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                buildArmyEditor(), buildPlatoonTable());
-        // the editor is a fixed-height form and the table is the part worth growing, so all the
-        // slack goes to the table
+                editor, buildPlatoonTable());
         right.setResizeWeight(0.0);
         right.setOneTouchExpandable(true);
         right.setBorder(null);
@@ -744,7 +858,33 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         ret.add(casualtyMode, BorderLayout.NORTH);
         ret.add(new JScrollPane(platoons), BorderLayout.CENTER);
         ret.add(buttons, BorderLayout.SOUTH);
+        // A FLOOR, on the PANEL rather than on the scroll pane inside it, because the thing doing
+        // the squeezing is the vertical JSplitPane and a split honours the minimum size of its own
+        // direct children. Its resize weight is 0, which sends all SLACK to the table - and, when
+        // the window shrinks instead, takes it all from the table too. At the window's minimum
+        // height that left SEVEN PIXELS: caption and buttons visible, not one row of the table the
+        // window exists to show. With a floor the shrink has to come out of the editor above.
+        // BorderLayout.CENTER ignores minimum sizes, which is why setting it there did nothing.
+        ret.setMinimumSize(new Dimension(280,
+                platoons.getRowHeight() * 4 + PLATOON_HEADER_ROOM + buttons.getPreferredSize().height));
         return ret;
+    }
+
+    private static void doFitHtmlHeightNow(JLabel label) {
+        final javax.swing.text.View view =
+                (javax.swing.text.View) label.getClientProperty(javax.swing.plaf.basic.BasicHTML.propertyKey);
+        final Insets insets = label.getInsets();
+        final int width = label.getWidth() - insets.left - insets.right;
+        if (view == null || width <= 0) {
+            return;
+        }
+        view.setSize(width, 0);
+        final int wanted = (int) Math.ceil(view.getPreferredSpan(javax.swing.text.View.Y_AXIS))
+                + insets.top + insets.bottom;
+        if (label.getPreferredSize().height != wanted) {
+            label.setPreferredSize(new Dimension(label.getPreferredSize().width, wanted));
+            label.revalidate();
+        }
     }
 
     /**
@@ -828,14 +968,19 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * nearest the button it is about.
      */
     private JPanel buildStatusBar() {
-        final JPanel bar = new JPanel(new BorderLayout(12, 0));
+        // WRAPPING, not BorderLayout. LINE_END takes its full preferred width and CENTER gets the
+        // leftover, so the run reason - which is a whole sentence, measured at 740px of a 940px bar -
+        // starved the derivation line beside it. What got cut was the assumed-pair count, which is
+        // the one thing that explains why Run is off: an FFA hex read "Your own relationships are
+        // read. 2 army pair(s)..." and stopped exactly where the answer was. Now they share a row
+        // when both fit and take one each when they do not, and neither is ever truncated.
+        final JPanel bar = new JPanel(new gui.services.WrapLayout(FlowLayout.LEADING, 12, 0));
         bar.setBorder(BorderFactory.createEmptyBorder(4, 8, 5, 8));
         for (JLabel one : new JLabel[]{status, runReason}) {
             one.setFont(one.getFont().deriveFont(Font.PLAIN));
         }
-        runReason.setHorizontalAlignment(SwingConstants.TRAILING);
-        bar.add(status, BorderLayout.CENTER);
-        bar.add(runReason, BorderLayout.LINE_END);
+        bar.add(status);
+        bar.add(runReason);
 
         final JPanel ret = new JPanel(new BorderLayout());
         ret.add(new JSeparator(), BorderLayout.NORTH);
@@ -923,14 +1068,15 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             diplomacy.setEnabled(nacoes > 1);
             diplomacy.setToolTipText(nacoes > 1 ? null
                     : labels.getString("BATTLESIM.DIPLOMACY.EMPTY"));
-            status.setText(BattleSimConverter.getDerivationText(controler.getScenario()));
+            setLabelWithTooltip(status,
+                    BattleSimConverter.getDerivationText(controler.getScenario()));
             // R-40: the button's state and the sentence beside it come from the SAME gate, so
             // they cannot drift into saying different things.
             run.setEnabled(BattleSimConverter.isRunnable(controler.getScenario()));
             // One label, two jobs, and they can never both apply: before a run it says why Run is
             // off (empty when it is on), after one it says what the run did and what it could not
             // do. Both belong at the edge nearest the button they are about.
-            runReason.setText(controler.getLastResult() == null
+            setLabelWithTooltip(runReason, controler.getLastResult() == null
                     ? BattleSimConverter.getRunDisabledReason(controler.getScenario())
                     : BattleSimConverter.getRunResultText(controler.getLastResult()));
             results.setEnabled(controler.getLastResult() != null);
@@ -1003,6 +1149,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 ? labels.getString("BATTLESIM.MORAL.UNKNOWN.TOOLTIP") : null);
         attackBonus.setValue(army.getAttackBonus());
         defenseBonus.setValue(army.getArmyDefenseBonus());
+        // refit AFTER the text changes: a fleet's caption is three lines where a land army's is two
+        doFitHtmlHeightNow(casualtyMode);
         casualtyMode.setText(BattleSimConverter.getCasualtyModeText(army,
                 control.facade.WorldFacadeCounselor.getInstance().getCenario()));
         strength.setText(BattleSimConverter.getArmyStrength(army));
