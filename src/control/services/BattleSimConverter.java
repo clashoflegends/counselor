@@ -415,6 +415,14 @@ public class BattleSimConverter {
         if (!army.getSizeBand().isEmpty()) {
             ret.append(String.format(labels.getString("BATTLESIM.SIZE.REPORTED"),
                     army.getSizeBand()));
+            // BOTH bands when they differ, which happens exactly when the army holds ships: the
+            // displayed one then describes the FLEET and the land band - the size of the force it
+            // can put ashore - is suppressed. That is the number a player facing a landing wants,
+            // and it was being thrown away. See ArmySim.getSizeBandLand.
+            final String land = army.getSizeBandLand();
+            if (!land.isEmpty() && !land.equals(army.getSizeBand())) {
+                ret.append(String.format(labels.getString("BATTLESIM.SIZE.CARRYING"), land));
+            }
         }
         if (army.getPelotoes().isEmpty()) {
             // an empty platoon table looks like a bug unless something says what to do about it
