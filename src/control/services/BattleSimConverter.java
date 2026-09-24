@@ -573,11 +573,14 @@ public class BattleSimConverter {
         if (undecided) {
             ret.add(labels.getString("BATTLESIM.VERDICT.STALEMATE"));
         } else if (!standing.isEmpty()) {
-            ret.add(String.format(labels.getString("BATTLESIM.VERDICT.HOLDS"),
-                    join(standing)));
+            // "X holds the field" versus "X, Y and Z hold the field" - one army or several is the
+            // difference between a verdict that reads and one that reads like a template.
+            ret.add(String.format(labels.getString(standing.size() == 1
+                    ? "BATTLESIM.VERDICT.HOLDS" : "BATTLESIM.VERDICT.HOLD"), join(standing)));
         }
         if (!destroyed.isEmpty()) {
-            ret.add(String.format(labels.getString("BATTLESIM.VERDICT.DESTROYED"),
+            ret.add(String.format(labels.getString(destroyed.size() == 1
+                    ? "BATTLESIM.VERDICT.DESTROYED" : "BATTLESIM.VERDICT.DESTROYED.MANY"),
                     join(destroyed)));
         }
         for (ArmySim army : scenario.getArmies()) {
