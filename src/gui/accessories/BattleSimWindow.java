@@ -226,6 +226,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * fresh pair on each of the dozens of refreshes was pure churn.
      */
     private final transient DefaultTableCellRenderer centredCell = centredRenderer();
+    private final transient DefaultTableCellRenderer numberCell = numberRenderer();
     private final transient DefaultTableCellRenderer troopTypeCell = troopTypeRenderer();
 
     /**
@@ -781,8 +782,13 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             platoons.getColumnModel().getColumn(ii).setPreferredWidth(widths[ii]);
             platoons.getColumnModel().getColumn(ii).setWidth(widths[ii]);
         }
-        for (int ii : new int[]{0, 8, 9}) {
-            platoons.getColumnModel().getColumn(ii).setCellRenderer(centredCell);
+        // Lyr is a single letter and centres. Atk, Def, After and Lost are NUMBERS and go right,
+        // like every other number in the table - they were drifting left because the model declares
+        // them String (they carry thousands separators and answer "--" when the owner is unknown,
+        // neither of which an int can express), and Swing right-aligns Integer columns only.
+        platoons.getColumnModel().getColumn(0).setCellRenderer(centredCell);
+        for (int ii : new int[]{6, 7, 8, 9}) {
+            platoons.getColumnModel().getColumn(ii).setCellRenderer(numberCell);
         }
         // the troop type is an object, not a name: it has to be pickable, and the same renderer
         // that keeps nations out of BaseModel.toString() keeps troop types out of it too
@@ -793,6 +799,13 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private static DefaultTableCellRenderer centredRenderer() {
         final DefaultTableCellRenderer ret = new DefaultTableCellRenderer();
         ret.setHorizontalAlignment(SwingConstants.CENTER);
+        return ret;
+    }
+
+    /** For the number columns the model declares as String. See where it is applied. */
+    private static DefaultTableCellRenderer numberRenderer() {
+        final DefaultTableCellRenderer ret = new DefaultTableCellRenderer();
+        ret.setHorizontalAlignment(SwingConstants.TRAILING);
         return ret;
     }
 

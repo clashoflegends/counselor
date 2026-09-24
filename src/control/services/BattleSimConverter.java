@@ -13,6 +13,7 @@ import business.combat.ScenarioRoster;
 import java.util.ArrayList;
 import business.facade.ExercitoFacade;
 import java.util.List;
+import java.util.Map;
 import model.Cenario;
 import model.Pelotao;
 import msgs.BaseMsgs;
@@ -119,7 +120,61 @@ public class BattleSimConverter {
             ret.append("<br>&nbsp;&nbsp;").append(getLayerName(layer)).append(": ")
                     .append(getReasonName(participation.getReason(layer)));
         }
+        // and, when one of those three answers is something the PLAYER can undo, what to do about
+        // it. Naming the test that stopped an army was only ever half the sentence: at 906 t3 hex
+        // 0452 an unscouted fleet said "land: no troops visible in it" three times over and the
+        // player still had to work out on his own that the cure is to type the composition.
+        final String fix = getFightsInFix(participation);
+        if (!fix.isEmpty()) {
+            ret.append("<br>").append(fix);
+        }
         return ret.append("</html>").toString();
+    }
+
+    /**
+     * The one thing to DO about this army, or empty when nothing it says is the player's to fix.
+     *
+     * Deliberately ONE line for the army rather than one per layer: three instructions on a panel
+     * that already carries three diagnoses is a wall, and the reasons are ordered here by how
+     * completely they block the army. An army with nothing in it cannot fight in ANY layer, so that
+     * instruction outranks a city-assault order it also is not carrying.
+     *
+     * Whitelisted through a switch rather than looked up as {@code "BATTLESIM.FIX." + reason
+     * .name()}: a missing key renders as a visible placeholder rather than as nothing, so a reason
+     * with no cure would print a bug on the panel. Adding a cure means adding it in both places,
+     * which is the point - it should not be possible to half-add one.
+     */
+    private static String getFightsInFix(LayerParticipation participation) {
+        final LayerParticipation.Reason[] ordered = {
+            reasonOf(participation, CombatLayer.ARMY),
+            reasonOf(participation, CombatLayer.NAVY),
+            reasonOf(participation, CombatLayer.CITY)};
+        for (LayerParticipation.Reason reason : ordered) {
+            if (reason == LayerParticipation.Reason.NO_TROOPS) {
+                return labels.getString("BATTLESIM.FIX.NO_TROOPS");
+            }
+        }
+        for (LayerParticipation.Reason reason : ordered) {
+            if (reason == null) {
+                continue;
+            }
+            switch (reason) {
+                case CARRIES_NO_TROOPS:
+                    return labels.getString("BATTLESIM.FIX.CARRIES_NO_TROOPS");
+                case WILL_NOT_ASSAULT_CITY:
+                    return labels.getString("BATTLESIM.FIX.WILL_NOT_ASSAULT_CITY");
+                case NOT_HOSTILE_TO_CITY:
+                    return labels.getString("BATTLESIM.FIX.NOT_HOSTILE_TO_CITY");
+                default:
+                    break;
+            }
+        }
+        return "";
+    }
+
+    private static LayerParticipation.Reason reasonOf(LayerParticipation participation,
+            CombatLayer layer) {
+        return participation == null ? null : participation.getReason(layer);
     }
 
     /** One layer's answer: "takes part", or the single test that stopped it. */
@@ -194,10 +249,56 @@ public class BattleSimConverter {
      * status bar has nothing to explain and says nothing.
      */
     public static String getRunDisabledReason(CombatScenario scenario) {
-        return labels.getString(scenario == null
-                ? "BATTLESIM.RUN.DISABLED.NO_ARMIES"
-                : "BATTLESIM.RUN." + (scenario.getRunGate(ENGINE_EXISTS) == RunGate.READY
-                        ? "READY" : "DISABLED." + scenario.getRunGate(ENGINE_EXISTS).name()));
+        if (scenario == null) {
+            return labels.getString("BATTLESIM.RUN.DISABLED.NO_ARMIES");
+        }
+        final RunGate gate = scenario.getRunGate(ENGINE_EXISTS);
+        // NAME the armies when the thing blocking the run is that they are empty. The generic
+        // sentence was true and useless: at 906 t3 hex 0452 it said armies here are hostile but
+        // cannot reach each other, on a hex where the whole answer was that two named Tyrell
+        // fleets had arrived with no platoons in them.
+        if (gate == RunGate.NO_ENGAGEMENT) {
+            final String empty = namesOfEmptyArmies(scenario);
+            if (!empty.isEmpty()) {
+                return String.format(
+                        labels.getString("BATTLESIM.RUN.DISABLED.NO_ENGAGEMENT.EMPTY"), empty);
+            }
+        }
+        return labels.getString("BATTLESIM.RUN."
+                + (gate == RunGate.READY ? "READY" : "DISABLED." + gate.name()));
+    }
+
+    /**
+     * The armies that hold nothing the player can count, by name, or empty when there are none.
+     *
+     * These are the ones an {@code Add platoon} would rescue. An army is counted only when EVERY
+     * layer stopped on {@code NO_TROOPS} - an army excluded for some other reason is a different
+     * problem with a different cure, and sweeping it in here would send the player to edit a
+     * composition that was never the issue.
+     */
+    private static String namesOfEmptyArmies(CombatScenario scenario) {
+        final StringBuilder ret = new StringBuilder();
+        final Map<ArmySim, LayerParticipation> participation = scenario.getParticipation();
+        for (ArmySim army : scenario.getArmies()) {
+            final LayerParticipation one = participation.get(army);
+            if (one == null || !isEmptyEverywhere(one)) {
+                continue;
+            }
+            if (ret.length() > 0) {
+                ret.append(", ");
+            }
+            ret.append(army.getNome());
+        }
+        return ret.toString();
+    }
+
+    private static boolean isEmptyEverywhere(LayerParticipation participation) {
+        for (CombatLayer layer : CombatLayer.values()) {
+            if (participation.getReason(layer) != LayerParticipation.Reason.NO_TROOPS) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
