@@ -149,6 +149,37 @@ class BattleSimEmptyEnemyTest {
                 "an army with troops in it carries no mark: " + plain);
     }
 
+    /**
+     * Every row keeps its three layer slots, INCLUDING the rows that fight nowhere.
+     *
+     * The block used to be suppressed for an army in no layer, on the argument that three dots
+     * carry no information. The FFA hex is where that argument breaks: before anybody declares a
+     * war no army engages at all, so every row lost its block at the same time and the player was
+     * left with a disabled Run button and nothing on screen connected to it - "run simulation was
+     * disabled but no glyphs". 0452 is the same shape: neither army engages, so both rows must
+     * still show the slots that say so.
+     */
+    @Test
+    void anArmyThatFightsNowhereStillShowsItsThreeLayerSlots() {
+        final CombatScenario scenario = lannisport();
+        final ArmySim empty = find(scenario, "Colin Florent");
+        final ArmySim jaime = find(scenario, "Jaime Lannister");
+
+        assertFalse(scenario.getParticipation().get(jaime).isInAnyLayer(),
+                "the premise: on this hex nobody engages at all");
+
+        final String idle = BattleSimConverter.getArmyTitle(
+                jaime, scenario.getParticipation().get(jaime));
+        final String unseen = BattleSimConverter.getArmyTitle(
+                empty, scenario.getParticipation().get(empty));
+
+        // three NOT_IN_LAYER marks, sea then land then city, in the slots that never move
+        assertTrue(idle.contains("[· · ·]"),
+                "an army in no layer says so in all three slots: " + idle);
+        assertTrue(unseen.contains("[· · ·]"),
+                "and so does the one nobody can see into: " + unseen);
+    }
+
     /** And the row says what the player WAS told, rather than going blank. */
     @Test
     void anUncountableArmyShowsItsReportedBandInsteadOfNothing() {

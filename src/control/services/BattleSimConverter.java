@@ -34,11 +34,6 @@ import persistenceCommons.SettingsManager;
 public class BattleSimConverter {
 
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    /**
-     * The land layer resolves now (T-801), so Run can be enabled. Still ONE constant: the sea and
-     * city layers are not here yet, and when they arrive this stays exactly where it is.
-     */
-    private static final boolean ENGINE_EXISTS = true;
 
     private BattleSimConverter() {
     }
@@ -228,6 +223,10 @@ public class BattleSimConverter {
         }
         final int edited = scenario == null ? 0 : scenario.getEditedCount();
         if (edited > 0) {
+            // The gap between the two sentences is HERE and nowhere else. BATTLESIM.STATUS.EDITED
+            // used to open with a literal space in all five files, which Properties.load strips
+            // before anyone sees it - so it bought nothing, and had it ever worked it would have
+            // indented the sentence when it appears alone, which is the usual case.
             if (ret.length() > 0) {
                 ret.append("   ");
             }
@@ -252,7 +251,7 @@ public class BattleSimConverter {
         if (scenario == null) {
             return labels.getString("BATTLESIM.RUN.DISABLED.NO_ARMIES");
         }
-        final RunGate gate = scenario.getRunGate(ENGINE_EXISTS);
+        final RunGate gate = scenario.getRunGate();
         // NAME the armies when the thing blocking the run is that they are empty. The generic
         // sentence was true and useless: at 906 t3 hex 0452 it said armies here are hostile but
         // cannot reach each other, on a hex where the whole answer was that two named Tyrell
@@ -304,12 +303,12 @@ public class BattleSimConverter {
     /**
      * Whether Run may be enabled at all.
      *
-     * One constant, one call site. T-801 landed the land layer and flipped it; the sea and city
-     * layers do not get a second flag, because a scenario that engages on one layer is runnable and
+     * There was a constant here until T-801, and it is gone rather than flipped: the sea and city
+     * layers do not get a second one, because a scenario that engages on one layer is runnable and
      * the result says which layers it resolved.
      */
     public static boolean isRunnable(CombatScenario scenario) {
-        return scenario != null && scenario.getRunGate(ENGINE_EXISTS).isRunnable();
+        return scenario != null && scenario.getRunGate().isRunnable();
     }
 
     /**
@@ -568,14 +567,22 @@ public class BattleSimConverter {
     }
 
     /**
-     * The roster leaf: the army's name, and the layers it fights in.
+     * The roster leaf: the army's name, and the three layer slots - ALWAYS the three.
      *
-     * Only the layers it IS in, with nothing at all when it fights nowhere. The positional badge
-     * {@code N A C} / {@code N \u00b7 \u00b7} is right for a fixed-width column but wrong here: a
-     * JTree's proportional font does not align the slots into columns anyway, so the placeholders
-     * carry no information, and an army in no layer rendered as three dots beside its name, which
-     * every reader takes for a truncated name. The empty case is explained properly in the army
-     * editor's "Fights in:" line, which is where a player is looking when he asks.
+     * <h3>The empty block used to be suppressed, and that was the bug</h3>
+     *
+     * An army in no layer at all rendered as a plain name and a strength, on the argument that a
+     * JTree's proportional font does not align the slots into columns anyway, so three dots carried
+     * no information and read as a truncated name. The FFA hex is the counter-example: before anyone
+     * declares a war, NO army engages, so every row lost its block at once and the player was left
+     * with three ordinary-looking rows and a disabled Run button with nothing connecting them. John,
+     * on a live hex: "run simulation was disabled but no glyphs."
+     *
+     * The dots are not decoration in that state, they are the answer - {@code
+     * BATTLESIM.OUTCOME.NOT_IN_LAYER} means "not in this layer" and this is the one case where every
+     * slot says it. The slot never moves, so the block is also the only thing that distinguishes an
+     * army that fights nowhere from one that fights everywhere at a glance. The army editor's
+     * "Fights in:" line still carries the reasons; this carries the fact.
      */
     public static String getArmyTitle(ArmySim army, LayerParticipation participation) {
         return getArmyTitle(army, participation, null);
@@ -595,9 +602,8 @@ public class BattleSimConverter {
         }
         final String name = getUnknownMark(army) + army.getNome();
         final String strength = getArmyStrengthShort(army);
-        if (participation == null || !participation.isInAnyLayer()) {
-            return strength.isEmpty() ? name : String.format("%s  -  %s", name, strength);
-        }
+        // No branch on participation: markFor already answers NOT_IN_LAYER for a null one and for
+        // every layer it declines, so an idle army renders three dots and keeps its slots.
         return String.format("%s  [%s]  %s", name,
                 getLayerMarks(army, participation, result), strength);
     }
@@ -701,7 +707,12 @@ public class BattleSimConverter {
     public static List<String> getVerdictLines(CombatScenario scenario, CombatResult result) {
         final List<String> ret = new ArrayList<>();
         if (result.getRounds() == 0) {
-            ret.add(labels.getString("BATTLESIM.VERDICT.NOBATTLE"));
+            // The SAME key the status bar uses, not a second one saying the same thing. There were
+            // two - BATTLESIM.VERDICT.NOBATTLE and BATTLESIM.RESULT.NOLANDBATTLE - byte-identical in
+            // all five languages, and both reached from this one predicate on this one result: the
+            // status bar after the run, this dialog when it is opened. One fact, one sentence; two
+            // copies of it only means that one day a translator fixes one of them.
+            ret.add(labels.getString("BATTLESIM.RESULT.NOLANDBATTLE"));
             return ret;
         }
         final List<String> standing = new ArrayList<>();

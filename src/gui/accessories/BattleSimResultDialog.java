@@ -142,7 +142,7 @@ public class BattleSimResultDialog extends JDialog {
             ret.add(left(String.format(labels.getString("BATTLESIM.RESULTS.ROUNDS"),
                     report.getRounds()) + "  -  "
                     + labels.getString("BATTLESIM.RESULTS.REMAINING")));
-            ret.add(table(new RoundsModel(report)));
+            ret.add(table(new RoundsModel(scenario, report)));
         }
 
         if (hasNotesToShow(result)) {
@@ -260,10 +260,13 @@ public class BattleSimResultDialog extends JDialog {
         private static final long serialVersionUID = 1L;
         private final transient java.util.List<ArmySim> armies;
         private final transient CombatResult result;
+        /** Held for {@code getDisplayName}: a name is only unique RELATIVE to the other armies. */
+        private final transient CombatScenario scenario;
 
         CasualtyModel(CombatScenario scenario, CombatResult result) {
             this.armies = scenario.getArmies();
             this.result = result;
+            this.scenario = scenario;
         }
 
         @Override
@@ -294,7 +297,9 @@ public class BattleSimResultDialog extends JDialog {
         public Object getValueAt(int row, int column) {
             final ArmySim army = armies.get(row);
             if (column == 0) {
-                return army.getNome();
+                // the SCENARIO's name for it, not the army's own: three garrisons on one hex all
+                // answer "Garrison", and this table is where that made the result unreadable
+                return scenario.getDisplayName(army);
             }
             final int[] totals = BattleSimConverter.getArmyTotals(army, result);
             if (totals == null) {
@@ -309,9 +314,11 @@ public class BattleSimResultDialog extends JDialog {
 
         private static final long serialVersionUID = 1L;
         private final transient LayerReport report;
+        private final transient CombatScenario scenario;
 
-        RoundsModel(LayerReport report) {
+        RoundsModel(CombatScenario scenario, LayerReport report) {
             this.report = report;
+            this.scenario = scenario;
         }
 
         @Override
@@ -341,7 +348,7 @@ public class BattleSimResultDialog extends JDialog {
         public Object getValueAt(int row, int column) {
             final ArmySim army = report.getArmies().get(row);
             if (column == 0) {
-                return army.getNome();
+                return scenario.getDisplayName(army);
             }
             final int value = report.getRemaining(army, column - 1);
             return value < 0 ? "--" : String.format("%,d", value);
