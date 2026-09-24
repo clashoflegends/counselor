@@ -125,6 +125,45 @@ class BattleSimEmptyEnemyTest {
      * and not something he does anything about. A cure printed on every row would be noise, and
      * noise on every row is how the one that matters gets skipped - which is how this started.
      */
+    /**
+     * The roster row FLAGS the army, so the blocker is visible without selecting anything.
+     *
+     * An unscouted army used to render as a bare name with nothing after it, next to rows carrying
+     * "29,259/78,665" - which reads as a rendering fault, not as missing intelligence. Twice the
+     * conclusion drawn was that the window was broken.
+     */
+    @Test
+    void theRosterFlagsAnArmyThePlayerCannotCount() {
+        final CombatScenario scenario = lannisport();
+        final ArmySim empty = find(scenario, "Colin Florent");
+        final ArmySim jaime = find(scenario, "Jaime Lannister");
+
+        final String flagged = control.services.BattleSimConverter.getArmyTitle(
+                empty, scenario.getParticipation().get(empty));
+        final String plain = control.services.BattleSimConverter.getArmyTitle(
+                jaime, scenario.getParticipation().get(jaime));
+
+        assertTrue(flagged.startsWith("❓"),
+                "the mark leads the row so a column can be read down: " + flagged);
+        assertFalse(plain.startsWith("❓"),
+                "an army with troops in it carries no mark: " + plain);
+    }
+
+    /** And the row says what the player WAS told, rather than going blank. */
+    @Test
+    void anUncountableArmyShowsItsReportedBandInsteadOfNothing() {
+        final CombatScenario scenario = lannisport();
+        final ArmySim empty = find(scenario, "Colin Florent");
+        empty.setSizeBand("huge navy");
+        empty.setSizeBandLand("vast army");
+
+        final String title = control.services.BattleSimConverter.getArmyTitle(
+                empty, scenario.getParticipation().get(empty));
+
+        assertTrue(title.contains("vast army"),
+                "the LAND band, which for a fleet is the force it can put ashore: " + title);
+    }
+
     @Test
     void anArmyWithNothingToFixIsNotGivenAnInstruction() {
         final CombatScenario scenario = lannisport();

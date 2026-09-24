@@ -462,6 +462,14 @@ public class BattleSimConverter {
             ret.append(String.format("%s %,d/%,d",
                     labels.getString("BATTLESIM.LAYER.NAVY"), seaAttack, seaDefense));
         }
+        // Nothing to count, so say what the player WAS told instead of leaving the row blank. The
+        // band is the whole of his intelligence on an unscouted army and it is what he will type
+        // the composition against; a bare name simply looks like a bug. Land band preferred, since
+        // for a fleet it is the force that can come ashore and the naval word hides it.
+        if (ret.length() == 0) {
+            ret.append(army.getSizeBandLand().isEmpty()
+                    ? army.getSizeBand() : army.getSizeBandLand());
+        }
         return ret.toString();
     }
 
@@ -582,13 +590,38 @@ public class BattleSimConverter {
      */
     public static String getArmyTitle(ArmySim army, LayerParticipation participation,
             CombatResult result) {
+        final String name = getUnknownMark(army) + army.getNome();
         final String strength = getArmyStrengthShort(army);
         if (participation == null || !participation.isInAnyLayer()) {
-            return strength.isEmpty() ? army.getNome()
-                    : String.format("%s  -  %s", army.getNome(), strength);
+            return strength.isEmpty() ? name : String.format("%s  -  %s", name, strength);
         }
-        return String.format("%s  [%s]  %s", army.getNome(),
+        return String.format("%s  [%s]  %s", name,
                 getLayerMarks(army, participation, result), strength);
+    }
+
+    /**
+     * A glyph on any army the player cannot count, which is the one thing that silently blocks a
+     * run.
+     *
+     * At the FRONT, before the name, so a column of armies can be read straight down - the same
+     * reason the layer marks hold a fixed slot. An unscouted army otherwise rendered as a bare name
+     * with nothing after it, which reads as a rendering fault rather than as missing intelligence:
+     * 906 t3 hex 0452 showed "Paxter Redwyne" and "Colin Florent" with no numbers at all beside a
+     * Jaime Lannister carrying "29,259/78,665", and the player twice concluded the window was
+     * broken rather than that he had something to fill in.
+     *
+     * A GLYPH and not a colour. The roster has no cell renderer of its own, so colouring it means
+     * introducing one, and a {@code DefaultTreeCellRenderer} is a single instance reused for every
+     * row - a foreground set on one row persists to the next unless every branch resets it, which
+     * is the same trap already recorded for table renderers. A glyph also survives a theme change,
+     * and the roster is already read in glyphs.
+     *
+     * Keyed on the TROOP COUNT rather than on an empty platoon list, because an army whose platoons
+     * are all at zero is equally uncountable and equally blocking.
+     */
+    private static String getUnknownMark(ArmySim army) {
+        return army != null && new ExercitoFacade().getQtTropasTotal(army) <= 0
+                ? labels.getString("BATTLESIM.ARMY.UNKNOWN") + " " : "";
     }
 
     /**
