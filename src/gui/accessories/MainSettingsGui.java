@@ -949,6 +949,8 @@ public class MainSettingsGui extends JPanel {
     /**
      * The EGF open when Settings was opened, or null if none. Source for the
      * "set autoload to current" button.
+     *
+     * @return
      */
     public File getCurrentResultsFile() {
         return currentResultsFile;

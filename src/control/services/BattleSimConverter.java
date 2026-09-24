@@ -386,7 +386,9 @@ public class BattleSimConverter {
                 ? labels.getString("BATTLESIM.RESULT.NOLANDBATTLE")
                 : String.format(labels.getString("BATTLESIM.RESULT.DONE"), result.getRounds()));
         for (String note : result.getNotes()) {
-            ret.append("<br>").append(labels.getString(note));
+            final int count = result.getNoteCount(note);
+            ret.append("<br>").append(count > 0
+                    ? String.format(labels.getString(note), count) : labels.getString(note));
         }
         return ret.append("</html>").toString();
     }

@@ -135,7 +135,10 @@ public class BattleSimResultDialog extends JDialog {
                 // so repeating it here would state the same fact three times on one screen and
                 // make the notes look longer than they are.
                 if (!"BATTLESIM.RESULT.LANDONLY".equals(note)) {
-                    ret.add(left("- " + labels.getString(note)));
+                    final int count = result.getNoteCount(note);
+                    ret.add(left("- " + (count > 0
+                            ? String.format(labels.getString(note), count)
+                            : labels.getString(note))));
                 }
             }
         }
