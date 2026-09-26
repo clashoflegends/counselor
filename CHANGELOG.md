@@ -17,6 +17,12 @@
 - This was the single biggest reason **Run simulation** used to sit disabled on a hex where a battle was obviously coming.
 - **In a free-for-all game it is different, and there is a reason.** Your turn results carry a foreign nation's diplomacy only when it points at *you*, so a fight between two other nations genuinely cannot be read from your file. The simulator will not guess: it marks the pair as assumed neutral and leaves Run disabled rather than invent a war. **Declare the relationship yourself in the Diplomacy panel and it runs.** A battle you are in is never affected, because your own diplomacy is complete.
 
+### Set the diplomacy yourself
+
+- **The simulator now has a Diplomacy panel**: the full grid of who is hostile to whom, read from your turn results and **editable**. Change a relationship and every number on the screen moves with it, so you can ask "what if they declare on me" without waiting to find out.
+- It is where you fix a battle the simulator will not start. In a free-for-all, or any pair your results cannot show, one declaration here turns Run on.
+- The panel stays open while you work, so you can change a relationship, run, and change it again without closing anything. It also reads properly on the dark theme, which it did not at first.
+
 ### It tells you what it cannot know, and how to fix it
 
 - **The armies blocking the run are marked in the roster**, so you can see at a glance which one is the problem instead of hunting for it.
@@ -29,6 +35,10 @@
 - The window now fits a 1366x768 laptop screen without hiding its own buttons, the results page scrolls at a sensible speed with the mouse wheel, and the numbers are right-aligned so you can compare columns down a row.
 - Armies are grouped under their nation in the roster, and each one carries three small marks, one per stage, showing where it fights and where it does not.
 - Morale you type is kept when you press Run again, and half-finished edits in a number box are no longer thrown away when you click somewhere else.
+
+### Elsewhere
+
+- **The resource-path toggle on the results window shows its own tooltip** instead of the one belonging to the button next to it.
 
 ## 18-SEP-2026 - v2.1.928
 
