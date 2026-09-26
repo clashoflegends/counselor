@@ -577,6 +577,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         // do different things at different scales and a player who mixes them up loses work.
         left.add(tooltipped(button("BATTLESIM.CLONE.WINDOW", "cloneWindow"),
                 "BATTLESIM.CLONE.WINDOW.HINT"));
+        left.add(tooltipped(button("BATTLESIM.SAVE", "save"), "BATTLESIM.SAVE.HINT"));
+        left.add(tooltipped(button("BATTLESIM.LOAD", "load"), "BATTLESIM.LOAD.HINT"));
         ret.add(left, BorderLayout.CENTER);
 
         run.setActionCommand("run");
@@ -1167,6 +1169,106 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     // ------------------------------------------------------------------ refresh
 
+    /** The extension, deliberately nothing an EGF uses. See {@code BattleSimTransfer}. */
+    private static final String EXTENSION = ".bsim";
+
+    /**
+     * Writes the whole scenario - every edit - to a file the player can keep or send.
+     *
+     * The RESULT is not in it, and that is the point rather than a shortcut: an ally who is handed
+     * conclusions has nothing to check, whereas one who is handed the assumptions can press Run and
+     * disagree. It is also the only workable answer, since a {@code CombatResult} is keyed by army
+     * identity and would have to be rebuilt on the far side anyway.
+     */
+    private void doSave() {
+        final javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
+        fc.setDialogTitle(labels.getString("BATTLESIM.SAVE.TITLE"));
+        fc.setSelectedFile(new java.io.File(defaultFileName()));
+        if (fc.showSaveDialog(this) != javax.swing.JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        java.io.File target = fc.getSelectedFile();
+        if (!target.getName().toLowerCase(java.util.Locale.ROOT).endsWith(EXTENSION)) {
+            target = new java.io.File(target.getParentFile(), target.getName() + EXTENSION);
+        }
+        try (java.io.Writer out = new java.io.OutputStreamWriter(
+                new java.io.FileOutputStream(target), java.nio.charset.StandardCharsets.UTF_8)) {
+            out.write(business.combat.BattleSimTransfer.write(controler.getScenario()));
+            setLabelWithTooltip(status,
+                    String.format(labels.getString("BATTLESIM.SAVE.DONE"), target.getName()));
+        } catch (java.io.IOException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    String.format(labels.getString("BATTLESIM.SAVE.FAILED"), ex.getMessage()),
+                    labels.getString("BATTLESIM.SAVE.TITLE"),
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Opens a saved battle in a NEW window, so nothing here is discarded.
+     *
+     * John, 2026-09-26, deciding this: like Clone. Which means an ally's battle can sit beside the
+     * player's own and be compared, and every window already carries the time it was opened so the
+     * two are told apart with no extra work.
+     *
+     * <h3>A mismatch refuses the whole file, and says what it choked on</h3>
+     *
+     * John's rule. The message names the offending code, because "cannot load this file" is a dead
+     * end while "this file uses troop type goldcloaks2, which this game does not have" tells him it
+     * came from another scenario and that retrying will not help. Same lesson as the disabled Run
+     * button, which was useless until it named the army blocking it.
+     */
+    private void doLoad() {
+        final javax.swing.JFileChooser fc = new javax.swing.JFileChooser();
+        fc.setDialogTitle(labels.getString("BATTLESIM.LOAD.TITLE"));
+        if (fc.showOpenDialog(this) != javax.swing.JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        final java.io.File source = fc.getSelectedFile();
+        final String xml;
+        try {
+            xml = new String(java.nio.file.Files.readAllBytes(source.toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8);
+        } catch (java.io.IOException ex) {
+            // The message goes to the player, not a log: this window has no logger and the failure
+            // is his to act on - a locked file, a full disk, a path he cannot write to.
+            doLoadFailed(labels.getString("BATTLESIM.TRANSFER.UNREADABLE"), source.getName());
+            return;
+        }
+        final control.facade.WorldFacadeCounselor world =
+                control.facade.WorldFacadeCounselor.getInstance();
+        try {
+            final business.combat.CombatScenario loaded = business.combat.BattleSimTransfer.read(
+                    xml, world.getPartida(), world.getNacoes());
+            final BattleSimWindow ret = new BattleSimWindow(new BattleSimControler(loaded),
+                    titleFor(loaded.getLocal()));
+            ret.setSize(getSize());
+            ret.setLocation(getX() + CLONE_OFFSET, getY() + CLONE_OFFSET);
+            ret.setVisible(true);
+        } catch (business.combat.BattleSimTransfer.TransferException ex) {
+            doLoadFailed(labels.getString(ex.getReasonKey()), ex.getOffending());
+        }
+    }
+
+    /** One refusal dialog, which always names the thing it refused over. */
+    private void doLoadFailed(String reason, String offending) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+                String.format(labels.getString("BATTLESIM.LOAD.FAILED"), reason, offending),
+                labels.getString("BATTLESIM.LOAD.TITLE"),
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+    }
+
+    /** Hex and time, so a folder of saved battles is readable without opening them. */
+    private String defaultFileName() {
+        final business.combat.CombatScenario scenario = controler.getScenario();
+        final String hex = scenario == null || scenario.getLocal() == null
+                ? "battle" : scenario.getLocal().getCoordenadas();
+        return "battlesim-" + hex + "-"
+                + java.time.LocalDateTime.now().format(
+                        java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
+                + EXTENSION;
+    }
+
     /**
      * Forks this window: same scenario, same edits, no result.
      *
@@ -1560,6 +1662,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             controler.doCloneArmy();
         } else if ("removeArmy".equals(command)) {
             controler.doRemoveArmy();
+        } else if ("save".equals(command)) {
+            doSave();
+            return;
+        } else if ("load".equals(command)) {
+            doLoad();
+            return;
         } else if ("cloneWindow".equals(command)) {
             // Opens a second window and changes NOTHING here, so it returns before the refresh
             // below: refreshing this window would be harmless but would also redraw a roster the
