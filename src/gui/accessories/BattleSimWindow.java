@@ -563,6 +563,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         left.add(button("BATTLESIM.ARMY.ADD", "addArmy"));
         left.add(button("BATTLESIM.ARMY.CLONE", "cloneArmy"));
         left.add(button("BATTLESIM.ARMY.REMOVE", "removeArmy"));
+        // With the other ARMY actions, because that is what they act on - and deliberately not
+        // beside the toolbar's Copy, which is the spreadsheet export and a different thing (T-446).
+        left.add(tooltipped(button("BATTLESIM.ARMY.COPYONE", "copyArmy"),
+                "BATTLESIM.ARMY.COPYONE.HINT"));
+        left.add(tooltipped(button("BATTLESIM.ARMY.PASTE", "pasteArmy"),
+                "BATTLESIM.ARMY.PASTE.HINT"));
         // Diplomacy sits with the army buttons rather than beside Run, because it edits the
         // scenario like they do. The matrix IS the law for who fights whom (T-418), so this is not
         // an advanced option tucked away - it is the other half of setting up the battle.
@@ -1176,6 +1182,85 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     // ------------------------------------------------------------------ refresh
 
     /**
+     * The selected army onto the clipboard, machine-readable, so it can be pasted anywhere. T-841.
+     *
+     * A different thing from the toolbar's {@code Copy}, which writes translated display names for
+     * a spreadsheet and is fixed by T-446. That one is lossy and localised - a Portuguese
+     * Counselor's copy of it would not parse in an English one - which is exactly why pasting
+     * needed its own flavour rather than reading the existing output.
+     */
+    private void doCopyArmy() {
+        final ArmySim army = controler.getSelected();
+        if (army == null) {
+            return;
+        }
+        java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
+                new java.awt.datatransfer.StringSelection(
+                        business.combat.BattleSimTransfer.writeArmy(army)), null);
+        setLabelWithTooltip(status, String.format(
+                labels.getString("BATTLESIM.ARMY.COPYONE.DONE"), army.getNome()));
+    }
+
+    /**
+     * Reads an army - or a whole saved battle's armies - off the clipboard into THIS scenario.
+     *
+     * John's use case: "Copy an army from another turn or game, then paste into a BattleSim."
+     * Which is why the clipboard is the transport rather than anything in-process: it crosses
+     * Counselors.
+     *
+     * <h3>Everything arrives MANUAL, and that is not a shortcut</h3>
+     *
+     * John, 2026-09-26: "We assume we are streamlining player typing stuff." A paste is the player
+     * typing faster, so the numbers are his - no "(?)", no EXACT or ESTIMATED claim, and nothing
+     * added to the unknown-morale count. An army that arrived from another game is not
+     * intelligence about THIS hex and must not read as though it were.
+     *
+     * <h3>A mismatch refuses the whole paste</h3>
+     *
+     * Not just the army that failed. A partial import is a scenario the player did not build and
+     * cannot see the seams of, and the message names the offending code so he can tell it came
+     * from another scenario rather than wondering what he did wrong.
+     */
+    private void doPasteArmy() {
+        final String xml = clipboardText();
+        if (xml.isEmpty()) {
+            return;
+        }
+        final control.facade.WorldFacadeCounselor world =
+                control.facade.WorldFacadeCounselor.getInstance();
+        try {
+            final java.util.List<ArmySim> armies =
+                    business.combat.BattleSimTransfer.readArmies(xml, world.getPartida(),
+                            world.getNacoes());
+            for (ArmySim army : armies) {
+                controler.doAddPastedArmy(army);
+            }
+            setLabelWithTooltip(status, String.format(
+                    labels.getString("BATTLESIM.ARMY.PASTE.DONE"), armies.size()));
+        } catch (business.combat.BattleSimTransfer.TransferException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    String.format(labels.getString("BATTLESIM.ARMY.PASTE.FAILED"),
+                            labels.getString(ex.getReasonKey()), ex.getOffending()),
+                    labels.getString("BATTLESIM.ARMY.PASTE"),
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    /** Whatever text is on the clipboard, or empty when there is none we can read. */
+    private static String clipboardText() {
+        try {
+            final Object ret = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard()
+                    .getData(java.awt.datatransfer.DataFlavor.stringFlavor);
+            return ret == null ? "" : ret.toString();
+        } catch (java.awt.datatransfer.UnsupportedFlavorException
+                | java.io.IOException | IllegalStateException ex) {
+            // An image, a file list, or another application holding the clipboard open. Nothing to
+            // paste is not an error worth a dialog.
+            return "";
+        }
+    }
+
+    /**
      * Puts the result on the clipboard as plain text, for an email to an ally. T-805/T-847.
      *
      * John, 2026-09-26, cutting this down to what it should be: "just write the relevant part of
@@ -1691,6 +1776,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             controler.doCloneArmy();
         } else if ("removeArmy".equals(command)) {
             controler.doRemoveArmy();
+        } else if ("copyArmy".equals(command)) {
+            doCopyArmy();
+            return;
+        } else if ("pasteArmy".equals(command)) {
+            doPasteArmy();
         } else if ("copyResult".equals(command)) {
             doCopyResult();
             return;

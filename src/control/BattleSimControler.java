@@ -211,6 +211,50 @@ public class BattleSimControler {
      * editable and obviously provisional; what it is not is a button that appears to work and
      * leaves Run dead.
      */
+    /**
+     * Places an army that arrived from the clipboard onto this hex. T-841.
+     *
+     * Two things it must do that {@code addArmy} alone does not, and both were found by reasoning
+     * about what a pasted army lacks rather than by it going wrong:
+     *
+     * <ul>
+     *   <li><b>The HEX.</b> {@code BattleSimTransfer} rebuilds an army with no Local, because the
+     *       file does not carry one - the receiving scenario's hex is the right answer and only
+     *       this side knows it. Without it every attack lookup runs with a null Local and the
+     *       shared formula SWALLOWS the NPE and returns zero, which is the same trap doAddArmy
+     *       carries a comment about.</li>
+     *   <li><b>The GROUND.</b> It fights on the scenario's terrain, including the player's
+     *       override, not on whatever it was standing on when it was copied.</li>
+     * </ul>
+     *
+     * MANUAL, like anything else the player typed - see the paste action's own note.
+     */
+    public void doAddPastedArmy(ArmySim army) {
+        if (army == null) {
+            return;
+        }
+        army.setLocal(scenario.getLocal());
+        if (scenario.getTerreno() != null) {
+            army.setTerreno(scenario.getTerreno());
+        }
+        // A codigo of its own, because the source army's may already be on this hex - two armies
+        // sharing one is how a roster loses a row and a result loses an outcome.
+        if (army.getCodigo() == null || findByCodigo(army.getCodigo()) != null) {
+            army.setCodigo("sim" + System.identityHashCode(army));
+        }
+        scenario.addArmy(army, CombatScenario.Provenance.MANUAL);
+        this.selected = army;
+    }
+
+    private ArmySim findByCodigo(String codigo) {
+        for (ArmySim one : scenario.getArmies()) {
+            if (codigo.equals(one.getCodigo())) {
+                return one;
+            }
+        }
+        return null;
+    }
+
     public void doAddArmy() {
         final ArmySim army = new ArmySim(labels.getString("BATTLESIM.ARMY.NEW"),
                 scenario.getTerreno(), newArmyNacao());
