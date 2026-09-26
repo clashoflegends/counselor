@@ -152,7 +152,7 @@ public class BattleSimResultDialog extends JDialog {
                 // The land-only caveat is already the reason printed against LAYER 1 and LAYER 3,
                 // so repeating it here would state the same fact three times on one screen and
                 // make the notes look longer than they are.
-                if (!"BATTLESIM.RESULT.LANDONLY".equals(note)) {
+                if (!isAlreadySaidPerLayer(note)) {
                     final int count = result.getNoteCount(note);
                     ret.add(left("- " + (count > 0
                             ? String.format(labels.getString(note), count)
@@ -163,10 +163,24 @@ public class BattleSimResultDialog extends JDialog {
         return ret;
     }
 
+    /**
+     * A note the LAYER SECTIONS already carry, and which would otherwise be said twice on one
+     * screen.
+     *
+     * The sea layer has no resolver, so LAYER 1 already prints "Not simulated yet" as its own
+     * reason; repeating it in the notes states the same fact in two places. The older
+     * {@code LANDONLY} note said the same thing about all three layers and is still emitted by
+     * {@code LandCombatResolver}'s standalone entry, so both are suppressed.
+     */
+    private static boolean isAlreadySaidPerLayer(String note) {
+        return "BATTLESIM.RESULT.LANDONLY".equals(note)
+                || "BATTLESIM.RESULT.NAVYNOTSIMULATED".equals(note);
+    }
+
     /** Whether anything is left once the caveat each layer already states is taken out. */
     private static boolean hasNotesToShow(CombatResult result) {
         for (String note : result.getNotes()) {
-            if (!"BATTLESIM.RESULT.LANDONLY".equals(note)) {
+            if (!isAlreadySaidPerLayer(note)) {
                 return true;
             }
         }

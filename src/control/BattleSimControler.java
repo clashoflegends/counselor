@@ -1,6 +1,7 @@
 package control;
 
 import business.combat.ArmySim;
+import business.combat.CombatChain;
 import business.combat.CombatLayer;
 import business.combat.CombatLevel;
 import business.combat.CombatScenario;
@@ -487,7 +488,10 @@ public class BattleSimControler {
      * changing one.
      */
     public CombatResult doRun() {
-        this.lastResult = new LandCombatResolver().resolve(scenario,
+        // THE CHAIN, not one resolver: CombateTmpbm.executaCombates runs the layers in order on one
+        // set of armies, and the city is re-tested AFTER the land battle - an army destroyed ashore
+        // does not then storm the walls, and a mauled one storms them with what it has left.
+        this.lastResult = new CombatChain().resolve(scenario,
                 WorldFacadeCounselor.getInstance().getCenario());
         return this.lastResult;
     }
@@ -495,17 +499,19 @@ public class BattleSimControler {
     /**
      * The rounds table for one layer, ready for the results pane.
      *
-     * Only the land layer resolves, so the other two are built empty and carry a REASON. A layer
-     * that quietly vanished would let a land-only forecast read as a whole battle, which is the one
-     * thing the results pane must never do.
+     * Each layer answers for itself. A layer with no resolver says NOTSIMULATED, one that resolved
+     * and found nothing to fight says NOBATTLE, and the two are different answers - "the sea layer
+     * is not built yet" and "nobody fought at sea" must never read the same, or a partial forecast
+     * passes for a whole battle.
      */
     public LayerReport getLayerReport(CombatLayer layer) {
-        if (layer != CombatLayer.ARMY || lastResult == null) {
+        // NAVY has no resolver yet; that is a different statement from "no battle happened".
+        if (lastResult == null || layer == CombatLayer.NAVY) {
             final LayerReport ret = new LayerReport(layer, 0);
             ret.setNotFoughtReason("BATTLESIM.LAYER.NOTSIMULATED");
             return ret;
         }
-        final LayerReport ret = LayerReport.ofLand(scenario, lastResult);
+        final LayerReport ret = LayerReport.of(scenario, lastResult, layer);
         if (!ret.isFought()) {
             ret.setNotFoughtReason("BATTLESIM.LAYER.NOBATTLE");
         }
