@@ -4,6 +4,7 @@ import business.combat.ArmySim;
 import business.combat.CombatLayer;
 import business.combat.CombatLevel;
 import business.combat.CasualtyMode;
+import business.combat.CityCombatResolver;
 import business.combat.CombatResult;
 import business.combat.CombatScenario;
 import business.combat.LayerParticipation;
@@ -15,6 +16,7 @@ import business.facade.ExercitoFacade;
 import java.util.List;
 import java.util.Map;
 import model.Cenario;
+import model.Cidade;
 import model.Nacao;
 import model.Pelotao;
 import msgs.BaseMsgs;
@@ -757,6 +759,10 @@ public class BattleSimConverter {
                     ? "BATTLESIM.VERDICT.DESTROYED" : "BATTLESIM.VERDICT.DESTROYED.MANY"),
                     join(destroyed)));
         }
+        final String city = getCityVerdict(scenario, result);
+        if (city != null) {
+            ret.add(city);
+        }
         for (ArmySim army : scenario.getArmies()) {
             final int[] totals = getArmyTotals(army, result);
             if (totals == null || totals[2] <= 0) {
@@ -766,6 +772,29 @@ public class BattleSimConverter {
                     totals[2], totals[0], Math.round(100f * totals[2] / totals[0])));
         }
         return ret;
+    }
+
+    /**
+     * What became of the city, or null when no assault was fought.
+     *
+     * Its own line rather than a clause on "X holds the field", because the two can disagree and
+     * both be true: an attacker can be left standing on the hex having been thrown back off the
+     * walls. The land verdict says who is still there; this says whether the city changed hands.
+     *
+     * {@code NO_ASSAULT} returns null on purpose - a hex whose city nobody attacked has nothing to
+     * report, and a line saying so would appear under every land battle fought near a city.
+     */
+    private static String getCityVerdict(CombatScenario scenario, CombatResult result) {
+        final CityCombatResolver.CityResult city = result.getCityResult();
+        if (city == null || city.getOutcome() == null
+                || city.getOutcome() == CityCombatResolver.CityOutcome.NO_ASSAULT) {
+            return null;
+        }
+        final Cidade cidade = scenario.getLocal() == null ? null : scenario.getLocal().getCidade();
+        final String nome = cidade == null || cidade.getNome() == null
+                ? labels.getString("BATTLESIM.CITY.TITLE") : cidade.getNome();
+        return String.format(labels.getString("BATTLESIM.VERDICT.CITY."
+                + city.getOutcome().name()), nome);
     }
 
     private static String join(List<String> names) {

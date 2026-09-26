@@ -149,9 +149,9 @@ public class BattleSimResultDialog extends JDialog {
             ret.add(gap());
             ret.add(heading(labels.getString("BATTLESIM.RESULTS.NOTES")));
             for (String note : result.getNotes()) {
-                // The land-only caveat is already the reason printed against LAYER 1 and LAYER 3,
-                // so repeating it here would state the same fact three times on one screen and
-                // make the notes look longer than they are.
+                // The missing-sea caveat is already the reason printed against LAYER 1, so
+                // repeating it here would state the same fact twice on one screen and make the
+                // notes look longer than they are.
                 if (!isAlreadySaidPerLayer(note)) {
                     final int count = result.getNoteCount(note);
                     ret.add(left("- " + (count > 0
@@ -169,7 +169,7 @@ public class BattleSimResultDialog extends JDialog {
      *
      * The sea layer has no resolver, so LAYER 1 already prints "Not simulated yet" as its own
      * reason; repeating it in the notes states the same fact in two places. The older
-     * {@code LANDONLY} note said the same thing about all three layers and is still emitted by
+     * {@code LANDONLY} note said the same thing about the sea AND the city and is still emitted by
      * {@code LandCombatResolver}'s standalone entry, so both are suppressed.
      */
     private static boolean isAlreadySaidPerLayer(String note) {

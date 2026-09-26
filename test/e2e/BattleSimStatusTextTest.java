@@ -115,10 +115,10 @@ class BattleSimStatusTextTest {
         return ret;
     }
 
-    /** A run that resolved nothing: the hex engaged on no land layer at all. */
+    /** A run that resolved nothing: the hex engaged on no layer at all. */
     private static CombatResult noRounds() {
         final CombatResult ret = new CombatResult();
-        ret.setRounds(0);
+        ret.setRounds(business.combat.CombatLayer.ARMY, 0);
         return ret;
     }
 
