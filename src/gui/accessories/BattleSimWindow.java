@@ -180,6 +180,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private transient BattleSimResultPanel resultPane;
     private transient javax.swing.JTabbedPane bottomTabs;
     private int resultTabIndex = -1;
+    /** Enough that both title bars are readable at once. */
+    private static final int CLONE_OFFSET = 28;
     private final JLabel status = new JLabel();
     private final JLabel runReason = new JLabel();
     private final JLabel armyTitle = new JLabel();
@@ -327,9 +329,22 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     };
 
     public BattleSimWindow(Local local) {
-        this.controler = new BattleSimControler(local);
-        setTitle(String.format(labels.getString("BATTLESIM.TITLE"),
-                local == null ? "" : local.getCoordenadas()));
+        this(new BattleSimControler(local),
+                String.format(labels.getString("BATTLESIM.TITLE"),
+                        local == null ? "" : local.getCoordenadas()));
+    }
+
+    /**
+     * A window over a controler somebody else built: the fork behind Clone window.
+     *
+     * Everything below is unchanged - the window has never cared where its scenario came from, and
+     * that is the reason this feature is small. The only thing a clone needs that a fresh window
+     * does not is its own TITLE, so the two are told apart on the taskbar and in the window list
+     * while they are compared side by side.
+     */
+    private BattleSimWindow(BattleSimControler controler, String title) {
+        this.controler = controler;
+        setTitle(title);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
         add(buildToolbar(), BorderLayout.NORTH);
@@ -533,6 +548,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         left.add(button("TROOPCASUALTIES.BORDER.TITLE", "casualties"));
         left.add(tooltipped(button("BATTLESIM.COPY", "copy"), "COPIAR.ARMY.ACOES"));
         left.add(tooltipped(button("MENU.ABOUT", "about"), "BATTLESIM.ABOUT.TOOLTIP"));
+        // Clone WINDOW, last in the group and named apart from Clone ARMY two buttons along. They
+        // do different things at different scales and a player who mixes them up loses work.
+        left.add(tooltipped(button("BATTLESIM.CLONE.WINDOW", "cloneWindow"),
+                "BATTLESIM.CLONE.WINDOW.HINT"));
         ret.add(left, BorderLayout.CENTER);
 
         run.setActionCommand("run");
@@ -1123,6 +1142,32 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     // ------------------------------------------------------------------ refresh
 
+    /**
+     * Forks this window: same scenario, same edits, no result.
+     *
+     * The clone carries everything the player has typed - diplomacy, tactics, combat level, morale,
+     * platoon numbers, terrain, the city - and starts with nothing run, because a result is keyed
+     * to the armies that produced it and those armies no longer exist over here. He presses Run
+     * himself, usually after more edits, which is the whole point of the fork.
+     *
+     * Offset from this window rather than centred, so the copy does not land exactly on top of the
+     * thing it is meant to be compared against.
+     */
+    private void doCloneWindow() {
+        // No commitSpinners() here: the action dispatcher calls it before reaching any branch, so a
+        // second call would find nothing pending and read as a safeguard that is not doing anything.
+        final BattleSimWindow ret = new BattleSimWindow(
+                new BattleSimControler(controler.getScenario().copy()),
+                // The separating space lives HERE, not in the label: Properties.load strips a
+                // leading space from a value, so " (copy)" arrives as "(copy)" and the title reads
+                // "Battle at 1360(copy)". LabelsIntegrityTest catches it, which is how this is
+                // known rather than guessed.
+                getTitle() + " " + labels.getString("BATTLESIM.CLONE.SUFFIX"));
+        ret.setSize(getSize());
+        ret.setLocation(getX() + CLONE_OFFSET, getY() + CLONE_OFFSET);
+        ret.setVisible(true);
+    }
+
     /** Opens the results pane, or raises and refreshes the one already open. */
     private void showResults() {
         if (controler.getLastResult() == null) {
@@ -1491,6 +1536,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             controler.doCloneArmy();
         } else if ("removeArmy".equals(command)) {
             controler.doRemoveArmy();
+        } else if ("cloneWindow".equals(command)) {
+            // Opens a second window and changes NOTHING here, so it returns before the refresh
+            // below: refreshing this window would be harmless but would also redraw a roster the
+            // player did not touch, and the fork is meant to feel like a copy, not an edit.
+            doCloneWindow();
+            return;
         } else if ("diplomacy".equals(command)) {
             // The dialog edits the scenario directly and refreshes this window as it goes, so there
             // is nothing to do here afterwards - and nothing to undo if he closes it, because

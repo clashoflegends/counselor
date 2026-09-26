@@ -80,6 +80,24 @@ public class BattleSimControler {
     }
 
     /**
+     * A controler over a scenario somebody else built: the fork behind Clone window.
+     *
+     * NO LAST RESULT, deliberately. {@code CombatResult} keys its outcomes and its per-platoon
+     * survivors by object IDENTITY, so a carried-over result would describe armies that do not
+     * exist in this window - every lookup missing, every row reading "--". John's own framing has
+     * the player pressing Run on the fork anyway, usually after more edits, so the honest opening
+     * state is "nothing has been run here yet".
+     *
+     * The selection is the first army, as it is for a freshly loaded hex.
+     */
+    public BattleSimControler(CombatScenario scenario) {
+        this.scenario = scenario;
+        if (scenario != null && !scenario.getArmies().isEmpty()) {
+            this.selected = scenario.getArmies().get(0);
+        }
+    }
+
+    /**
      * Who to stand in as the owner of a city the player cannot see the owner of.
      *
      * Every city has an owner and the shared combat code assumes one, so the answer is to supply
