@@ -733,6 +733,11 @@ public class BattleSimConverter {
             ret.add(labels.getString("BATTLESIM.RESULT.NOLANDBATTLE"));
             return ret;
         }
+        // The sea battle happens before anybody is ashore, so it is read first.
+        final String sea = getSeaVerdict(scenario, result);
+        if (sea != null) {
+            ret.add(sea);
+        }
         final List<String> standing = new ArrayList<>();
         final List<String> destroyed = new ArrayList<>();
         boolean undecided = false;
@@ -768,10 +773,51 @@ public class BattleSimConverter {
             if (totals == null || totals[2] <= 0) {
                 continue;
             }
-            ret.add(String.format(labels.getString("BATTLESIM.VERDICT.COST"), army.getNome(),
+            // An army that fought at sea has HULLS in this total as well as bodies, because the
+            // sea battle put both at risk and a summary that counted only the bodies would tell a
+            // fleet that lost half its ships it had lost nothing. The sentence has to say so:
+            // "139 of 2,812 troops" is wrong when 12 of the 139 were cargo ships.
+            final boolean atSea =
+                    result.getOutcome(army, CombatLayer.NAVY) == CombatResult.Outcome.WON
+                    || result.getOutcome(army, CombatLayer.NAVY) == CombatResult.Outcome.LOST;
+            ret.add(String.format(labels.getString(atSea
+                    ? "BATTLESIM.VERDICT.COST.NAVAL" : "BATTLESIM.VERDICT.COST"), army.getNome(),
                     totals[2], totals[0], Math.round(100f * totals[2] / totals[0])));
         }
         return ret;
+    }
+
+    /**
+     * Who still has a fleet, or null when no sea battle was fought.
+     *
+     * Its own line, before the land one, because the sea battle happens first and can decide the
+     * rest of the hex: a fleet sunk in open water never puts anybody ashore. WON here is the
+     * Judge's own naval verdict - still a fleet, and still present - so an army whose hulls all
+     * sank but whose troops reached the beach appears as having LOST at sea and may still hold the
+     * field afterwards. The two lines disagreeing is the report working.
+     */
+    private static String getSeaVerdict(CombatScenario scenario, CombatResult result) {
+        if (result.getRounds(CombatLayer.NAVY) <= 0) {
+            return null;
+        }
+        final List<String> afloat = new ArrayList<>();
+        final List<String> sunk = new ArrayList<>();
+        for (ArmySim army : scenario.getArmies()) {
+            final CombatResult.Outcome outcome = result.getOutcome(army, CombatLayer.NAVY);
+            if (outcome == CombatResult.Outcome.WON) {
+                afloat.add(army.getNome());
+            } else if (outcome == CombatResult.Outcome.LOST) {
+                sunk.add(army.getNome());
+            }
+        }
+        if (sunk.isEmpty() && afloat.isEmpty()) {
+            return null;
+        }
+        if (sunk.isEmpty()) {
+            return labels.getString("BATTLESIM.VERDICT.SEA.STALEMATE");
+        }
+        return String.format(labels.getString(sunk.size() == 1
+                ? "BATTLESIM.VERDICT.SEA.SUNK" : "BATTLESIM.VERDICT.SEA.SUNK.MANY"), join(sunk));
     }
 
     /**

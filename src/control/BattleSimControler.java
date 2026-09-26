@@ -506,9 +506,9 @@ public class BattleSimControler {
      */
     public LayerReport getLayerReport(CombatLayer layer) {
         // NAVY has no resolver yet; that is a different statement from "no battle happened".
-        if (lastResult == null || layer == CombatLayer.NAVY) {
+        if (lastResult == null) {
             final LayerReport ret = new LayerReport(layer, 0);
-            ret.setNotFoughtReason("BATTLESIM.LAYER.NOTSIMULATED");
+            ret.setNotFoughtReason("BATTLESIM.LAYER.NOBATTLE");
             return ret;
         }
         final LayerReport ret = LayerReport.of(scenario, lastResult, layer);

@@ -2,6 +2,7 @@ package gui.accessories;
 
 import business.combat.ArmySim;
 import business.combat.CombatLayer;
+import business.combat.NavyCombatResolver;
 import business.combat.CombatResult;
 import business.combat.CombatScenario;
 import business.combat.LayerReport;
@@ -139,9 +140,12 @@ public class BattleSimResultDialog extends JDialog {
                 ret.add(left(labels.getString(report.getNotFoughtReason())));
                 continue;
             }
+            // The sea table counts HULLS, so it must not be captioned "troops remaining".
             ret.add(left(String.format(labels.getString("BATTLESIM.RESULTS.ROUNDS"),
                     report.getRounds()) + "  -  "
-                    + labels.getString("BATTLESIM.RESULTS.REMAINING")));
+                    + labels.getString(layer == CombatLayer.NAVY
+                            ? "BATTLESIM.RESULTS.REMAINING.SHIPS"
+                            : "BATTLESIM.RESULTS.REMAINING")));
             ret.add(table(new RoundsModel(scenario, report)));
         }
 
@@ -149,9 +153,8 @@ public class BattleSimResultDialog extends JDialog {
             ret.add(gap());
             ret.add(heading(labels.getString("BATTLESIM.RESULTS.NOTES")));
             for (String note : result.getNotes()) {
-                // The missing-sea caveat is already the reason printed against LAYER 1, so
-                // repeating it here would state the same fact twice on one screen and make the
-                // notes look longer than they are.
+                // The land-only caveat is already the reason printed against the layers that did
+                // not run, so repeating it here would state the same fact twice on one screen.
                 if (!isAlreadySaidPerLayer(note)) {
                     final int count = result.getNoteCount(note);
                     ret.add(left("- " + (count > 0
@@ -167,14 +170,12 @@ public class BattleSimResultDialog extends JDialog {
      * A note the LAYER SECTIONS already carry, and which would otherwise be said twice on one
      * screen.
      *
-     * The sea layer has no resolver, so LAYER 1 already prints "Not simulated yet" as its own
-     * reason; repeating it in the notes states the same fact in two places. The older
-     * {@code LANDONLY} note said the same thing about the sea AND the city and is still emitted by
-     * {@code LandCombatResolver}'s standalone entry, so both are suppressed.
+     * {@code LandCombatResolver}'s standalone entry - the one with no chain in front of it - notes
+     * that it resolved the land battle alone. Every layer below already prints its own reason, so
+     * repeating it in the notes states the same fact twice on one screen.
      */
     private static boolean isAlreadySaidPerLayer(String note) {
-        return "BATTLESIM.RESULT.LANDONLY".equals(note)
-                || "BATTLESIM.RESULT.NAVYNOTSIMULATED".equals(note);
+        return "BATTLESIM.RESULT.LANDONLY".equals(note);
     }
 
     /** Whether anything is left once the caveat each layer already states is taken out. */
@@ -357,6 +358,13 @@ public class BattleSimResultDialog extends JDialog {
             // is a land-battle idea, and not "R0", which numbers a round the player never sees.
             if (report.getLayer() == CombatLayer.CITY) {
                 return labels.getString("BATTLESIM.RESULTS.ROUNDASSAULT");
+            }
+            // The SEA layer's counter opens at 1 and has no first-strike round, so its columns run
+            // R1..Rn. Numbering them like the land layer's would head the first one "R0/fs" and put
+            // every later one one behind the round the Judge prints.
+            if (report.getLayer() == CombatLayer.NAVY) {
+                return String.format(labels.getString("BATTLESIM.RESULTS.ROUND"),
+                        column - 2 + NavyCombatResolver.FIRST_ROUND);
             }
             // column 2 is the end of round 0, which is the first-strike round
             return column == 2 ? labels.getString("BATTLESIM.RESULTS.ROUNDFS")
