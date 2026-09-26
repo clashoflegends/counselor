@@ -119,21 +119,22 @@ public class BattleSimControler {
     // ------------------------------------------------------------------ roster
 
     /**
-     * The roster tree: a node per non-empty group, an army leaf under each.
+     * The roster tree: a node per NATION on the hex, an army leaf under each.
      *
      * Rebuilt whole rather than mutated, because the grouping can change from any edit - retyping an
-     * army's nation moves it, and a diplomacy edit can move several at once. A tree that tried to
-     * patch itself would need to know which edits can do that, and would eventually be wrong.
+     * army's nation moves it between nodes, and a diplomacy edit rewrites every node's enemy list at
+     * once. A tree that tried to patch itself would need to know which edits can do that, and would
+     * eventually be wrong.
      */
     public DefaultTreeModel getRosterModel() {
         final ScenarioRoster roster = ScenarioRoster.of(scenario);
         final Map<ArmySim, LayerParticipation> participation = scenario.getParticipation();
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode(
                 labels.getString("BATTLESIM.ARMIES.TITLE"));
-        for (ScenarioRoster.Group group : roster.getGroups()) {
+        for (model.Nacao nacao : roster.getNacoes()) {
             final DefaultMutableTreeNode node = new DefaultMutableTreeNode(
-                    BattleSimConverter.getGroupTitle(roster, group));
-            for (ArmySim army : roster.getArmies(group)) {
+                    BattleSimConverter.getNacaoTitle(roster, nacao));
+            for (ArmySim army : roster.getArmies(nacao)) {
                 // lastResult is null until Run has been pressed, and goes back to null on every
                 // edit - so the marks describe the scenario on screen or they are not there at all
                 node.add(new DefaultMutableTreeNode(

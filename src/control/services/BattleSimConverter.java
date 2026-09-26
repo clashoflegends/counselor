@@ -15,6 +15,7 @@ import business.facade.ExercitoFacade;
 import java.util.List;
 import java.util.Map;
 import model.Cenario;
+import model.Nacao;
 import model.Pelotao;
 import msgs.BaseMsgs;
 import persistenceCommons.BundleManager;
@@ -38,23 +39,38 @@ public class BattleSimConverter {
     private BattleSimConverter() {
     }
 
-    /** The roster node's title, as in "Fighting against me". */
-    public static String getGroupName(ScenarioRoster.Group group) {
-        switch (group) {
-            case MINE:
-                return labels.getString("BATTLESIM.GROUP.MINE");
-            case FIGHTING_WITH_ME:
-                return labels.getString("BATTLESIM.GROUP.WITH");
-            case FIGHTING_AGAINST_ME:
-                return labels.getString("BATTLESIM.GROUP.AGAINST");
-            default:
-                return labels.getString("BATTLESIM.GROUP.OUT");
+    /**
+     * A nation node's title: who it is, how many troops it has here, and who it fights.
+     *
+     * "House Lannister (4,332)  vs House Tyrell". The enemy list is the half that stops
+     * this being a step backwards: the four groups it replaces were the ONLY place in the window
+     * that said who fights whom, and nothing else shows it - the army editor answers per layer, and
+     * the matrix is behind the Diplomacy button. Stated directly now rather than relative to the
+     * player, so it reads the same whether or not he has an army on the hex.
+     *
+     * A nation with no enemies here gets no clause at all rather than "vs nobody", which is the
+     * common case on a quiet hex and does not need a sentence.
+     *
+     * Kept SHORT on purpose: the first draft read "- at war with House Tyrell" and truncated the
+     * top row of the tree, which then grew a horizontal scrollbar. A tree node has whatever width
+     * the split gives it and no more.
+     */
+    public static String getNacaoTitle(ScenarioRoster roster, Nacao nacao) {
+        final String name = nacao == null
+                ? labels.getString("BATTLESIM.NACAO.UNKNOWN") : nacao.getNome();
+        final String ret = String.format("%s (%,d)", name, roster.getQtTropas(nacao));
+        final List<Nacao> foes = roster.getEnemies(nacao);
+        if (foes.isEmpty()) {
+            return ret;
         }
-    }
-
-    /** "Fighting against me (2,300)". The running troop total is the wireframe's right column. */
-    public static String getGroupTitle(ScenarioRoster roster, ScenarioRoster.Group group) {
-        return String.format("%s (%,d)", getGroupName(group), roster.getQtTropas(group));
+        final StringBuilder named = new StringBuilder();
+        for (Nacao one : foes) {
+            named.append(named.length() == 0 ? "" : ", ").append(one.getNome());
+        }
+        // the separator is CODE, not part of the label: Properties.load strips leading whitespace,
+        // so a label written as "  -  at war with %s" silently loses its gap in every language
+        return ret + "  "
+                + String.format(labels.getString("BATTLESIM.NACAO.ATWAR"), named.toString());
     }
 
     public static String getLayerName(CombatLayer layer) {
