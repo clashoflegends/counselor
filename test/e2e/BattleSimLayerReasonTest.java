@@ -90,8 +90,15 @@ class BattleSimLayerReasonTest {
         final Local hex = hexWithCity(tully);
         final CombatScenario scenario = new CombatScenario(null, hex);
         final ArmySim one = army("Joron Blacktide", greyjoy, hex);
+        // EXPLICIT since the default became ATTACK_CITY (2026-09-26). The case this test is about
+        // is a player who has NOT ordered the assault, which used to be what an army arrived as and
+        // is now something he has to choose - so the test has to choose it too, or it stops being
+        // about the thing it was written for.
+        one.setCombatLevel(CombatLevel.ATTACK_ARMY);
+        final ArmySim two = army("Nute the Barber", greyjoy, hex);
+        two.setCombatLevel(CombatLevel.ATTACK_ARMY);
         scenario.addArmy(one, CombatScenario.Provenance.ESTIMATED);
-        scenario.addArmy(army("Nute the Barber", greyjoy, hex), CombatScenario.Provenance.ESTIMATED);
+        scenario.addArmy(two, CombatScenario.Provenance.ESTIMATED);
         // at war with the city's owner, so ONLY the combat level is stopping the assault
         scenario.setRelacionamento(greyjoy, tully, RelationshipMatrix.SWORN_ENEMY);
 
