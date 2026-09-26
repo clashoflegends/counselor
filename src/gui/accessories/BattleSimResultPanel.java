@@ -149,21 +149,83 @@ public class BattleSimResultPanel extends JPanel {
             ret.add(table(new RoundsModel(scenario, report)));
         }
 
-        if (hasNotesToShow(result)) {
-            ret.add(gap());
-            ret.add(heading(labels.getString("BATTLESIM.RESULTS.NOTES")));
-            for (String note : result.getNotes()) {
+        doAddFooter(ret, result);
+        return ret;
+    }
+
+    /**
+     * The three lists that say how far to trust the numbers above. T-804.
+     *
+     * <h3>Why three and not one</h3>
+     *
+     * They answer different questions and they behave differently over time, and a player who
+     * cannot tell them apart will either distrust everything or wait forever for a fix that is
+     * never coming:
+     *
+     * <ul>
+     *   <li><b>What can move these numbers</b> - per-run, and it SHRINKS. An unknown morale is
+     *       fixed by typing one; the drowning estimate goes when the Judge stops rolling. Every
+     *       line here is either the player's to close or ours.</li>
+     *   <li><b>Withheld by design</b> - per-run, and it NEVER empties. The game keeps these
+     *       secrets on purpose. Nothing the player does will close a line here.</li>
+     *   <li><b>Not modelled</b> - constant, and it shrinks only as the simulator grows. These are
+     *       things the turn decides that this tool does not attempt at all.</li>
+     * </ul>
+     *
+     * <h3>Never suppressed, and "none" is computed</h3>
+     *
+     * R-44/R-45/R-49. The withheld list prints only what is actually on this hex, so an absent line
+     * means "nothing was withheld here", not "nobody looked". The not-modelled list is always
+     * shown, because its whole job is to be the standing answer to "is that everything?".
+     */
+    private void doAddFooter(JPanel ret, CombatResult result) {
+        doAddNoteList(ret, result, "BATTLESIM.RESULTS.NOTES", "BATTLESIM.RESULT.");
+        doAddNoteList(ret, result, "BATTLESIM.RESULTS.WITHHELD", "BATTLESIM.WITHHELD.");
+
+        ret.add(gap());
+        ret.add(heading(labels.getString("BATTLESIM.RESULTS.NOTMODELLED")));
+        // The ENGINE line first, because it frames everything under it: which of the Judge's two
+        // combat families these numbers come from.
+        ret.add(left("- " + labels.getString("BATTLESIM.NOTMODELLED.ENGINE")));
+        for (String key : NOT_MODELLED) {
+            ret.add(left("- " + labels.getString(key)));
+        }
+    }
+
+    /**
+     * Constant, and deliberately written out rather than derived. T-814.
+     *
+     * Every one of these is something the TURN decides and this tool does not attempt: it is the
+     * standing answer to "is that everything?". A list that was computed from what the code happens
+     * to implement would silently shrink whenever somebody deleted a feature.
+     */
+    private static final String[] NOT_MODELLED = {
+        "BATTLESIM.NOTMODELLED.CHARACTERS",
+        "BATTLESIM.NOTMODELLED.LOYALTY",
+        "BATTLESIM.NOTMODELLED.EXPERIENCE",
+    };
+
+    /** One footer list: the heading, then every note carrying that prefix. Silent when empty. */
+    private void doAddNoteList(JPanel ret, CombatResult result, String heading, String prefix) {
+        boolean first = true;
+        for (String note : result.getNotes()) {
+            if (!note.startsWith(prefix) || isAlreadySaidPerLayer(note)) {
+                continue;
+            }
+            if (first) {
+                ret.add(gap());
+                ret.add(heading(labels.getString(heading)));
+                first = false;
+            }
+            {
                 // The land-only caveat is already the reason printed against the layers that did
                 // not run, so repeating it here would state the same fact twice on one screen.
-                if (!isAlreadySaidPerLayer(note)) {
-                    final int count = result.getNoteCount(note);
-                    ret.add(left("- " + (count > 0
-                            ? String.format(labels.getString(note), count)
-                            : labels.getString(note))));
-                }
+                final int count = result.getNoteCount(note);
+                ret.add(left("- " + (count > 0
+                        ? String.format(labels.getString(note), count)
+                        : labels.getString(note))));
             }
         }
-        return ret;
     }
 
     /**
@@ -176,16 +238,6 @@ public class BattleSimResultPanel extends JPanel {
      */
     private static boolean isAlreadySaidPerLayer(String note) {
         return "BATTLESIM.RESULT.LANDONLY".equals(note);
-    }
-
-    /** Whether anything is left once the caveat each layer already states is taken out. */
-    private static boolean hasNotesToShow(CombatResult result) {
-        for (String note : result.getNotes()) {
-            if (!isAlreadySaidPerLayer(note)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private JComponentRow gap() {

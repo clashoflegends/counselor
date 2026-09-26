@@ -5,6 +5,7 @@
 package radialMenu.mapmenu;
 
 import business.ImageManager;
+import control.facade.WorldFacadeCounselor;
 import java.awt.Point;
 import java.io.Serializable;
 import java.util.SortedMap;
@@ -58,11 +59,23 @@ public class MapMenuManager implements Serializable {
 
             menu = doConfigOption(MapMenuRadialActions.LOCAL_INFO);
             menu = doConfigOption(MapMenuRadialActions.RANGE_PLOT);
-            // BOTH BattleSims, always. They are deliberately live side by side so the same hex can
-            // be opened in each and compared; the suffixes go and the old entry with them once the
-            // new one has been through a release.
+            // Both BattleSims, side by side, so the same hex can be opened in each and compared -
+            // EXCEPT where the new one does not apply. John, 2026-09-26: "only enable the BattleSim
+            // (New) radial when the game uses CombatTmpbm. This way WDO gets the BS (old). GoT and
+            // DoD and Greek get both."
+            //
+            // The rebuild models the traditional engine only, so in a game that resolves city
+            // battles with the newer family it would answer confidently about the wrong thing.
+            // Offering it there and disclaiming it afterwards is worse than not offering it: the
+            // disclaimer arrives after the player has already read the numbers.
+            //
+            // ABSENT rather than disabled. A greyed entry on a radial menu invites a hunt for the
+            // setting that turns it on, and there isn't one - it is a property of the game.
             menu = doConfigOption(MapMenuRadialActions.COMBAT_SIMULATOR);
-            menu = doConfigOption(MapMenuRadialActions.COMBAT_SIMULATOR_NEW);
+            if (!business.combat.CombatEngines.isOtherFamily(
+                    WorldFacadeCounselor.getInstance().getPartida())) {
+                menu = doConfigOption(MapMenuRadialActions.COMBAT_SIMULATOR_NEW);
+            }
             menu = doConfigOption(MapMenuRadialActions.LOCAL_CASUALTIES);
             menu = doConfigOption(MapMenuRadialActions.ARMY_MOVEMENT_SIMULATOR);
             menu = doConfigOption(MapMenuRadialActions.NAVY_MOVEMENT_SIMULATOR);
