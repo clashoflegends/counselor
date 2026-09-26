@@ -238,4 +238,34 @@ class BattleSimPlatoonTableTest {
     void noSelectedArmyGivesAnEmptyTable() {
         assertEquals(0, modelOver(new CombatScenario(null, hex()), null).getRowCount());
     }
+
+    /**
+     * The three transport columns appear only for an army that has a hull. T-428.
+     *
+     * They are Capacity, Cargo and Ships, and they carry the table from 10 columns to 13 - 640px to
+     * 822px, which is wider than the window gives it, so showing them when they mean nothing costs
+     * a horizontal scrollbar on every land army in the game. They only mean something together and
+     * only when there is something to put the cargo in.
+     */
+    @Test
+    void theTransportColumnsAppearOnlyForAnArmyWithShips() {
+        final CombatScenario scenario = new CombatScenario(null, hex());
+        final ArmySim ashore = new ArmySim(loadedArmy(platoon(troopType("inf", false), 900)));
+        scenario.addArmy(ashore, CombatScenario.Provenance.EXACT);
+
+        assertEquals(10, modelOver(scenario, ashore).getColumnCount(),
+                "a land army has no use for Capacity, Cargo or Ships");
+    }
+
+    /** And they do appear the moment one platoon floats. */
+    @Test
+    void theTransportColumnsAppearForAFleet() {
+        final CombatScenario scenario = new CombatScenario(null, hex());
+        final ArmySim fleet = new ArmySim(loadedArmy(platoon(troopType("inf", false), 900),
+                platoon(troopType("ng", true), 40)));
+        scenario.addArmy(fleet, CombatScenario.Provenance.EXACT);
+
+        assertEquals(13, modelOver(scenario, fleet).getColumnCount(),
+                "one hull is enough: the three figures are about what it can carry");
+    }
 }

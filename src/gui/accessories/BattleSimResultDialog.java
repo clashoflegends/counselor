@@ -80,6 +80,18 @@ public class BattleSimResultDialog extends JDialog {
         pack();
         doSizeToContent();
         setLocationRelativeTo(owner);
+        doRestoreBounds();
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                doRememberBounds();
+            }
+
+            @Override
+            public void componentMoved(java.awt.event.ComponentEvent e) {
+                doRememberBounds();
+            }
+        });
     }
 
     /**
@@ -100,6 +112,57 @@ public class BattleSimResultDialog extends JDialog {
         setSize(new Dimension(
                 Math.min(maxWidth, Math.max(560, getWidth())),
                 Math.min(maxHeight, Math.max(360, getHeight()))));
+    }
+
+    /** One key, four numbers, so a half-written value cannot leave the window half-placed. */
+    private static final String BOUNDS_KEY = "battleSimResultBounds";
+
+    /**
+     * Puts the dialog back where it was left, if it is still somewhere a player can reach.
+     *
+     * Sizing to content is the right OPENING guess and it is only a guess: how wide a result wants
+     * to be is a matter of how long the battle ran, and a player who has widened it once has said
+     * what he wants. Remembered rather than recomputed from then on.
+     *
+     * VALIDATED against the current screen before it is used. A saved position is a fact about the
+     * monitor that was attached when it was saved: reconnecting a laptop without its second display
+     * would otherwise reopen this window at x=2400, off the edge of a screen that no longer exists,
+     * with no way to drag it back.
+     */
+    private void doRestoreBounds() {
+        final String saved = SettingsManager.getInstance().getConfig(BOUNDS_KEY, "");
+        final String[] parts = saved.split(",");
+        if (parts.length != 4) {
+            return;
+        }
+        try {
+            final java.awt.Rectangle want = new java.awt.Rectangle(
+                    Integer.parseInt(parts[0].trim()), Integer.parseInt(parts[1].trim()),
+                    Integer.parseInt(parts[2].trim()), Integer.parseInt(parts[3].trim()));
+            final Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+            if (want.width < 360 || want.height < 240
+                    || want.x + 120 > screen.width || want.y + 60 > screen.height
+                    || want.x + want.width < 120 || want.y < 0) {
+                return;     // off the edge, or too small to hold anything: keep the fresh size
+            }
+            setBounds(want);
+        } catch (NumberFormatException ex) {
+            // a hand-edited properties.config; the computed size is a perfectly good answer
+        }
+    }
+
+    /**
+     * Saves size and position on every move or resize.
+     *
+     * To the file, not just to memory, because the value of remembering is that it survives the
+     * session where the player did the resizing.
+     */
+    private void doRememberBounds() {
+        if (!isShowing()) {
+            return;     // the bounds during construction and disposal are not the player's choice
+        }
+        SettingsManager.getInstance().setConfigAndSaveToFile(BOUNDS_KEY,
+                getX() + "," + getY() + "," + getWidth() + "," + getHeight());
     }
 
     /** Rebuilt whole on every Run, because every number in it changes. */
