@@ -329,10 +329,35 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     };
 
     public BattleSimWindow(Local local) {
-        this(new BattleSimControler(local),
-                String.format(labels.getString("BATTLESIM.TITLE"),
-                        local == null ? "" : local.getCoordenadas()));
+        this(new BattleSimControler(local), titleFor(local));
     }
+
+    /**
+     * "Battle at 1360 - 15:29:04". The hex, and the moment this window was opened.
+     *
+     * <h3>Why every window is stamped, not just a clone</h3>
+     *
+     * John, 2026-09-26, on telling forks apart: "maybe the timestamp at creation (15:29 vs 14:21)".
+     * Both of his examples carry one, and that is the right shape - the windows a player is
+     * comparing are peers. Labelling only the copy would make the first one "the real one" and the
+     * rest annotations of it, when in the workflow they are four attempts at the same battle.
+     * It also covers opening the same hex twice from the map, which has nothing to do with cloning.
+     *
+     * <h3>Why seconds and not just HH:mm</h3>
+     *
+     * Because the workflow is to clone REPEATEDLY - edit, run, clone, edit, run, clone - and every
+     * fork made inside the same minute would carry the same label. A stamp that collides is worse
+     * than no stamp: it looks like an identifier and is not one. Seconds still read as a time.
+     */
+    private static String titleFor(Local local) {
+        return String.format(labels.getString("BATTLESIM.TITLE"),
+                local == null ? "" : local.getCoordenadas())
+                + " - " + java.time.LocalTime.now().format(TITLE_CLOCK);
+    }
+
+    /** Wall-clock, seconds included. See {@link #titleFor}. */
+    private static final java.time.format.DateTimeFormatter TITLE_CLOCK =
+            java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /**
      * A window over a controler somebody else built: the fork behind Clone window.
@@ -1156,13 +1181,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private void doCloneWindow() {
         // No commitSpinners() here: the action dispatcher calls it before reaching any branch, so a
         // second call would find nothing pending and read as a safeguard that is not doing anything.
+        // REBUILT from the hex, never appended to this window's title. Appending would compound:
+        // a clone of a clone would carry two stamps, a clone of that three, and the label a player
+        // is using to tell four windows apart would be the longest thing in the title bar.
         final BattleSimWindow ret = new BattleSimWindow(
                 new BattleSimControler(controler.getScenario().copy()),
-                // The separating space lives HERE, not in the label: Properties.load strips a
-                // leading space from a value, so " (copy)" arrives as "(copy)" and the title reads
-                // "Battle at 1360(copy)". LabelsIntegrityTest catches it, which is how this is
-                // known rather than guessed.
-                getTitle() + " " + labels.getString("BATTLESIM.CLONE.SUFFIX"));
+                titleFor(controler.getScenario().getLocal()));
         ret.setSize(getSize());
         ret.setLocation(getX() + CLONE_OFFSET, getY() + CLONE_OFFSET);
         ret.setVisible(true);
