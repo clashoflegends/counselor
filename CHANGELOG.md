@@ -1,5 +1,34 @@
 # What's New in Counselor
 
+## 26-SEP-2026 - v2.1.929
+
+### The Battle Simulator now fights the whole battle
+
+*Opening to beta players first, as **BattleSim (new)** on the hex menu. The old simulator is still there and unchanged.*
+
+- **A battle on one hex can be three fights, and the simulator used to run one of them.** It resolved the land battle and stopped. If a fleet met a fleet, or an army stormed a city, none of that appeared in the result, so the numbers you were shown described part of a battle and did not say which part.
+- **It now runs all three, in the order the turn runs them**: the sea battle first, then the landing and the land battle, then the assault on the city. A fleet that loses its ships at sea puts fewer troops ashore. An army mauled ashore storms the walls with what is left. Each stage starts where the last one finished, and the result shows that carry-over so you can follow it down the page.
+- **One table per stage.** The sea table counts ships, the land and city tables count troops, and each one begins with what actually entered that stage. Before, everything was one table and a fleet of 40 ships carrying 900 infantry would have been shown as a force of 940 in a battle where only 40 of them could be hit.
+- **The verdict says what became of your fleet and of the city**, not just who is left holding the field. Those can disagree and both be true: an attacker can lose every ship and still take the hex, or be thrown back off the walls and still be standing on the ground outside them.
+
+### Simulate battles you are not in
+
+- **In a locked alliance or team game you can now open the simulator on any hex where two nations are about to fight**, not only hexes where you have an army. The simulator works out who is hostile to whom from the team flags, exactly as the turn does.
+- This was the single biggest reason **Run simulation** used to sit disabled on a hex where a battle was obviously coming.
+
+### It tells you what it cannot know, and how to fix it
+
+- **The armies blocking the run are marked in the roster**, so you can see at a glance which one is the problem instead of hunting for it.
+- **An enemy you have not scouted arrives with no troops and no morale**, because that is all your turn report knows about it. The simulator says so plainly and lets you type in what you think is there. Its answer is only as good as what you tell it, and now it is honest about which numbers came from you.
+- **Where a rule is genuinely a roll of the dice, you are told the range** rather than shown one draw dressed up as a forecast. If a fleet loses its last ship within reach of shore, the troops it was carrying drown at around 18 percent, and the turn itself still varies. Expect the survivors to move a little either way.
+- **Change the Terrain and the city's defences move too.** They used to ignore it, so a nation whose walls are stronger in the mountains kept its flat-ground defence no matter what you chose. Every other number on the screen had changed.
+
+### Reading the result
+
+- The window now fits a 1366x768 laptop screen without hiding its own buttons, the results page scrolls at a sensible speed with the mouse wheel, and the numbers are right-aligned so you can compare columns down a row.
+- Armies are grouped under their nation in the roster, and each one carries three small marks, one per stage, showing where it fights and where it does not.
+- Morale you type is kept when you press Run again, and half-finished edits in a number box are no longer thrown away when you click somewhere else.
+
 ## 18-SEP-2026 - v2.1.928
 
 ### The battle simulator no longer edits your real armies
