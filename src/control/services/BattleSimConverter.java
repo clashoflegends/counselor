@@ -665,8 +665,8 @@ public class BattleSimConverter {
      * Four states per slot, and they are four different statements:
      * <ul>
      *   <li>a dot - this army is not in that layer at all;</li>
-     *   <li>the layer's letter - it is in it, but no verdict: either no run yet, or a layer the
-     *       engine does not resolve yet, which today is the sea and the city;</li>
+     *   <li>the layer's letter - it is in it, and there is no verdict yet because nothing has been
+     *       run. All three layers resolve, so this state no longer survives a run;</li>
      *   <li>an outcome glyph - it fought and this is how it ended;</li>
      *   <li>the watching glyph - it was in the layer and never met an enemy there.</li>
      * </ul>
@@ -855,26 +855,51 @@ public class BattleSimConverter {
     }
 
     /**
-     * The three marks in words, for the roster tooltip.
+     * The three marks in words, for the roster tooltip. T-838.
      *
-     * An emoji is a guess unless something says what it means. Null before a run and for an army in
-     * no layer at all, so the hover stays silent rather than explaining a row of dots.
+     * An emoji is a guess unless something says what it means, and this used to answer only after a
+     * run and only for an army that fought - which is precisely backwards. The two moments a player
+     * hovers a row of dots asking what they mean are BEFORE he has pressed Run, and on the army
+     * that is taking no part; both returned null and the hover stayed silent.
+     *
+     * <h3>Why the dots stay</h3>
+     *
+     * The original note against placeholders argued that three dots beside a name read as a
+     * truncated name. That was true when they rendered bare. They now sit in brackets between the
+     * name and the troop count, {@code Name  [. . .]  1,300/4,200}, which cannot be read as a
+     * truncation - and removing them would cost the fixed slot that lets a column of armies be read
+     * straight down. The thing John actually wanted, a signal that something is BLOCKING the run,
+     * is a property of the scenario rather than of any army, and it is answered separately: the
+     * uncountable-army glyph in front of the name, and the reason text under the disabled button.
+     *
+     * So the dots keep their slots and the hover explains them, which is the third option - neither
+     * "bare rows say nothing" nor "three dots read as a truncation".
      */
     public static String getLayerHint(ArmySim army, LayerParticipation participation,
             CombatResult result) {
-        if (participation == null || !participation.isInAnyLayer() || result == null) {
+        if (participation == null) {
             return null;
+        }
+        if (result == null || !participation.isInAnyLayer()) {
+            // No verdict to give, so give the participation instead - the same four lines the
+            // "Fights in" line already says, rather than a second wording of them that can drift.
+            return getFightsIn(participation);
         }
         final StringBuilder ret = new StringBuilder("<html>");
         for (CombatLayer layer : CombatLayer.values()) {
+            final String said;
             if (!participation.isIn(layer)) {
-                continue;
+                // EVERY layer answers, including the ones it sat out. A slot that says nothing is
+                // the dot the player is hovering to ask about.
+                said = getReasonName(participation.getReason(layer));
+            } else {
+                final CombatResult.Outcome outcome = result.getOutcome(army, layer);
+                said = outcome == null
+                        ? labels.getString("BATTLESIM.OUTCOME.NOT_RESOLVED.HINT")
+                        : labels.getString("BATTLESIM.OUTCOME." + outcome.name() + ".HINT");
             }
-            final CombatResult.Outcome outcome = result.getOutcome(army, layer);
-            ret.append(String.format("%s: %s<br>", labels.getString("BATTLESIM.LAYER."
-                    + layer.name()), outcome == null
-                            ? labels.getString("BATTLESIM.OUTCOME.NOT_RESOLVED.HINT")
-                            : labels.getString("BATTLESIM.OUTCOME." + outcome.name() + ".HINT")));
+            ret.append(String.format("%s: %s<br>",
+                    labels.getString("BATTLESIM.LAYER." + layer.name()), said));
         }
         return ret.append("</html>").toString();
     }

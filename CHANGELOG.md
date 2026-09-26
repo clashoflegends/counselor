@@ -4,7 +4,7 @@
 
 ### The Battle Simulator now fights the whole battle
 
-*Opening to beta players first, as **BattleSim (new)** on the hex menu. The old simulator is still there and unchanged.*
+*The hex menu now offers **BattleSim (Old)** and **BattleSim (New)**. Both are live so you can open the same hex in each and compare; the old one is unchanged. The suffixes go away, and the old one with them, once the new simulator has a release behind it.*
 
 - **A battle on one hex can be three fights, and the simulator used to run one of them.** It resolved the land battle and stopped. If a fleet met a fleet, or an army stormed a city, none of that appeared in the result, so the numbers you were shown described part of a battle and did not say which part.
 - **It now runs all three, in the order the turn runs them**: the sea battle first, then the landing and the land battle, then the assault on the city. A fleet that loses its ships at sea puts fewer troops ashore. An army mauled ashore storms the walls with what is left. Each stage starts where the last one finished, and the result shows that carry-over so you can follow it down the page.
@@ -15,6 +15,7 @@
 
 - **In a locked alliance or team game you can now open the simulator on any hex where two nations are about to fight**, not only hexes where you have an army. The simulator works out who is hostile to whom from the team flags, exactly as the turn does.
 - This was the single biggest reason **Run simulation** used to sit disabled on a hex where a battle was obviously coming.
+- **In a free-for-all game it is different, and there is a reason.** Your turn results carry a foreign nation's diplomacy only when it points at *you*, so a fight between two other nations genuinely cannot be read from your file. The simulator will not guess: it marks the pair as assumed neutral and leaves Run disabled rather than invent a war. **Declare the relationship yourself in the Diplomacy panel and it runs.** A battle you are in is never affected, because your own diplomacy is complete.
 
 ### It tells you what it cannot know, and how to fix it
 

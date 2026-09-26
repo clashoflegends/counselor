@@ -122,6 +122,47 @@ class BattleSimLayerReasonTest {
     }
 
     /**
+     * The roster tooltip answers BEFORE a run, and for an army taking no part. T-838.
+     *
+     * Those are the two moments somebody hovers a row of dots to ask what they mean, and both used
+     * to return null: the hover stayed silent on exactly the question it exists to answer. The dots
+     * themselves stay - in brackets between the name and the troop count they cannot be read as a
+     * truncated name, and the fixed slot is what lets a column of armies be read straight down.
+     */
+    @Test
+    void theLayerTooltipAnswersBeforeAnyRun() {
+        final Nacao greyjoy = nacao("g", "House Greyjoy"), tully = nacao("t", "House Tully");
+        final Local hex = hexWithCity(tully);
+        final CombatScenario scenario = new CombatScenario(null, hex);
+        final ArmySim one = army("Joron Blacktide", greyjoy, hex);
+        scenario.addArmy(one, CombatScenario.Provenance.ESTIMATED);
+        scenario.setRelacionamento(greyjoy, tully, RelationshipMatrix.SWORN_ENEMY);
+
+        // result == null: nothing has been run yet
+        final String hint = BattleSimConverter.getLayerHint(one,
+                scenario.getParticipation().get(one), null);
+
+        assertTrue(hint != null && !hint.isEmpty(), "the dots have to explain themselves");
+        assertTrue(hint.contains("city:"), "and every layer answers: " + hint);
+    }
+
+    /** An army in no layer at all gets the same courtesy, run or no run. */
+    @Test
+    void theLayerTooltipAnswersForAnArmyInNoLayer() {
+        final Nacao mine = nacao("m", "Mine");
+        final Local hex = hexWithCity(mine);
+        final CombatScenario scenario = new CombatScenario(null, hex);
+        final ArmySim alone = army("Alone", mine, hex);
+        scenario.addArmy(alone, CombatScenario.Provenance.EXACT);
+
+        final String hint = BattleSimConverter.getLayerHint(alone,
+                scenario.getParticipation().get(alone), null);
+
+        assertTrue(hint != null && hint.contains("Takes no part in this battle"),
+                "the one army the player opened the window to ask about: " + hint);
+    }
+
+    /**
      * An army in NO layer still gets three answers, one per layer.
      *
      * This is the 0-of-3 end of John's "0 to 3", and the case the whole line exists for.
