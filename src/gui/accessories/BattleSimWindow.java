@@ -160,6 +160,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         }
     };
     private final JButton results = new JButton(labels.getString("BATTLESIM.RESULTS.OPEN"));
+    /** Gated with {@link #results}: there is nothing to copy until a battle has been run. */
+    private final JButton copyResult = new JButton(labels.getString("BATTLESIM.RESULT.COPY"));
     /**
      * Held, like the diplomacy dialog: a second press must RAISE the open pane rather than stack a
      * second copy of the same numbers over it, and a re-run must refresh the one already on screen.
@@ -577,6 +579,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         // do different things at different scales and a player who mixes them up loses work.
         left.add(tooltipped(button("BATTLESIM.CLONE.WINDOW", "cloneWindow"),
                 "BATTLESIM.CLONE.WINDOW.HINT"));
+        copyResult.setActionCommand("copyResult");
+        copyResult.addActionListener(this);
+        copyResult.setEnabled(false);
+        left.add(tooltipped(copyResult, "BATTLESIM.RESULT.COPY.HINT"));
         left.add(tooltipped(button("BATTLESIM.SAVE", "save"), "BATTLESIM.SAVE.HINT"));
         left.add(tooltipped(button("BATTLESIM.LOAD", "load"), "BATTLESIM.LOAD.HINT"));
         ret.add(left, BorderLayout.CENTER);
@@ -1169,6 +1175,28 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     // ------------------------------------------------------------------ refresh
 
+    /**
+     * Puts the result on the clipboard as plain text, for an email to an ally. T-805/T-847.
+     *
+     * John, 2026-09-26, cutting this down to what it should be: "just write the relevant part of
+     * the msg body and copy to clipboard. Player can paste and edit in gmail." Which is right - the
+     * Counselor composing mail would be a much larger promise (an SMTP failure the player cannot
+     * see, a body he cannot edit before it goes) in exchange for saving one paste.
+     *
+     * The SAVE FILE is the other half and already has its own button: paste this into the mail,
+     * attach a .bsim, and the ally can load the assumptions and press Run rather than take the
+     * numbers on trust.
+     */
+    private void doCopyResult() {
+        final String text = BattleSimResultText.render(controler);
+        if (text.isEmpty()) {
+            return;     // the button is disabled without a result; this is the belt to that braces
+        }
+        java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
+                new java.awt.datatransfer.StringSelection(text), null);
+        setLabelWithTooltip(status, labels.getString("BATTLESIM.RESULT.COPY.DONE"));
+    }
+
     /** The extension, deliberately nothing an EGF uses. See {@code BattleSimTransfer}. */
     private static final String EXTENSION = ".bsim";
 
@@ -1415,6 +1443,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                     ? BattleSimConverter.getRunDisabledReason(controler.getScenario())
                     : BattleSimConverter.getRunResultText(controler.getLastResult()));
             results.setEnabled(controler.getLastResult() != null);
+            copyResult.setEnabled(controler.getLastResult() != null);
             doSyncResultTab();
             // An edit throws the result away, so a pane still showing it would be describing a
             // battle that no longer matches the window. It goes with the numbers.
@@ -1662,6 +1691,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             controler.doCloneArmy();
         } else if ("removeArmy".equals(command)) {
             controler.doRemoveArmy();
+        } else if ("copyResult".equals(command)) {
+            doCopyResult();
+            return;
         } else if ("save".equals(command)) {
             doSave();
             return;

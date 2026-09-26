@@ -94,6 +94,12 @@ class BattleSimResultShot {
         // the screen, and forcing a size was hiding whether that works - which is the one thing
         // worth photographing. Reported below so a too-wide result is visible as a number as well
         // as a picture.
+        // The EMAIL BODY, printed so it can be read as a player would read it. A picture of the
+        // dialog does not tell you whether the text version lines up in a mail client.
+        System.out.println("----- result text -----");
+        System.out.println(gui.accessories.BattleSimResultText.render(controler));
+        System.out.println("----- end -----");
+
         final BattleSimResultDialog dialog = new BattleSimResultDialog((Frame) null, controler);
         dialog.setVisible(true);
         System.out.println("DIALOG|" + dialog.getWidth() + "x" + dialog.getHeight()

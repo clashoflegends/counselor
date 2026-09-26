@@ -199,7 +199,7 @@ public class BattleSimResultPanel extends JPanel {
      * standing answer to "is that everything?". A list that was computed from what the code happens
      * to implement would silently shrink whenever somebody deleted a feature.
      */
-    private static final String[] NOT_MODELLED = {
+    static final String[] NOT_MODELLED = {
         "BATTLESIM.NOTMODELLED.CHARACTERS",
         "BATTLESIM.NOTMODELLED.LOYALTY",
         "BATTLESIM.NOTMODELLED.EXPERIENCE",
@@ -236,7 +236,7 @@ public class BattleSimResultPanel extends JPanel {
      * that it resolved the land battle alone. Every layer below already prints its own reason, so
      * repeating it in the notes states the same fact twice on one screen.
      */
-    private static boolean isAlreadySaidPerLayer(String note) {
+    static boolean isAlreadySaidPerLayer(String note) {
         return "BATTLESIM.RESULT.LANDONLY".equals(note);
     }
 
