@@ -78,9 +78,28 @@ public class BattleSimResultDialog extends JDialog {
         add(scrolled(buildBody()), BorderLayout.CENTER);
         add(buildButtons(), BorderLayout.SOUTH);
         pack();
-        setSize(new Dimension(Math.min(760, Math.max(520, getWidth())),
-                Math.min(640, Math.max(360, getHeight()))));
+        doSizeToContent();
         setLocationRelativeTo(owner);
+    }
+
+    /**
+     * Opens at the size the result actually needs, bounded by the screen rather than by a constant.
+     *
+     * It used to be {@code min(760, ...)} wide. 760 fits a land-only battle and clips a three-layer
+     * one, because each layer table carries a column per round: the first real sea-land-city result
+     * opened with the Lost column off the edge, a horizontal scrollbar under the tables, and the
+     * caveat line cut off mid-sentence. Every number was right and none of them could be read.
+     *
+     * Bounded at 90% of the screen so it cannot open wider than the display, and floored so a
+     * one-line result is still a dialog rather than a slot.
+     */
+    private void doSizeToContent() {
+        final Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        final int maxWidth = (int) (screen.width * 0.9);
+        final int maxHeight = (int) (screen.height * 0.85);
+        setSize(new Dimension(
+                Math.min(maxWidth, Math.max(560, getWidth())),
+                Math.min(maxHeight, Math.max(360, getHeight()))));
     }
 
     /** Rebuilt whole on every Run, because every number in it changes. */
@@ -247,7 +266,12 @@ public class BattleSimResultDialog extends JDialog {
         holder.add(table.getTableHeader(), BorderLayout.NORTH);
         holder.add(table, BorderLayout.CENTER);
         final int height = table.getRowHeight() * (model.getRowCount() + 1) + 4;
-        holder.setPreferredSize(new Dimension(520, height));
+        // The table's OWN width, not a flat 520. Every layer table is as wide as the battle was
+        // long - one column per round - so a fixed figure fits the short ones and clips the rest,
+        // and the player met a horizontal scrollbar and a sentence cut off mid-word on his first
+        // three-layer result.
+        holder.setPreferredSize(new Dimension(
+                Math.max(520, table.getPreferredSize().width), height));
         holder.setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
         return new JComponentRow(holder);
     }

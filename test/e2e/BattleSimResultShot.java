@@ -73,11 +73,15 @@ class BattleSimResultShot {
         }
         controler.doRun();
 
+        // The dialog's OWN size, not one imposed here. It sizes itself to the result and clamps to
+        // the screen, and forcing a size was hiding whether that works - which is the one thing
+        // worth photographing. Reported below so a too-wide result is visible as a number as well
+        // as a picture.
         final BattleSimResultDialog dialog = new BattleSimResultDialog((Frame) null, controler);
-        dialog.setPreferredSize(new Dimension(WIDTH - 200, HEIGHT - 120));
-        dialog.pack();
-        dialog.setSize(WIDTH - 200, HEIGHT - 120);
         dialog.setVisible(true);
+        System.out.println("DIALOG|" + dialog.getWidth() + "x" + dialog.getHeight()
+                + "|laptop=" + WIDTH + "x" + HEIGHT
+                + "|fits=" + (dialog.getWidth() <= WIDTH && dialog.getHeight() <= HEIGHT));
         try {
             BattleSimShots.auditTree(dialog, "result/" + hex, null);
             final File out = new File("target/shots");

@@ -591,7 +591,14 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         // and a right-hand pane that claims it needs only 280px lets the roster take 44px that the
         // platoon table needs to show its 640px of columns without a scrollbar. This is what the
         // form is actually worth, so the divider settles where the table fits.
-        editor.setMinimumSize(new Dimension(600, 96));
+        // A FLOOR EQUAL TO THE FORM, so the army panel is never squeezed. John, 2026-09-26: "the
+        // army top panel should have a set size that fits all fields. While the platoon list should
+        // shrink to fit and have a scroll bar." A form with a field below the fold is not a smaller
+        // form, it is a form with a missing control - which is exactly how Combat level went
+        // unreachable. The platoon table is the one that gives: it holds 1 to 4 rows in almost
+        // every army and about 10 in the worst, and it scrolls, so losing height costs it a
+        // scrollbar rather than a control.
+        editor.setMinimumSize(new Dimension(600, armyFormHeight + 6));
         editor.getVerticalScrollBar().setUnitIncrement(16);
         armyScroll = editor;
         final JSplitPane right = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
@@ -932,8 +939,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         // height that left SEVEN PIXELS: caption and buttons visible, not one row of the table the
         // window exists to show. With a floor the shrink has to come out of the editor above.
         // BorderLayout.CENTER ignores minimum sizes, which is why setting it there did nothing.
+        // ONE row plus the furniture. It used to ask for four, which together with the army form's
+        // real height is more than the window's own 560px minimum can give - and when a split
+        // cannot satisfy both children something has to lose. This is the one that should: it
+        // scrolls.
         ret.setMinimumSize(new Dimension(280,
-                platoons.getRowHeight() * 4 + PLATOON_HEADER_ROOM + buttons.getPreferredSize().height));
+                platoons.getRowHeight() + PLATOON_HEADER_ROOM + buttons.getPreferredSize().height));
         return ret;
     }
 
