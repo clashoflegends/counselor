@@ -879,9 +879,9 @@ public class BattleSimControler {
      * formula reads the owner's powers.
      */
     public void setCityOwner(Nacao nacao) {
-        if (nacao != null && scenario.getCidade() != null) {
-            scenario.getCidade().setNacao(nacao);
-        }
+        // through the scenario, never cidade.setNacao directly: that back-links the scenario's
+        // CLONE onto the real nation's city list and leaves it there. See CombatScenario.
+        scenario.setCityOwner(nacao);
     }
 
     public void setCityLealdade(int lealdade) {
