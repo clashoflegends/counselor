@@ -18,6 +18,7 @@ import model.Pelotao;
 import model.Terreno;
 import model.TipoTropa;
 import org.junit.jupiter.api.Test;
+import persistenceCommons.BundleManager;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -126,10 +127,14 @@ class BattleSimCityVerdictTest {
 
         assertTrue(result.getRounds() > 0,
                 "the assault is a round of this battle, and the only one");
+        // against the RESOLVED label, not against its English text: the sentence is translated in
+        // five languages and reworded whenever the layers change, and a hard-coded copy of it
+        // turns this assertion into one that passes because nothing matches any more
+        final String noBattle = new BundleManager().getString("BATTLESIM.RESULT.NOLANDBATTLE");
         final String verdict = joined(BattleSimConverter.getVerdictLines(scenario, result));
-        assertFalse(verdict.contains("No battle was fought"),
+        assertFalse(verdict.contains(noBattle),
                 "a razed city is not an empty hex: " + verdict);
-        assertFalse(BattleSimConverter.getRunResultText(result).contains("No battle was fought"),
+        assertFalse(BattleSimConverter.getRunResultText(result).contains(noBattle),
                 "and the status line agrees with the verdict");
     }
 
