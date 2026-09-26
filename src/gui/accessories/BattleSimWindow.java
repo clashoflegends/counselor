@@ -265,6 +265,14 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     /** Guards the listeners while the editor is being repopulated from the model. */
     private boolean refreshing = false;
+    /** The army form and the split above the platoon table, for the one-time fit below. */
+    private JPanel armyForm;
+    private JSplitPane armySplit;
+    private JScrollPane armyScroll;
+    private int armyFormHeight = 0;
+    private boolean armySplitFitted = false;
+    /** The platoon table keeps at least this much: it is the answer the window exists for. */
+    private static final int PLATOON_TABLE_FLOOR = 220;
     /** Built once: the catalogue does not change, and this is reattached after every model swap. */
     private DefaultCellEditor troopTypeEditor;
     /** The non-modal diplomacy grid, kept so a second click raises it instead of stacking one. */
@@ -561,18 +569,47 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         // to give at 560px and it should be the form, which a player can scroll through, rather
         // than the table, which is the answer he came for. A floor on the platoon panel alone could
         // not fix it - when a split is shorter than both minimums together, one child loses anyway.
-        final JScrollPane editor = new JScrollPane(buildArmyEditor(),
+        armyForm = buildArmyEditor();
+        final JPanel form = armyForm;
+        final JScrollPane editor = new JScrollPane(form,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         editor.setBorder(null);
+        // THE WHOLE FORM, on open. Without this the split settled on the editor's MINIMUM - 96px,
+        // two rows of nine - and everything from Attack bonus down was below the fold: the Combat
+        // level combo, the Target, and the "Fights in" line. That is not a cosmetic loss. Combat
+        // level is what puts an army in the city layer at all, so a hex whose only battle is an
+        // assault showed three dots against every army and a disabled Run button whose own message
+        // said "See Fights in for each" - about a line the player could not see either. Found in QA
+        // at 866 t1 hex 1660, where the answer was one combo box away the entire time.
+        //
+        // The height the form needs with its derived block filled - see measuredWith. The window
+        // opens here; doFitArmySplit refines it once the real text is in, for the cases where the
+        // participation block runs longer than the placeholder.
+        editor.setPreferredSize(new Dimension(600, armyFormHeight + 6));
         // Width matters as much as height here: the horizontal split shares slack by resize weight,
         // and a right-hand pane that claims it needs only 280px lets the roster take 44px that the
         // platoon table needs to show its 640px of columns without a scrollbar. This is what the
         // form is actually worth, so the divider settles where the table fits.
         editor.setMinimumSize(new Dimension(600, 96));
         editor.getVerticalScrollBar().setUnitIncrement(16);
+        armyScroll = editor;
         final JSplitPane right = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 editor, buildPlatoonTable());
+        armySplit = right;
+        // SHOWING_CHANGED, not addNotify and not the constructor. doRefresh runs while the window
+        // is still being built, when the split has no height yet and resetToPreferredSizes is a
+        // no-op - which is exactly how the first two attempts at this silently did nothing. This
+        // fires when the pane is really on screen and has a size to divide.
+        right.addHierarchyListener(new java.awt.event.HierarchyListener() {
+            @Override
+            public void hierarchyChanged(java.awt.event.HierarchyEvent e) {
+                if ((e.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0
+                        && right.isShowing()) {
+                    doFitArmySplit();
+                }
+            }
+        });
         right.setResizeWeight(0.0);
         right.setOneTouchExpandable(true);
         right.setBorder(null);
@@ -736,6 +773,36 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         for (JSpinner one : new JSpinner[]{commander, morale, attackBonus, defenseBonus}) {
             one.addChangeListener(this);
         }
+        armyFormHeight = measuredWith(ret);
+        return ret;
+    }
+
+    /**
+     * The form's height WITH its derived block filled, measured before anything is on screen.
+     *
+     * Four of the nine rows are labels that are empty until the first refresh, so measuring the
+     * panel as built reports about a third of what it needs - and the split then opens on the four
+     * control rows with Combat level and "Fights in" below the fold. That is how QA at 866 t1 hex
+     * 1660 met a disabled Run button, three dots against every army, and a message pointing at a
+     * line it could not show: the answer was one combo box away the whole time.
+     *
+     * Placeholders rather than arithmetic on the font, because the real block is four labels of
+     * different shapes - two lines of strength, one of size band, up to five of participation and
+     * one of provenance - and counting pixels by hand is how this gets wrong again when one of
+     * them grows a line.
+     */
+    private int measuredWith(JPanel form) {
+        final String[] was = {strength.getText(), sizeBand.getText(), fightsIn.getText(),
+            source.getText()};
+        strength.setText("<html>x<br>x</html>");
+        sizeBand.setText("x");
+        fightsIn.setText("<html>x<br>x<br>x<br>x<br>x</html>");
+        source.setText("x");
+        final int ret = form.getPreferredSize().height;
+        strength.setText(was[0]);
+        sizeBand.setText(was[1]);
+        fightsIn.setText(was[2]);
+        source.setText(was[3]);
         return ret;
     }
 
@@ -1012,6 +1079,36 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * a diplomacy edit can move several at once. Working out which widgets a given edit touches is
      * how a view goes quietly stale, and the whole thing is a few dozen rows.
      */
+    /**
+     * Opens the army form at the height it actually needs, ONCE, after it first has content.
+     *
+     * Measuring it at construction is not enough and that is not a detail: four of the nine rows
+     * are LABELS that are empty until a refresh fills them, so the form measures short and the
+     * split settles above the "Fights in" line. That line is the one the disabled-Run message
+     * tells the player to read.
+     *
+     * Once only, and only while the divider is still where the layout put it, so a player who
+     * drags it keeps his choice for the rest of the session. Capped so the platoon table never
+     * drops below a usable few rows: on a short window the form is the one that should scroll,
+     * which is the trade {@link #buildPanes} already describes.
+     */
+    private void doFitArmySplit() {
+        if (armySplitFitted || armySplit == null || armyForm == null
+                || armySplit.getHeight() <= 0) {
+            return;
+        }
+        armySplitFitted = true;
+        // The PREFERRED size, then resetToPreferredSizes - NOT setDividerLocation. An absolute
+        // divider survives a resize and takes the shrink entirely out of the pane below it, which
+        // is how the first version of this fix left the platoon table at SEVEN PIXELS once the
+        // window was pulled down to its 860x560 minimum: the table's own floor is honoured by the
+        // split's layout and ignored by a divider pinned past it. Going through preferred sizes
+        // keeps the split doing its normal job, so the form opens whole AND gives way first when
+        // there is not enough room for both.
+        armyScroll.setPreferredSize(new Dimension(600, armyForm.getPreferredSize().height + 6));
+        armySplit.resetToPreferredSizes();
+    }
+
     private void doRefresh() {
         doRefresh(true);
     }
@@ -1064,6 +1161,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             }
             refreshEditor();
             refreshGround();
+            doFitArmySplit();
             final int nacoes = controler.getScenario().getNacoes().size();
             diplomacy.setEnabled(nacoes > 1);
             diplomacy.setToolTipText(nacoes > 1 ? null
