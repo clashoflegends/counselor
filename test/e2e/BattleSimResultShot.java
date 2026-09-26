@@ -64,6 +64,23 @@ class BattleSimResultShot {
     }
 
     private static void shoot(Local local, String hex) {
+        // The SETUP WINDOW after a run, so the Result tab is photographed in place - that is where
+        // a player reads it now, and the pop-out is the second case rather than the first.
+        final gui.accessories.BattleSimWindow window = new gui.accessories.BattleSimWindow(local);
+        window.pack();
+        window.setSize(WIDTH - 60, HEIGHT - 40);
+        // LAY IT OUT before measuring. Sizing a window does not run its layout, so auditing here
+        // without this reports every label as 0x0 - a fault in the tool that reads exactly like a
+        // fault in the window.
+        window.validate();
+        try {
+            BattleSimShots.auditTree(window, "window/" + hex, null);
+            BattleSimShots.write(window, new File("target/shots"),
+                    "bsim_window_" + hex + ".png", 1.0);
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
+        }
+
         final BattleSimControler controler = new BattleSimControler(local);
         final CombatScenario scenario = controler.getScenario();
         // Ordered to assault, because a hex nobody attacked has no city layer to photograph and

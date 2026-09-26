@@ -165,6 +165,21 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * second copy of the same numbers over it, and a re-run must refresh the one already on screen.
      */
     private transient BattleSimResultDialog resultDialog;
+    /**
+     * The result, read IN PLACE, beside the roster and the form that produced it.
+     *
+     * A tab rather than a third column: three columns need about 1,370px and the laptop this has
+     * to survive is 1,366. It costs no width at all here, and the loop it serves is read-then-edit
+     * rather than read-while-editing - the player reads the verdict, switches back, changes a
+     * tactic, runs again.
+     *
+     * The pop-out {@link BattleSimResultDialog} stays for the second-monitor case, and both render
+     * from ONE {@link BattleSimResultPanel}: two renderings of the same result would drift, and a
+     * reader would have no way to tell which was lying.
+     */
+    private transient BattleSimResultPanel resultPane;
+    private transient javax.swing.JTabbedPane bottomTabs;
+    private int resultTabIndex = -1;
     private final JLabel status = new JLabel();
     private final JLabel runReason = new JLabel();
     private final JLabel armyTitle = new JLabel();
@@ -602,7 +617,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         editor.getVerticalScrollBar().setUnitIncrement(16);
         armyScroll = editor;
         final JSplitPane right = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                editor, buildPlatoonTable());
+                editor, buildBottomTabs());
         armySplit = right;
         // SHOWING_CHANGED, not addNotify and not the constructor. doRefresh runs while the window
         // is still being built, when the split has no height yet and resetToPreferredSizes is a
@@ -901,6 +916,46 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * are centred because they hold a marker rather than a quantity; the four editable numbers keep
      * the default right alignment, which is what makes them scannable as a column.
      */
+    /**
+     * Platoons and Result, as two tabs sharing the bottom pane.
+     *
+     * The Result tab is disabled until there IS one, so the tab strip states plainly whether the
+     * hex has been run rather than offering an empty page.
+     */
+    private javax.swing.JComponent buildBottomTabs() {
+        resultPane = new BattleSimResultPanel(controler);
+        bottomTabs = new javax.swing.JTabbedPane();
+        bottomTabs.addTab(labels.getString("BATTLESIM.PLATOON.TITLE"), buildPlatoonTable());
+        bottomTabs.addTab(labels.getString("BATTLESIM.RESULTS.TAB"), resultPane);
+        resultTabIndex = bottomTabs.getTabCount() - 1;
+        bottomTabs.setEnabledAt(resultTabIndex, false);
+        return bottomTabs;
+    }
+
+    /**
+     * Points the bottom pane at the result after a run, and back at the platoons when it is thrown
+     * away.
+     *
+     * Switching TO it on a run is the whole point of the tab - a player who pressed Run wants the
+     * numbers, and making him find the tab afterwards is the click the pane exists to remove.
+     */
+    private void doSyncResultTab() {
+        if (bottomTabs == null || resultTabIndex < 0) {
+            return;
+        }
+        final boolean has = controler.getLastResult() != null;
+        if (has) {
+            resultPane.refresh();
+            bottomTabs.setEnabledAt(resultTabIndex, true);
+            bottomTabs.setSelectedIndex(resultTabIndex);
+        } else {
+            if (bottomTabs.getSelectedIndex() == resultTabIndex) {
+                bottomTabs.setSelectedIndex(0);
+            }
+            bottomTabs.setEnabledAt(resultTabIndex, false);
+        }
+    }
+
     private JPanel buildPlatoonTable() {
         // Right-click Copy / Export to CSV, as the old window had on both its tables (T-431). Only
         // the platoon table here: the roster is a JTree, and the armies are already covered by the
@@ -1189,6 +1244,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                     ? BattleSimConverter.getRunDisabledReason(controler.getScenario())
                     : BattleSimConverter.getRunResultText(controler.getLastResult()));
             results.setEnabled(controler.getLastResult() != null);
+            doSyncResultTab();
             // An edit throws the result away, so a pane still showing it would be describing a
             // battle that no longer matches the window. It goes with the numbers.
             if (controler.getLastResult() == null && resultDialog != null
