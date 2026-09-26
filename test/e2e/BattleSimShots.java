@@ -250,7 +250,7 @@ public final class BattleSimShots {
      * Paints the root pane, not the frame: a packed-but-never-shown JFrame carries native decoration
      * insets that would leave a band of nothing down two edges of every image.
      */
-    private static void write(java.awt.Window frame, File dir, String name, double scale)
+    static void write(java.awt.Window frame, File dir, String name, double scale)
             throws Exception {
         final Component root = ((javax.swing.RootPaneContainer) frame).getRootPane();
         final int w = Math.max(1, (int) Math.ceil(root.getWidth() * scale));
@@ -279,7 +279,7 @@ public final class BattleSimShots {
      * PNG is guesswork once the ellipsis is one pixel wide. The images are for the things a
      * measurement cannot name - overlap, crowding, a pane that reads badly.
      */
-    private static void auditTree(Container root, String where, JTable table) {
+    static void auditTree(Container root, String where, JTable table) {
         walk(root, where);
         panes(root, where);
         if (table != null && table.getColumnCount() > 0) {
@@ -577,6 +577,13 @@ public final class BattleSimShots {
     }
 
     /** Hex by map key, falling back to a scan on the printed coordinates. */
+    /** Opens the EGF and returns one hex, for a harness that wants the world but not the window. */
+    static Local loadHex(File egf, String hex) throws Exception {
+        final WorldFacadeCounselor wfc = WorldFacadeCounselor.getInstance();
+        wfc.doStart(egf);
+        return findHex(wfc, hex);
+    }
+
     private static Local findHex(WorldFacadeCounselor wfc, String hex) {
         final Local direct = wfc.getLocais().get(hex);
         if (direct != null) {
@@ -598,7 +605,7 @@ public final class BattleSimShots {
      * for a window that is packed and painted but never shown, and which changes a colour rather
      * than a layout. So the title bar in these images is FlatLaf's own, in light mode.
      */
-    private static void installLookAndFeel() {
+    static void installLookAndFeel() {
         final SettingsManager sm = SettingsManager.getInstance();
         sm.setConfigurationMode("Client");
         sm.setLanguage(sm.getConfig("language", "en"));

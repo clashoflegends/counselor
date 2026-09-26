@@ -353,6 +353,11 @@ public class BattleSimResultDialog extends JDialog {
             if (column == 1) {
                 return labels.getString("BATTLESIM.RESULTS.START");
             }
+            // The city layer is ONE column and it is the assault - not a first-strike round, which
+            // is a land-battle idea, and not "R0", which numbers a round the player never sees.
+            if (report.getLayer() == CombatLayer.CITY) {
+                return labels.getString("BATTLESIM.RESULTS.ROUNDASSAULT");
+            }
             // column 2 is the end of round 0, which is the first-strike round
             return column == 2 ? labels.getString("BATTLESIM.RESULTS.ROUNDFS")
                     : String.format(labels.getString("BATTLESIM.RESULTS.ROUND"), column - 2);
