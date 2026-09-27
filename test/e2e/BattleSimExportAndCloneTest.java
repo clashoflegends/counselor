@@ -90,6 +90,45 @@ class BattleSimExportAndCloneTest {
     }
 
     /**
+     * THE CONTRACT, pinned byte for byte. T-446.
+     *
+     * John: <i>"Players have their own spreadsheets where they copy from the Sim and paste in their
+     * spreadsheet. So keep the fields and gaps the same."</i> So this asserts the whole document
+     * rather than sampling it - the trailing tabs, the leading tab on platoon rows and the three
+     * blank lines after an army are the shape a sheet parses, and every one of them was lost when
+     * the rebuild's first Copy was written as a clean export instead of a port.
+     *
+     * If this test has to change, a player's spreadsheet has to change with it.
+     */
+    @Test
+    void theExportMatchesTheOldContractExactly() {
+        final CombatScenario scenario = new CombatScenario(null, hex());
+        scenario.addArmy(army(platoon(troopType("inf", false, 50), 900)),
+                CombatScenario.Provenance.EXACT);
+
+        final String[] lines = control.services.BattleSimConverter
+                .getClipboardText(scenario).split("\n", -1);
+
+        assertEquals("Name\tCommander rank\tMoral\tLand attack\tLand defense\tNavy attack\t"
+                + "Navy defense\tTerrain\tFaction\t", lines[0], "army header");
+        assertEquals("\tTroop Type\t# of Soldiers\tTraining\tWeapon\tArmor\tAttack\tDefense\t",
+                lines[1], "platoon header, indented one column");
+        assertEquals("", lines[2], "blank line closes the header block");
+        assertTrue(lines[3].endsWith("\t"), "every field trails a tab: " + lines[3]);
+        assertEquals(10, lines[3].split("\t", -1).length, "9 army fields and the trailing tab");
+        assertTrue(lines[4].startsWith("\t"), "platoon rows indent under their army: " + lines[4]);
+        assertEquals(9, lines[4].split("\t", -1).length,
+                "leading tab, 7 platoon fields, trailing tab");
+        assertEquals("", lines[5], "blank line closes the platoon block");
+        assertEquals("", lines[6], "two more close the army");
+        assertEquals("", lines[7]);
+        // the ninth is not a fourth blank line: the document ENDS with a newline, so splitting
+        // keeps an empty entry for it. Counting it as content is the easiest way to get this shape wrong.
+        assertEquals("", lines[8], "the tail of the final newline");
+        assertEquals(9, lines.length, "and nothing after it");
+    }
+
+    /**
      * Land and naval land under the RIGHT headers.
      *
      * The old export put {@code getAtaqueExercito(army, true)} under "Land attack", and
@@ -97,7 +136,7 @@ class BattleSimExportAndCloneTest {
      * {@code naval == tipoTropa.isBarcos()}. A fleet's strength was printed as a land army's.
      *
      * Pinned with an army that is ONLY ships, so the two figures cannot be confused: land must be
-     * zero and naval must not.
+     * zero and naval must not. The column POSITIONS are the old ones; only the values moved.
      */
     @Test
     void theExportPutsNavalStrengthUnderTheNavalHeader() {
@@ -105,15 +144,10 @@ class BattleSimExportAndCloneTest {
         scenario.addArmy(army(platoon(troopType("trireme", true, 40), 46)),
                 CombatScenario.Provenance.EXACT);
 
-        final String[] lines = control.services.BattleSimConverter.getClipboardText(scenario).split("\n");
-        final String[] header = lines[0].split("\t");
-        final String[] values = lines[1].split("\t");
+        final String[] values = armyLine(scenario).split("\t", -1);
 
-        // header order: commander, nation, morale, land atk, land def, naval atk, naval def
-        assertEquals(7, header.length, lines[0]);
-        assertEquals("0", values[3], "a fleet has no LAND attack: " + lines[1]);
-        assertTrue(Integer.parseInt(values[5]) > 0,
-                "and its naval attack must not be zero: " + lines[1]);
+        assertEquals("0", values[3], "a fleet has no LAND attack");
+        assertTrue(Integer.parseInt(values[5]) > 0, "and its naval attack must not be zero");
     }
 
     /** The reverse, so the test cannot pass by both being zero. */
@@ -123,11 +157,34 @@ class BattleSimExportAndCloneTest {
         scenario.addArmy(army(platoon(troopType("inf", false, 50), 900)),
                 CombatScenario.Provenance.EXACT);
 
-        final String[] values = control.services.BattleSimConverter
-                .getClipboardText(scenario).split("\n")[1].split("\t");
+        final String[] values = armyLine(scenario).split("\t", -1);
 
         assertTrue(Integer.parseInt(values[3]) > 0, "a land host has a land attack");
         assertEquals("0", values[5], "and no naval attack");
+    }
+
+    /**
+     * The extensions are at the RIGHT end, which is the only place John allowed them.
+     *
+     * Anywhere else and every column after the insertion point lands in the wrong cell - which is
+     * exactly what the rebuild's first Copy did with the faction at position 2.
+     */
+    @Test
+    void theExtensionsSitAtTheRightEndAndNowhereElse() {
+        final CombatScenario scenario = new CombatScenario(null, hex());
+        scenario.addArmy(army(platoon(troopType("inf", false, 50), 900)),
+                CombatScenario.Provenance.EXACT);
+
+        final String[] lines = control.services.BattleSimConverter
+                .getClipboardText(scenario).split("\n", -1);
+        final String[] header = lines[0].split("\t", -1);
+        final String[] platoonHeader = lines[1].split("\t", -1);
+
+        assertEquals("Terrain", header[7], "the last field of the OLD contract stays last of the old");
+        assertEquals("Faction", header[8], "and the extension follows it");
+        assertEquals("Armor", platoonHeader[5], "same on the platoon line");
+        assertEquals("Attack", platoonHeader[6]);
+        assertEquals("Defense", platoonHeader[7]);
     }
 
     /** Every platoon gets its own indented row under its army. */
@@ -137,10 +194,19 @@ class BattleSimExportAndCloneTest {
         scenario.addArmy(army(platoon(troopType("inf", false, 50), 900),
                 platoon(troopType("arc", false, 30), 200)), CombatScenario.Provenance.EXACT);
 
-        final String[] lines = control.services.BattleSimConverter.getClipboardText(scenario).split("\n");
+        final String[] lines = control.services.BattleSimConverter
+                .getClipboardText(scenario).split("\n", -1);
 
-        assertEquals(4, lines.length, "header, army, and one row per platoon");
-        assertTrue(lines[2].startsWith("\t"), "platoon rows are indented: " + lines[2]);
+        assertEquals(10, lines.length, "3 header, army, 2 platoons, 3 blank, 1 tail");
+        assertTrue(lines[4].startsWith("\t"), "platoon rows are indented: " + lines[4]);
+        assertTrue(lines[5].startsWith("\t"), "both of them: " + lines[5]);
+    }
+
+    /** The army line, wherever the header block ends. */
+    private static String armyLine(CombatScenario scenario) {
+        final String[] lines = control.services.BattleSimConverter
+                .getClipboardText(scenario).split("\n", -1);
+        return lines[3];
     }
 
     /**

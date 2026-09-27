@@ -343,40 +343,115 @@ public class BattleSimConverter {
      * <b>The headers were hardcoded English</b> in a feature where every other string comes from
      * the bundle. They come from the bundle now, reusing the keys the army table already uses.
      */
+    /**
+     * The army labels of the OLD window's export, hardcoded English ON PURPOSE.
+     *
+     * This class's rule is that every string comes from the bundle. These are the exception, and it
+     * is not an oversight: a player's spreadsheet reads this header, and a header that changed when
+     * he switched the Counselor to Portuguese would break his sheet in a way he could not diagnose.
+     * The old window hardcoded them and so does this. They are a wire format, not prose.
+     *
+     * {@code Faction} is the T-446 extension and sits at the RIGHT end, after the eight the old
+     * contract defined.
+     */
+    private static final String[] ARMY_LABELS = {"Name", "Commander rank", "Moral", "Land attack",
+        "Land defense", "Navy attack", "Navy defense", "Terrain", "Faction"};
+    /** Same rule. {@code Attack} and {@code Defense} are the T-427 extension, at the right end. */
+    private static final String[] PLATOON_LABELS = {"Troop Type", "# of Soldiers", "Training",
+        "Weapon", "Armor", "Attack", "Defense"};
+
+    /**
+     * The army list as a spreadsheet paste. T-446.
+     *
+     * <h3>This is a compatibility surface, not an export</h3>
+     *
+     * John, 2026-09-21: <i>"Players have their own spreadsheets where they copy from the Sim and
+     * paste in their spreadsheet. So keep the fields and gaps the same. Anything we add, we add to
+     * the right of existing as an extension to the contract."</i>
+     *
+     * The rebuild's first version was written as a clean export rather than as a port, and it moved
+     * every column: it inserted the faction at position 2, dropped Commander rank and Terrain,
+     * joined with tabs instead of TRAILING every field with one, and padded platoon rows out to the
+     * army width. Nobody was hurt only because the old window still shipped its own Copy - which is
+     * exactly why this blocked retiring it.
+     *
+     * <h3>The shape, and why the empty-looking bits are load-bearing</h3>
+     *
+     * Every field is followed by a tab, so each line ENDS with one; the platoon lines begin with a
+     * tab, so they indent one column under their army; each army is followed by three blank lines.
+     * None of that is formatting. It is the shape a sheet parses, so it is reproduced exactly,
+     * including the parts that look like accidents.
+     *
+     * <h3>Two deliberate differences from the old output</h3>
+     *
+     * <b>The derived columns are the right way round now.</b> {@code getAtaqueExercito}'s boolean is
+     * NAVAL, not land, so the old export printed the FLEET's strength under "Land attack" for
+     * years. John, same day: <i>"correct the inverted columns. I think no one complained because
+     * they look at the individual values (i.e. qtd, training) instead of the derived
+     * calculations."</i> Column POSITIONS are untouched; only the values moved into the headers
+     * that always named them.
+     *
+     * <b>Platoons come out in casualty order</b>, the order the window shows, rather than the old
+     * export's alphabetical-by-codigo. A sheet cannot key on platoon row order - armies have
+     * different platoon counts - and the order is the information the player opened the window for.
+     */
     public static String getClipboardText(CombatScenario scenario) {
         final StringBuilder ret = new StringBuilder();
-        appendRow(ret, labels.getString("COMANDANTE"), labels.getString("NACAO"),
-                labels.getString("MORAL"), labels.getString("TROPA.ATAQUE.TERRA"),
-                labels.getString("TROPA.DEFESA.TERRA"), labels.getString("TROPA.ATAQUE.NAVAL"),
-                labels.getString("TROPA.DEFESA.NAVAL"));
+        if (SettingsManager.getInstance().isConfig("BattleSimArmyCopyLabels", "1", "1")) {
+            appendTabbed(ret, ARMY_LABELS);
+            ret.append('\t');
+            appendTabbed(ret, PLATOON_LABELS);
+            ret.append('\n');
+        }
         final ExercitoFacade facade = new ExercitoFacade();
+        final Cenario cenario = scenario == null || scenario.getPartida() == null
+                ? null : scenario.getPartida().getCenario();
         for (ArmySim army : scenario.getArmies()) {
-            appendRow(ret, army.getNome(),
-                    army.getNacao() == null ? "" : String.valueOf(army.getNacao().getNome()),
-                    String.valueOf(army.getMoral()),
-                    // false is LAND, true is NAVAL. The old export had these the other way round.
-                    String.valueOf(facade.getAtaqueExercito(army, false)),
-                    String.valueOf(facade.getDefesaExercito(army, false)),
-                    String.valueOf(facade.getAtaqueExercito(army, true)),
-                    String.valueOf(facade.getDefesaExercito(army, true)));
+            appendTabbed(ret, armyFields(army, facade, cenario));
             for (Pelotao pelotao : new control.BattleSimControler.PlatoonTableModel(
                     scenario, army).getPlatoons()) {
-                appendRow(ret, "", pelotao.getTipoTropa() == null ? ""
-                        : String.valueOf(pelotao.getTipoTropa().getNome()),
-                        String.valueOf(pelotao.getQtd()), String.valueOf(pelotao.getTreino()),
-                        String.valueOf(pelotao.getModAtaque()),
-                        String.valueOf(pelotao.getModDefesa()), "");
+                ret.append('\t');
+                appendTabbed(ret, platoonFields(pelotao, army, facade));
             }
+            // one blank line closes the platoon block, two more close the army. All three are in
+            // the old output and a sheet built against it will be counting them.
+            ret.append('\n').append('\n').append('\n');
         }
         return ret.toString();
     }
 
-    private static void appendRow(StringBuilder to, String... cells) {
-        for (int ii = 0; ii < cells.length; ii++) {
-            if (ii > 0) {
-                to.append('\t');
-            }
-            to.append(cells[ii]);
+    /** Eight fields in the old order, then the faction. */
+    private static String[] armyFields(ArmySim army, ExercitoFacade facade, Cenario cenario) {
+        return new String[]{
+            facade.getComandanteTitulo(army, cenario),
+            String.valueOf(army.getComandantePericia()),
+            String.valueOf(facade.getMoral(army)),
+            // false is LAND here, true is NAVAL. See the note above.
+            String.valueOf(facade.getAtaqueExercito(army, false)),
+            String.valueOf(facade.getDefesaExercito(army, false)),
+            String.valueOf(facade.getAtaqueExercito(army, true)),
+            String.valueOf(facade.getDefesaExercito(army, true)),
+            facade.getTerreno(army),
+            army.getNacao() == null ? "" : army.getNacao().getNome()};
+    }
+
+    /** Five fields in the old order, then the pair the window computes live. */
+    private static String[] platoonFields(Pelotao pelotao, ArmySim army, ExercitoFacade facade) {
+        return new String[]{
+            pelotao.getTipoTropa() == null ? "" : pelotao.getTipoTropa().getNome(),
+            String.valueOf(pelotao.getQtd()),
+            String.valueOf(pelotao.getTreino()),
+            String.valueOf(pelotao.getModAtaque()),
+            String.valueOf(pelotao.getModDefesa()),
+            // Raw, not the window's grouped "1,234": the destination is a cell that has to add up.
+            String.valueOf(facade.getAtaquePelotao(pelotao, army)),
+            String.valueOf(facade.getDefesaPelotao(pelotao, army))};
+    }
+
+    /** Every field TRAILED by a tab, then the newline. The trailing tab is part of the contract. */
+    private static void appendTabbed(StringBuilder to, String... cells) {
+        for (String cell : cells) {
+            to.append(cell == null ? "" : cell).append('\t');
         }
         to.append('\n');
     }
