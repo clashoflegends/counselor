@@ -569,6 +569,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 "BATTLESIM.ARMY.COPYONE.HINT"));
         left.add(tooltipped(button("BATTLESIM.ARMY.PASTE", "pasteArmy"),
                 "BATTLESIM.ARMY.PASTE.HINT"));
+        // Fill defaults sits with the army buttons because it EDITS them. It is the
+        // assisted form of the thing ScenarioLoader's note tells the player to do by hand:
+        // type in what he thinks is in an enemy stack.
+        left.add(tooltipped(button("BATTLESIM.FILL", "fill"), "BATTLESIM.FILL.HINT"));
         // Diplomacy sits with the army buttons rather than beside Run, because it edits the
         // scenario like they do. The matrix IS the law for who fights whom (T-418), so this is not
         // an advanced option tucked away - it is the other half of setting up the battle.
@@ -1282,6 +1286,42 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         setLabelWithTooltip(status, labels.getString("BATTLESIM.RESULT.COPY.DONE"));
     }
 
+    /**
+     * Writes the averages from the player's own file into every unknown, and SAYS what it wrote.
+     *
+     * <h3>Why it reports instead of just doing it</h3>
+     *
+     * Because it changes numbers the player did not type, on armies he cannot see, and a silent
+     * change of that kind is indistinguishable from the tool having decided something on its own.
+     * The line names the three kinds separately - morale, commanders, head counts - so he can tell
+     * at a glance whether the thing he cared about was actually filled or was already known.
+     *
+     * <h3>The warning is not decoration</h3>
+     *
+     * A seeded head count arrives as troop type {@code none}, which carries attack and defence of 1
+     * on every terrain, so the army it builds is a FLOOR on the enemy rather than an estimate of
+     * him. Saying that once, here, is the difference between a useful starting point and a
+     * confidently wrong forecast. John ruled out inventing a composition (2026-09-27), so the
+     * honest move is to fill the count and be loud about what it is worth.
+     */
+    private void doFillDefaults() {
+        final business.combat.ScenarioDefaults.Filled filled = controler.doFillDefaults();
+        if (filled.getTotal() == 0) {
+            setLabelWithTooltip(status, labels.getString(filled.isPlaceholderMissing()
+                    ? "BATTLESIM.FILL.NOPLACEHOLDER" : "BATTLESIM.FILL.NOTHING"));
+            return;
+        }
+        doRefresh();
+        setLabelWithTooltip(status, String.format(labels.getString("BATTLESIM.FILL.DONE"),
+                filled.getMorale(), filled.getCommanders(), filled.getHeadCounts()));
+        if (filled.getHeadCounts() > 0) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    labels.getString("BATTLESIM.FILL.UNKNOWNTROOPS"),
+                    labels.getString("BATTLESIM.FILL"),
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
     /** The extension, deliberately nothing an EGF uses. See {@code BattleSimTransfer}. */
     private static final String EXTENSION = ".bsim";
 
@@ -1781,6 +1821,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             return;
         } else if ("pasteArmy".equals(command)) {
             doPasteArmy();
+        } else if ("fill".equals(command)) {
+            doFillDefaults();
         } else if ("copyResult".equals(command)) {
             doCopyResult();
             return;

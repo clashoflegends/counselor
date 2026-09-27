@@ -5,6 +5,7 @@ import business.combat.CombatChain;
 import business.combat.CombatLayer;
 import business.combat.CombatLevel;
 import business.combat.CombatScenario;
+import business.combat.ScenarioDefaults;
 import business.combat.CombatResult;
 import business.combat.LandCombatResolver;
 import business.combat.LayerReport;
@@ -244,6 +245,35 @@ public class BattleSimControler {
         }
         scenario.addArmy(army, CombatScenario.Provenance.MANUAL);
         this.selected = army;
+    }
+
+    /**
+     * Fills every unknown on every foreign army with the average from the player's OWN file. T-837.
+     *
+     * John, 2026-09-27: <i>"an option to Fill in all default values with average numbers"</i>. The
+     * rules and the reasoning live in {@code ScenarioDefaults}; this supplies the two things it
+     * cannot reach from PbmCommons and deliberately does not try to.
+     *
+     * <b>The sample is the whole map, not this hex.</b> A size band is a ranking across every army
+     * in the game, so fitting it against the two or three armies standing here would be fitting it
+     * against noise. Walking {@code getLocais()} is the client's job - that is why the sample is an
+     * argument rather than something the rule builds for itself.
+     */
+    public ScenarioDefaults.Filled doFillDefaults() {
+        final WorldFacadeCounselor world = WorldFacadeCounselor.getInstance();
+        final List<model.Exercito> sample = new ArrayList<>();
+        for (Local hex : world.getLocais().values()) {
+            if (hex == null || hex.getExercitos() == null) {
+                continue;
+            }
+            for (model.Exercito army : hex.getExercitos().values()) {
+                if (army != null) {
+                    sample.add(army);
+                }
+            }
+        }
+        return ScenarioDefaults.fill(scenario, ScenarioDefaults.Sample.from(sample),
+                ScenarioDefaults.placeholderOf(world.getCenario()));
     }
 
     private ArmySim findByCodigo(String codigo) {
