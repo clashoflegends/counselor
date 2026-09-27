@@ -573,6 +573,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         // assisted form of the thing ScenarioLoader's note tells the player to do by hand:
         // type in what he thinks is in an enemy stack.
         left.add(tooltipped(button("BATTLESIM.FILL", "fill"), "BATTLESIM.FILL.HINT"));
+        left.add(tooltipped(button("BATTLESIM.WHATIF", "whatIf"),
+                "BATTLESIM.WHATIF.HINT"));
         // Diplomacy sits with the army buttons rather than beside Run, because it edits the
         // scenario like they do. The matrix IS the law for who fights whom (T-418), so this is not
         // an advanced option tucked away - it is the other half of setting up the battle.
@@ -1482,15 +1484,46 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private void doCloneWindow() {
         // No commitSpinners() here: the action dispatcher calls it before reaching any branch, so a
         // second call would find nothing pending and read as a safeguard that is not doing anything.
-        // REBUILT from the hex, never appended to this window's title. Appending would compound:
-        // a clone of a clone would carry two stamps, a clone of that three, and the label a player
-        // is using to tell four windows apart would be the longest thing in the title bar.
-        final BattleSimWindow ret = new BattleSimWindow(
-                new BattleSimControler(controler.getScenario().copy()),
-                titleFor(controler.getScenario().getLocal()));
-        ret.setSize(getSize());
-        ret.setLocation(getX() + CLONE_OFFSET, getY() + CLONE_OFFSET);
+        openBeside(this, controler.getScenario().copy());
+    }
+
+    /**
+     * Opens a prepared scenario in its own window, offset from this one.
+     *
+     * Shared by Clone and by the what-if's "open as a battle", because they are the same gesture:
+     * here is a second version of this fight, side by side with the first.
+     *
+     * The title is REBUILT from the hex, never appended to the owner's. Appending would compound -
+     * a clone of a clone would carry two stamps, a clone of that three - and the label a player is
+     * using to tell four windows apart would end up the longest thing in the title bar.
+     */
+    static void openBeside(BattleSimWindow owner, business.combat.CombatScenario scenario) {
+        final BattleSimWindow ret = new BattleSimWindow(new BattleSimControler(scenario),
+                titleFor(scenario.getLocal()));
+        if (owner != null) {
+            ret.setSize(owner.getSize());
+            ret.setLocation(owner.getX() + CLONE_OFFSET, owner.getY() + CLONE_OFFSET);
+        }
         ret.setVisible(true);
+    }
+
+    /**
+     * "What do I need to win?" on the platoon the player has selected. T-842.
+     *
+     * It needs a platoon, because the question is about a QUANTITY and a quantity belongs to one.
+     * Saying so is better than a disabled button whose reason is invisible - the same lesson as
+     * Run, which was useless until it named the army blocking it.
+     */
+    private void doWhatIf() {
+        final int row = platoons.getSelectedRow();
+        if (row < 0 || controler.getSelected() == null
+                || !(platoons.getModel() instanceof BattleSimControler.PlatoonTableModel)) {
+            setLabelWithTooltip(status, labels.getString("BATTLESIM.WHATIF.NOPLATOON"));
+            return;
+        }
+        new WhatIfDialog(this, controler, controler.getSelected(),
+                ((BattleSimControler.PlatoonTableModel) platoons.getModel()).getPlatoon(row))
+                .setVisible(true);
     }
 
     /** Opens the results pane, or raises and refreshes the one already open. */
@@ -1867,6 +1900,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             return;
         } else if ("pasteArmy".equals(command)) {
             doPasteArmy();
+        } else if ("whatIf".equals(command)) {
+            doWhatIf();
+            return;
         } else if ("fill".equals(command)) {
             doFillDefaults();
         } else if ("copyResult".equals(command)) {
