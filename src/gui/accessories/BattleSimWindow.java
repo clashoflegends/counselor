@@ -1311,14 +1311,60 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                     ? "BATTLESIM.FILL.NOPLACEHOLDER" : "BATTLESIM.FILL.NOTHING"));
             return;
         }
+        // Land the player on the biggest pile of unidentified men before he reads anything else.
+        // John, 2026-09-27: "so that the player can notice and adjust it". It is the one figure the
+        // fill cannot get roughly right and the one only he can fix.
+        final ArmySim focus = business.combat.ScenarioDefaults.largestUnknown(
+                controler.getScenario());
+        if (focus != null) {
+            controler.setSelected(focus);
+        }
         doRefresh();
+        if (focus != null) {
+            scrollToSelected();
+        }
         setLabelWithTooltip(status, String.format(labels.getString("BATTLESIM.FILL.DONE"),
                 filled.getMorale(), filled.getCommanders(), filled.getHeadCounts()));
-        if (filled.getHeadCounts() > 0) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    labels.getString("BATTLESIM.FILL.UNKNOWNTROOPS"),
-                    labels.getString("BATTLESIM.FILL"),
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        if (focus == null) {
+            return;
+        }
+        // Named, so the dialog and the selection agree about WHICH army - a warning that says
+        // "an army" while the roster has just jumped somewhere sends the player looking.
+        final String where = String.format(labels.getString("BATTLESIM.FILL.FOCUS"),
+                controler.getScenario().getDisplayName(focus),
+                business.combat.ScenarioDefaults.unknownTroops(focus));
+        setLabelWithTooltip(status, where);
+        javax.swing.JOptionPane.showMessageDialog(this,
+                labels.getString("BATTLESIM.FILL.UNKNOWNTROOPS") + "\n\n" + where,
+                labels.getString("BATTLESIM.FILL"),
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Puts the selected army where the player can SEE it, which selecting alone does not.
+     *
+     * {@code reselectInRoster} sets the selection row and stops there, which is right for an
+     * ordinary refresh - the player is already looking at what he clicked. It is not enough when
+     * the tool moves the selection on its own: on a hex with a dozen armies the row it chose can
+     * be off the bottom of a scrolled pane, and a highlight nobody can see is the same as no
+     * highlight at all.
+     */
+    private void scrollToSelected() {
+        final ArmySim wanted = controler.getSelected();
+        if (wanted == null) {
+            return;
+        }
+        for (int row = 0; row < roster.getRowCount(); row++) {
+            final Object node = roster.getPathForRow(row).getLastPathComponent();
+            if (!(node instanceof DefaultMutableTreeNode)) {
+                continue;
+            }
+            final Object user = ((DefaultMutableTreeNode) node).getUserObject();
+            if (user instanceof BattleSimControler.ArmyNode
+                    && ((BattleSimControler.ArmyNode) user).getArmy() == wanted) {
+                roster.scrollRowToVisible(row);
+                return;
+            }
         }
     }
 
