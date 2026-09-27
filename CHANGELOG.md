@@ -1,5 +1,47 @@
 # What's New in Counselor
 
+## 27-SEP-2026 - v2.1.930
+
+### Ask the Battle Simulator what you NEED, not just what happens
+
+*Open a battle, select a platoon, and press **What do I need?**. The simulator runs itself backwards.*
+
+- **"1,850 Heavy Infantry takes the city. 1,800 does not."** Pick the platoon you would reinforce, say whether you want to take the city or hold the field, and it finds the smallest number that gets you there.
+- **It tells you when numbers are not the answer.** Against an enemy with better troops, piling on men makes the battle longer rather than winnable, and the simulator says so plainly instead of reporting a defeat. That is the moment to look at training, weapons, tactics or who is commanding, and now you are told to.
+- **Open as a battle** turns the answer into a real simulation you can inspect, rather than a number you have to trust.
+
+### A tactics grid, because you cannot know what he will choose
+
+*Your enemy picks his tactic fresh every turn, so nobody can predict it. **Tactics grid** answers the useful question instead: which of yours holds up worst.*
+
+- **Every tactic against every tactic, over the whole battle** - sea, land and the assault on the walls. Both halves of a tactic count: the strength it gives you, and the order your platoons take casualties in.
+- **Two recommendations, and they are different questions.** *Safe* is the tactic whose worst case is best, whatever he does. *Sharp* is for when his own plan ties his hands.
+- **It can pin him down.** If his siege engines have to survive to reach your walls, most of his tactics simply lose them on the way - so he cannot really choose those, and the grid greys them out and names what beats the ones he has left.
+
+### Fill in what you do not know about the enemy
+
+- **One button fills every blank on every enemy army** from averages taken out of your own turn results: morale, commander skill, and army size worked out from the size band you were told.
+- **It never touches your armies or anything you typed**, and pressing it twice does nothing the second time.
+- **Then it jumps to the army that needs you most** - the biggest one whose troops nobody has identified - and says so, because that is the one figure the Counselor cannot work out for you.
+
+### Save a battle, send it to an ally, paste an army into it
+
+- **Save and Open.** Keep a battle, or send it to an ally so he can press Run himself and see your assumptions rather than your conclusions.
+- **Copy result** puts the whole outcome on the clipboard as plain text, ready to paste into an email.
+- **Copy army and Paste army** move one army between battles, between turns, between games, and between two players' Counselors.
+- **Clone window** forks a battle so you can change one thing and compare side by side. Every window is stamped with the time it was opened, so four of them are still easy to tell apart.
+
+### On the game server
+
+- **Drowning is no longer a dice roll.** When a fleet loses its last ship within reach of shore, how many of its troops drown is now set by the fleet commander's skill: 25% with no commander at all, 18% at skill 50, down to 11% at skill 100 or better. The range is exactly what the dice could already produce - what changed is that it is now earned rather than rolled, and the simulator can tell you the number in advance. **This is already live on the server.**
+
+### Smaller things
+
+- **Copy in the Battle Simulator matches the old spreadsheet layout again**, column for column, so sheets built against it keep working. The Land and Navy strength columns are now the right way round - they had been swapped for years.
+- The Learn City action's help now describes what you actually get, on success and on failure.
+
+---
+
 ## 26-SEP-2026 - v2.1.929
 
 ### The Battle Simulator now fights the whole battle
