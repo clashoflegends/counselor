@@ -13,10 +13,8 @@ import business.ImageManager;
 import business.combat.ArmySim;
 import business.converter.ConverterFactory;
 import business.facade.BattleSimFacade;
-import business.facade.CidadeFacade;
 import business.facade.ExercitoFacade;
 import business.facade.LocalFacade;
-import business.facade.NacaoFacade;
 import control.facade.WorldFacadeCounselor;
 import control.services.AcaoConverter;
 import control.services.CenarioConverter;
@@ -72,8 +70,6 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
     private int rowIndex = 0;
     private BattleSimPlatoonCasualtyControlerNew casualtyControler;
     private final BattleSimFacade bsf = new BattleSimFacade();
-    private final NacaoFacade nacaoFacade = new NacaoFacade();
-    private final CidadeFacade cidadeFacade = new CidadeFacade();
     private final ExercitoFacade exercitoFacade = new ExercitoFacade();
     private final LocalFacade localFacade = new LocalFacade();
 
@@ -265,9 +261,6 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
                 case "jbCasualtiesList":
                     doLocalCasualties();
                     break;
-                case "jbSimulation":
-                    doSimulation();
-                    break;
                 case "jbNewArmy":
                     doNewArmy();
                     break;
@@ -347,82 +340,6 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
         TroopsCasualtiesList casualtiesSim = new TroopsCasualtiesList(getTerrain());
         casualtiesSim.setLocationRelativeTo(this.getTabGui());
         casualtiesSim.setVisible(true);
-    }
-
-    private void doSimulation() {
-        //put results in a new window.
-        //clone the army so that we can run multiple simulations without changing the BattleSim
-
-        //FIXME: to start, all armies attack the city.
-        doCombatCity();
-    }
-
-    private void doCombatCity() {
-        //FIXME: add Cidade from GUI (as opposed to labels) and Controler
-
-        final Cidade city = getCity();
-        //calc defense
-        long defesa = cidadeFacade.getDefesa(getCity());
-        //calcula forca e constituicao das tropas, sem tatica
-        int ataqueTotal = 0;
-        long qtTrops = 0;
-        for (ArmySim army : armiesList) {
-            //add the total amount of troops to be used later
-            qtTrops += exercitoFacade.getQtTropasTotal(army);
-            //calcula os fatores da media ponderada.
-            int forcaBasica = bsf.getArmyAttackBaseLand(army, army.getLocal());
-            int forcaPlus = 0;
-            //The simulator builds a dummy Cidade when the hex holds no city (the sliders make it a what-if),
-            //and a dummy has no nation: there is no diplomatic modifier to apply. 100 is the neutral value
-            //(dificuldadeBonus[0 + 3] == 0), so no existing simulation changes - only the path that threw.
-            int modRelacionamento = (city.getNacao() == null)
-                    ? 100
-                    : 100 - nacaoFacade.getBonusRelacionamento(city.getNacao(), army.getNacao());
-            //aqui entram os bonus da nacao por terreno/tropa
-            final int dano = forcaPlus + (forcaBasica * modRelacionamento / 100);
-            ataqueTotal += dano;
-            //City round %s: %s inflicted %s of damage to %s with a defense of %s.
-//            final String msgDano = SysMsgs.CombateFezDanoCidadeAtaque + SysMsgs.Separador + rounds + SysMsgs.Separador
-//                    + army.displayComandante() + SysMsgs.Separador + dano + SysMsgs.Separador
-//                    + city.displayNomeHex() + SysMsgs.Separador + defesa;
-        }
-        //apply damage
-
-        //distribui a defesa do cp como dano aos atacantes
-        for (ArmySim army : armiesList) {
-            if (qtTrops <= 0) {
-                //no troops on either side of the split (a Blank army was added but never given platoons):
-                //there is nothing to distribute, and the ratio below would divide by zero.
-                break;
-            }
-            long danoPer = defesa * exercitoFacade.getQtTropasTotal(army) / qtTrops;
-
-            //City round %s: %s with an attack of %s inflicted %s of damage to %s with a defense of %s.
-            //how to apply damage from PbmCommons?
-//            army.sumCombateDano(danoPer);
-//            List<String> msgDanoT = army.doCombateDano();
-            List<String> msgDanoT = new ArrayList<>();
-            try {
-                boolean first = true;
-                for (String item : msgDanoT) {
-                    if (first) {
-//                        msg += "\t\t" + SysMsgs.CombateCasualtiesLabel + SysMsgs.Separador + rounds + "\n";
-                        first = false;
-                    }
-//                    msg += "\t\t" + item + "\n";
-                }
-            } catch (NullPointerException ex) {
-                //just skip, no messages
-            }
-        }
-        System.out.println(defesa + "/" + ataqueTotal);
-
-        //check results
-        if (ataqueTotal <= defesa) {
-            //ataque falhou.
-        } else {
-            //capturou
-        }
     }
 
     private void doCopyTableArmy() {
