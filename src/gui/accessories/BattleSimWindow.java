@@ -575,6 +575,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         left.add(tooltipped(button("BATTLESIM.FILL", "fill"), "BATTLESIM.FILL.HINT"));
         left.add(tooltipped(button("BATTLESIM.WHATIF", "whatIf"),
                 "BATTLESIM.WHATIF.HINT"));
+        left.add(tooltipped(button("BATTLESIM.TACTICGRID", "tacticGrid"),
+                "BATTLESIM.TACTICGRID.HINT"));
         // Diplomacy sits with the army buttons rather than beside Run, because it edits the
         // scenario like they do. The matrix IS the law for who fights whom (T-418), so this is not
         // an advanced option tucked away - it is the other half of setting up the battle.
@@ -1900,6 +1902,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             return;
         } else if ("pasteArmy".equals(command)) {
             doPasteArmy();
+        } else if ("tacticGrid".equals(command)) {
+            new TacticGridDialog(this, controler).setVisible(true);
+            return;
         } else if ("whatIf".equals(command)) {
             doWhatIf();
             return;
