@@ -585,6 +585,15 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         diplomacy.addActionListener(this);
         // Reference and export, ported from the old window (T-429, T-430, T-434, T-435). None of
         // them edits the scenario, which is why they sit apart from the army buttons.
+        //
+        // BATTLESIM.COPY reads "Copy table" and not "Copy", which is what it said until
+        // 2026-09-29. Three buttons on this toolbar begin with Copy - Copy army, Copy table,
+        // Copy result - and only ONE of them has a Paste beside it. A player who pressed the
+        // familiar Copy and then looked for a paste found none, eight buttons from the pair
+        // that would have served him. Separating the two Copies by position was meant to keep
+        // them from being confused and did the opposite; each button naming its object is what
+        // actually does that. The clipboard FORMAT is untouched - T-446 is about the bytes,
+        // not the label.
         left.add(tooltipped(button("TATICA", "tactics"), "BATTLESIM.TATICA.HINT"));
         left.add(button("TROOPCASUALTIES.BORDER.TITLE", "casualties"));
         left.add(tooltipped(button("BATTLESIM.COPY", "copy"), "COPIAR.ARMY.ACOES"));
@@ -1232,6 +1241,13 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private void doPasteArmy() {
         final String xml = clipboardText();
         if (xml.isEmpty()) {
+            // SAY SO. This used to return in silence, which makes a working button
+            // indistinguishable from a broken one - and the clipboard being empty or holding
+            // something unreadable is the ordinary case, not an error. John, 2026-09-29:
+            // "I can copy but there is no option to paste" - the discoverability half of that
+            // is the button naming below, but a Paste that does nothing when pressed would
+            // have confirmed his reading of it.
+            setLabelWithTooltip(status, labels.getString("BATTLESIM.ARMY.PASTE.EMPTY"));
             return;
         }
         final control.facade.WorldFacadeCounselor world =
