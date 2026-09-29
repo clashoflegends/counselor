@@ -421,7 +421,13 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             int progress = (Integer) evt.getNewValue();
             progressMonitor.setProgress(progress);
 
-            final String message = String.format(labels.getString("CONFIG.DOWNLOAD.FILE"), progress);
+            // Its OWN label, with the percentage in it. This read getString("CONFIG.DOWNLOAD.FILE")
+            // and passed progress to a string with no specifier, which String.format
+            // silently discards - so the note said "Downloading file..." from 0 to 100 and
+            // the number never appeared. A second key rather than a specifier on the first,
+            // because that one is also used as the monitor's static message above.
+            final String message = String.format(
+                    labels.getString("CONFIG.DOWNLOAD.FILE.PROGRESS"), progress);
             progressMonitor.setNote(message);
 
             if (progress == 100) {
