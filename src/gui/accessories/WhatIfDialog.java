@@ -220,18 +220,22 @@ public class WhatIfDialog extends JDialog implements ActionListener {
      * misled by it, which is why the qualifier is inside that line and not below it.
      */
     private String sentence(WhatIfSearch.Answer result) {
-        final String troop = platoon.getTipoTropa() == null ? "" : platoon.getTipoTropa().getNome();
         final StringBuilder ret = new StringBuilder();
         if (result.isWinsAtNothing()) {
             ret.append(labels.getString("BATTLESIM.WHATIF.ALREADY"));
         } else if (!result.isFound()) {
             ret.append(String.format(labels.getString(result.isCeilingStalemate()
                     ? "BATTLESIM.WHATIF.STALEMATE" : "BATTLESIM.WHATIF.NONE"),
-                    result.getCeiling(), troop));
+                    result.getCeiling()));
         } else {
+            // NO TROOP NAME HERE. Crash 327108: the troop was being passed as the second argument
+            // to labels whose second specifier is %,d, and String.format throws
+            // IllegalFormatConversionException rather than coercing - on the SUCCESS path, so the
+            // headline feature crashed whenever it found an answer. The troop is already named in
+            // the line above the answer box ("Varying the X of Y"), so nothing is lost by it.
             ret.append(String.format(labels.getString(result.isLowerBound()
                     ? "BATTLESIM.WHATIF.ATLEAST" : "BATTLESIM.WHATIF.EXACT"),
-                    result.getThreshold(), troop, platoon.getQtd()));
+                    result.getThreshold(), platoon.getQtd()));
             if (!result.isVerified()) {
                 ret.append("\n\n").append(labels.getString("BATTLESIM.WHATIF.UNVERIFIED"));
             }
