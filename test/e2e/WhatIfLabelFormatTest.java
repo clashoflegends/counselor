@@ -36,8 +36,15 @@ public class WhatIfLabelFormatTest {
 
     private static final BundleManager labels =
             SettingsManager.getInstance().getBundleManager();
-    /** Any conversion: %d, %,d, %s and friends. Doubled %% is an escape and is not one. */
-    private static final Pattern SPECIFIER = Pattern.compile("%(?!%)[-#+ 0,(]*\\d*(?:\\.\\d+)?([a-zA-Z])");
+    /**
+     * Any conversion: %d, %,d, %s and friends. Doubled %% is an escape, not one.
+     *
+     * NO SPACE in the flag class, though Java accepts one as a flag. With it,
+     * "%d%% done" parsed as TWO specifiers: the second % of the escape, then the
+     * space swallowed as a flag, then the d of "done" read as the conversion.
+     * Caught by this test failing on a label that was correct.
+     */
+    private static final Pattern SPECIFIER = Pattern.compile("%(?!%)[-#+0,(]*\\d*(?:\\.\\d+)?([a-zA-Z])");
 
     private static int specifiers(String text) {
         final Matcher matcher = SPECIFIER.matcher(text);
@@ -103,6 +110,63 @@ public class WhatIfLabelFormatTest {
             final String text = labels.getString(key);
             assertEquals(0, specifiers(text), key + " is appended unformatted: " + text);
         }
+    }
+
+    /**
+     * The tactics grid's two recommendation lines, and its cells.
+     *
+     * Same dialog family, same release, and none of them had a test until the what-if crashed.
+     * Safe takes a name then two counts; sharp takes two names; a cell takes one figure.
+     */
+    @Test
+    public void theTacticGridLinesTakeWhatTheGridPasses() {
+        assertEquals("sdd", conversions(labels.getString("BATTLESIM.TACTICGRID.SAFE")));
+        assertEquals("ss", conversions(labels.getString("BATTLESIM.TACTICGRID.SHARP")));
+        assertEquals("d", conversions(labels.getString("BATTLESIM.TACTICGRID.CELL.WIN")));
+        assertEquals("d", conversions(labels.getString("BATTLESIM.TACTICGRID.CELL.LOSS")));
+        assertDoesNotThrow(() -> String.format(
+                labels.getString("BATTLESIM.TACTICGRID.SAFE"), "Flank", 5, 6));
+        assertDoesNotThrow(() -> String.format(
+                labels.getString("BATTLESIM.TACTICGRID.SHARP"), "Guerrilla", "Flank"));
+    }
+
+    /** Fill defaults reports three counts, and nothing else. */
+    @Test
+    public void theFillReportTakesThreeCounts() {
+        assertEquals("ddd", conversions(labels.getString("BATTLESIM.FILL.DONE")));
+        assertDoesNotThrow(() -> String.format(labels.getString("BATTLESIM.FILL.DONE"), 3, 2, 1));
+        for (String key : new String[]{"BATTLESIM.FILL.NOTHING", "BATTLESIM.FILL.NOPLACEHOLDER",
+            "BATTLESIM.FILL.UNKNOWNTROOPS"}) {
+            assertEquals(0, specifiers(labels.getString(key)), key + " is appended unformatted");
+        }
+    }
+
+    /** Save, open and the army clipboard: the ones that name a file, a reason or an army. */
+    @Test
+    public void theTransferMessagesTakeWhatTheirCallersPass() {
+        assertEquals("s", conversions(labels.getString("BATTLESIM.SAVE.DONE")));
+        assertEquals("s", conversions(labels.getString("BATTLESIM.SAVE.FAILED")));
+        assertEquals("ss", conversions(labels.getString("BATTLESIM.LOAD.FAILED")),
+                "a reason and the thing it choked on");
+        assertEquals("s", conversions(labels.getString("BATTLESIM.ARMY.COPYONE.DONE")));
+        assertEquals("d", conversions(labels.getString("BATTLESIM.ARMY.PASTE.DONE")));
+        assertEquals("ss", conversions(labels.getString("BATTLESIM.ARMY.PASTE.FAILED")));
+    }
+
+    /**
+     * The portraits download note has a percentage in it.
+     *
+     * Found by auditing every format call after the what-if crash: this one passed a progress value
+     * to a label with no specifier, which String.format silently discards - so the note read
+     * "Downloading file..." from 0 to 100 and the number never appeared.
+     */
+    @Test
+    public void theDownloadNoteShowsThePercentage() {
+        assertEquals("d", conversions(labels.getString("CONFIG.DOWNLOAD.FILE.PROGRESS")));
+        assertEquals(0, specifiers(labels.getString("CONFIG.DOWNLOAD.FILE")),
+                "the monitor's static message must stay argument-free");
+        assertDoesNotThrow(() -> String.format(
+                labels.getString("CONFIG.DOWNLOAD.FILE.PROGRESS"), 42));
     }
 
     /**
