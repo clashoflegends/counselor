@@ -1338,11 +1338,30 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 controler.getScenario().getDisplayName(focus),
                 business.combat.ScenarioDefaults.unknownTroops(focus));
         setLabelWithTooltip(status, where);
-        javax.swing.JOptionPane.showMessageDialog(this,
-                labels.getString("BATTLESIM.FILL.UNKNOWNTROOPS") + "\n\n" + where,
-                labels.getString("BATTLESIM.FILL"),
-                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        // ONCE PER WINDOW, and the status bar carries it every time after that.
+        //
+        // John's framing for this button is "set some initial values for a quick check", and
+        // the loop it exists for is fill, look, edit, fill again. A modal on every press taxes
+        // the loop rather than the mistake. But the warning is the honest half of the feature -
+        // a filled army is unidentified troops fighting at 1, so its strength is a FLOOR - and
+        // dropping it would leave the player reading a forecast nobody had qualified. Once is
+        // enough to teach it; the status line and the jumped-to selection say it thereafter.
+        if (!filledWarningShown) {
+            filledWarningShown = true;
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    labels.getString("BATTLESIM.FILL.UNKNOWNTROOPS") + "\n\n" + where,
+                    labels.getString("BATTLESIM.FILL"),
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
     }
+
+    /**
+     * Whether this window has already explained what an unidentified army is worth. See doFill.
+     *
+     * Per WINDOW rather than per application: a Clone is a fresh question, often opened days
+     * later or handed to an ally, and the first result it produces deserves the same sentence.
+     */
+    private transient boolean filledWarningShown;
 
     /**
      * Puts the selected army where the player can SEE it, which selecting alone does not.
