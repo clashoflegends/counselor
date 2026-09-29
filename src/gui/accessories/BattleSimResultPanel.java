@@ -283,7 +283,19 @@ public class BattleSimResultPanel extends JPanel {
         final JPanel holder = new JPanel(new BorderLayout());
         holder.add(table.getTableHeader(), BorderLayout.NORTH);
         holder.add(table, BorderLayout.CENTER);
-        final int height = table.getRowHeight() * (model.getRowCount() + 1) + 4;
+        // ASK the header and the table how tall they are, rather than multiplying a row height.
+        //
+        // It used to be rowHeight * (rows + 1) + 4, which assumes the header is exactly one row
+        // tall and that rows have no spacing between them. Neither holds: a table header is
+        // typically taller than a row, and JTable adds rowMargin between rows. On a four-army
+        // result the shortfall was most of a row, so the last army was sliced in half - reported by
+        // a player on 2026-09-28, in both the casualties table and the city layer, on the one
+        // screen the whole feature exists to show.
+        //
+        // getPreferredSize on each of them accounts for the font, the LookAndFeel and the row
+        // margin, so this cannot drift again with a theme change or a high-DPI display.
+        final int height = table.getTableHeader().getPreferredSize().height
+                + table.getPreferredSize().height + 2;
         // The table's OWN width, not a flat 520. Every layer table is as wide as the battle was
         // long - one column per round - so a fixed figure fits the short ones and clips the rest,
         // and the player met a horizontal scrollbar and a sentence cut off mid-word on his first
