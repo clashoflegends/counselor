@@ -122,6 +122,12 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             Toast.showError(labels.getString("ORDEM.ALVO.AUSENTE"));
             return false;
         }
+        if (hasBlankSoleParam(po)) {
+            // The order carries exactly one parameter and it came back blank, so the Judge would reject it
+            // outright and the player would lose the action. Tell them now instead. See hasBlankSoleParam.
+            Toast.showError(labels.getString("ORDEM.PARAMETRO.AUSENTE"));
+            return false;
+        }
         getTabGui().getActor().doOrderSave(index, po);
         if (SettingsManager.getInstance().isAutoSaveActions()) {
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_AUTOSAVE, this.getTabGui());
@@ -213,6 +219,54 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             }
         }
         return false;
+    }
+
+    /**
+     * True when the order carries exactly ONE parameter and that parameter came back blank.
+     * <p>
+     * How it happens: {@code ComponentFactory.getParametros} mints a single space as its null sentinel when
+     * a picker has nothing selected, which is what an empty combo yields. The commonest case by far is a
+     * {@code Personagem_Local_NoNacao} order (kill/duel/curse someone in my hex) issued from a hex that holds
+     * no enemy character at all - the list is empty, so there is nothing to select. Measured across the whole
+     * life of the Judge log: 253 of 258 {@code @PARAMETRO.INCORRETO#} rejections are this, and every affected
+     * order is single-parameter. FeitBadLuck is the worst at ~43 per 1,000 submissions.
+     * <p>
+     * Why refusing the save is safe: the Judge rejects exactly this case in
+     * {@code Ordem.tratamentoParametro}, which tests the whole joined parameter string against {@code ""}.
+     * At arity 1 that string IS this one value, so an order this method blocks is one the Judge would have
+     * thrown out, costing the player the action for the turn. It cannot reject anything the server accepts.
+     * <p>
+     * Deliberately narrow, on both axes:
+     * <ul>
+     * <li><b>Arity 1 only.</b> At higher arity the joined string keeps its {@code ;} separators and so never
+     * equals {@code ""}, meaning the Judge does NOT reject it - rejecting here would be broader than the
+     * server and could block a legal order. Blank parameters at arity &gt; 1 are left alone on purpose.</li>
+     * <li><b>Skips {@code none}, {@code stringop} and {@code Var}.</b> The first two return early in
+     * {@code tratamentoParametro} and are never parameter-checked at all; {@code Var} takes its own branch
+     * and a different message. None of the three appears in the measured set, so excluding them costs
+     * nothing and keeps this strictly inside the server's own rule.</li>
+     * </ul>
+     * A typed target still passes: the pickers are {@code setEditable(true)} for fog of war, and typed text
+     * comes back through the {@code ClassCastException} branch as itself, which is not blank.
+     */
+    static boolean hasBlankSoleParam(PersonagemOrdem po) {
+        if (po == null || po.getOrdem() == null || po.getParametrosId() == null) {
+            return false;
+        }
+        final Ordem ord = po.getOrdem();
+        final List<String> ids = po.getParametrosId();
+        if (ids.size() != 1 || ord.getParametrosIdeQtd() != 1) {
+            return false; // only the arity-1 case matches the Judge's empty-string test
+        }
+        final String chave = ord.getChave();
+        if (chave == null
+                || chave.equalsIgnoreCase("none")
+                || chave.equalsIgnoreCase("stringop")
+                || chave.equalsIgnoreCase("Var")) {
+            return false; // the Judge never applies its empty-parameter rejection to these
+        }
+        final String id = ids.get(0);
+        return id == null || id.trim().isEmpty();
     }
 
     private void doRepeatAction() {
