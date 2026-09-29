@@ -75,10 +75,14 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
 
     private void doSalvaAction() {
         try {
-            doSalvaAction(indexModelOrdem);
+            if (!doSalvaAction(indexModelOrdem)) {
+                return; //refused: the multi-level copies below would target the same open slot and fail too
+            }
             final int repeats = ordemFacade.getRequirementsMultiLevel(getTabGui().getOrdemQuadro().getOrdem());
             for (int ii = 0; ii < repeats; ii++) {
-                doSalvaAction(getTabGui().getNextActionSlot());
+                if (!doSalvaAction(getTabGui().getNextActionSlot())) {
+                    break;
+                }
             }
             getTabGui().doFindNextActionSlot();
         } catch (NullPointerException ex) {
@@ -99,8 +103,9 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         getTabGui().resetOrdersAllOnSave();
     }
 
-    private void doSalvaAction(int index) {
-        doSaveOrder(index, index < 0 ? null : getTabGui().getOrdemQuadro());
+    /** Returns false when nothing was saved, which is what stops the slot-filling loops below. */
+    private boolean doSalvaAction(int index) {
+        return doSaveOrder(index, index < 0 ? null : getTabGui().getOrdemQuadro());
     }
 
     /**
@@ -108,6 +113,14 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
      * in the panel or repeated from last turn. Returns false when nothing was saved.
      */
     private boolean doSaveOrder(int index, PersonagemOrdem po) {
+        return doSaveOrder(index, po, true);
+    }
+
+    /**
+     * @param reportRefusal false for bulk callers that summarise the outcome themselves, so a run of
+     * refused orders does not stack one red toast per order on top of that summary.
+     */
+    private boolean doSaveOrder(int index, PersonagemOrdem po, boolean reportRefusal) {
         if (index < 0 || po == null) {
             return false;
         }
@@ -119,13 +132,17 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             // KI-017: don't serialize an order whose required hex/city target is blank (ticking ALL swaps the
             // target picker for an empty 4-digit box; a blank one produced a malformed action that later
             // NPE-crashed the results-EGF render). Tell the player and abort this save.
-            Toast.showError(labels.getString("ORDEM.ALVO.AUSENTE"));
+            if (reportRefusal) {
+                Toast.showError(labels.getString("ORDEM.ALVO.AUSENTE"));
+            }
             return false;
         }
         if (hasBlankSoleParam(po)) {
             // The order carries exactly one parameter and it came back blank, so the Judge would reject it
             // outright and the player would lose the action. Tell them now instead. See hasBlankSoleParam.
-            Toast.showError(labels.getString("ORDEM.PARAMETRO.AUSENTE"));
+            if (reportRefusal) {
+                Toast.showError(labels.getString("ORDEM.PARAMETRO.AUSENTE"));
+            }
             return false;
         }
         getTabGui().getActor().doOrderSave(index, po);
@@ -172,7 +189,9 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             if (slot < 0) {
                 break; //out of empty slots: what is already in the turn stays as the player left it
             }
-            if (doSaveOrder(slot, po)) {
+            //quiet: the DOAGAIN.* summary below already reports how many did not go in, so a per-order
+            //toast here would stack one red popup per refusal on top of it.
+            if (doSaveOrder(slot, po, false)) {
                 saved++;
             }
             slot = getTabGui().getNextActionSlot();
@@ -275,7 +294,13 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             //find open slot
             int nextActionSlot = getTabGui().getNextActionSlot();
             while (nextActionSlot >= 0) {
-                doSalvaAction(nextActionSlot);
+                //TERMINATION: getNextActionSlot returns the FIRST row still showing " ", and the only thing
+                //that fills it is the setValueAt inside doSaveOrder. So a refused save leaves the same slot
+                //open and this loop would spin on it forever, on the EDT, popping a Toast per pass. Any
+                //guard that returns false before that setValueAt has to break the loop, not continue it.
+                if (!doSalvaAction(nextActionSlot)) {
+                    break;
+                }
                 //update open slot
                 nextActionSlot = getTabGui().getNextActionSlot();
             }
