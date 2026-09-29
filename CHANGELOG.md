@@ -1,5 +1,19 @@
 # What's New in Counselor
 
+## 28-SEP-2026 - v2.1.931
+
+*A same-day fix release for yesterday's 2.930. If you installed 2.930, please take this one - two of the things it fixes are in the feature we wrote to you about.*
+
+### Fixes
+
+- **"What do I need?" crashed whenever it found an answer.** The Battle Simulator's new backwards search threw an error the moment it worked, so it only appeared to run when it failed to find anything. Fixed.
+- **The result screen cut the last army in half.** With four or more armies, the casualties table and the city table both sliced their bottom row. They now size themselves to what is in them, whatever your font or display scaling.
+- **Clone army could crash the old Battle Simulator.** Creating a new blank army and then cloning it threw an error. Fixed.
+- **The portraits download now shows how far along it is.** The progress note said "Downloading file..." from start to finish and never showed a percentage.
+- **Fill defaults no longer interrupts you every time.** It explains what unidentified troops are worth once per window, then gets out of the way - the status line and the jump to the army still say it on every press.
+
+---
+
 ## 27-SEP-2026 - v2.1.930
 
 ### Ask the Battle Simulator what you NEED, not just what happens
