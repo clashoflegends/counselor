@@ -1,5 +1,40 @@
 # What's New in Counselor
 
+## 29-SEP-2026 - v2.1.932
+
+### Your orders no longer vanish into a blank target
+
+*The commonest wasted turn in the game, and it was silent.*
+
+- **An order with an empty target is now refused before it is saved.** If the picker had nothing to choose from - a curse aimed at an enemy character on a hex where every character present is friendly, for instance - the order was accepted, sent, and thrown out by the Judge. All you got back was "Wrong parameters." and a lost action.
+- **You are told at once, and told what is missing**, while you can still do something about it.
+- **Repeat no longer hangs when it hits one.** Using Repeat on an order the client had to refuse could lock the window up.
+
+### The map draws scouting the way YOU want it
+
+*A new button on the map toolbar, beside the scouts toggle. Your choice is remembered.*
+
+- **Moving outlines** - the crawling dashes, as they are today.
+- **Still outlines** - the same picture, standing perfectly still.
+- **Classic circles** - the dashed circle the map marked scout targets with for years, back exactly as it was.
+- **And what the drawings mean:** long dashes are your own scout and recon orders, short ticks are an ally's, and the shaded hexes are ground that two orders both cover, which is effort you could be spending elsewhere.
+
+### The Battle Simulator says what happens to the city
+
+*Send four armies at one city and you had to read four army icons to work out whether the walls fell.*
+
+- **The city now reports for itself**, under its own layer: the defence you had to beat, how much of it your siege engines knocked off first, the attack each of your armies brought, and what the walls gave back to each of them.
+- **It names who ends up holding the city** - the army and its nation - so you can see in advance which of several attackers walks away with it.
+- **Every outcome says where the city lands**, including razed, repelled, and the walls falling with nobody left to hold them.
+
+### Fixes
+
+- **The old Battle Simulator opens on Charge again.** An army loaded from your turn came in on whatever tactic it carried, which is Standard until you order one - and Standard has no casualty order, so the platoon column on the right was blank with nothing to explain it. Every army now opens on Charge, as it always used to, and the Tactic box is right there to change it.
+- **"Copy to spreadsheet" is now "Export via copy"**, with a tooltip of its own, so it is no longer mistaken for Copy army.
+- **Paste army now says when there is nothing to paste** instead of doing nothing at all.
+
+---
+
 ## 28-SEP-2026 - v2.1.931
 
 *A same-day fix release for yesterday's 2.930. If you installed 2.930, please take this one - two of the things it fixes are in the feature we wrote to you about.*
