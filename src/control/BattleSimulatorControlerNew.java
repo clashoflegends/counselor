@@ -11,6 +11,7 @@ import baseLib.GenericoComboObject;
 import baseLib.IBaseModel;
 import business.ImageManager;
 import business.combat.ArmySim;
+import business.combat.CasualtyMode;
 import business.converter.ConverterFactory;
 import business.facade.BattleSimFacade;
 import business.facade.ExercitoFacade;
@@ -127,10 +128,24 @@ public class BattleSimulatorControlerNew implements Serializable, ChangeListener
         return new GenericoComboBoxModel(lista.toArray(new IBaseModel[0]));
     }
 
+    /**
+     * Every army arrives on Charge, whatever tactic it is carrying on the map.
+     * <p>
+     * {@code Exercito} defaults its tactic to Standard (2) and keeps whatever was ordered last turn,
+     * while a brand new army in here starts on Charge (0). So loading the stored tactic made the two
+     * doors into this window behave differently, and the one a player actually uses - pulling his own
+     * army off the map - landed on Standard for anyone who had not yet ordered a tactic this turn.
+     * <p>
+     * Standard has no casualty ranking at all, so that opened the simulator on an empty platoon list
+     * with nothing to say why. Charge for everyone restores the behaviour this window had for years,
+     * and the tactic combo is right there to change it. Nothing is written back to the army: ArmySim
+     * clones the platoons, so everything edited here stays inside the simulator.
+     */
     public TableModel getArmyListTableModel(Collection<Exercito> armies) {
         for (Exercito army : armies) {
-            //ArmySim clones the platoons, so everything edited here stays inside the simulator.
-            armiesList.add(bsf.clone(army));
+            final ArmySim copy = bsf.clone(army);
+            copy.setTatica(CasualtyMode.TATICA_CHARGE);
+            armiesList.add(copy);
         }
         return ExercitoConverter.getBattleModel(armiesList);
     }
