@@ -45,6 +45,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private JLabelGradient jlActionCounter;
     private javax.swing.JButton jbRecent; // recent-files dropdown, built in code (not the .form)
     private javax.swing.JButton jbFind;   // quick-search entry point, built in code (not the .form)
+    private javax.swing.JButton jbOverlayStyle; // map overlay style menu, built in code (not the .form)
 
     private final SettingsManager settingsManager;
 
@@ -131,6 +132,17 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbLegend.setFocusable(false);
         jbLegend.addActionListener(e -> gui.services.MapLegendDialog.show(this, labels));
         jToolBar2.add(jbLegend, jToolBar2.getComponentZOrder(toggleDisplayPortrait) + 1);
+        jToolBar2.revalidate();
+        jToolBar2.repaint();
+
+        // Overlay style, next to the scouts toggle it governs. A visible button rather than a key in
+        // properties.config: the animation already HAD a hidden switch (animateMapOverlays=0) and a
+        // player still had to write in and ask for one, which is the whole argument against hiding it.
+        jbOverlayStyle = new javax.swing.JButton(svgIcon("circle-dashed"));
+        jbOverlayStyle.setToolTipText(labels.getString("MAP.OVERLAY.STYLE.TOOLTIP"));
+        jbOverlayStyle.setFocusable(false);
+        jbOverlayStyle.addActionListener(e -> showOverlayStyleMenu());
+        jToolBar2.add(jbOverlayStyle, jToolBar2.getComponentZOrder(toggleScouts) + 1);
         jToolBar2.revalidate();
         jToolBar2.repaint();
 
@@ -248,6 +260,35 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             popup.add(clear);
         }
         popup.show(jbRecent, 0, jbRecent.getHeight());
+    }
+
+    /**
+     * The three ways the map can draw the order-composition overlays: the animated footprints, the same
+     * footprints standing still, and the classic dashed circle the game marked scout targets with from
+     * 2022 until the footprints replaced it.
+     * <p>
+     * Radio items rather than a cycling button, because the player has to be able to SEE which of the
+     * three is on without clicking through the other two to find out.
+     */
+    private void showOverlayStyleMenu() {
+        final javax.swing.JPopupMenu popup = new javax.swing.JPopupMenu();
+        final javax.swing.ButtonGroup group = new javax.swing.ButtonGroup();
+        final String current = settingsManager.getConfig(
+                business.MapaManager.MAP_OVERLAY_STYLE, business.MapaManager.OVERLAY_STYLE_ANIMATED);
+        final String[][] choices = {
+            {business.MapaManager.OVERLAY_STYLE_ANIMATED, "MAP.OVERLAY.STYLE.ANIMATED"},
+            {business.MapaManager.OVERLAY_STYLE_STATIC, "MAP.OVERLAY.STYLE.STATIC"},
+            {business.MapaManager.OVERLAY_STYLE_CIRCLE, "MAP.OVERLAY.STYLE.CIRCLE"}};
+        for (final String[] choice : choices) {
+            final javax.swing.JRadioButtonMenuItem item
+                    = new javax.swing.JRadioButtonMenuItem(labels.getString(choice[1]));
+            item.setToolTipText(labels.getString(choice[1] + ".HINT"));
+            item.setSelected(choice[0].equals(current));
+            item.addActionListener(e -> wc.doMapOverlayStyle(choice[0]));
+            group.add(item);
+            popup.add(item);
+        }
+        popup.show(jbOverlayStyle, 0, jbOverlayStyle.getHeight());
     }
 
     /**

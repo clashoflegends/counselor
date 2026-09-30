@@ -151,6 +151,14 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         final ScoutFootprint.Coverage coverage = ScoutFootprint.compute(
                 listFactory.listPersonagens(), getJogadorAtivo(), listFactory.listLocais());
         ScoutFootprint.setCurrent(coverage);
+        // The classic style draws its marker into the actions bitmap over in MapaManager, so the vector
+        // footprint has to go - otherwise both appear at once. The coverage above is still computed,
+        // because the hex-info line answers from it whatever is on the map.
+        if (SettingsManager.getInstance().isConfig(MapaManager.MAP_OVERLAY_STYLE,
+                MapaManager.OVERLAY_STYLE_CIRCLE, MapaManager.OVERLAY_STYLE_ANIMATED)) {
+            getTabGui().setScoutOverlay(null, null, null);
+            return;
+        }
         if (SettingsManager.getInstance().isConfig("drawScoutOnMap", "0", "1")) {
             getTabGui().setScoutOverlay(null, null, null);
             return;
@@ -213,6 +221,13 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         final MoveConvergence.Result result = MoveConvergence.compute(
                 listFactory.listPersonagens(), getJogadorAtivo(), listFactory.listLocais());
         MoveConvergence.setCurrent(result);
+        // The classic style is the map as it was before any of these markers existed, so it gets none
+        // of them. The detection still runs: the hex-info line and its warning are not drawings.
+        if (SettingsManager.getInstance().isConfig(MapaManager.MAP_OVERLAY_STYLE,
+                MapaManager.OVERLAY_STYLE_CIRCLE, MapaManager.OVERLAY_STYLE_ANIMATED)) {
+            getTabGui().setConvergeOverlay(null);
+            return;
+        }
         // The markers ride the order paths, so with those hidden there is nothing to ride; the
         // hex-info line still answers, which is why the detection above is not skipped for this.
         final boolean pathsDrawn = SettingsManager.getInstance().isConfig("drawPcPath", "1", "1")

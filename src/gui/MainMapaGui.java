@@ -62,6 +62,8 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     private final gui.services.ScaledMapIcon mapIcon = new gui.services.ScaledMapIcon();
     /** Marching-ants tick. ~11 fps: fast enough to read as motion, slow enough to be free. */
     private static final int SCOUT_ANIMATION_MS = 90;
+    /** Where the dashes rest when nothing is animating them - mid-sweep, see startOverlayAnimation. */
+    private static final float STATIC_DASH_PHASE = 32f;
     private javax.swing.Timer overlayAnimator;
     private boolean scoutsPresent = false, convergePresent = false;
     private float scoutDashPhase = 0f;
@@ -677,11 +679,18 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
      * label - at high zoom a full repaint re-runs the bicubic rescale of the entire base map, which is
      * far too expensive to do several times a second.
      * <p>
-     * Switch off with {@code animateMapOverlays=0} in properties.config; the border then simply sits
-     * still, which is also what happens for anyone whose window is not showing.
+     * Runs only under the animated overlay style; the map toolbar's overlay-style menu switches it off,
+     * as does the older {@code animateMapOverlays=0} in properties.config. Either way the dashes simply
+     * sit still, which is also what happens for anyone whose window is not showing.
      */
     private void startOverlayAnimation() {
-        if (!persistenceCommons.SettingsManager.getInstance().isConfig("animateMapOverlays", "1", "1")) {
+        if (!isOverlayAnimated()) {
+            // The dashes have to sit SOMEWHERE, and phase 0 parks the converging marker at the very
+            // start of its tail, where it reads as a marker on nothing. Park it mid-sweep instead, on
+            // the piece of path it is there to point at.
+            scoutDashPhase = STATIC_DASH_PHASE;
+            mapIcon.setDashPhase(scoutDashPhase);
+            mapaLabel.repaint();
             return;
         }
         if (overlayAnimator == null) {
@@ -715,6 +724,20 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         if (overlayAnimator != null && overlayAnimator.isRunning()) {
             overlayAnimator.stop();
         }
+    }
+
+    /**
+     * True only under {@code mapOverlayStyle=1}. The older {@code animateMapOverlays=0} key still wins
+     * when it is set, so anyone who found it and switched the movement off keeps what they chose
+     * without having to learn the new setting.
+     */
+    private boolean isOverlayAnimated() {
+        final persistenceCommons.SettingsManager settings = persistenceCommons.SettingsManager.getInstance();
+        if (!settings.isConfig("animateMapOverlays", "1", "1")) {
+            return false;
+        }
+        return settings.isConfig(business.MapaManager.MAP_OVERLAY_STYLE,
+                business.MapaManager.OVERLAY_STYLE_ANIMATED, business.MapaManager.OVERLAY_STYLE_ANIMATED);
     }
 
     /** Player-chosen colour for that border (Settings / properties.config ColorHexRange). */

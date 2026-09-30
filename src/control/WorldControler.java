@@ -8,6 +8,7 @@ import gui.services.ClipboardHelper;
 
 import baseLib.BaseModel;
 import business.BusinessException;
+import business.MapaManager;
 import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
@@ -1676,6 +1677,22 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         int settingValue = jbTemp.isSelected() ? 1 : 0;
         SettingsManager.getInstance().setConfig("drawScoutOnMap", String.valueOf(settingValue));
         SettingsManager.getInstance().doConfigSave("drawScoutOnMap");
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
+
+    /**
+     * Switch how the map draws the order-composition overlays: animated footprints, the same footprints
+     * standing still, or the classic dashed circle.
+     * <p>
+     * The classic marker is drawn into the actions bitmap and the other two are vector overlays on the
+     * label, so a change has to redraw BOTH - hence the same pair of dispatches the map toggles use.
+     * ACTIONS_MAP_REDRAW also re-runs the scout and converging overlays, which is what starts or stops
+     * the animation timer.
+     */
+    public void doMapOverlayStyle(String style) {
+        SettingsManager.getInstance().setConfig(MapaManager.MAP_OVERLAY_STYLE, style);
+        SettingsManager.getInstance().doConfigSave(MapaManager.MAP_OVERLAY_STYLE);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
