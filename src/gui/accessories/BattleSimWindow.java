@@ -586,17 +586,21 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         // Reference and export, ported from the old window (T-429, T-430, T-434, T-435). None of
         // them edits the scenario, which is why they sit apart from the army buttons.
         //
-        // BATTLESIM.COPY reads "Copy table" and not "Copy", which is what it said until
+        // BATTLESIM.COPY reads "Export via copy" and not "Copy", which is what it said until
         // 2026-09-29. Three buttons on this toolbar begin with Copy - Copy army, Copy table,
         // Copy result - and only ONE of them has a Paste beside it. A player who pressed the
         // familiar Copy and then looked for a paste found none, eight buttons from the pair
         // that would have served him. Separating the two Copies by position was meant to keep
         // them from being confused and did the opposite; each button naming its object is what
-        // actually does that. The clipboard FORMAT is untouched - T-446 is about the bytes,
-        // not the label.
+        // actually does that. John picked the wording, 2026-09-29: EXPORT says it is data
+        // leaving for another tool, which none of the other buttons claim, and "via copy"
+        // says it lands on the clipboard rather than in a file the player would go looking
+        // for. It also gets its own tooltip: the shared COPIAR.ARMY.ACOES still serves the
+        // OLD window, which has no Copy army to contrast it with.
+        // The clipboard FORMAT is untouched - T-446 is about the bytes, not the label.
         left.add(tooltipped(button("TATICA", "tactics"), "BATTLESIM.TATICA.HINT"));
         left.add(button("TROOPCASUALTIES.BORDER.TITLE", "casualties"));
-        left.add(tooltipped(button("BATTLESIM.COPY", "copy"), "COPIAR.ARMY.ACOES"));
+        left.add(tooltipped(button("BATTLESIM.COPY", "copy"), "BATTLESIM.COPY.HINT"));
         left.add(tooltipped(button("MENU.ABOUT", "about"), "BATTLESIM.ABOUT.TOOLTIP"));
         // Clone WINDOW, last in the group and named apart from Clone ARMY two buttons along. They
         // do different things at different scales and a player who mixes them up loses work.
