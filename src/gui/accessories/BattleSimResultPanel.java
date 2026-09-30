@@ -138,15 +138,25 @@ public class BattleSimResultPanel extends JPanel {
                             .toUpperCase())));
             if (!report.isFought()) {
                 ret.add(left(labels.getString(report.getNotFoughtReason())));
-                continue;
+            } else {
+                // The sea table counts HULLS, so it must not be captioned "troops remaining".
+                ret.add(left(String.format(labels.getString("BATTLESIM.RESULTS.ROUNDS"),
+                        report.getRounds()) + "  -  "
+                        + labels.getString(layer == CombatLayer.NAVY
+                                ? "BATTLESIM.RESULTS.REMAINING.SHIPS"
+                                : "BATTLESIM.RESULTS.REMAINING")));
+                ret.add(table(new RoundsModel(scenario, report)));
             }
-            // The sea table counts HULLS, so it must not be captioned "troops remaining".
-            ret.add(left(String.format(labels.getString("BATTLESIM.RESULTS.ROUNDS"),
-                    report.getRounds()) + "  -  "
-                    + labels.getString(layer == CombatLayer.NAVY
-                            ? "BATTLESIM.RESULTS.REMAINING.SHIPS"
-                            : "BATTLESIM.RESULTS.REMAINING")));
-            ret.add(table(new RoundsModel(scenario, report)));
+            // The city's own answer goes UNDER its layer's table, because the table cannot hold it:
+            // rows there are armies and cells are troops remaining, while what the player came to
+            // find out is whether the walls fell and who ends up behind them. Outside the isFought
+            // branch on purpose - the fate of the city is not the rounds table's to report, and it
+            // must not go missing on any path that skips one. T-849.
+            if (layer == CombatLayer.CITY) {
+                for (String line : BattleSimConverter.getCityLines(scenario, result)) {
+                    ret.add(left(line));
+                }
+            }
         }
 
         doAddFooter(ret, result);

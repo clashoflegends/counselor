@@ -914,8 +914,101 @@ public class BattleSimConverter {
         final Cidade cidade = scenario.getLocal() == null ? null : scenario.getLocal().getCidade();
         final String nome = cidade == null || cidade.getNome() == null
                 ? labels.getString("BATTLESIM.CITY.TITLE") : cidade.getNome();
+        // "was taken" is only half the headline when several nations are at the walls. Its own key
+        // rather than a second argument on the old one, so nothing that already formats
+        // BATTLESIM.VERDICT.CITY.CAPTURED with one argument can be caught out by the change.
+        if (city.getOutcome() == CityCombatResolver.CityOutcome.CAPTURED
+                && city.getOwner() != null && city.getOwner().getNacao() != null) {
+            return String.format(labels.getString("BATTLESIM.VERDICT.CITY.CAPTURED.BY"),
+                    nome, nacaoNome(city.getOwner().getNacao()));
+        }
         return String.format(labels.getString("BATTLESIM.VERDICT.CITY."
                 + city.getOutcome().name()), nome);
+    }
+
+    /**
+     * The city's own answer, in numbers, for the layer-3 section. T-849.
+     *
+     * <h3>The report this exists for</h3>
+     *
+     * John, 2026-09-29: with several armies storming one city "it is not clear if the city
+     * captured/razed or not. In particular when the attacking armies fail to capture it but still
+     * have troops remaining. I need to interpret each army icon."
+     *
+     * <p>
+     * The per-army marks were not lying - a repelled assault stamps LOST on every attacker even when
+     * each of them walks away with troops - but the city's fate was a fact about the CITY that could
+     * only be read by inferring it from a column of army rows. The layer-3 table cannot answer it
+     * either: its rows are armies and its cells are troops remaining.
+     *
+     * <h3>Why lines and not a row in that table</h3>
+     *
+     * Because a defence figure in a troops-remaining column is a different quantity wearing the same
+     * heading, and the one thing that table promises is that a cell is a troop count. The city gets
+     * its own lines underneath instead, which also has room for the part the table could never carry:
+     * WHO ends up holding it.
+     *
+     * <h3>Every outcome says where the city lands</h3>
+     *
+     * Including the ones where the answer is nobody. Razed, no-survivor and repelled each leave the
+     * city somewhere different, and a blank would read as an unanswered question rather than as an
+     * answer. The claimant is {@code CityResult.getOwner()}, which mirrors the Judge's
+     * {@code doCityCaptured} rule (highest recomputed attack, strict {@code <} from zero, dead armies
+     * included) rather than guessing at one.
+     */
+    public static List<String> getCityLines(CombatScenario scenario, CombatResult result) {
+        final List<String> ret = new ArrayList<>();
+        if (scenario == null || result == null) {
+            return ret;
+        }
+        final CityCombatResolver.CityResult city = result.getCityResult();
+        if (city == null || city.getOutcome() == null
+                || city.getOutcome() == CityCombatResolver.CityOutcome.NO_ASSAULT) {
+            return ret;
+        }
+        // The comparison the whole layer turns on, stated as the two numbers that were compared. A
+        // player who disagrees with the verdict can see which side of it he disagrees with.
+        ret.add(city.getFortificationReduction() > 0
+                ? String.format(labels.getString("BATTLESIM.CITY.RESULT.DEFENCE.SIEGE"),
+                        city.getDefence(), city.getFortificationReduction())
+                : String.format(labels.getString("BATTLESIM.CITY.RESULT.DEFENCE"),
+                        city.getDefence()));
+        ret.add(String.format(labels.getString("BATTLESIM.CITY.RESULT.ATTACK"),
+                city.getAttackTotal()));
+        // Per army, because the summed figure is the only thing the rule uses and a player with four
+        // armies at the walls needs to know which of them is carrying the assault.
+        for (ArmySim attacker : city.getAttackers()) {
+            ret.add(String.format(labels.getString("BATTLESIM.CITY.RESULT.ATTACK.ARMY"),
+                    attacker.getNome(), city.getAttack(attacker), city.getDamage(attacker)));
+        }
+        ret.add(getCityVerdict(scenario, result));
+        ret.add(getCityHolderLine(scenario, city));
+        return ret;
+    }
+
+    /** Where the city ends up, named for every outcome including the ones with no new owner. */
+    private static String getCityHolderLine(CombatScenario scenario, CityCombatResolver.CityResult city) {
+        switch (city.getOutcome()) {
+            case CAPTURED:
+                // getOwner() is a working copy, but the name and the nation are cloned with it.
+                return String.format(labels.getString("BATTLESIM.CITY.RESULT.HOLDS"),
+                        city.getOwner().getNome(), nacaoNome(city.getOwner().getNacao()));
+            case RAZED:
+                return labels.getString("BATTLESIM.CITY.RESULT.RAZED");
+            case CAPTURED_NO_SURVIVOR:
+                return labels.getString("BATTLESIM.CITY.RESULT.NOSURVIVOR");
+            case REPELLED:
+            default:
+                return String.format(labels.getString("BATTLESIM.CITY.RESULT.HELD"),
+                        nacaoNome(scenario.getCidadeAtiva() == null
+                                ? null : scenario.getCidadeAtiva().getNacao()));
+        }
+    }
+
+    /** An unowned or unknown nation is a real state on an unscouted hex, so it gets a word. */
+    private static String nacaoNome(Nacao nacao) {
+        return nacao == null || nacao.getNome() == null || nacao.getNome().trim().isEmpty()
+                ? labels.getString("BATTLESIM.CITY.RESULT.NOBODY") : nacao.getNome();
     }
 
     private static String join(List<String> names) {

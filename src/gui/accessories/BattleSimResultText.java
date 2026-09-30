@@ -77,27 +77,34 @@ public final class BattleSimResultText {
             final LayerReport report = controler.getLayerReport(layer);
             if (!report.isFought()) {
                 ret.append(labels.getString(report.getNotFoughtReason())).append(NL);
-                continue;
-            }
-            // The same caption the panel prints, for the same reason: the number of rounds, and
-            // WHAT the columns count - ships for the sea layer, bodies for the other two. Leaving
-            // it out of the text version was the first drift between the two renderings and it
-            // took one reading of the output to spot, which is why the output gets read.
-            ret.append(String.format(labels.getString("BATTLESIM.RESULTS.ROUNDS"),
-                    report.getRounds()))
-                    .append("  -  ")
-                    .append(labels.getString(layer == CombatLayer.NAVY
-                            ? "BATTLESIM.RESULTS.REMAINING.SHIPS"
-                            : "BATTLESIM.RESULTS.REMAINING"))
-                    .append(NL);
-            ret.append(roundsHeader(report, layer));
-            for (ArmySim army : report.getArmies()) {
-                final StringBuilder line = new StringBuilder(pad(scenario.getDisplayName(army)));
-                for (int col = 0; col <= report.getRounds(); col++) {
-                    final int value = report.getRemaining(army, col);
-                    line.append(cell(value < 0 ? "--" : number(value)));
+            } else {
+                // The same caption the panel prints, for the same reason: the number of rounds, and
+                // WHAT the columns count - ships for the sea layer, bodies for the other two. Leaving
+                // it out of the text version was the first drift between the two renderings and it
+                // took one reading of the output to spot, which is why the output gets read.
+                ret.append(String.format(labels.getString("BATTLESIM.RESULTS.ROUNDS"),
+                        report.getRounds()))
+                        .append("  -  ")
+                        .append(labels.getString(layer == CombatLayer.NAVY
+                                ? "BATTLESIM.RESULTS.REMAINING.SHIPS"
+                                : "BATTLESIM.RESULTS.REMAINING"))
+                        .append(NL);
+                ret.append(roundsHeader(report, layer));
+                for (ArmySim army : report.getArmies()) {
+                    final StringBuilder line = new StringBuilder(pad(scenario.getDisplayName(army)));
+                    for (int col = 0; col <= report.getRounds(); col++) {
+                        final int value = report.getRemaining(army, col);
+                        line.append(cell(value < 0 ? "--" : number(value)));
+                    }
+                    ret.append(line.toString().replaceAll("\\s+$", "")).append(NL);
                 }
-                ret.append(line.toString().replaceAll("\\s+$", "")).append(NL);
+            }
+            // Same lines the panel puts under the same table, from the same builder. A second
+            // wording of the city's fate here is a second thing to keep true. T-849.
+            if (layer == CombatLayer.CITY) {
+                for (String cityLine : BattleSimConverter.getCityLines(scenario, result)) {
+                    ret.append(cityLine).append(NL);
+                }
             }
         }
 
