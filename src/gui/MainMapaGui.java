@@ -661,9 +661,17 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         syncOverlayAnimation();
     }
 
-    /** One timer for every animated overlay - two would just fight over the same repaint. */
+    /**
+     * One timer for every animated overlay - two would just fight over the same repaint.
+     * <p>
+     * The overlay STYLE is checked here rather than inside {@link #startOverlayAnimation}, because a
+     * start method that quietly declines to start does nothing about a timer that is already running.
+     * Switching from moving outlines to still ones left the dashes crawling for exactly that reason,
+     * and the route through classic circles hid it: circles clear the overlays, that route reached
+     * stopOverlayAnimation on the way past, and the next switch then looked correct.
+     */
     private void syncOverlayAnimation() {
-        if (scoutsPresent || convergePresent) {
+        if ((scoutsPresent || convergePresent) && isOverlayAnimated()) {
             startOverlayAnimation();
         } else {
             stopOverlayAnimation();
@@ -679,20 +687,10 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
      * label - at high zoom a full repaint re-runs the bicubic rescale of the entire base map, which is
      * far too expensive to do several times a second.
      * <p>
-     * Runs only under the animated overlay style; the map toolbar's overlay-style menu switches it off,
-     * as does the older {@code animateMapOverlays=0} in properties.config. Either way the dashes simply
-     * sit still, which is also what happens for anyone whose window is not showing.
+     * Whether it runs at all is {@link #syncOverlayAnimation}'s decision, not this method's - see the
+     * note there about why the style check cannot live here.
      */
     private void startOverlayAnimation() {
-        if (!isOverlayAnimated()) {
-            // The dashes have to sit SOMEWHERE, and phase 0 parks the converging marker at the very
-            // start of its tail, where it reads as a marker on nothing. Park it mid-sweep instead, on
-            // the piece of path it is there to point at.
-            scoutDashPhase = STATIC_DASH_PHASE;
-            mapIcon.setDashPhase(scoutDashPhase);
-            mapaLabel.repaint();
-            return;
-        }
         if (overlayAnimator == null) {
             overlayAnimator = new javax.swing.Timer(SCOUT_ANIMATION_MS, evt -> {
                 if (!mapaLabel.isShowing()) {
@@ -720,9 +718,22 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
         }
     }
 
+    /**
+     * Stops the timer and parks the dashes where they read correctly with nothing advancing them.
+     * <p>
+     * Phase 0 would leave the converging marker at the very start of its tail, where it reads as a
+     * marker on nothing, so they rest mid-sweep instead - on the piece of path the marker is there to
+     * point at. Parking on the way out rather than on the way in means the dashes stop wherever the
+     * player last saw them ONLY until the next repaint, instead of forever.
+     */
     private void stopOverlayAnimation() {
         if (overlayAnimator != null && overlayAnimator.isRunning()) {
             overlayAnimator.stop();
+        }
+        if (scoutDashPhase != STATIC_DASH_PHASE) {
+            scoutDashPhase = STATIC_DASH_PHASE;
+            mapIcon.setDashPhase(scoutDashPhase);
+            mapaLabel.repaint();
         }
     }
 
