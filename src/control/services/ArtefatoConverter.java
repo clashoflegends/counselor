@@ -285,17 +285,38 @@ public class ArtefatoConverter implements Serializable {
             return ret.toString();
         }
         ret.append('\n').append("- ").append(labels.getString("ITEM.SECONDARY")).append(":\n");
-        if (secundario != null) {
+        if (secundario != null && artefato.getHabilidades().isEmpty()) {
+            // Only when there are no powers to list. On live data secundario is a SHORT restatement
+            // of the first one - game 906 carries "Bestow Good" beside the power "Bestow Good Luck" -
+            // so printing both reads as a truncation bug rather than as two facts.
             ret.append('\n').append(secundario);
         }
         for (model.Habilidade habilidade : artefato.getHabilidades().values()) {
-            ret.append("\n").append(habilidade.getNome());
-            final String help = getPowerHelp(habilidade.getCodigo());
-            if (help != null) {
-                ret.append("\n    ").append(help);
-            }
+            doAppendPower(ret, habilidade, "");
         }
         return ret.toString();
+    }
+
+    /**
+     * One power, its rule, and whatever modifies it.
+     *
+     * Powers nest: game 906's Obsidian Dagger carries {@code ;AGO;} "Bestow Good Luck", and inside
+     * that sits {@code ;C50;} "50% chance to activate". The chance is the part a player is weighing
+     * when he decides whether to rely on the item, so it is listed under its parent rather than
+     * dropped. Recursion is bounded by the data, which is two deep today, and by each power appearing
+     * once in its parent's map.
+     */
+    private static void doAppendPower(StringBuilder ret, model.Habilidade habilidade, String indent) {
+        ret.append('\n').append(indent).append(habilidade.getNome());
+        final String help = getPowerHelp(habilidade.getCodigo());
+        // Only when it adds something. Most DB.POWER entries for item powers ARE the power's name,
+        // and a line repeating the line above it is worse than no line.
+        if (help != null && !help.trim().equalsIgnoreCase(String.valueOf(habilidade.getNome()).trim())) {
+            ret.append('\n').append(indent).append("    ").append(help);
+        }
+        for (model.Habilidade nested : habilidade.getHabilidades().values()) {
+            doAppendPower(ret, nested, indent + "    ");
+        }
     }
 
     /**

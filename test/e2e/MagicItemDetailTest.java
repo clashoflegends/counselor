@@ -160,6 +160,55 @@ class MagicItemDetailTest {
         }
     }
 
+    /**
+     * With real powers present, the short secondary string is NOT printed beside them.
+     *
+     * Game 906 carries secundario "Bestow Good" on an item whose power is "Bestow Good Luck".
+     * Printing both reads as a truncation bug, not as two facts.
+     */
+    @Test
+    void theShortSecondaryStepsAsideForTheRealPowers() {
+        final Artefato dagger = item("Obsidian Dagger", "Volcanic glass, older than the Wall.",
+                power(";AGO;", "Bestow Good Luck"));
+        dagger.setSecundario("Bestow Good");
+
+        final String text = ArtefatoConverter.getDetailText(dagger);
+
+        assertTrue(text.contains("Bestow Good Luck"), "the power is listed: " + text);
+        assertEquals(1, text.split(java.util.regex.Pattern.quote("Bestow Good"), -1).length - 1,
+                "the short restatement is printed as well, which reads as a truncation: " + text);
+    }
+
+    /**
+     * A power's own modifiers are listed under it.
+     *
+     * Game 906's Obsidian Dagger: ;AGO; "Bestow Good Luck" with ;C50; "50% chance to activate" nested
+     * inside it. The chance is what a player weighs when deciding whether to rely on the item.
+     */
+    @Test
+    void aPowersModifiersAreListedUnderIt() {
+        final Habilidade luck = power(";AGO;", "Bestow Good Luck");
+        luck.addHabilidade(power(";C50;", "50% chance to activate"));
+        final String text = ArtefatoConverter.getDetailText(
+                item("Obsidian Dagger", "Volcanic glass.", luck));
+
+        assertTrue(text.contains("Bestow Good Luck"), "the power: " + text);
+        assertTrue(text.contains("50% chance to activate"), "and what modifies it: " + text);
+        assertTrue(text.indexOf("Bestow Good Luck") < text.indexOf("50% chance to activate"),
+                "the modifier belongs under its parent: " + text);
+    }
+
+    /** A rule identical to the power's own name is not printed twice. */
+    @Test
+    void aRuleThatOnlyRepeatsTheNameIsNotEchoed() {
+        // DB.POWER.AGO is exactly "Bestow Good Luck", which is also the power's name here.
+        final String text = ArtefatoConverter.getDetailText(
+                item("Obsidian Dagger", "Volcanic glass.", power(";AGO;", "Bestow Good Luck")));
+
+        assertEquals(1, text.split(java.util.regex.Pattern.quote("Bestow Good Luck"), -1).length - 1,
+                "the rule repeats the name right under it: " + text);
+    }
+
     /** A secondary that merely repeats the history is not printed twice. */
     @Test
     void aSecondaryThatRepeatsTheHistoryIsNotEchoed() {
