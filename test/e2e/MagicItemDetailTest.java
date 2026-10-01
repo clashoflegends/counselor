@@ -124,6 +124,54 @@ class MagicItemDetailTest {
         assertTrue(text.contains("Nothing special."), "the history is still there: " + text);
     }
 
+    /**
+     * The secondary-power TEXT is shown, because it is the field that actually carries data.
+     *
+     * Across games 88 and 96 - 67 magic items - every single one shipped an EMPTY habilidades map
+     * while secundario was populated. A tab reading only the map prints a heading over nothing, which
+     * is how this request came in.
+     */
+    @Test
+    void theSecondaryPowerTextIsShownEvenWithNoPowerCodes() {
+        final Artefato sword = item("Dawn", "A star-forged blade.");
+        sword.setSecundario("Grants its bearer sight of hidden foes.");
+
+        final String text = ArtefatoConverter.getDetailText(sword);
+
+        assertTrue(text.contains(labels.getString("ITEM.SECONDARY")), "the heading: " + text);
+        assertTrue(text.contains("Grants its bearer sight of hidden foes."),
+                "and the text the scenario wrote: " + text);
+    }
+
+    /**
+     * The scenario's "not written yet" placeholders stay out of the player's face.
+     *
+     * "History and details - To Be Defined" is what most of those 67 items carry, and in game 88 it
+     * is in the history AND the secondary, so printing it raw would say it twice.
+     */
+    @Test
+    void placeholderSecondariesAreSuppressed() {
+        for (String placeholder : new String[]{"History and details - To Be Defined", "-", "  ", "TBD"}) {
+            final Artefato sword = item("Dawn", "A star-forged blade.");
+            sword.setSecundario(placeholder);
+            final String text = ArtefatoConverter.getDetailText(sword);
+            assertFalse(text.contains(labels.getString("ITEM.SECONDARY")),
+                    "placeholder [" + placeholder + "] earned a heading: " + text);
+        }
+    }
+
+    /** A secondary that merely repeats the history is not printed twice. */
+    @Test
+    void aSecondaryThatRepeatsTheHistoryIsNotEchoed() {
+        final Artefato sword = item("Dawn", "A star-forged blade.");
+        sword.setSecundario("A star-forged blade.");
+
+        final String text = ArtefatoConverter.getDetailText(sword);
+
+        assertEquals(1, text.split(java.util.regex.Pattern.quote("A star-forged blade."), -1).length - 1,
+                "the same sentence appears twice: " + text);
+    }
+
     /** No item selected is not an error, and an item with no history is not either. */
     @Test
     void theEmptyCasesAreQuiet() {

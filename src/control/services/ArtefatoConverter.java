@@ -278,10 +278,16 @@ public class ArtefatoConverter implements Serializable {
             ret.append("  (").append(tipo).append(')');
         }
         ret.append('\n');
-        if (artefato.getHabilidades().isEmpty()) {
+        final String secundario = getSecondaryText(artefato);
+        if (secundario == null && artefato.getHabilidades().isEmpty()) {
+            // No heading over nothing. The tab has printed an empty "Dormant powers:" list for years,
+            // because it only ever read getHabilidades() - see the note on getSecondaryText.
             return ret.toString();
         }
         ret.append('\n').append("- ").append(labels.getString("ITEM.SECONDARY")).append(":\n");
+        if (secundario != null) {
+            ret.append('\n').append(secundario);
+        }
         for (model.Habilidade habilidade : artefato.getHabilidades().values()) {
             ret.append("\n").append(habilidade.getNome());
             final String help = getPowerHelp(habilidade.getCodigo());
@@ -291,6 +297,52 @@ public class ArtefatoConverter implements Serializable {
         }
         return ret.toString();
     }
+
+    /**
+     * The item's secondary-power TEXT, or null when there is nothing worth printing.
+     *
+     * <h3>Why this is read at all</h3>
+     *
+     * Because the powers map is usually empty and this string usually is not. Across two real turn
+     * files - games 88 and 96, 67 magic items between them - EVERY item shipped
+     * {@code <habilidades>} empty, while {@code secundario} was populated. The tab that read only the
+     * map was therefore printing a "Dormant powers" heading over an empty list, which is how a player
+     * ends up asking to be told what his item does.
+     *
+     * <h3>The placeholders</h3>
+     *
+     * Most of those 67 read "History and details - To Be Defined" or "-", which are the scenario
+     * saying it has not written one. They are suppressed rather than shown, and so is a secondary
+     * that merely repeats the history - in game 88 the two fields carry the same placeholder, so a
+     * naive print would say the same sentence twice.
+     */
+    private static String getSecondaryText(Artefato artefato) {
+        final String ret = artefato.getSecundario();
+        if (ret == null || ret.trim().isEmpty() || "-".equals(ret.trim())) {
+            return null;
+        }
+        if (ret.trim().equalsIgnoreCase(String.valueOf(artefato.getHistoria()).trim())) {
+            return null;
+        }
+        for (String placeholder : SECONDARY_PLACEHOLDERS) {
+            if (ret.trim().equalsIgnoreCase(placeholder)) {
+                return null;
+            }
+        }
+        return ret.trim();
+    }
+
+    /**
+     * Scenario text meaning "nobody has written this yet", matched whole and case-insensitively.
+     *
+     * Written out rather than guessed at from a pattern: a real power whose description happens to
+     * contain one of these words must still reach the player.
+     */
+    private static final String[] SECONDARY_PLACEHOLDERS = {
+        "History and details - To Be Defined",
+        "To Be Defined",
+        "TBD",
+    };
 
     /**
      * The rule text for one power code, or null when the bundle has none.
