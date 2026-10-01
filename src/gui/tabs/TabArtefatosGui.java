@@ -15,7 +15,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import model.Artefato;
-import model.Habilidade;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistence.local.WorldManager;
@@ -245,11 +244,10 @@ public class TabArtefatosGui extends TabBase implements Serializable {
     }
 
     private void setAreaText(Artefato artefato) {
-        String temp = String.format("%s\n\n- %s:", artefato.getHistoria(), labels.getString("ITEM.SECONDARY"));
-        for (Habilidade habilidade : artefato.getHabilidades().values()) {
-            temp += "\n" + habilidade.getNome();
-        }
-        this.listaHistoria.setText(temp);
+        // One builder, shared with the character's Magic Items tab, so the two never drift. It also
+        // prints each dormant power's own rule under it, which this tab never did. T-850.
+        this.listaHistoria.setText(control.services.ArtefatoConverter.getDetailText(artefato));
+        this.listaHistoria.setCaretPosition(0);
     }
 
     private void setAreaText() {

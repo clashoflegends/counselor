@@ -234,4 +234,85 @@ public class ArtefatoConverter implements Serializable {
         ret.addTab(artefatoFacade.getNome(artefato));
         return ret.getList();
     }
+
+    /**
+     * Everything the client knows about one magic item, as the text block both places show. T-850.
+     *
+     * <h3>The request</h3>
+     *
+     * A player, 2026-09-30: the character's Magic Items tab lists what he is carrying but says
+     * nothing about it, so "dormant powers and whether or not it can move" meant leaving the
+     * character and looking the item up somewhere else.
+     *
+     * <h3>One builder, two tabs</h3>
+     *
+     * The Magic Items tab already rendered the history and the dormant powers for the nation's
+     * items; this is that same text, moved here so the character's tab shows exactly the same thing.
+     * Two renderings of one item would drift, and a reader would have no way to tell which of them
+     * was out of date.
+     *
+     * <h3>The powers now carry their rule, not just their name</h3>
+     *
+     * A line reading "Immovable" is only an answer to somebody who already knows what it means. The
+     * {@code DB.POWER.<code>} help - 803 entries, one per power - is already in the bundle and was
+     * read by nothing, so each dormant power now prints its own sentence underneath. That is where
+     * "cannot be moved" comes from: {@code DB.POWER.IMN}.
+     *
+     * <h3>Nothing is unlocked here</h3>
+     *
+     * The client only renders what the turn file carries. A game that does not grant item histories
+     * or secondary powers simply does not ship them, which is the Judge's decision and not this
+     * method's - exactly as the Magic Items tab has always worked.
+     */
+    public static String getDetailText(Artefato artefato) {
+        if (artefato == null) {
+            return "";
+        }
+        final StringBuilder ret = new StringBuilder();
+        if (artefato.getHistoria() != null && !artefato.getHistoria().trim().isEmpty()) {
+            ret.append(artefato.getHistoria()).append("\n\n");
+        }
+        ret.append(artefatoFacade.getHabilidade(artefato));
+        final String tipo = artefatoFacade.getDescricao(artefato);
+        if (tipo != null && !tipo.trim().isEmpty()) {
+            ret.append("  (").append(tipo).append(')');
+        }
+        ret.append('\n');
+        if (artefato.getHabilidades().isEmpty()) {
+            return ret.toString();
+        }
+        ret.append('\n').append("- ").append(labels.getString("ITEM.SECONDARY")).append(":\n");
+        for (model.Habilidade habilidade : artefato.getHabilidades().values()) {
+            ret.append("\n").append(habilidade.getNome());
+            final String help = getPowerHelp(habilidade.getCodigo());
+            if (help != null) {
+                ret.append("\n    ").append(help);
+            }
+        }
+        return ret.toString();
+    }
+
+    /**
+     * The rule text for one power code, or null when the bundle has none.
+     *
+     * Read straight from the bundle rather than through {@link BundleManager#getString}, because a
+     * miss there logs FATAL and answers "N/A (Missing Translation: ...)" - which is right for a label
+     * the window cannot do without, and wrong for an optional footnote. Codes arrive wrapped as
+     * {@code ;IMN;} and the keys are bare.
+     */
+    private static String getPowerHelp(String codigo) {
+        if (codigo == null) {
+            return null;
+        }
+        final String bare = codigo.replace(";", "").trim();
+        if (bare.isEmpty()) {
+            return null;
+        }
+        try {
+            return java.util.ResourceBundle.getBundle("rulesandhelpothers")
+                    .getString("DB.POWER." + bare);
+        } catch (java.util.MissingResourceException ex) {
+            return null;
+        }
+    }
 }

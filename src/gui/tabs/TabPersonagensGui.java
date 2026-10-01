@@ -50,7 +50,7 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
     private final JogadorFacade jogadorFacade = new JogadorFacade();
     private Personagem personagemAtivo;
     private final SubTabPopup stResults = new SubTabPopup();
-    private final SubTabBaseList stMagicItems = new SubTabBaseList();
+    private final gui.subtabs.SubTabMagicItems stMagicItems = new gui.subtabs.SubTabMagicItems();
     private final SubTabBaseList stSpells = new SubTabBaseList();
     private SubTabOrdem stOrdens;
     private final PortraitControler portraitControler;
@@ -385,7 +385,10 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
 
     private void doTabMagicItem() {
         if (personagemFacade.hasArtefatos(getPersonagem())) {
-            stMagicItems.setListModel(personagemControl.getArtefatoTableModel());
+            // The items go in beside the model: the tab now explains the selected one, and the
+            // model holds only formatted strings. T-850.
+            stMagicItems.setListModel(personagemControl.getArtefatoTableModel(),
+                    personagemControl.getArtefatos());
             detalhesPersonagem.addTab(labels.getString("ARTEFATOS"),
                     new javax.swing.ImageIcon(getClass().getResource("/images/hex_artefato.gif")),
                     stMagicItems, labels.getString("ARTEFATOS.TOOLTIP"));

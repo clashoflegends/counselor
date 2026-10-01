@@ -76,6 +76,19 @@ public class PersonagemControler extends ControlBase implements Serializable, Ac
         }
     }
 
+    /**
+     * The same items the table model above was built from, in the same order.
+     *
+     * The Magic Items tab needs the items themselves to show what each one does, and the model holds
+     * only formatted strings. Both read {@code PersonagemFacade.getArtefatos}, so the orders match;
+     * matching back by displayed name instead would pick the wrong one of two items sharing a name.
+     */
+    public java.util.Collection<model.Artefato> getArtefatos() {
+        return personagem == null
+                ? java.util.Collections.<model.Artefato>emptyList()
+                : new business.facade.PersonagemFacade().getArtefatos(personagem);
+    }
+
     public GenericoTableModel getFeiticoTableModel() {
         if (personagem == null) {
             return (null);
