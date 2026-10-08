@@ -356,6 +356,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
         //salva o arquivo
         File ret = null;
+        boolean saveAttemptFailed = false;
         if (!this.saved) {
             //monta o dialogo
             //define default
@@ -364,19 +365,50 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 //accept the default name + folder (same folder as the rr.egf) without prompting
                 fcOrders.setSelectedFile(new File(fcOrders.getCurrentDirectory(), fileName));
                 ret = doFileSave(comando, missingActionMsg);
+                saveAttemptFailed = (ret == null);
                 if (ret != null) {
                     log.info(String.format("Auto-saved Server file[%s]: %s", SysApoio.getPidOs(), ret.getAbsolutePath()));
                 }
             } else if (fcOrders.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
                 //exibe dialogo
                 ret = doFileSave(comando, missingActionMsg);
-                log.info(String.format("Saved Server file[%s]: %s", SysApoio.getPidOs(), ret.getAbsolutePath()));
+                saveAttemptFailed = (ret == null);
+                if (ret != null) {
+                    log.info(String.format("Saved Server file[%s]: %s", SysApoio.getPidOs(), ret.getAbsolutePath()));
+                }
             } else {
+                //cancelled, not failed: nothing was attempted, so do not offer the retry below
                 this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
             }
         } else {
             //salva com o nome anterior.
             ret = doFileSave(comando, missingActionMsg);
+            saveAttemptFailed = (ret == null);
+        }
+        if (saveAttemptFailed) {
+            //The save failed and the orders exist only in memory. Every silent path above reuses the previous
+            //folder, so without this the player has no way to redirect and closing the window loses the lot -
+            //the realistic case being a cloud-synced folder that went away for a moment (G: Google Drive,
+            //2026-10-07: "cannot find the path specified", the mount was back minutes later). Offer Save As
+            //once, whatever the cause: a vanished drive, a read-only folder, a lock, a full disk.
+            ret = doSaveOrdensRetryAs(comando, missingActionMsg, jbTemp);
+        }
+        return ret;
+    }
+
+    /**
+     * Last chance to keep the orders after a failed save: show the file chooser so the player can pick a
+     * folder that works. Cancelling leaves the orders in memory, exactly as they were, so they can try again.
+     */
+    private File doSaveOrdensRetryAs(Comando comando, String missingActionMsg, Component jbTemp) {
+        SysApoio.showDialogError(labels.getString("ORDENS.SALVAS.NAO.RETRY"), this.getGui());
+        if (fcOrders.showSaveDialog(jbTemp) != JFileChooser.APPROVE_OPTION) {
+            this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
+            return null;
+        }
+        final File ret = doFileSave(comando, missingActionMsg);
+        if (ret != null) {
+            log.info(String.format("Saved Server file after a retry[%s]: %s", SysApoio.getPidOs(), ret.getAbsolutePath()));
         }
         return ret;
     }
@@ -408,6 +440,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             log.error(ex.getMessage());
             SysApoio.showDialogError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
+            //null means FAILED: the caller decides what to do about it. It used to return the file it had
+            //tried to write either way, so a failed save still logged "Saved Server file".
+            ret = null;
         }
         return ret;
     }
