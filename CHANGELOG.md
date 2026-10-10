@@ -12,6 +12,7 @@
 - **The Size column now sorts by size** instead of alphabetically.
 - **Only your own cities are judged**, and only where the rule is actually switched on. A capital is exempt, as is the Night's Watch on the Wall.
 - **No mark is not a promise.** A big city hidden from you does not appear in your turn file, so the Judge can still refuse an upgrade the Counselor had no way to see coming. A mark is reliable; the absence of one is a best guess.
+- **And it asks before you spend the order.** Save Improve City Size on a city that is currently capped and the Counselor says which city is in the way and asks whether to save it anyway. It asks, rather than refuses, because the answer can change during the turn: take the blocking city, raze it, or let its loyalty drop a size, and the upgrade goes through. The gamble stays yours.
 
 ## 29-SEP-2026 - v2.1.932
 
