@@ -1,6 +1,14 @@
 # What's New in Counselor
 
-## UNRELEASED - next build
+## 09-OCT-2026 - v2.1.933
+
+### Your magic items finally tell you what they do
+
+*The Magic Items tab on a character used to be a bare list of names.*
+
+- **Every item now carries its history and its powers**, on the character tab as well as the nation-wide one, read from the same place so the two can never drift apart.
+- **A power states its rule, not just its name.** "Immovable" only means something if you already know what it means; it now reads "Cannot be moved: dropped on the ground if its bearer moves away." Those explanations have been in the game data for years and nothing had ever shown them to you.
+- **Powers inside powers are listed too**, indented under the one that holds them - so when an item works only half the time, you can see that before you plan a turn around it.
 
 ### The Cities tab tells you which cities cannot grow
 
@@ -9,10 +17,21 @@
 - **The Size column turns amber on a city that cannot be upgraded**, and the tooltip names the city standing in the way and the hex it sits on - the same two facts the Judge gives you in the turn result, except now you get them before you spend the order.
 - **The city detail pane says the same thing in words**, under the size line.
 - **A new filter, "Growth capped"**, lists every one of your cities in that state at once.
+- **And it asks before you spend the order.** Save Improve City Size on a city that is currently capped and the Counselor says which city is in the way and asks whether to save it anyway. It asks rather than refuses, because the answer can change during the turn: take the blocking city, raze it, or let its loyalty drop a size, and the upgrade goes through. The gamble stays yours.
 - **The Size column now sorts by size** instead of alphabetically.
 - **Only your own cities are judged**, and only where the rule is actually switched on. A capital is exempt, as is the Night's Watch on the Wall.
 - **No mark is not a promise.** A big city hidden from you does not appear in your turn file, so the Judge can still refuse an upgrade the Counselor had no way to see coming. A mark is reliable; the absence of one is a best guess.
-- **And it asks before you spend the order.** Save Improve City Size on a city that is currently capped and the Counselor says which city is in the way and asks whether to save it anyway. It asks, rather than refuses, because the answer can change during the turn: take the blocking city, raze it, or let its loyalty drop a size, and the upgrade goes through. The gamble stays yours.
+
+### A failed save no longer strands an hour of orders
+
+- **If saving your orders fails, you are offered another folder** instead of being left with the orders only in memory and no way to redirect them. This came from a real afternoon lost: the orders folder was on a cloud drive, the mount dropped for a minute, and there was no way out but to close the window.
+- **It works for any cause** - a disconnected drive, a read-only folder, a locked file, a full disk.
+- **The log no longer claims to have saved a file it did not write**, and submitting now correctly reports a missing file rather than trying to attach one.
+
+### Magic item names sort where you expect
+
+- **No item name starts with "The" any more**, so you no longer have to look in two places in a drop-down. The Iron Throne is now Iron Throne, The Painted Table is Painted Table, and so on. The two items called The Lens are now Celebrimbor's Lens and Celebrimbor Lens, next to the rest of his work.
+- These names arrive with your turn file, so they change from your next turn onward. Older turn files keep the old names.
 
 ## 29-SEP-2026 - v2.1.932
 
