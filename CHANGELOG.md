@@ -1,5 +1,18 @@
 # What's New in Counselor
 
+## UNRELEASED - next build
+
+### The Cities tab tells you which cities cannot grow
+
+*Only in games where city size is capped by how close the next big city is.*
+
+- **The Size column turns amber on a city that cannot be upgraded**, and the tooltip names the city standing in the way and the hex it sits on - the same two facts the Judge gives you in the turn result, except now you get them before you spend the order.
+- **The city detail pane says the same thing in words**, under the size line.
+- **A new filter, "Growth capped"**, lists every one of your cities in that state at once.
+- **The Size column now sorts by size** instead of alphabetically.
+- **Only your own cities are judged**, and only where the rule is actually switched on. A capital is exempt, as is the Night's Watch on the Wall.
+- **No mark is not a promise.** A big city hidden from you does not appear in your turn file, so the Judge can still refuse an upgrade the Counselor had no way to see coming. A mark is reliable; the absence of one is a best guess.
+
 ## 29-SEP-2026 - v2.1.932
 
 ### Your orders no longer vanish into a blank target
