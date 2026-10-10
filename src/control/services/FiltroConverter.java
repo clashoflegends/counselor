@@ -8,6 +8,7 @@ import baseLib.GenericoComboBoxModel;
 import baseLib.GenericoComboObject;
 import baseLib.IBaseModel;
 import persistence.local.ListFactory;
+import control.facade.WorldFacadeCounselor;
 import business.services.ComparatorBaseDisplayModelSorter;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -57,6 +58,10 @@ public class FiltroConverter implements Serializable {
             //loyalty decay-risk options (match the loyalty column colours: red = imminent, amber = some)
             lista.add(new GenericoComboObject(labels.getString("FILTRO.DECAY.RED"), "decayred"));
             lista.add(new GenericoComboObject(labels.getString("FILTRO.DECAY.AMBER"), "decayamber"));
+            if (WorldFacadeCounselor.getInstance().hasCitySizeCap()) {
+                //only offered where ;SCC; is on - elsewhere the filter can only ever come back empty
+                lista.add(new GenericoComboObject(labels.getString("FILTRO.SIZECAP"), "sizecap"));
+            }
         }
         if (options == 6) {
             //Active options

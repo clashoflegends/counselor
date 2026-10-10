@@ -16,6 +16,7 @@ import control.services.CidadeConverter;
 import control.services.FiltroConverter;
 import gui.TabBase;
 import gui.services.CityLoyaltyTableCellRenderer;
+import gui.services.CitySizeCapTableCellRenderer;
 import gui.services.IAcaoGui;
 import gui.services.LoyaltyDeltaTableCellRenderer;
 import gui.subtabs.SubTabBaseList;
@@ -55,6 +56,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     private SubTabOrdem stOrdens;
     private Cenario cenario;
     private CityLoyaltyTableCellRenderer clcr;
+    private CitySizeCapTableCellRenderer cscr;
     private LoyaltyDeltaTableCellRenderer ldcr;
 
     /**
@@ -248,6 +250,8 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         clcr = new CityLoyaltyTableCellRenderer();
         //loyalty-var column: diverging scale - red/amber for drops, green/blue for gains.
         ldcr = new LoyaltyDeltaTableCellRenderer();
+        //size column: amber when a neighbouring big city caps this one's growth (;SCC;).
+        cscr = new CitySizeCapTableCellRenderer();
 
         TableModel model = cidadeControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
         this.setMainModel(model);
@@ -278,6 +282,9 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         }
         if (ldcr != null) {
             jtMainLista.getColumnModel().getColumn(jtMainLista.getColumn(labels.getString("LEALDADE.VARIACAO")).getModelIndex()).setCellRenderer(ldcr);
+        }
+        if (cscr != null) {
+            jtMainLista.getColumnModel().getColumn(jtMainLista.getColumn(labels.getString("TAMANHO")).getModelIndex()).setCellRenderer(cscr);
         }
         this.updateGui();
         this.doTagHide();

@@ -295,6 +295,21 @@ public class WorldFacadeCounselor implements Serializable {
         return getCenario().hasHabilidade(";SNC;");
     }
 
+    /**
+     * {@code ;SCC;} - a city's size is capped by how close the next big one is. Mirrors PbmJudge
+     * {@code PartidaControl.hasHabilidade}: the game OR the scenario carries it, and both the upgrade
+     * order and natural loyalty growth read the same gate. Checking the scenario alone would miss it -
+     * game 916 carries it on the game.
+     */
+    public boolean hasCitySizeCap() {
+        try {
+            final Partida partida = WorldManager.getInstance().getPartida();
+            return partida.hasHabilidade(";SCC;") || partida.getCenario().hasHabilidade(";SCC;");
+        } catch (NullPointerException ex) {
+            return false;
+        }
+    }
+
     public SortedMap<String, Habilidade> getHabilidades(String habilidades) {
         SortedMap<String, Habilidade> ret = new TreeMap<>();
         String[] temp = habilidades.trim().split(";");

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedMap;
 import javax.swing.ComboBoxModel;
 import model.ActorAction;
 import model.Cidade;
@@ -74,7 +75,7 @@ public class CidadeConverter implements Serializable {
             classes.add(OpenSlotCounter.class);
         }
         colNames.add(labels.getString("TAMANHO"));
-        classes.add(java.lang.Integer.class);
+        classes.add(CitySizeCap.class);
         colNames.add(labels.getString("LOCAL"));
         classes.add(Local.class);
         colNames.add(labels.getString("IMPOSTOS"));
@@ -138,7 +139,7 @@ public class CidadeConverter implements Serializable {
         return (colNames.toArray(new String[0]));
     }
 
-    private static Object[] toArray(Cidade cidade) {
+    private static Object[] toArray(Cidade cidade, SortedMap<String, Local> locais) {
         final Mercado mercado = WorldFacadeCounselor.getInstance().getMercado();
         final Local local = cidadeFacade.getLocal(cidade);
         final int presencasQt = localFacade.getPersonagens(local).size();
@@ -159,7 +160,7 @@ public class CidadeConverter implements Serializable {
 
             cArray[ii++] = openSlot;
         }
-        cArray[ii++] = cidadeFacade.getTamanhoNome(cidade);
+        cArray[ii++] = buildCitySizeCap(cidade, locais);
         cArray[ii++] = local;
 
         cArray[ii++] = cidadeFacade.getArrecadacaoImpostos(cidade);
@@ -219,14 +220,60 @@ public class CidadeConverter implements Serializable {
             return (ret);
         } else {
             int ii = 0;
+            //resolved once per table build rather than per row - the map itself is cheap (the loaded
+            //world's own map), the per-city radius-3 neighbour walk is not.
+            final SortedMap<String, Local> locais = sizeCapLocais();
             Object[][] ret = new Object[listaExibir.size()][getCidadeColNames(new ArrayList<>(30)).length];
             Iterator lista = listaExibir.iterator();
             while (lista.hasNext()) {
                 Cidade cidade = (Cidade) lista.next();
-                ret[ii++] = CidadeConverter.toArray(cidade);
+                ret[ii++] = CidadeConverter.toArray(cidade, locais);
             }
             return (ret);
         }
+    }
+
+    /** The hex map the {@code ;SCC;} proximity rule walks, or null when the rule is off for this game. */
+    private static SortedMap<String, Local> sizeCapLocais() {
+        if (!WorldFacadeCounselor.getInstance().hasCitySizeCap()) {
+            return null;
+        }
+        return listFactory.listLocais();
+    }
+
+    /**
+     * The city-size cell: the size name the column has always shown, plus the hex of the neighbour
+     * capping its growth when {@code ;SCC;} is on and the city is the active player's own.
+     *
+     * Own cities only - the rule reads nation flags ({@code ;PKW;}, {@code ;PIC;}) that the EGF
+     * carries only for the nations the player owns, so on a foreign city it would answer with the
+     * exemptions missing. See {@link CitySizeCap}.
+     */
+    private static CitySizeCap buildCitySizeCap(Cidade cidade, SortedMap<String, Local> locais) {
+        final String sizeName = cidadeFacade.getTamanhoNome(cidade);
+        final int size = cidade.getTamanho();
+        if (locais == null
+                || !jogadorFacade.isMine(cidade, WorldFacadeCounselor.getInstance().getJogadorAtivo())) {
+            return new CitySizeCap(size, sizeName, null);
+        }
+        return new CitySizeCap(size, sizeName, cidadeFacade.isCheckCitySizeCapToUpgrade(cidade, locais));
+    }
+
+    /**
+     * Why this city cannot grow, naming the blocking city and its hex - the same two facts the Judge
+     * puts in the turn result, minus the range in hexes, which {@code ;PIC;} changes per nation.
+     * Single formatting site, shared by the table tooltip and the city detail pane.
+     */
+    public static String getSizeCapMessage(CitySizeCap cap) {
+        if (cap == null || !cap.isBlocked()) {
+            return null;
+        }
+        final Local blocker = cap.getBlocker();
+        final Cidade blockerCity = blocker.getCidade();
+        return String.format(labels.getString("CIDADE.SIZECAP.BLOCKED"),
+                cidadeFacade.getTamanhoNome(cap.getSize() + 1),
+                blockerCity == null ? labels.getString("?") : cidadeFacade.getNome(blockerCity),
+                LocalFacade.getCoordenadas(blocker));
     }
 
     public static GenericoTableModel getPresencasModel(Cidade cidade) {
@@ -393,6 +440,14 @@ public class CidadeConverter implements Serializable {
                     ret.add(cidade);
                 }
             }
+        } else if (filtro.equalsIgnoreCase("sizecap")) {
+            //own cities whose growth is capped by a neighbouring big city (;SCC;)
+            final SortedMap<String, Local> locais = sizeCapLocais();
+            for (Cidade cidade : listFactory.listCidades().values()) {
+                if (buildCitySizeCap(cidade, locais).isBlocked()) {
+                    ret.add(cidade);
+                }
+            }
         } else if (filtro.equalsIgnoreCase("decayamber")) {
             //cities at some risk of a loyalty-driven size reduction (amber loyalty)
             for (Cidade cidade : listFactory.listCidades().values()) {
@@ -491,6 +546,11 @@ public class CidadeConverter implements Serializable {
                 SysApoio.iif(cidade.isCapital(), labels.getString("(CAPITAL)"), ""),
                 nacaoFacade.getNome(cidade.getNacao())));
         ret.addTab(String.format("%s: %s", labels.getString("TAMANHO"), BaseMsgs.cidadeTamanho[cidade.getTamanho()]));
+        //a tooltip on the size column is easy to miss, so the cap is spelled out here too
+        final String sizeCap = getSizeCapMessage(buildCitySizeCap(cidade, sizeCapLocais()));
+        if (sizeCap != null) {
+            ret.addTab(sizeCap);
+        }
         ret.addTab(String.format("%s: %s", labels.getString("FORTIFICACOES"), BaseMsgs.cidadeFortificacao[cidade.getFortificacao()]));
         if (cidade.getLealdade() > 0) {
             ret.addTab(String.format("%s: %s (%s)",
