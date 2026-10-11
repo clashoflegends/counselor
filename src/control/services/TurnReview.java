@@ -154,7 +154,8 @@ public final class TurnReview implements Serializable {
                 // One unreadable actor must never cost the whole review.
                 try {
                     addOpenSlot(ret, actor, ordensQtCheck, nationPackagesLimit);
-                    addOrderFindings(ret, actor, observer, locais, world, hasCitySizeCap);
+                    addOrderFindings(ret, actor, observer, locais, world, hasCitySizeCap,
+                            ordensQtCheck, nationPackagesLimit);
                 } catch (RuntimeException ex) {
                     //A review is a convenience; never let one bad actor take the list down. LOGGED,
                     //not swallowed: a silent catch here is what hid a broken test fixture, and silent
@@ -218,14 +219,16 @@ public final class TurnReview implements Serializable {
     }
 
     private static void addOrderFindings(List<Finding> out, BaseModel actor, Jogador observer,
-            SortedMap<String, Local> locais, Collection<Personagem> world, boolean hasCitySizeCap) {
+            SortedMap<String, Local> locais, Collection<Personagem> world, boolean hasCitySizeCap,
+            ActorOffersOrders offersOrders, int nationPackagesLimit) {
         for (Map.Entry<Integer, PersonagemOrdem> entry : actor.getAcoes().entrySet()) {
             final PersonagemOrdem po = entry.getValue();
             if (po == null || po.getOrdem() == null) {
                 continue;
             }
             addSizeCap(out, actor, observer, entry.getKey(), po, locais, hasCitySizeCap);
-            addRendezvous(out, actor, entry.getKey(), po, locais, world);
+            addRendezvous(out, actor, entry.getKey(), po, locais, world, offersOrders,
+                    nationPackagesLimit);
         }
     }
 
@@ -269,29 +272,38 @@ public final class TurnReview implements Serializable {
      * MovUnir: "move to hex X, then join character Y". The join fails unless the two are on the SAME
      * hex when the order runs, so the destination has to be where the target will END the turn.
      *
-     * <b>Measured, and the numbers matter.</b> Across games 850 to 907 ({@code ordem_estatistica}
-     * joined to {@code personagem_turno.id_hex_final}), the destination equalled the target's
-     * end-of-turn hex in <b>15,448 of 15,461 successes (99.92%)</b> and in only <b>317 of 1,549
-     * could-not-attempt failures (20.5%)</b>.
+     * <b>Measured.</b> Across games 850 to 907, comparing the order's destination against
+     * {@code personagem_turno.id_hex_final} - the hex the server actually left the target on - they
+     * agreed in <b>15,448 of 15,461 successes (99.92%)</b> and in only <b>317 of 1,549
+     * could-not-attempt failures (20.5%)</b>. Over the full population that rule would flag 1,232 of
+     * the 1,628 MovUnir failures (76%) and 13 of the 15,888 successes (0.08%). MovUnir is the largest
+     * source of could-not-attempt in the catalogue that is not deliberate (1,628 of 17,710 issued),
+     * behind only PegArt, whose 76% failure rate IS the mechanic - a blind search.
      * <p>
-     * Against the FULL population rather than the rows that join, this check would flag <b>1,232 of
-     * the 1,628 MovUnir failures (76%) and 13 of the 15,888 successes (0.08%)</b>. The gap is the
-     * targets whose ident resolves to nobody, which {@link #byIdent} skips on purpose. MovUnir is the
-     * largest source of could-not-attempt in the whole catalogue that is not deliberate: 1,628 of
-     * 17,710 issued, behind only PegArt, whose 76% failure rate IS the mechanic (a blind search).
+     * <b>Read those figures as the ceiling, not as this check's error rate.</b> They score the RULE
+     * against the server's own answer. The client has to ESTIMATE that answer from orders the player
+     * has not submitted yet ({@link #plannedEndOf}), and every case the estimate cannot reach is
+     * handled by staying silent, which costs recall rather than precision. Two further reasons not to
+     * read the separation too literally: {@code Ordem.executa870} runs {@code executa810} and then
+     * builds a SEPARATE {@code Ordem755JoinLeader} whose outcome is never written back, so a row can
+     * be stored SIM with the move done and the join refused; and {@code executa810} writes PRE for
+     * its own failures, so some of the 1,628 are movement failures with no rendezvous in them.
+     * Neither changes the direction of the signal, and both make it conservative here.
      *
      * <b>Do NOT "simplify" this to the target's CURRENT hex.</b> That was measured too and it is
      * wrong: 42% of SUCCESSFUL MovUnir orders have the target somewhere else at turn start, because
      * walking to a rendezvous is ordinary play. It would flag roughly 6,400 good orders.
      *
-     * <b>Gated on parameter SHAPE, not order code</b> - a {@code Coordenada} followed by {@code
-     * Personagem_Nacao}. That pair is unique to MovUnir across the entire order catalogue, and it
-     * covers its three codes (870 and 871, which the Judge routes to the same {@code executa870}, and
-     * 817, whose {@code Direcao_Ex} first parameter excludes it here automatically) without naming
-     * any of them, so a scenario that adds the same mechanic under a new code is covered for free.
+     * <b>Gated on parameter SHAPE, not order code.</b> A {@code Coordenada} followed by exactly
+     * {@code Personagem_Nacao} is unique to MovUnir across the whole catalogue, and it covers its
+     * codes (870 and 871, which the Judge routes to the same {@code executa870}; its direction-
+     * parameterised variant excludes itself) without naming any of them. The client could not gate on
+     * the code even if it wanted to: {@code model.Ordem} carries {@code nu_ordem}, never the
+     * {@code cd_ordem} the Judge dispatches on.
      */
     private static void addRendezvous(List<Finding> out, BaseModel actor, int slot,
-            PersonagemOrdem po, SortedMap<String, Local> locais, Collection<Personagem> world) {
+            PersonagemOrdem po, SortedMap<String, Local> locais, Collection<Personagem> world,
+            ActorOffersOrders offersOrders, int nationPackagesLimit) {
         if (!(actor instanceof Personagem) || !isJoinLeaderShape(po)) {
             return;
         }
@@ -305,13 +317,7 @@ public final class TurnReview implements Serializable {
             //beats inventing a verdict about a character we cannot find.
             return;
         }
-        if (target.getAcoes().isEmpty() && target.getLider() != null) {
-            //PersonagemFacade.getLocalDestination keeps its leader branch INSIDE the getAcoes() loop,
-            //so a passenger holding no orders answers with its own hex instead of its leader's
-            //destination. That would read as a mismatch when it is simply unknown here.
-            return;
-        }
-        final Local plannedEnd = personagemFacade.getLocalDestination(target, locais);
+        final Local plannedEnd = plannedEndOf(target, locais, offersOrders, nationPackagesLimit, 0);
         if (plannedEnd == null || dest.equals(plannedEnd)) {
             return;
         }
@@ -322,14 +328,110 @@ public final class TurnReview implements Serializable {
                 LocalFacade.getCoordenadas(plannedEnd)));
     }
 
-    /** A destination coordinate followed by an own-nation character: the MovUnir family. */
-    static boolean isJoinLeaderShape(PersonagemOrdem po) {
-        if (po.getOrdem().getParametrosIdeQtd() < 2 || po.getParametrosId() == null
-                || po.getParametrosId().size() < 2) {
+    /** Guards the {@code lider} chain, which {@code PersonagemFacade} warns is recursive. */
+    private static final int MAX_LEADER_DEPTH = 8;
+
+    /**
+     * Where this character will be standing when MovUnir runs, or <b>null when that cannot be known
+     * yet</b> - which is the whole point of this method existing instead of a call to
+     * {@code PersonagemFacade.getLocalDestination}.
+     *
+     * That helper is right for what it was written for, DRAWING the path a character is taking, where
+     * being wrong costs a stray line. It is wrong for a WARNING in three ways, and this check needs
+     * all three closed. It is not fixed in place because {@code MapaManager} calls it on the Judge and
+     * Distiler side of the shared library.
+     * <ol>
+     * <li><b>It treats every {@code Mov}-typed order with a direction as a move.</b> {@code Bloq}
+     * (code 840) is typed {@code Mov} and takes a {@code Direcao}, and {@code Ordem.executa840} sets
+     * a blockade facing and subtracts morale without ever touching the hex. A blockading army
+     * commander is exactly who a player marches out to join, and the helper would place them one hex
+     * off and raise a warning on an order that works. So a move has to carry a destination
+     * {@code Coordenada} or a plotted {@code Direcao_Ex} PATH; a bare {@code Direcao} does not move
+     * anybody (the other one, {@code MovCity} 845, moves a city).</li>
+     * <li><b>Its {@code lider} branch sits INSIDE its loop over orders</b>, so it answers with the
+     * leader's destination as soon as it meets any non-movement order and never reads a move in a
+     * later slot. Here every slot is scanned for a real move first, and the leader is only consulted
+     * when there is none - which is also the Judge's order of events, since {@code executa810} has an
+     * explicit {@code isViajandoCom} branch that takes a passenger out of the group.</li>
+     * <li><b>With no orders at all it silently answers "wherever they are now".</b> In a SUBMITTED
+     * turn that is a good answer and the data says so (42 of 45 successes, 1 of 161 failures). In the
+     * dialog it is a trap, because the commonest way to see a target with no orders is that the
+     * player has not planned them YET - plan the escort before the leader and the review warns about
+     * a rendezvous the player is still in the middle of arranging, in the same list that tells them
+     * the leader has an open slot. So the current hex is only trusted once the target has nothing
+     * left to plan.</li>
+     * </ol>
+     */
+    private static Local plannedEndOf(Personagem target, SortedMap<String, Local> locais,
+            ActorOffersOrders offersOrders, int nationPackagesLimit, int depth) {
+        if (target == null || depth > MAX_LEADER_DEPTH) {
+            return null;
+        }
+        for (PersonagemOrdem po : target.getAcoes().values()) {
+            if (po == null || po.getOrdem() == null || !movesTheCharacter(po)) {
+                continue;
+            }
+            return destinationOf(target, po, locais);
+        }
+        if (target.getLider() != null) {
+            //no move of their own, so they go where whoever is carrying them goes
+            return plannedEndOf(target.getLider(), locais, offersOrders, nationPackagesLimit, depth + 1);
+        }
+        if (hasOpenSlot(target, offersOrders, nationPackagesLimit)) {
+            //still being planned: "they are not moving" is a guess about an unwritten order
+            return null;
+        }
+        return target.getLocal();
+    }
+
+    /**
+     * True when this order actually relocates the character issuing it.
+     *
+     * Structural rather than a list of codes, for the same reason the MovUnir gate is: a destination
+     * {@code Coordenada} anywhere in the parameters (ArtMov carries it second, behind the item), or a
+     * plotted {@code Direcao_Ex} path. A bare {@code Direcao} is deliberately excluded - see
+     * {@link #plannedEndOf} on {@code Bloq}.
+     */
+    static boolean movesTheCharacter(PersonagemOrdem po) {
+        if (!acaoFacade.isMovimento(po)) {
             return false;
         }
-        return po.getOrdem().getParametroIde(0).contains("Coordenada")
-                && po.getOrdem().getParametroIde(1).contains("Personagem_Nacao");
+        for (int ii = 0; ii < po.getOrdem().getParametrosIdeQtd(); ii++) {
+            if (po.getOrdem().getParametroIde(ii).contains("Coordenada")) {
+                return true;
+            }
+        }
+        return po.getOrdem().getParametroIde(0).contains("Direcao_Ex");
+    }
+
+    private static Local destinationOf(Personagem pers, PersonagemOrdem po,
+            SortedMap<String, Local> locais) {
+        final Local coord = acaoFacade.getLocalDestination(pers, po, locais);
+        if (coord != null) {
+            return coord;
+        }
+        //a plotted path: the last hex it reaches, exactly as the map draws it
+        final SortedMap<Integer, Local> path = acaoFacade.getLocalDestinationPath(pers, po, locais);
+        return path.isEmpty() ? null : path.get(path.size() - 1);
+    }
+
+    /**
+     * A destination coordinate followed by an own-nation character, on a movement order: MovUnir.
+     *
+     * The second parameter is matched EXACTLY, not by {@code contains}. {@code Personagem_Nacao_Local}
+     * and {@code Personagem_Nacao_Nonhero_Local} are still live deprecated aliases until 2027-07-01
+     * (KI-026) and both still ship in real scenarios, so {@code contains} would sweep in any future
+     * order shaped "march to a hex and do something to a character there" with no code change and no
+     * test. {@code trim()} first, because the catalogue really does carry leading-space parameter
+     * tokens. The {@code Mov} type is free to check and nails the gate down further.
+     */
+    static boolean isJoinLeaderShape(PersonagemOrdem po) {
+        if (po.getOrdem().getParametrosIdeQtd() < 2 || po.getParametrosId() == null
+                || po.getParametrosId().size() < 2 || !acaoFacade.isMovimento(po)) {
+            return false;
+        }
+        return po.getOrdem().getParametroIde(0).trim().contains("Coordenada")
+                && po.getOrdem().getParametroIde(1).trim().equals("Personagem_Nacao");
     }
 
     /**

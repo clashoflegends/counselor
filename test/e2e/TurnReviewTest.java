@@ -51,7 +51,7 @@ class TurnReviewTest {
     @Test
     void rendezvousIsFlaggedWhenTheTargetWillBeSomewhereElse() {
         final Fixture f = new Fixture();
-        final Personagem target = f.plain("Jon", "0707");
+        final Personagem target = f.done(f.plain("Jon", "0707"));
         final Personagem actor = f.joiner("Tyrion", "0101", "0505", target);
 
         final List<Finding> found = f.run(actor, target);
@@ -67,7 +67,7 @@ class TurnReviewTest {
     @Test
     void noFindingWhenTheTargetAlreadyStandsOnTheDestination() {
         final Fixture f = new Fixture();
-        final Personagem target = f.plain("Jon", "0505");
+        final Personagem target = f.done(f.plain("Jon", "0505"));
         final Personagem actor = f.joiner("Tyrion", "0101", "0505", target);
 
         assertEquals(0, count(f.run(actor, target), Kind.RENDEZVOUS));
@@ -106,11 +106,35 @@ class TurnReviewTest {
         final Personagem leader = f.armyMover("Jeor", "0405", "E"); // ends 0505
         final Personagem target = f.plain("Jon", "0405");
         target.setLider(leader);
-        f.give(target, f.idleOrder());                              // has an order, so not the skip case
+        f.give(target, f.idleOrder());                              // an order, but not a move
         final Personagem actor = f.joiner("Tyrion", "0101", "0505", target);
 
         assertEquals(0, count(f.run(actor, target, leader), Kind.RENDEZVOUS),
                 "the passenger ends where the leader ends, which is the destination");
+    }
+
+    /**
+     * The passenger's OWN move wins over the leader's, and it must be found in whatever slot it sits
+     * in.
+     *
+     * {@code PersonagemFacade.getLocalDestination} keeps its leader branch inside its loop over
+     * orders, so it answers with the leader's destination the moment it meets any non-movement order
+     * and never reads a move in a later slot. {@code executa810} has an explicit
+     * {@code isViajandoCom} branch that takes a passenger out of the group, so the leader's
+     * destination is the wrong answer here.
+     */
+    @Test
+    void aPassengersOwnMoveInALaterSlotBeatsTheLeader() {
+        final Fixture f = new Fixture();
+        final Personagem leader = f.armyMover("Jeor", "0405", "E");  // leader ends 0505
+        final Personagem target = f.plain("Jon", "0405");
+        target.setLider(leader);
+        f.give(target, f.idleOrder());                                // slot 0: not a move
+        f.giveMove(target, "0707");                                   // slot 1: their own move
+        final Personagem actor = f.joiner("Tyrion", "0101", "0505", target);
+
+        assertEquals(1, count(f.run(actor, target, leader), Kind.RENDEZVOUS),
+                "they leave the group and walk to 0707; the leader's 0505 is not where they land");
     }
 
     /**
@@ -122,15 +146,66 @@ class TurnReviewTest {
      * worse than no row at all.
      */
     @Test
-    void aTargetWithNoOrdersAndALeaderIsSkipped() {
+    void aTargetWithNoOrdersOfItsOwnStillFollowsItsLeader() {
         final Fixture f = new Fixture();
-        final Personagem leader = f.armyMover("Jeor", "0405", "E");
+        final Personagem leader = f.armyMover("Jeor", "0405", "E");  // ends 0505
         final Personagem target = f.plain("Jon", "0909");
         target.setLider(leader);
+
+        assertEquals(0, count(f.run(actor(f, target), target, leader), Kind.RENDEZVOUS),
+                "a passenger goes where it is carried, wherever it is standing now");
+
+        final Fixture g = new Fixture();
+        final Personagem elsewhere = g.armyMover("Jeor", "0405", "SE"); // ends somewhere else
+        final Personagem rider = g.plain("Jon", "0909");
+        rider.setLider(elsewhere);
+        assertEquals(1, count(g.run(actor(g, rider), rider, elsewhere), Kind.RENDEZVOUS),
+                "and if the leader is going elsewhere, so is the passenger");
+    }
+
+    private static Personagem actor(Fixture f, Personagem target) {
+        return f.joiner("Tyrion", "0101", "0505", target);
+    }
+
+    // ----- the two shapes that produced confident false warnings -----
+
+    /**
+     * A target still being PLANNED is not a target standing still.
+     *
+     * The commonest way to meet a target with no orders is that the player has not got to them yet -
+     * plan the escort before the leader and the old rule warned about a rendezvous the player was in
+     * the middle of arranging, in the same list that said the leader had an open slot. In a SUBMITTED
+     * turn "no orders" really does mean "not moving" (42 of 45 successes, 1 of 161 failures), which
+     * is why the current hex is trusted the moment the target has nothing left to plan.
+     */
+    @Test
+    void aTargetThePlayerHasNotPlannedYetIsNotJudged() {
+        final Fixture f = new Fixture();
+        final Personagem target = f.plain("Jon", "0707");   // no orders, every slot still open
         final Personagem actor = f.joiner("Tyrion", "0101", "0505", target);
 
-        assertEquals(0, count(f.run(actor, target, leader), Kind.RENDEZVOUS),
-                "unknown is not the same as wrong");
+        assertEquals(0, count(f.run(actor, target), Kind.RENDEZVOUS),
+                "they have not been given their orders yet, so there is nothing to disagree with");
+
+        f.done(target);
+        assertEquals(1, count(f.run(actor, target), Kind.RENDEZVOUS),
+                "control: once they are fully planned and staying put, the mismatch is real");
+    }
+
+    /**
+     * {@code Bloq} is typed {@code Mov} and takes a {@code Direcao}, but {@code executa840} only sets
+     * a blockade facing - the character does not move. Reading it as a move puts a blockading
+     * commander one hex from where they are standing, and a blockading commander is exactly who a
+     * player marches out to join.
+     */
+    @Test
+    void aBlockadingTargetHasNotMovedAnywhere() {
+        final Fixture f = new Fixture();
+        final Personagem target = f.blockader("Jon", "0505", "E");
+        final Personagem actor = f.joiner("Tyrion", "0101", "0505", target);
+
+        assertEquals(0, count(f.run(actor, target), Kind.RENDEZVOUS),
+                "Bloq sets a facing, not a destination: the join at 0505 succeeds");
     }
 
     /**
@@ -169,7 +244,7 @@ class TurnReviewTest {
         final Fixture f = new Fixture();
         final Personagem dead = f.plain("Jon", "0909");   // registered FIRST, so order cannot save us
         dead.setVida(0);
-        final Personagem target = f.plain("Jon", "0505"); // same ident, alive, standing where we go
+        final Personagem target = f.done(f.plain("Jon", "0505")); // same ident, alive, where we go
         final Personagem actor = f.joiner("Tyrion", "0101", "0505", target);
 
         assertEquals(0, count(f.run(actor, target, dead), Kind.RENDEZVOUS),
@@ -184,7 +259,7 @@ class TurnReviewTest {
     @Test
     void anAlliedCharacterIsResolvedWhenTheIdentIsUnambiguous() {
         final Fixture f = new Fixture();
-        final Personagem ally = f.foreign("Davos", "0909");
+        final Personagem ally = f.done(f.foreign("Davos", "0909"));
         final Personagem actor = f.joiner("Tyrion", "0101", "0505", ally);
 
         assertEquals(1, count(f.run(actor, ally), Kind.RENDEZVOUS),
@@ -198,8 +273,8 @@ class TurnReviewTest {
     @Test
     void anAmbiguousIdentOutsideMyNationResolvesToNobody() {
         final Fixture f = new Fixture();
-        final Personagem ally = f.foreign("Davos", "0909");
-        final Personagem twin = f.foreign("Davos", "0808");
+        final Personagem ally = f.done(f.foreign("Davos", "0909"));
+        final Personagem twin = f.done(f.foreign("Davos", "0808"));
         final Personagem actor = f.joiner("Tyrion", "0101", "0505", ally);
 
         assertEquals(0, count(f.run(actor, ally, twin), Kind.RENDEZVOUS),
@@ -429,6 +504,36 @@ class TurnReviewTest {
                     actor -> offersOrders, limit, sizeCapOn);
         }
 
+        /**
+         * Fill every slot, so the review stops treating the character as still being planned.
+         * A character has 2 slots ({@code Personagem.getOrdensQt}).
+         */
+        Personagem done(Personagem p) {
+            while (p.getAcaoSize() < 2) {
+                give(p, idleOrder());
+            }
+            return p;
+        }
+
+        /**
+         * Bloq: typed {@code Mov} and parameterised by a {@code Direcao}, but {@code executa840} only
+         * sets a blockade facing. The character does not go anywhere.
+         */
+        Personagem blockader(String name, String at, String facing) {
+            final Personagem p = plain(name, at);
+            final Ordem o = new Ordem();
+            o.setNome("Bloq");
+            o.setCodigo("840");
+            o.setTipo("Mov");
+            o.setParametrosIde(new String[]{"Direcao"});
+            final PersonagemOrdem po = new PersonagemOrdem();
+            po.setOrdem(o);
+            po.setParametrosId(new ArrayList<>(Collections.singletonList(facing)));
+            p.setAcao(0, po);
+            give(p, idleOrder());   // slot 1, so it is done planning
+            return p;
+        }
+
         /** A character of SOMEBODY ELSE'S nation, which the order picker never offered. */
         Personagem foreign(String name, String at) {
             final Nacao theirs = new Nacao();
@@ -449,6 +554,20 @@ class TurnReviewTest {
             p.setNacao(nation);
             p.setLocal(hex(at));
             return p;
+        }
+
+        /** A plain coordinate move into the character's next free slot. */
+        void giveMove(Personagem p, String to) {
+            final Ordem o = new Ordem();
+            o.setNome("MovPers");
+            o.setCodigo("810");
+            o.setTipo("Mov");
+            o.setParametrosIde(new String[]{"Coordenada_12"});
+            final PersonagemOrdem po = new PersonagemOrdem();
+            po.setOrdem(o);
+            po.setParametrosId(new ArrayList<>(Collections.singletonList(to)));
+            give(p, po);
+            hex(to);
         }
 
         void give(Personagem p, PersonagemOrdem po) {
