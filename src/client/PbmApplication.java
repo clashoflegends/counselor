@@ -14,6 +14,8 @@ import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import gui.services.ScreenFit;
+import gui.services.WindowSlots;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -101,18 +103,27 @@ public class PbmApplication extends Application implements Serializable {
             frame.setTransferHandler(new EgfDropHandler(mainWin));
             //set icon
             frame.setIconImage(ImageManager.getInstance().getIconApp());
+            //Geometry is remembered PER DISPLAY ARRANGEMENT (WindowSlots), because a docked laptop
+            //used to overwrite a single slot twice a day. Fall back to the legacy single-slot keys
+            //when this arrangement has not been seen before, so an upgrading player keeps the
+            //window they had instead of being handed a default one.
+            final Rectangle slotSaved = WindowSlots.load(settingsStore(), configName, screenSignature());
+            if (slotSaved != null) {
+                posX = slotSaved.x;
+                posY = slotSaved.y;
+                width = slotSaved.width;
+                height = slotSaved.height;
+            }
             if (width != -1 || posX != -1) {
-                //The remembered geometry came from whatever display set was attached LAST time. A
-                //docked laptop changes that between runs: a window closed on a 2560-wide monitor is
-                //restored oversized on the laptop panel, and a remembered x of 2560 points at a
-                //screen that is no longer there. Clamp both to a screen that exists before using
-                //them - see ScreenFit.
+                //Whatever the source, the remembered rectangle still has to fit the screens attached
+                //NOW: a matching signature means the same screen sizes, not the same positions, and
+                //properties.config is hand-editable. See ScreenFit.
                 final Rectangle saved = new Rectangle(
                         posX != -1 ? posX : frame.getLocation().x,
                         posX != -1 ? posY : frame.getLocation().y,
                         width != -1 ? width : frame.getWidth(),
                         width != -1 ? height : frame.getHeight());
-                final Rectangle fitted = gui.services.ScreenFit.fit(saved, gui.services.ScreenFit.usableScreens());
+                final Rectangle fitted = ScreenFit.fit(saved, ScreenFit.usableScreens());
                 if (!fitted.equals(saved)) {
                     log.info(String.format("Remembered window %dx%d at %d,%d does not fit the current "
                             + "screens; using %dx%d at %d,%d.", saved.width, saved.height, saved.x,
@@ -162,6 +173,26 @@ public class PbmApplication extends Application implements Serializable {
         log.info("Interface carregada and exibida.");
     }
 
+    /** The current display arrangement's identity; see WindowSlots.signature. */
+    private String screenSignature() {
+        return WindowSlots.signature(ScreenFit.usableScreens());
+    }
+
+    /** SettingsManager narrowed to the two calls WindowSlots needs, so that class stays testable. */
+    private WindowSlots.Store settingsStore() {
+        return new WindowSlots.Store() {
+            @Override
+            public String get(String key, String defaultValue) {
+                return SettingsManager.getInstance().getConfig(key, defaultValue);
+            }
+
+            @Override
+            public void set(String key, String value) {
+                SettingsManager.getInstance().setConfig(key, value);
+            }
+        };
+    }
+
     private void saveFrameConfigs() {
         if (isMaximized) {
             //save maximize windows config
@@ -172,6 +203,11 @@ public class PbmApplication extends Application implements Serializable {
             SettingsManager.getInstance().setConfig(configName + "SizeHeight", frame.getSize().height + "");
             SettingsManager.getInstance().setConfig(configName + "PositionX", frame.getLocation().x + "");
             SettingsManager.getInstance().setConfig(configName + "PositionY", frame.getLocation().y + "");
+            //...and against THIS display arrangement, so docking does not overwrite the laptop's
+            //geometry. The legacy keys above stay written: an older build reads only those, and a
+            //player who rolls back should not lose their window.
+            WindowSlots.save(settingsStore(), configName, screenSignature(),
+                    new Rectangle(frame.getLocation(), frame.getSize()));
             SettingsManager.getInstance().setConfig("maximizeWindowOnStart", "0");
         }
         SettingsManager.getInstance().saveToFile();

@@ -7,6 +7,7 @@
 - **Dock your laptop at night, open the Counselor on the laptop alone in the morning, and the window no longer comes back too big for the screen.** It remembered the size of the monitor it was closed on.
 - **A window left on a monitor that is no longer plugged in** comes back on the screen you do have, centred, instead of opening somewhere you cannot see or drag it to.
 - **If your screens have not changed, nothing moves.** A window already sitting comfortably where you left it is not touched, including one on a second monitor that is still attached.
+- **Each setup now remembers its own window.** The Counselor keeps the size and position separately for your last three screen arrangements, so docking and undocking no longer overwrite each other - re-dock and the window goes back where you had it at the desk, not where you left it on the laptop.
 
 ## 09-OCT-2026 - v2.1.933
 
