@@ -12,6 +12,11 @@
 - **Double click any line to jump straight to it**, the same way quick search does.
 - **Nothing here blocks or changes anything.** It is a second pair of eyes, not a gate: you can send a turn with every line still on the list.
 
+### Scout and recon markers sit on the right hex
+
+- **A character under orders to blockade is no longer drawn one hex away.** Setting a blockade points a character in a direction but does not move them, and the map was reading that direction as a march. Any scout, recon or map area order from a blockading character - or from one moving a city - was marked on the hex next door.
+- **A character travelling with a leader but marching off on their own** is now marked where they are actually going, not where the group is going. And one who is simply riding along with no orders of their own is marked at the group destination instead of where the group started.
+
 ### The map now looks where you are looking
 
 - **On opening a turn, the map centres on the list you are actually on.** It used to centre on your capital whatever tab you landed on, so if you reopened on Characters your first character was often off screen entirely.

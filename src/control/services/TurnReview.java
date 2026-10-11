@@ -282,7 +282,8 @@ public final class TurnReview implements Serializable {
      * <p>
      * <b>Read those figures as the ceiling, not as this check's error rate.</b> They score the RULE
      * against the server's own answer. The client has to ESTIMATE that answer from orders the player
-     * has not submitted yet ({@link #plannedEndOf}), and every case the estimate cannot reach is
+     * has not submitted yet - {@code PersonagemFacade.getLocalDestination} with a still-planning
+     * test, which this work had to correct first - and every case the estimate cannot reach is
      * handled by staying silent, which costs recall rather than precision. Two further reasons not to
      * read the separation too literally: {@code Ordem.executa870} runs {@code executa810} and then
      * builds a SEPARATE {@code Ordem755JoinLeader} whose outcome is never written back, so a row can
@@ -317,7 +318,8 @@ public final class TurnReview implements Serializable {
             //beats inventing a verdict about a character we cannot find.
             return;
         }
-        final Local plannedEnd = plannedEndOf(target, locais, offersOrders, nationPackagesLimit, 0);
+        final Local plannedEnd = personagemFacade.getLocalDestination(target, locais,
+                pc -> hasOpenSlot(pc, offersOrders, nationPackagesLimit));
         if (plannedEnd == null || dest.equals(plannedEnd)) {
             return;
         }
@@ -326,93 +328,6 @@ public final class TurnReview implements Serializable {
                 LocalFacade.getCoordenadas(dest),
                 target.getNome(),
                 LocalFacade.getCoordenadas(plannedEnd)));
-    }
-
-    /** Guards the {@code lider} chain, which {@code PersonagemFacade} warns is recursive. */
-    private static final int MAX_LEADER_DEPTH = 8;
-
-    /**
-     * Where this character will be standing when MovUnir runs, or <b>null when that cannot be known
-     * yet</b> - which is the whole point of this method existing instead of a call to
-     * {@code PersonagemFacade.getLocalDestination}.
-     *
-     * That helper is right for what it was written for, DRAWING the path a character is taking, where
-     * being wrong costs a stray line. It is wrong for a WARNING in three ways, and this check needs
-     * all three closed. It is not fixed in place because {@code MapaManager} calls it on the Judge and
-     * Distiler side of the shared library.
-     * <ol>
-     * <li><b>It treats every {@code Mov}-typed order with a direction as a move.</b> {@code Bloq}
-     * (code 840) is typed {@code Mov} and takes a {@code Direcao}, and {@code Ordem.executa840} sets
-     * a blockade facing and subtracts morale without ever touching the hex. A blockading army
-     * commander is exactly who a player marches out to join, and the helper would place them one hex
-     * off and raise a warning on an order that works. So a move has to carry a destination
-     * {@code Coordenada} or a plotted {@code Direcao_Ex} PATH; a bare {@code Direcao} does not move
-     * anybody (the other one, {@code MovCity} 845, moves a city).</li>
-     * <li><b>Its {@code lider} branch sits INSIDE its loop over orders</b>, so it answers with the
-     * leader's destination as soon as it meets any non-movement order and never reads a move in a
-     * later slot. Here every slot is scanned for a real move first, and the leader is only consulted
-     * when there is none - which is also the Judge's order of events, since {@code executa810} has an
-     * explicit {@code isViajandoCom} branch that takes a passenger out of the group.</li>
-     * <li><b>With no orders at all it silently answers "wherever they are now".</b> In a SUBMITTED
-     * turn that is a good answer and the data says so (42 of 45 successes, 1 of 161 failures). In the
-     * dialog it is a trap, because the commonest way to see a target with no orders is that the
-     * player has not planned them YET - plan the escort before the leader and the review warns about
-     * a rendezvous the player is still in the middle of arranging, in the same list that tells them
-     * the leader has an open slot. So the current hex is only trusted once the target has nothing
-     * left to plan.</li>
-     * </ol>
-     */
-    private static Local plannedEndOf(Personagem target, SortedMap<String, Local> locais,
-            ActorOffersOrders offersOrders, int nationPackagesLimit, int depth) {
-        if (target == null || depth > MAX_LEADER_DEPTH) {
-            return null;
-        }
-        for (PersonagemOrdem po : target.getAcoes().values()) {
-            if (po == null || po.getOrdem() == null || !movesTheCharacter(po)) {
-                continue;
-            }
-            return destinationOf(target, po, locais);
-        }
-        if (target.getLider() != null) {
-            //no move of their own, so they go where whoever is carrying them goes
-            return plannedEndOf(target.getLider(), locais, offersOrders, nationPackagesLimit, depth + 1);
-        }
-        if (hasOpenSlot(target, offersOrders, nationPackagesLimit)) {
-            //still being planned: "they are not moving" is a guess about an unwritten order
-            return null;
-        }
-        return target.getLocal();
-    }
-
-    /**
-     * True when this order actually relocates the character issuing it.
-     *
-     * Structural rather than a list of codes, for the same reason the MovUnir gate is: a destination
-     * {@code Coordenada} anywhere in the parameters (ArtMov carries it second, behind the item), or a
-     * plotted {@code Direcao_Ex} path. A bare {@code Direcao} is deliberately excluded - see
-     * {@link #plannedEndOf} on {@code Bloq}.
-     */
-    static boolean movesTheCharacter(PersonagemOrdem po) {
-        if (!acaoFacade.isMovimento(po)) {
-            return false;
-        }
-        for (int ii = 0; ii < po.getOrdem().getParametrosIdeQtd(); ii++) {
-            if (po.getOrdem().getParametroIde(ii).contains("Coordenada")) {
-                return true;
-            }
-        }
-        return po.getOrdem().getParametroIde(0).contains("Direcao_Ex");
-    }
-
-    private static Local destinationOf(Personagem pers, PersonagemOrdem po,
-            SortedMap<String, Local> locais) {
-        final Local coord = acaoFacade.getLocalDestination(pers, po, locais);
-        if (coord != null) {
-            return coord;
-        }
-        //a plotted path: the last hex it reaches, exactly as the map draws it
-        final SortedMap<Integer, Local> path = acaoFacade.getLocalDestinationPath(pers, po, locais);
-        return path.isEmpty() ? null : path.get(path.size() - 1);
     }
 
     /**
