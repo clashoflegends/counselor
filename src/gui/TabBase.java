@@ -388,6 +388,33 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
         });
     }
 
+    /**
+     * Re-assert this tab's map tag from the row it currently shows selected.
+     *
+     * Needed because every data tab tags the map as it is BUILT (each auto-selects row 0, which fires
+     * its own {@code printTag}), and {@code MainDadosGui} then switches to the remembered tab without
+     * re-firing a selection. The map was therefore left showing whatever the LAST-built tagging tab
+     * pointed at - Finances, i.e. the nation's capital - while the player looked at a different list.
+     * Opening on Characters centred the map on the capital with the first character off screen, which
+     * since v2.1.917 also made the order-range border look as though it had failed to draw (KI-037).
+     *
+     * Clears the selection before re-setting it on purpose: {@code setSelectionInterval} on a row that
+     * is ALREADY selected fires no {@code valueChanged}, so without the clear this would do nothing in
+     * the exact case it exists for - row 0 selected by construction.
+     *
+     * Each tab keeps its own tagging logic; this only makes it run again for the visible one.
+     */
+    public void retagSelectedRow() {
+        final JTable list = getMainLista();
+        if (list == null || list.getRowCount() == 0) {
+            //tabs with no map-tagging list (Actions, Troops, Spells) have nothing to re-assert
+            return;
+        }
+        final int row = Math.max(list.getSelectedRow(), 0);
+        list.getSelectionModel().clearSelection();
+        list.getSelectionModel().setSelectionInterval(row, row);
+    }
+
     public JTable getMainLista() {
         log.fatal("Can't use getMainLista() here. Needs to override int he tab.");
         return null;

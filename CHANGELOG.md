@@ -2,6 +2,11 @@
 
 ## UNRELEASED - next build
 
+### The map now looks where you are looking
+
+- **On opening a turn, the map centres on the list you are actually on.** It used to centre on your capital whatever tab you landed on, so if you reopened on Characters your first character was often off screen entirely.
+- **That also made order ranges look broken.** Plan a move and the range outline was drawn correctly - around a hex you could not see. It was there all along.
+
 ### The window comes back the right size when your screens change
 
 - **Dock your laptop at night, open the Counselor on the laptop alone in the morning, and the window no longer comes back too big for the screen.** It remembered the size of the monitor it was closed on.

@@ -6,6 +6,8 @@
 package gui;
 
 import control.MapaControler;
+import java.awt.Component;
+import javax.swing.SwingUtilities;
 import control.facade.WorldFacadeCounselor;
 import gui.tabs.TabAcoesGui;
 import gui.tabs.TabArtefatosGui;
@@ -39,6 +41,9 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
     /**
      * Creates new form MainDadosGui
      */
+    /** Guards the one-shot KI-037 re-tag; addNotify can fire more than once. */
+    private boolean retagged = false;
+
     public MainDadosGui() {
         initComponents();
         MapaControler mapaControl = WorldFacadeCounselor.getInstance().getMapaControler();
@@ -92,6 +97,31 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
             int sel = jTabbedPane1.getSelectedIndex();
             if (sel >= 0) {
                 SettingsManager.getInstance().setConfig("LastDataTab", jTabbedPane1.getTitleAt(sel));
+            }
+        });
+    }
+
+    /**
+     * Re-tag the map from the tab the player actually ends up on (KI-037).
+     *
+     * Deferred to {@code addNotify} and then one more hop through the event queue, NOT done at the end
+     * of the constructor, because the map resolves its zoom in its OWN addNotify: a tag placed before
+     * that lands at 1x, which is the defect fixed in v2.1.882. By the time this runs the hierarchy is
+     * realized and the zoom is settled.
+     *
+     * Runs once per instance. A new load builds a new MainDadosGui, so there is nothing to reset.
+     */
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        if (retagged) {
+            return;
+        }
+        retagged = true;
+        SwingUtilities.invokeLater(() -> {
+            final Component selected = jTabbedPane1.getSelectedComponent();
+            if (selected instanceof TabBase) {
+                ((TabBase) selected).retagSelectedRow();
             }
         });
     }
