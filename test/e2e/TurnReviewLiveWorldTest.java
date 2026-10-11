@@ -37,7 +37,7 @@ class TurnReviewLiveWorldTest {
         return TurnReview.compute(wfc.getActors(), wfc.getJogadorAtivo(), wfc.getLocais(),
                 wfc.listPersonagens().values(), Collections.emptyMap(),
                 actor -> cenarioFacade.hasOrdens(wfc.getPartida(), actor),
-                wfc.getNationPackagesLimit());
+                wfc.getNationPackagesLimit(), wfc.hasCitySizeCap());
     }
 
     /** The whole pass over a real world, with nothing entered: it must complete and say something. */

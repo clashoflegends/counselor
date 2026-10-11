@@ -51,6 +51,14 @@ import persistenceCommons.BundleManager;
  * the save path, so a bug in a check can cost the player a confusing row but never an hour of orders.
  * Double-clicking a row reuses {@link QuickSearchDialog#jump} so a jump from here behaves exactly like
  * a jump from quick search.
+ * <p>
+ * <b>It is a SNAPSHOT, and modeless, so it must not outlive its game.</b> The findings hold live
+ * {@code BaseModel} actors and the jump reaches through the {@code MainDadosGui} that was open when it
+ * was built, both of which are replaced on the next EGF load. {@code QuickSearchDialog} solves this by
+ * being modal; this one cannot be, since the whole point is to work through the list with the tabs in
+ * front of you. So it is registered in {@code ComponentFactory.disposeSecondaryWindows} instead, and
+ * {@code ComponentFactoryStaleWindowTest} pins that registration. Within one turn it is still a
+ * snapshot: fix an order and the row stays until Review is opened again.
  *
  * @author jmoura
  */
@@ -63,7 +71,7 @@ public final class TurnReviewDialog extends JDialog {
     private final transient List<Finding> findings;
 
     private TurnReviewDialog(Window parent, MainDadosGui dados, BundleManager labels,
-            List<Finding> findings, int orderCount, int actorCount) {
+            List<Finding> findings, int orderCount, int actorCount, boolean failed) {
         super(parent, ModalityType.MODELESS);
         this.labels = labels;
         this.dados = dados;
@@ -76,11 +84,20 @@ public final class TurnReviewDialog extends JDialog {
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         scroll.setPreferredSize(new Dimension(760, 360));
 
-        final JLabel summary = new JLabel(findings.isEmpty()
-                ? String.format(tx("REVIEW.EMPTY", "Nothing to flag. %s orders across %s actors."),
-                        orderCount, actorCount)
-                : String.format(tx("REVIEW.COUNT", "%s to look at, across %s orders and %s actors."),
-                        findings.size(), orderCount, actorCount));
+        final String summaryText;
+        if (failed) {
+            summaryText = tx("REVIEW.FAILED",
+                    "The review could not be completed, so this list is not a clean bill of health.");
+        } else if (findings.isEmpty()) {
+            summaryText = String.format(
+                    tx("REVIEW.EMPTY", "Nothing to flag. %s orders across %s actors."),
+                    orderCount, actorCount);
+        } else {
+            summaryText = String.format(
+                    tx("REVIEW.COUNT", "%s to look at, across %s orders and %s actors."),
+                    findings.size(), orderCount, actorCount);
+        }
+        final JLabel summary = new JLabel(summaryText);
         summary.setBorder(BorderFactory.createEmptyBorder(8, 12, 2, 12));
 
         final JLabel hint = new JLabel(tx("REVIEW.HINT",
@@ -102,6 +119,9 @@ public final class TurnReviewDialog extends JDialog {
         add(scroll, BorderLayout.CENTER);
         add(buttons, BorderLayout.SOUTH);
         getRootPane().setDefaultButton(close);
+        //DISPOSE, not the JDialog default of HIDE: closing with the window X would otherwise leave a
+        //hidden dialog holding every actor of this turn, and one per Review the player opened.
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         installKeys();
         pack();
         setLocationRelativeTo(parent);
@@ -117,7 +137,14 @@ public final class TurnReviewDialog extends JDialog {
     public static void show(Component parent, MainDadosGui dados, BundleManager labels) {
         final Window w = (parent instanceof Window) ? (Window) parent
                 : SwingUtilities.getWindowAncestor(parent);
+        if (dados == null) {
+            //Same guard QuickSearchDialog.show carries. Without it, clicking Review before a turn is
+            //open throws inside the gather below and renders as a clean bill of health.
+            Toast.show(w, label(labels, "REVIEW.NOTURN", "Open a turn file first"));
+            return;
+        }
         List<Finding> found;
+        boolean failed = false;
         int orders = 0;
         int actors = 0;
         try {
@@ -137,13 +164,21 @@ public final class TurnReviewDialog extends JDialog {
             found = TurnReview.compute(actorList, wfc.getJogadorAtivo(), wfc.getLocais(),
                     wfc.listPersonagens().values(), convergingNames(),
                     actor -> cenarioFacade.hasOrdens(wfc.getPartida(), actor),
-                    wfc.getNationPackagesLimit());
+                    wfc.getNationPackagesLimit(), wfc.hasCitySizeCap());
         } catch (RuntimeException ex) {
-            // A review is a convenience. It must never be the reason a player cannot finish a turn.
+            // A review is a convenience. It must never be the reason a player cannot finish a turn -
+            // but it must not claim the turn is clean either. The empty list and the failure are
+            // rendered differently for exactly that reason: this dialog's only job is to say whether
+            // the turn is ready, so "I could not look" and "I looked and found nothing" are opposite
+            // answers and the player has to be able to tell them apart.
             log.warn("Turn review failed", ex);
             found = new ArrayList<>();
+            failed = true;
         }
-        new TurnReviewDialog(w, dados, labels, found, orders, actors).setVisible(true);
+        //WARN rows first: in a twenty-actor turn the open-slot rows outnumber the ones the feature
+        //exists to surface, and the player reads from the top. The column sorter still works.
+        found.sort((a, b) -> a.getLevel().compareTo(b.getLevel()));
+        new TurnReviewDialog(w, dados, labels, found, orders, actors, failed).setVisible(true);
     }
 
     /** The converging-moves overlay's current picture, flattened to hex -> the names walking in. */
@@ -334,8 +369,12 @@ public final class TurnReviewDialog extends JDialog {
         }
     }
 
-    /** Bundle lookup that falls back to English when the key has not reached the bundled jar yet. */
     private String tx(String key, String fallback) {
+        return label(labels, key, fallback);
+    }
+
+    /** Bundle lookup that falls back to English when the key has not reached the bundled jar yet. */
+    private static String label(BundleManager labels, String key, String fallback) {
         final String s = labels.getString(key);
         return (s == null || s.startsWith("N/A (Missing Translation")) ? fallback : s;
     }

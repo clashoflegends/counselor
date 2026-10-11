@@ -1161,7 +1161,7 @@ public class ComponentFactory implements Serializable {
     private static final Class<?>[] STALE_ON_NEW_GAME = {
         ChartBar.class, ChartLine.class, ChartPie.class, ChartGauge.class,
         gui.charts.ChartRadar.class, gui.charts.ChartGrowth.class,
-        QuickSearchDialog.class, VictoryDashboardDialog.class,
+        QuickSearchDialog.class, VictoryDashboardDialog.class, TurnReviewDialog.class,
         gui.accessories.BattleSimWindow.class,
         gui.accessories.BattleCasualtySimulatorNew.class,
         gui.accessories.TroopsCasualtiesList.class,

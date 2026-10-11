@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import model.Cidade;
 import model.Jogador;
 import model.Local;
 import model.Nacao;
@@ -205,6 +206,43 @@ class TurnReviewTest {
                 "two living holders of one ident must not be resolved to either");
     }
 
+    // ----- the ;SCC; growth cap -----
+
+    /**
+     * A city that cannot grow is flagged - but ONLY where the rule exists.
+     *
+     * {@code CidadeFacade.isCheckCitySizeCapToUpgrade} is pure geometry: it measures the distance to
+     * the nearest big city and never looks at whether {@code ;SCC;} is switched on. Every other
+     * caller gates it on {@code WorldFacadeCounselor.hasCitySizeCap} for that reason, and this check
+     * shipped without the gate, so in any game WITHOUT the rule a perfectly legal upgrade was told
+     * "the Judge will refuse this order". A false warning in the one row style a player acts on.
+     */
+    @Test
+    void theGrowthCapIsOnlyCheckedWhereTheRuleIsSwitchedOn() {
+        final Fixture f = new Fixture();
+        final Cidade city = f.city("Winterfell", "0505", 3, false);
+        f.city("White Harbor", "0605", 4, false);      // a size-4 neighbour one hex away caps it
+        final Cidade actor = f.improveCity(city);
+
+        f.sizeCapOn = true;
+        assertEquals(1, count(f.runActors(actor), Kind.SIZE_CAP), "control: with ;SCC; it IS capped");
+
+        f.sizeCapOn = false;
+        assertEquals(0, count(f.runActors(actor), Kind.SIZE_CAP),
+                "without ;SCC; nothing caps anything, and saying otherwise is a lie");
+    }
+
+    /** With the rule on but nothing in range, there is nothing to say. */
+    @Test
+    void aCityWithNoBigNeighbourIsNotFlagged() {
+        final Fixture f = new Fixture();
+        final Cidade city = f.city("Winterfell", "0505", 3, false);
+        f.city("White Harbor", "0101", 4, false);      // far away
+        final Cidade actor = f.improveCity(city);
+
+        assertEquals(0, count(f.runActors(actor), Kind.SIZE_CAP));
+    }
+
     // ----- the predicate the SAVE PATH shares -----
 
     /**
@@ -287,7 +325,7 @@ class TurnReviewTest {
     /** No input, no findings, and never a null for the dialog to guard. */
     @Test
     void nullInputsYieldAnEmptyList() {
-        assertTrue(TurnReview.compute(null, null, null, null, null, null, 0).isEmpty());
+        assertTrue(TurnReview.compute(null, null, null, null, null, null, 0, true).isEmpty());
     }
 
     // ----- helpers -----
@@ -320,6 +358,7 @@ class TurnReviewTest {
         private final Nacao nation = new Nacao();
         private boolean offersOrders = true;
         private int limit;
+        private boolean sizeCapOn = true;
 
         Fixture() {
             me.setNome("me");
@@ -349,11 +388,45 @@ class TurnReviewTest {
             return l;
         }
 
+        /** Like {@link #run}, for actors that are not characters. */
+        List<Finding> runActors(BaseModel... actors) {
+            final List<BaseModel> list = new ArrayList<>(Arrays.asList(actors));
+            return TurnReview.compute(list, me, locais, Collections.<Personagem>emptyList(),
+                    converging, actor -> offersOrders, limit, sizeCapOn);
+        }
+
+        /** A city of my nation on a hex, which is what the size-cap rule measures between. */
+        Cidade city(String name, String at, int size, boolean capital) {
+            final Cidade c = new Cidade();
+            c.setNome(name);
+            c.setCodigo(at);
+            c.setNacao(nation);
+            c.setTamanho(size);
+            c.setCapital(capital);
+            c.setLocal(hex(at));
+            hex(at).setCidade(c);
+            return c;
+        }
+
+        /** The city, carrying an Improve City Size order in slot 0. */
+        Cidade improveCity(Cidade city) {
+            final Ordem o = new Ordem();
+            o.setNome("AmplCP");
+            o.setCodigo("550");          // one of OrdemJudgeFactory's improve-city codes
+            o.setTipo("Cid");
+            o.setParametrosIde(new String[]{"None"});
+            final PersonagemOrdem po = new PersonagemOrdem();
+            po.setOrdem(o);
+            po.setParametrosId(new ArrayList<>(Collections.singletonList(" ")));
+            city.setAcao(0, po);
+            return city;
+        }
+
         List<Finding> run(Personagem... actors) {
             final List<BaseModel> list = new ArrayList<>(Arrays.asList(actors));
             final List<Personagem> world = new ArrayList<>(Arrays.asList(actors));
             return TurnReview.compute(list, me, locais, world, converging,
-                    actor -> offersOrders, limit);
+                    actor -> offersOrders, limit, sizeCapOn);
         }
 
         /** A character of SOMEBODY ELSE'S nation, which the order picker never offered. */

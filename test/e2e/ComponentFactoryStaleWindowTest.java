@@ -54,6 +54,21 @@ class ComponentFactoryStaleWindowTest {
         assertTrue(staleTypes().contains(gui.accessories.TroopsCasualtiesList.class));
     }
 
+    /**
+     * The Review Turn list is a snapshot of ONE turn and it is modeless, which is the combination
+     * this registry exists for.
+     *
+     * Its findings hold live {@code BaseModel} actors and its double-click jump reaches through the
+     * {@code MainDadosGui} that was open when the list was built - both replaced on the next EGF
+     * load. {@code QuickSearchDialog} avoids this by being modal; this one cannot be, because
+     * working through the list with the tabs in front of you is the entire point.
+     */
+    @Test
+    void theTurnReviewListIsClosedWhenAnotherGameIsOpened() {
+        assertTrue(staleTypes().contains(gui.services.TurnReviewDialog.class),
+                "the review lists actors from the game that built it; it cannot outlive it");
+    }
+
     /** The charts and dashboards that were already registered stay registered. */
     @Test
     void theOriginalSnapshotWindowsAreStillListed() {

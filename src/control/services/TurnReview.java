@@ -137,11 +137,14 @@ public final class TurnReview implements Serializable {
      *                       empty, which is also what the player gets after silencing that overlay
      * @param ordensQtCheck  true when the scenario offers orders at all for an actor class; passing
      *                       the predicate in keeps this free of the Partida lookup and testable
+     * @param hasCitySizeCap whether {@code ;SCC;} is switched on for this game at all. Passed in for
+     *                       the same reason as the predicate above, and REQUIRED: see
+     *                       {@link #addSizeCap}, where omitting it warned in every game.
      */
     public static List<Finding> compute(Collection<BaseModel> actors, Jogador observer,
             SortedMap<String, Local> locais, Collection<Personagem> world,
             Map<Local, List<String>> converging, ActorOffersOrders ordensQtCheck,
-            int nationPackagesLimit) {
+            int nationPackagesLimit, boolean hasCitySizeCap) {
         final List<Finding> ret = new ArrayList<>();
         if (actors != null) {
             for (BaseModel actor : actors) {
@@ -151,7 +154,7 @@ public final class TurnReview implements Serializable {
                 // One unreadable actor must never cost the whole review.
                 try {
                     addOpenSlot(ret, actor, ordensQtCheck, nationPackagesLimit);
-                    addOrderFindings(ret, actor, observer, locais, world);
+                    addOrderFindings(ret, actor, observer, locais, world, hasCitySizeCap);
                 } catch (RuntimeException ex) {
                     //A review is a convenience; never let one bad actor take the list down. LOGGED,
                     //not swallowed: a silent catch here is what hid a broken test fixture, and silent
@@ -173,7 +176,8 @@ public final class TurnReview implements Serializable {
 
     /**
      * The ONE definition of "this actor still has something unplanned", shared with {@code
-     * WorldControler.doSaveActorActions} so the review and the save-time toast can never drift.
+     * WorldControler.doSaveActorActions} so the review and the save-time toast cannot disagree about
+     * WHICH actors are unplanned. (The wording can still differ: see {@link #addOpenSlot}.)
      *
      * A nation counts points rather than slots: its setup is a package budget, not a list of orders.
      */
@@ -198,23 +202,29 @@ public final class TurnReview implements Serializable {
         return false;
     }
 
+    /**
+     * The {@code && getAcaoSize() > 0} mirrors the save toast's key choice exactly: a nation that has
+     * entered NOTHING is told it has orders to give, not that it has points to spend, because at that
+     * stage the two are the same sentence and the shorter one is already the one it hears on save.
+     */
     private static void addOpenSlot(List<Finding> out, BaseModel actor,
             ActorOffersOrders offersOrders, int nationPackagesLimit) {
         if (hasOpenSlot(actor, offersOrders, nationPackagesLimit)) {
             out.add(new Finding(Level.INFO,
-                    actor.isNacaoClass() ? Kind.OPEN_PACKAGE : Kind.OPEN_SLOT,
+                    actor.isNacaoClass() && actor.getAcaoSize() > 0
+                            ? Kind.OPEN_PACKAGE : Kind.OPEN_SLOT,
                     actor, -1, actor.getNome()));
         }
     }
 
     private static void addOrderFindings(List<Finding> out, BaseModel actor, Jogador observer,
-            SortedMap<String, Local> locais, Collection<Personagem> world) {
+            SortedMap<String, Local> locais, Collection<Personagem> world, boolean hasCitySizeCap) {
         for (Map.Entry<Integer, PersonagemOrdem> entry : actor.getAcoes().entrySet()) {
             final PersonagemOrdem po = entry.getValue();
             if (po == null || po.getOrdem() == null) {
                 continue;
             }
-            addSizeCap(out, actor, observer, entry.getKey(), po, locais);
+            addSizeCap(out, actor, observer, entry.getKey(), po, locais, hasCitySizeCap);
             addRendezvous(out, actor, entry.getKey(), po, locais, world);
         }
     }
@@ -226,10 +236,17 @@ public final class TurnReview implements Serializable {
      * answer, and a city can become capped after its order was saved (a neighbour grows, or the player
      * plans the two in the other order). So this is not a duplicate of that question: it is the state
      * as it stands now, which is the only state worth reviewing.
+     * <p>
+     * <b>{@code hasCitySizeCap} is not optional.</b> {@code CidadeFacade.isCheckCitySizeCapToUpgrade}
+     * is pure geometry - it measures the distance to the nearest big city and never looks at whether
+     * the RULE is switched on - so without this gate it answers for every game, and this row tells the
+     * player "the Judge will refuse this order" in games where the Judge will do no such thing. Every
+     * other caller gates it the same way: {@code OrdemControler.getSizeCapBlocker},
+     * {@code CidadeConverter}, {@code FiltroConverter}.
      */
     private static void addSizeCap(List<Finding> out, BaseModel actor, Jogador observer, int slot,
-            PersonagemOrdem po, SortedMap<String, Local> locais) {
-        if (!acaoFacade.isImproveCitySize(po)) {
+            PersonagemOrdem po, SortedMap<String, Local> locais, boolean hasCitySizeCap) {
+        if (!hasCitySizeCap || !acaoFacade.isImproveCitySize(po)) {
             return;
         }
         final Local hex = localOf(actor);

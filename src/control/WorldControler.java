@@ -116,7 +116,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private File currentResultsFile = null; // the EGF currently open (both manual-open and autoload paths); source for "set autoload to current"
     private MainResultWindowGui gui = null;
     // Static so the order-assembly below can be exercised without building a WorldControler (which needs
-    // the GUI). All three are stateless helpers; every other caller keeps using them unchanged.
+    // the GUI). All of these are stateless helpers; every other caller keeps using them unchanged.
     private static final OrdemFacade ordemFacade = new OrdemFacade();
     private final CidadeFacade cidadeFacade = new CidadeFacade();
     private final NacaoFacade nacaoFacade = new NacaoFacade();
