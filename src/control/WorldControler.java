@@ -9,7 +9,6 @@ import gui.services.ClipboardHelper;
 import baseLib.BaseModel;
 import business.BusinessException;
 import business.MapaManager;
-import business.facade.AcaoFacade;
 import business.facade.CenarioFacade;
 import business.facade.CidadeFacade;
 import business.facade.NacaoFacade;
@@ -20,6 +19,7 @@ import business.services.ComparatorFactory;
 import control.facade.WorldFacadeCounselor;
 import control.services.NacaoConverter;
 import control.services.OrdersHashService;
+import control.services.TurnReview;
 import control.support.ControlBase;
 import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
@@ -117,7 +117,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private MainResultWindowGui gui = null;
     // Static so the order-assembly below can be exercised without building a WorldControler (which needs
     // the GUI). All three are stateless helpers; every other caller keeps using them unchanged.
-    private static final AcaoFacade acaoFacade = new AcaoFacade();
     private static final OrdemFacade ordemFacade = new OrdemFacade();
     private final CidadeFacade cidadeFacade = new CidadeFacade();
     private final NacaoFacade nacaoFacade = new NacaoFacade();
@@ -1434,17 +1433,18 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                                 ordemFacade.getParametrosId(actor, index),
                                 ordemFacade.getParametrosDisplay(actor, index),
                                 ordemFacade.getTimeLastChange(actor, index));
-                    } else if (actor.isNacaoClass()) {
-                        //count points, not open slots
-                        if (acaoFacade.isPointsSetupUnderLimit(actor, nationPackagesLimit)) {
-                            ret = String.format(labels.getString("MISSING.PACKAGE.NATION"), actor.getNome());
-                        }
-                    } else {
-                        ret = String.format(labels.getString("MISSING.ORDERS"), actor.getNome());
                     }
                 }
-            } else if (cenarioFacade.hasOrdens(WFC.getPartida(), actor)) {
-                ret = String.format(labels.getString("MISSING.ORDERS"), actor.getNome());
+            }
+            //ONE definition of "this actor still has something unplanned", shared with the Review Turn
+            //dialog so the toast here and the list there can never drift apart. Note this message is
+            //still OVERWRITTEN each time round, so it names the LAST such actor; the review lists them
+            //all, which is the whole reason it exists.
+            if (TurnReview.hasOpenSlot(actor, a -> cenarioFacade.hasOrdens(WFC.getPartida(), a),
+                    nationPackagesLimit)) {
+                ret = String.format(labels.getString(
+                        actor.isNacaoClass() && actor.getAcaoSize() > 0
+                                ? "MISSING.PACKAGE.NATION" : "MISSING.ORDERS"), actor.getNome());
             }
         }
         return ret;

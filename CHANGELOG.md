@@ -2,6 +2,16 @@
 
 ## UNRELEASED - next build
 
+### Review your whole turn before you send it
+
+*A new Review button, next to Save orders.*
+
+- **One list of everything worth a second look**, instead of five warnings that each appeared once, somewhere else, and were gone. Open action slots, cities that cannot grow, meet-ups that will miss, and two of you walking into the same empty hex.
+- **It names every actor you left unplanned, not just one of them.** The old message was overwritten each time it found another, so with five characters half-planned you heard about one.
+- **New: it spots most rendezvous that will not happen.** Order a character to move somewhere and join one of your leaders there, and if that leader is going to end the turn somewhere else, the review says so. The move still happens; the joining does not, and until now the only way to find out was the turn result. Of every order in the game, this is the one most often thrown out before it is even attempted.
+- **Double click any line to jump straight to it**, the same way quick search does.
+- **Nothing here blocks or changes anything.** It is a second pair of eyes, not a gate: you can send a turn with every line still on the list.
+
 ### The map now looks where you are looking
 
 - **On opening a turn, the map centres on the list you are actually on.** It used to centre on your capital whatever tab you landed on, so if you reopened on Characters your first character was often off screen entirely.

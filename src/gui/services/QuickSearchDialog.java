@@ -293,6 +293,17 @@ public final class QuickSearchDialog extends JDialog {
     }
 
     private void doJump(Entry e) {
+        jump(dados, e);
+    }
+
+    /**
+     * Select an indexed row, centre the map on it and leave focus on the row.
+     * <p>
+     * Static and public because the Review Turn dialog navigates to an actor the same way, and
+     * the ORDER of the steps here is load-bearing (see the focus comment at the end) - worth
+     * sharing rather than re-deriving.
+     */
+    public static void jump(MainDadosGui dados, Entry e) {
         try {
             final javax.swing.JTabbedPane tabs = dados.getTabbedPane();
             if (e.getTabIndex() >= tabs.getTabCount()
@@ -331,7 +342,7 @@ public final class QuickSearchDialog extends JDialog {
      * Centre the map on the row's hex, exactly as a double-click on the row does. Some tabs already do
      * this from their selection listener; repeating it is harmless and covers the ones that do not.
      */
-    private void centreMap(TabBase tab, TableModel model, int modelRow) {
+    private static void centreMap(TabBase tab, TableModel model, int modelRow) {
         if (tab.getMapaControler() == null) {
             return;
         }

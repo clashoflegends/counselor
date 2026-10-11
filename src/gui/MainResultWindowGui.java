@@ -46,6 +46,7 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     private javax.swing.JButton jbRecent; // recent-files dropdown, built in code (not the .form)
     private javax.swing.JButton jbFind;   // quick-search entry point, built in code (not the .form)
     private javax.swing.JButton jbOverlayStyle; // map overlay style menu, built in code (not the .form)
+    private javax.swing.JButton jbReview; // turn review, built in code (not the .form)
 
     private final SettingsManager settingsManager;
 
@@ -121,6 +122,19 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         jbFind.setFocusable(false);
         jbFind.addActionListener(e -> gui.services.QuickSearchDialog.show(this, dadosGui, labels));
         jToolBar1.add(jbFind, 2);
+        jToolBar1.revalidate();
+        jToolBar1.repaint();
+
+        // Review turn, beside Save orders. The client already warned about most of what it lists, but
+        // each warning fired once, somewhere else, and then was gone; with twenty actors there was
+        // nowhere to stand back and look at the turn as a whole. Read-only - it never blocks a save.
+        jbReview = new javax.swing.JButton();
+        jbReview.setIcon(svgIcon("check"));
+        jbReview.setText(labels.getString("REVIEW.TOOLBAR"));
+        jbReview.setToolTipText(labels.getString("REVIEW.TOOLTIP"));
+        jbReview.setFocusable(false);
+        jbReview.addActionListener(e -> gui.services.TurnReviewDialog.show(this, dadosGui, labels));
+        jToolBar1.add(jbReview, jToolBar1.getComponentZOrder(jbSave) + 1);
         jToolBar1.revalidate();
         jToolBar1.repaint();
 
