@@ -1,5 +1,13 @@
 # What's New in Counselor
 
+## UNRELEASED - next build
+
+### The window comes back the right size when your screens change
+
+- **Dock your laptop at night, open the Counselor on the laptop alone in the morning, and the window no longer comes back too big for the screen.** It remembered the size of the monitor it was closed on.
+- **A window left on a monitor that is no longer plugged in** comes back on the screen you do have, centred, instead of opening somewhere you cannot see or drag it to.
+- **If your screens have not changed, nothing moves.** A window already sitting comfortably where you left it is not touched, including one on a second monitor that is still attached.
+
 ## 09-OCT-2026 - v2.1.933
 
 ### Your magic items finally tell you what they do

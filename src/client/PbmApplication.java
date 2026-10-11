@@ -13,6 +13,7 @@ import gui.services.EgfDropHandler;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -100,11 +101,29 @@ public class PbmApplication extends Application implements Serializable {
             frame.setTransferHandler(new EgfDropHandler(mainWin));
             //set icon
             frame.setIconImage(ImageManager.getInstance().getIconApp());
-            if (posX != -1) {
-                frame.setLocation(posX, posY);
-            }
-            if (width != -1) {
-                frame.setPreferredSize(new Dimension(width, height));
+            if (width != -1 || posX != -1) {
+                //The remembered geometry came from whatever display set was attached LAST time. A
+                //docked laptop changes that between runs: a window closed on a 2560-wide monitor is
+                //restored oversized on the laptop panel, and a remembered x of 2560 points at a
+                //screen that is no longer there. Clamp both to a screen that exists before using
+                //them - see ScreenFit.
+                final Rectangle saved = new Rectangle(
+                        posX != -1 ? posX : frame.getLocation().x,
+                        posX != -1 ? posY : frame.getLocation().y,
+                        width != -1 ? width : frame.getWidth(),
+                        width != -1 ? height : frame.getHeight());
+                final Rectangle fitted = gui.services.ScreenFit.fit(saved, gui.services.ScreenFit.usableScreens());
+                if (!fitted.equals(saved)) {
+                    log.info(String.format("Remembered window %dx%d at %d,%d does not fit the current "
+                            + "screens; using %dx%d at %d,%d.", saved.width, saved.height, saved.x,
+                            saved.y, fitted.width, fitted.height, fitted.x, fitted.y));
+                }
+                if (posX != -1) {
+                    frame.setLocation(fitted.x, fitted.y);
+                }
+                if (width != -1) {
+                    frame.setPreferredSize(new Dimension(fitted.width, fitted.height));
+                }
             }
         } catch (MissingResourceException e) {
             log.fatal(e);
