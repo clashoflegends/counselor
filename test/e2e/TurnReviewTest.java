@@ -176,18 +176,33 @@ class TurnReviewTest {
     }
 
     /**
-     * An autoloaded ally's turn file merges THEIR characters into the same world, and the picker
-     * never offered them. Here the ident belongs ONLY to the ally, so correct code resolves nothing
-     * and says nothing; a world-wide search would find them standing elsewhere and warn about it.
+     * Joining an ALLY is legal (Ordem755JoinLeader allows it) and the picker's combo is editable, so
+     * the parameter can name a character of another nation. That is 161 successful and 208 failed
+     * MovUnir orders in the measured corpus, so the check follows them rather than going quiet.
      */
     @Test
-    void anAlliedCharacterIsNeverTakenAsTheTarget() {
+    void anAlliedCharacterIsResolvedWhenTheIdentIsUnambiguous() {
         final Fixture f = new Fixture();
         final Personagem ally = f.foreign("Davos", "0909");
         final Personagem actor = f.joiner("Tyrion", "0101", "0505", ally);
 
-        assertEquals(0, count(f.run(actor, ally), Kind.RENDEZVOUS),
-                "an ally's character was never in the picker, so the parameter cannot mean them");
+        assertEquals(1, count(f.run(actor, ally), Kind.RENDEZVOUS),
+                "an ally standing somewhere else is still a rendezvous that will not happen");
+    }
+
+    /**
+     * ...but the widened search refuses to guess. Two living holders of one ident and the check says
+     * nothing, because naming the wrong character is worse than naming none.
+     */
+    @Test
+    void anAmbiguousIdentOutsideMyNationResolvesToNobody() {
+        final Fixture f = new Fixture();
+        final Personagem ally = f.foreign("Davos", "0909");
+        final Personagem twin = f.foreign("Davos", "0808");
+        final Personagem actor = f.joiner("Tyrion", "0101", "0505", ally);
+
+        assertEquals(0, count(f.run(actor, ally, twin), Kind.RENDEZVOUS),
+                "two living holders of one ident must not be resolved to either");
     }
 
     // ----- the predicate the SAVE PATH shares -----
@@ -272,7 +287,7 @@ class TurnReviewTest {
     /** No input, no findings, and never a null for the dialog to guard. */
     @Test
     void nullInputsYieldAnEmptyList() {
-        assertTrue(TurnReview.compute(null, null, null, null, null, 0).isEmpty());
+        assertTrue(TurnReview.compute(null, null, null, null, null, null, 0).isEmpty());
     }
 
     // ----- helpers -----
@@ -336,7 +351,9 @@ class TurnReviewTest {
 
         List<Finding> run(Personagem... actors) {
             final List<BaseModel> list = new ArrayList<>(Arrays.asList(actors));
-            return TurnReview.compute(list, me, locais, converging, actor -> offersOrders, limit);
+            final List<Personagem> world = new ArrayList<>(Arrays.asList(actors));
+            return TurnReview.compute(list, me, locais, world, converging,
+                    actor -> offersOrders, limit);
         }
 
         /** A character of SOMEBODY ELSE'S nation, which the order picker never offered. */

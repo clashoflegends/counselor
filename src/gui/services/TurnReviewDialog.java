@@ -135,7 +135,8 @@ public final class TurnReviewDialog extends JDialog {
                 }
             }
             found = TurnReview.compute(actorList, wfc.getJogadorAtivo(), wfc.getLocais(),
-                    convergingNames(), actor -> cenarioFacade.hasOrdens(wfc.getPartida(), actor),
+                    wfc.listPersonagens().values(), convergingNames(),
+                    actor -> cenarioFacade.hasOrdens(wfc.getPartida(), actor),
                     wfc.getNationPackagesLimit());
         } catch (RuntimeException ex) {
             // A review is a convenience. It must never be the reason a player cannot finish a turn.

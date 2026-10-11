@@ -131,14 +131,17 @@ public final class TurnReview implements Serializable {
      *                       them; inactive ones and other players' are skipped here
      * @param observer       the active player
      * @param locais         the hex index, for resolving order parameters
+     * @param world          every character the turn file carries, for the ident fallback in
+     *                       {@link #byIdent}; the actor's own nation is always searched first
      * @param converging     hex to the names walking into it, from {@code MoveConvergence}; may be
      *                       empty, which is also what the player gets after silencing that overlay
      * @param ordensQtCheck  true when the scenario offers orders at all for an actor class; passing
      *                       the predicate in keeps this free of the Partida lookup and testable
      */
     public static List<Finding> compute(Collection<BaseModel> actors, Jogador observer,
-            SortedMap<String, Local> locais, Map<Local, List<String>> converging,
-            ActorOffersOrders ordensQtCheck, int nationPackagesLimit) {
+            SortedMap<String, Local> locais, Collection<Personagem> world,
+            Map<Local, List<String>> converging, ActorOffersOrders ordensQtCheck,
+            int nationPackagesLimit) {
         final List<Finding> ret = new ArrayList<>();
         if (actors != null) {
             for (BaseModel actor : actors) {
@@ -148,7 +151,7 @@ public final class TurnReview implements Serializable {
                 // One unreadable actor must never cost the whole review.
                 try {
                     addOpenSlot(ret, actor, ordensQtCheck, nationPackagesLimit);
-                    addOrderFindings(ret, actor, observer, locais);
+                    addOrderFindings(ret, actor, observer, locais, world);
                 } catch (RuntimeException ex) {
                     //A review is a convenience; never let one bad actor take the list down. LOGGED,
                     //not swallowed: a silent catch here is what hid a broken test fixture, and silent
@@ -205,14 +208,14 @@ public final class TurnReview implements Serializable {
     }
 
     private static void addOrderFindings(List<Finding> out, BaseModel actor, Jogador observer,
-            SortedMap<String, Local> locais) {
+            SortedMap<String, Local> locais, Collection<Personagem> world) {
         for (Map.Entry<Integer, PersonagemOrdem> entry : actor.getAcoes().entrySet()) {
             final PersonagemOrdem po = entry.getValue();
             if (po == null || po.getOrdem() == null) {
                 continue;
             }
             addSizeCap(out, actor, observer, entry.getKey(), po, locais);
-            addRendezvous(out, actor, entry.getKey(), po, locais);
+            addRendezvous(out, actor, entry.getKey(), po, locais, world);
         }
     }
 
@@ -252,9 +255,13 @@ public final class TurnReview implements Serializable {
      * <b>Measured, and the numbers matter.</b> Across games 850 to 907 ({@code ordem_estatistica}
      * joined to {@code personagem_turno.id_hex_final}), the destination equalled the target's
      * end-of-turn hex in <b>15,448 of 15,461 successes (99.92%)</b> and in only <b>317 of 1,549
-     * could-not-attempt failures (20.5%)</b>. So flagging a mismatch catches about 80% of the waste
-     * while touching 0.08% of the orders that worked. MovUnir is the largest source of
-     * could-not-attempt in the whole catalogue that is not deliberate (1,628 of 17,710 issued).
+     * could-not-attempt failures (20.5%)</b>.
+     * <p>
+     * Against the FULL population rather than the rows that join, this check would flag <b>1,232 of
+     * the 1,628 MovUnir failures (76%) and 13 of the 15,888 successes (0.08%)</b>. The gap is the
+     * targets whose ident resolves to nobody, which {@link #byIdent} skips on purpose. MovUnir is the
+     * largest source of could-not-attempt in the whole catalogue that is not deliberate: 1,628 of
+     * 17,710 issued, behind only PegArt, whose 76% failure rate IS the mechanic (a blind search).
      *
      * <b>Do NOT "simplify" this to the target's CURRENT hex.</b> That was measured too and it is
      * wrong: 42% of SUCCESSFUL MovUnir orders have the target somewhere else at turn start, because
@@ -267,7 +274,7 @@ public final class TurnReview implements Serializable {
      * any of them, so a scenario that adds the same mechanic under a new code is covered for free.
      */
     private static void addRendezvous(List<Finding> out, BaseModel actor, int slot,
-            PersonagemOrdem po, SortedMap<String, Local> locais) {
+            PersonagemOrdem po, SortedMap<String, Local> locais, Collection<Personagem> world) {
         if (!(actor instanceof Personagem) || !isJoinLeaderShape(po)) {
             return;
         }
@@ -275,7 +282,7 @@ public final class TurnReview implements Serializable {
         if (dest == null) {
             return;
         }
-        final Personagem target = byIdent(po.getParametrosId().get(1), (Personagem) actor);
+        final Personagem target = byIdent(po.getParametrosId().get(1), (Personagem) actor, world);
         if (target == null) {
             //the combo is editable, so the parameter can hold text that names nobody. Saying nothing
             //beats inventing a verdict about a character we cannot find.
@@ -309,34 +316,85 @@ public final class TurnReview implements Serializable {
     }
 
     /**
-     * The character whose 5-character ident the parameter holds, searched in the ACTOR'S OWN NATION
-     * and among the living.
+     * The living character whose 5-character ident the parameter holds: the actor's OWN NATION first,
+     * then the wider world but only on a single unambiguous match.
      *
-     * Scoped deliberately, because a world-wide search is not merely wider, it is wrong. The picker
-     * that produced this parameter offered {@code NacaoFacade.listPersonagemNacao}, this nation's
-     * characters, so a match anywhere else is not who the player chose. And two things guarantee
-     * stray matches: an ident is RELEASED when its holder dies and is reused inside the same game
-     * (KI-051), and an autoloaded ally's turn file merges their characters into the same world.
-     * Either would pin the planned destination on the wrong body and raise a confident false warning,
-     * which is worse than the silence it replaced.
+     * Own nation first because that is what the picker offered ({@code
+     * NacaoFacade.listPersonagemNacao}), so a same-nation match is certainly the character chosen.
+     * The wider fallback exists because the combo is EDITABLE and joining an ALLY is legal, which
+     * {@code Ordem755JoinLeader.criticaRequisitos} spells out - and it is not rare: 161 successful and
+     * 208 could-not-attempt MovUnir orders across games 850 to 907 name a character of another
+     * nation. Dropping the fallback would blind the check to about one in eight of the cases it
+     * exists for.
+     *
+     * The fallback REFUSES to guess, which is what keeps it honest. An ident is released when its
+     * holder dies and reused inside the same game (KI-051), and an autoloaded ally's turn file merges
+     * their characters into the same world, so "first match wins" can answer with a corpse or with
+     * the wrong character and pin the planned destination on the wrong body. A second living holder
+     * therefore yields null and the check stays silent. Measured, that ambiguity is real but small:
+     * 54 of 1,546 could-not-attempt rows and 253 of 15,453 successes.
      */
-    private static Personagem byIdent(String ident, Personagem actor) {
-        if (ident == null || actor == null || actor.getNacao() == null) {
+    private static Personagem byIdent(String ident, Personagem actor, Collection<Personagem> world) {
+        if (ident == null || actor == null) {
             return null;
         }
         final String wanted = ident.trim();
         if (wanted.isEmpty()) {
             return null;
         }
-        for (Personagem pers : actor.getNacao().getPersonagens()) {
-            if (pers == null || pers == actor || personagemFacade.isMorto(pers)) {
-                continue;
+        if (actor.getNacao() != null) {
+            final Personagem mine = matchIn(actor.getNacao().getPersonagens(), wanted, actor);
+            if (mine != null) {
+                return mine;
             }
-            if (pers.getCodigo() != null && pers.getCodigo().trim().equals(wanted)) {
+        }
+        // Not in my nation. The parameter can still be legitimate: the picker's combo is EDITABLE,
+        // and Ordem755JoinLeader explicitly allows joining a character of an ALLIED nation
+        // (its NacaoAmigavelNao branch). Across games 850 to 907 that is 161 successful MovUnir
+        // orders and 208 that could not be attempted, in 28 and 20 games - too much to ignore.
+        //
+        // Widening the search is only safe while the answer is UNambiguous, so a second holder of
+        // the ident makes this give up rather than pick one. That is the whole risk being managed:
+        // an ident is released when its holder dies and reused in the same game (KI-051), so a
+        // "first match wins" search can answer with a corpse or with somebody else's character and
+        // pin the planned destination on the wrong body.
+        return uniqueMatchIn(world, wanted, actor);
+    }
+
+    private static Personagem matchIn(Collection<Personagem> candidates, String ident, Personagem actor) {
+        if (candidates == null) {
+            return null;
+        }
+        for (Personagem pers : candidates) {
+            if (isLivingMatch(pers, ident, actor)) {
                 return pers;
             }
         }
         return null;
+    }
+
+    /** The one living holder of this ident, or null when there is none or more than one. */
+    private static Personagem uniqueMatchIn(Collection<Personagem> candidates, String ident,
+            Personagem actor) {
+        if (candidates == null) {
+            return null;
+        }
+        Personagem found = null;
+        for (Personagem pers : candidates) {
+            if (!isLivingMatch(pers, ident, actor)) {
+                continue;
+            }
+            if (found != null) {
+                return null; // ambiguous: say nothing rather than name the wrong character
+            }
+            found = pers;
+        }
+        return found;
+    }
+
+    private static boolean isLivingMatch(Personagem pers, String ident, Personagem actor) {
+        return pers != null && pers != actor && !personagemFacade.isMorto(pers)
+                && pers.getCodigo() != null && pers.getCodigo().trim().equals(ident);
     }
 
     private static void addConverging(List<Finding> out, Map<Local, List<String>> converging) {
@@ -344,9 +402,16 @@ public final class TurnReview implements Serializable {
             return;
         }
         for (Map.Entry<Local, List<String>> hex : converging.entrySet()) {
-            out.add(new Finding(Level.INFO, Kind.CONVERGE, null, -1,
-                    LocalFacade.getCoordenadas(hex.getKey()),
-                    String.join(", ", hex.getValue())));
+            //Guarded per entry, not per pass: this runs OUTSIDE the per-actor loop, so without it one
+            //unreadable hex would escape to the dialog's own catch and discard every finding computed
+            //above it - the player would be told the turn is clean when it is not.
+            try {
+                out.add(new Finding(Level.INFO, Kind.CONVERGE, null, -1,
+                        LocalFacade.getCoordenadas(hex.getKey()),
+                        String.join(", ", hex.getValue())));
+            } catch (RuntimeException ex) {
+                log.warn(String.format("Skipping unreadable converging hex in turn review: %s", ex));
+            }
         }
     }
 
