@@ -1,5 +1,6 @@
 package e2e;
 
+import business.ArmyPath;
 import business.MovimentoExercito;
 import business.facade.ExercitoFacade;
 import control.services.ThreatReach;
@@ -8,6 +9,7 @@ import control.services.ThreatReach.Threat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -25,6 +27,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -440,6 +444,94 @@ class ThreatReachTest {
 
         assertEquals(1, f.run(f.unscouted("Desconhecido", "0505", f.theirs, 2, 0))
                 .getSoonest(f.locais.get("0505")));
+    }
+
+    // ----- the Armies tab shares this, and that is where the defect was visible -----
+
+    /**
+     * {@code rangeOf} is what {@code MapaControler.printTagArmyRange} draws, and it is the live bug.
+     *
+     * The Armies tab's filter combo offers All first and Enemies further down, so a player can click
+     * an unscouted enemy army - and before the roster substitution the shaded range came back as a
+     * perfect circle of the full point budget that crossed water. Sharing the call with the threat
+     * picture is also what stops the two answering differently about the same army.
+     */
+    @Test
+    void theArmiesTabRangeOfAnUnscoutedEnemyRespectsTerrain() {
+        final Fixture f = new Fixture();
+        for (int row = 1; row <= 12; row++) {
+            f.hex(String.format("%02d%02d", 6, row), f.water);
+        }
+        final TipoTropa foot = troop("FOOT", false, "", new Terreno[]{f.plain, f.mountain},
+                new int[]{3, 12});
+        giveRoster(f.theirs, foot);
+        final Exercito enemy = f.unscouted("Desconhecido", "0505", f.theirs, 2, 0);
+
+        final Map<Local, ArmyPath> range = ThreatReach.rangeOf(enemy, f.locais, f.cenario, 14);
+
+        assertFalse(range.isEmpty(), "it still has a range");
+        for (Local hex : range.keySet()) {
+            assertFalse(hex.getTerreno().isAgua(), hex.getCodigo() + " is water");
+        }
+    }
+
+    /** The union keeps the CHEAPEST path per hex, so the band a hex lands in is the soonest one. */
+    @Test
+    void rangeOfKeepsTheCheapestPathWhenTwoTroopsReachTheSameHex() {
+        final Fixture f = new Fixture();
+        final TipoTropa quick = troop("QUICK", false, "", new Terreno[]{f.plain, f.mountain},
+                new int[]{2, 12});
+        final TipoTropa slow = troop("SLOW", false, ";TTM;", new Terreno[]{f.plain, f.mountain},
+                new int[]{5, 4});
+        giveRoster(f.theirs, quick, slow);
+
+        final Map<Local, ArmyPath> range = ThreatReach.rangeOf(
+                f.unscouted("Desconhecido", "0505", f.theirs, 2, 0), f.locais, f.cenario, 14);
+
+        assertEquals(2, range.get(f.locais.get("0506")).getCost(),
+                "both reach the next hex; the cheap one has to win");
+    }
+
+    /** Nothing to ask about is not an exception. */
+    @Test
+    void rangeOfAnArmyWithNoHexIsEmpty() {
+        final Fixture f = new Fixture();
+        final Exercito nowhere = new Exercito();
+        nowhere.setNome("Nowhere");
+        nowhere.setCodigo("Nowhere");
+
+        assertTrue(ThreatReach.rangeOf(nowhere, f.locais, f.cenario, 14).isEmpty());
+        assertTrue(ThreatReach.rangeOf(null, f.locais, f.cenario, 14).isEmpty());
+    }
+
+    // ----- the cache -----
+
+    /**
+     * The picture is kept for the whole planning session - enemy positions do not move while the
+     * player writes orders - and dropped when a new game is opened.
+     *
+     * {@code MapaControler.initialize} is what drops it, beside the ScoutFootprint and
+     * MoveConvergence snapshots and for the same reason: a kept Threat holds an Exercito and the map
+     * keys on Local, so either one pins the whole previous World graph.
+     */
+    @Test
+    void theSnapshotIsKeptUntilANewGameIsOpened() {
+        final Fixture f = new Fixture();
+        final TipoTropa foot = troop("FOOT", false, "", new Terreno[]{f.plain, f.mountain},
+                new int[]{3, 12});
+        giveRoster(f.theirs, foot);
+        final Exercito enemy = f.unscouted("Desconhecido", "0505", f.theirs, 2, 0);
+        ThreatReach.setCurrent(null);
+
+        final Coverage first = ThreatReach.getOrCompute(Arrays.asList(enemy), f.me, f.locais,
+                f.cenario, 14);
+        assertSame(first, ThreatReach.getOrCompute(Arrays.asList(enemy), f.me, f.locais,
+                f.cenario, 14), "the second ask must not pay for the flood again");
+
+        ThreatReach.setCurrent(null);
+        assertNotSame(first, ThreatReach.getOrCompute(Arrays.asList(enemy), f.me, f.locais,
+                f.cenario, 14), "and a new game must not inherit the old one's picture");
+        ThreatReach.setCurrent(null);
     }
 
     // ----- whose armies count -----

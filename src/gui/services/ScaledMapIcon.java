@@ -65,6 +65,11 @@ public class ScaledMapIcon implements Icon {
      * cyan, so whose it is comes from underneath it, and the hex-info panel names both characters.
      */
     private static final Color CONVERGE_COLOR = SCOUT_COLOR;
+    /** Reachable next turn: the one worth acting on now. */
+    private static final Color THREAT_COLOR_SOON = new Color(220, 40, 40);
+    /** Reachable the turn after - and an UPPER bound, see ThreatReach. */
+    private static final Color THREAT_COLOR_LATER = new Color(235, 150, 40);
+    private static final double THREAT_STROKE_PX = 3.0;
     /**
      * How much of the path end the marker slides along, in 1x units, and how big it is.
      * <p>
@@ -100,6 +105,11 @@ public class ScaledMapIcon implements Icon {
     private List<Shape> scoutOverlap = Collections.emptyList();
     // Converging movement paths; the marker position along each is derived from the phase at paint
     // time, so what is stored is the path itself, not a precomputed marker.
+    // Threat reach: the ground a hostile force can be standing on in one turn, and in two.
+    // Outlines rather than a wash - a fill over a third of the map would bury the terrain the
+    // player is reading, and the region can be thousands of hexes.
+    private Shape threatSoon = null;
+    private Shape threatLater = null;
     private List<Shape> convergePaths = Collections.emptyList();
     private List<Rectangle> convergeTailBoxes = Collections.emptyList();
     private double zoom = 1.0;
@@ -143,6 +153,15 @@ public class ScaledMapIcon implements Icon {
                 this.convergeTailBoxes.add(box);
             }
         }
+    }
+
+    /**
+     * The edge of the ground a hostile force can reach next turn, and the turn after. 1x closed
+     * contours from {@code HexRangeOutline}; null clears either band.
+     */
+    public void setThreatOverlay(Shape soon, Shape later) {
+        this.threatSoon = soon;
+        this.threatLater = later;
     }
 
     /** Player-chosen border colour (properties.config ColorHexRange); null restores the default. */
@@ -196,6 +215,9 @@ public class ScaledMapIcon implements Icon {
             if (actions != null) {
                 g2.drawImage(actions, 0, 0, c);
             }
+            // under the annotations: this is context for everything else on the map, not a mark
+            // on one order, and it must never obscure a scout ring or a movement path
+            paintThreat(g2);
             paintScouts(g2);
             paintConverging(g2);
             if (rangeOutline != null) {
@@ -215,6 +237,35 @@ public class ScaledMapIcon implements Icon {
         } finally {
             g2.dispose();
         }
+    }
+
+    /**
+     * The two threat bands, the further one first so the nearer one draws over its edge.
+     *
+     * Each is a halo-backed solid line for the same reason the scout rings are dashed over a halo:
+     * one colour has to read across all five tilesets, and a plain stroke cannot win against pale
+     * desert and dark sea at once.
+     */
+    private void paintThreat(Graphics2D g2) {
+        if (threatSoon == null && threatLater == null) {
+            return;
+        }
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        final float w = (float) (THREAT_STROKE_PX / zoom);
+        paintThreatBand(g2, threatLater, THREAT_COLOR_LATER, w);
+        paintThreatBand(g2, threatSoon, THREAT_COLOR_SOON, w);
+    }
+
+    private void paintThreatBand(Graphics2D g2, Shape band, Color color, float w) {
+        if (band == null) {
+            return;
+        }
+        g2.setStroke(new BasicStroke(w * 1.75f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.setColor(haloFor(color));
+        g2.draw(band);
+        g2.setStroke(new BasicStroke(w, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.setColor(color);
+        g2.draw(band);
     }
 
     /**

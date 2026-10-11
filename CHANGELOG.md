@@ -2,6 +2,21 @@
 
 ## UNRELEASED - next build
 
+### See who can reach your cities, and how soon
+
+*A new Threat column on the Cities tab, and a matching map layer under Map overlay style.*
+
+- **Every city of yours now says how many turns away the nearest hostile force is.** Red means it can be standing on you next turn, amber the turn after. Sort the column and your front line comes to the top.
+- **The tooltip names them** - which army, whose, and how soon.
+- **Armies you have not scouted are counted too, at their worst.** You cannot see what is in them, so the Counselor assumes the fastest troops that nation could field and says which it assumed. It also assumes they are fed and not moving evasively, and that they will force-march, because all of those make them faster and the point of the column is not to be pleasantly surprised.
+- **The map layer outlines the same ground**, one turn and two, so you can see where a border is thin before you commit an army somewhere else.
+- **No mark is not a promise.** An army you have never seen is not in your turn file at all, so the Counselor marks danger it can prove and stays quiet otherwise - the same way the city growth cap works.
+- **The second turn is a ceiling, not a forecast.** Leftover movement does not carry over between turns, so anything shown as two turns away might take longer.
+
+### Army movement ranges no longer cross the ocean
+
+- **Click an enemy army in the Armies tab and the shaded range is now shaped like the terrain.** For an army you have not scouted it used to be a perfect circle that ignored water, rivers and mountains and reached about three times too far, because an army with no visible troops was being costed as if every hex were flat and free.
+
 ### Review your whole turn before you send it
 
 *A new Review button, next to Save orders.*

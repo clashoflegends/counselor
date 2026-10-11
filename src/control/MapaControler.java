@@ -13,6 +13,7 @@ import business.facade.ExercitoFacade;
 import business.facade.LocalFacade;
 import persistence.local.ListFactory;
 import control.facade.WorldFacadeCounselor;
+import control.services.ThreatReach;
 import control.services.LocalConverter;
 import control.support.ControlBase;
 import control.support.DispatchManager;
@@ -40,6 +41,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -106,6 +108,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         // window - the heap problem DispatchManager already guards against with weak receivers.
         ScoutFootprint.setCurrent(null);
         MoveConvergence.setCurrent(null);
+        ThreatReach.setCurrent(null);
         exercitoFacade = new ExercitoFacade();
         final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         mapaManager = new MapaManager(cenario, form);
@@ -253,6 +256,53 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         }
         getTabGui().setConvergeOverlay(paths);
     }
+
+    /**
+     * Recompute the threat overlay: the edge of the ground a hostile force can be standing on next
+     * turn, and the turn after.
+     *
+     * <b>Unlike the scout and converge overlays, this does not recompute.</b> Those two answer
+     * questions about the player's own orders and go stale the moment he saves one. This answers one
+     * about where the enemy is standing, which the EGF fixes for the whole planning session, so
+     * {@code ThreatReach.getOrCompute} works it out on the first ask and keeps it until a new game
+     * is opened. It is also by far the most expensive of the three - a flood per hostile army over
+     * the whole map - which is the other reason it is not on the save path.
+     * <p>
+     * The classic map style gets none of it, same as the other two: that style is the map as it was
+     * before any of these markers existed.
+     */
+    private void refreshThreatOverlay() {
+        if (!SettingsManager.getInstance().isConfig(THREAT_SETTING, "1", "0")) {
+            getTabGui().setThreatOverlay(null, null);
+            return;
+        }
+        if (SettingsManager.getInstance().isConfig(MapaManager.MAP_OVERLAY_STYLE,
+                MapaManager.OVERLAY_STYLE_CIRCLE, MapaManager.OVERLAY_STYLE_ANIMATED)) {
+            getTabGui().setThreatOverlay(null, null);
+            return;
+        }
+        try {
+            final ThreatReach.Coverage coverage = ThreatReach.getOrCompute(
+                    listFactory.listExercitos().values(), getJogadorAtivo(),
+                    listFactory.listLocais(), WorldFacadeCounselor.getInstance().getCenario(),
+                    WorldFacadeCounselor.getInstance().getCenarioArmyMoveMaxPoints());
+            if (coverage.isEmpty()) {
+                getTabGui().setThreatOverlay(null, null);
+                return;
+            }
+            //the two-turn set CONTAINS the one-turn set, so the bands are drawn as two outlines of
+            //nested regions rather than two disjoint rings - HexRangeOutline returns one contour per
+            //connected region plus one per hole, which is exactly right for that
+            getTabGui().setThreatOverlay(HexRangeOutline.build(coverage.getHexesWithin(1)),
+                    HexRangeOutline.build(coverage.getHexesWithin(ThreatReach.MAX_TURNS)));
+        } catch (RuntimeException ex) {
+            log.warn("Threat overlay skipped: " + ex);
+            getTabGui().setThreatOverlay(null, null);
+        }
+    }
+
+    /** Toolbar toggle, persisted like {@code drawScoutOnMap}. Default OFF: it is a specialist view. */
+    public static final String THREAT_SETTING = "drawThreatReach";
 
     public ImageIcon printMapaGeral() {
         return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), getJogadorAtivo()));
@@ -461,25 +511,29 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         tables.add(table);
     }
 
+    /**
+     * Shade every hex the selected army could move to this turn.
+     *
+     * <b>Goes through {@code ThreatReach.rangeOf} rather than building the movement itself.</b> The
+     * Armies tab's filter combo offers All first and Enemies further down, so this can be pointed at
+     * an army with no visible composition - and an unscouted army carries an EMPTY troop map, which
+     * {@code MovimentoExercito.getCustoMovimentacaoTerra} short-circuits to 1 point a hex ABOVE its
+     * own water, river and mountain checks. The reach then came back as a perfect circle of the full
+     * budget that crossed oceans. {@code ThreatReach} substitutes a roster the owner could actually
+     * field, and sharing the call is what stops this and the threat overlay disagreeing.
+     * <p>
+     * The BUDGET stays the plain-move allowance. Forced March and Move Navy would buy two more
+     * points, but this answers "where can it move", which for the player's own army is the move he is
+     * about to order; the worst case belongs to the threat picture, which is asking a different
+     * question.
+     */
     public void printTagArmyRange(Exercito exercito) {
         final Local local = exercitoFacade.getLocal(exercito);
-        boolean isAgua = localFacade.isAgua(local);
-        MovimentoExercito movEx = new MovimentoExercito();
-        if (isAgua) {
-            movEx.addTropasAll(exercitoFacade.getTipoTropasAgua(exercito));
-        } else {
-            movEx.addTropasAll(exercitoFacade.getTipoTropasTerra(exercito));
-        }
-        movEx.setComida(exercitoFacade.isComida(exercito));
-        //set starting point
-        movEx.setOrigem(exercitoFacade.getLocal(exercito));
-        movEx.setPorAgua(isAgua);
-        movEx.setLimiteMovimento(WorldFacadeCounselor.getInstance().getCenarioArmyMoveMaxPoints()); //exercito.getMovPontos()
-        movEx.setEvasivo(false);
-
-        HashMap<Local, ArmyPath> range = exercitoFacade.calculateArmyRangeHexes(listFactory.listLocais(), movEx);
+        final Map<Local, ArmyPath> range = ThreatReach.rangeOf(exercito, listFactory.listLocais(),
+                WorldFacadeCounselor.getInstance().getCenario(),
+                WorldFacadeCounselor.getInstance().getCenarioArmyMoveMaxPoints());
         range.remove(local);
-        addMovementTag(range);
+        addMovementTag(new HashMap<>(range));
     }
 
     public void printTagRange(Local local, int range) {
@@ -590,6 +644,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
                 tabGui.doActionsOnMap(this.printActionsOnMap());
                 refreshScoutOverlay();
                 refreshConvergeOverlay();
+                refreshThreatOverlay();
 //                if (SettingsManager.getInstance().isConfig("drawPcPath", "1", "1") || SettingsManager.getInstance().isConfig("drawPcPath", "3", "1")) {
 //                    tabGui.doActionsOnMap(this.printActionsOnMap());
 //                } else {

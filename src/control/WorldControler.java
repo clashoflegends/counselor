@@ -1708,6 +1708,19 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
 
+    /**
+     * Switch the threat-reach layer on or off.
+     *
+     * Only ACTIONS_MAP_REDRAW, unlike the other map toggles: this layer is a vector overlay on the
+     * label and draws nothing into the actions bitmap, so there is no tile reload to do. The
+     * dispatch is still needed because that is what re-runs the overlay refreshes.
+     */
+    public void doThreatReach(boolean on) {
+        SettingsManager.getInstance().setConfig(MapaControler.THREAT_SETTING, on ? "1" : "0");
+        SettingsManager.getInstance().doConfigSave(MapaControler.THREAT_SETTING);
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+    }
+
     private void doScoutTargets(JToggleButton jbTemp) {
         int settingValue = jbTemp.isSelected() ? 1 : 0;
         SettingsManager.getInstance().setConfig("drawScoutOnMap", String.valueOf(settingValue));

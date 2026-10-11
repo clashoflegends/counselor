@@ -78,6 +78,8 @@ public class CidadeConverter implements Serializable {
         classes.add(CitySizeCap.class);
         colNames.add(labels.getString("LOCAL"));
         classes.add(Local.class);
+        colNames.add(labels.getString("THREAT.COLUMN"));
+        classes.add(CityThreat.class);
         colNames.add(labels.getString("IMPOSTOS"));
         classes.add(java.lang.Integer.class);
         colNames.add(labels.getString("ZONA.ECONOMICA"));
@@ -162,6 +164,7 @@ public class CidadeConverter implements Serializable {
         }
         cArray[ii++] = buildCitySizeCap(cidade, locais);
         cArray[ii++] = local;
+        cArray[ii++] = buildCityThreat(cidade);
 
         cArray[ii++] = cidadeFacade.getArrecadacaoImpostos(cidade);
         cArray[ii++] = cidadeFacade.getProducao(cidade, WorldFacadeCounselor.getInstance().getCenario().getMoney(), WorldFacadeCounselor.getInstance().getCenario(), WorldFacadeCounselor.getInstance().getTurno());
@@ -232,6 +235,65 @@ public class CidadeConverter implements Serializable {
             return (ret);
         }
     }
+
+    /**
+     * How soon a hostile force could be standing on this city.
+     *
+     * Reads {@code ThreatReach}'s cached picture rather than computing anything, so the column and
+     * the map layer can never disagree, and the first table build after an EGF opens is the one that
+     * pays for the flood.
+     *
+     * Own cities only - see {@link CityThreat}.
+     */
+    private static CityThreat buildCityThreat(Cidade cidade) {
+        if (!jogadorFacade.isMine(cidade, WorldFacadeCounselor.getInstance().getJogadorAtivo())) {
+            return new CityThreat(0, null);
+        }
+        try {
+            final ThreatReach.Coverage coverage = ThreatReach.getOrCompute(
+                    listFactory.listExercitos().values(),
+                    WorldFacadeCounselor.getInstance().getJogadorAtivo(),
+                    listFactory.listLocais(), WorldFacadeCounselor.getInstance().getCenario(),
+                    WorldFacadeCounselor.getInstance().getCenarioArmyMoveMaxPoints());
+            final Local hex = cidade.getLocal();
+            return new CityThreat(coverage.getSoonest(hex), coverage.getThreats(hex));
+        } catch (RuntimeException ex) {
+            //one unreadable world must not cost the whole cities table
+            log.warn("Threat column skipped for " + cidade.getNome() + ": " + ex);
+            return new CityThreat(0, null);
+        }
+    }
+
+    /**
+     * The tooltip behind the Threat cell: who can be here, when, and what had to be assumed.
+     *
+     * Every assumed force says so by name. The reach of an army nobody has scouted is computed from
+     * the fastest troop its owner could field, which is a WORST CASE and not a sighting - a row that
+     * did not say so would read as counted intelligence.
+     */
+    public static String getThreatMessage(CityThreat threat) {
+        if (threat == null || !threat.isThreatened()) {
+            return null;
+        }
+        final StringBuilder ret = new StringBuilder("<html>");
+        ret.append(String.format(labels.getString("THREAT.TOOLTIP.TITLE"), threat.getTurns()));
+        int shown = 0;
+        for (ThreatReach.Threat one : threat.getThreats()) {
+            if (shown++ >= THREAT_TOOLTIP_MAX) {
+                ret.append("<br>").append(String.format(labels.getString("THREAT.TOOLTIP.MORE"),
+                        threat.getThreats().size() - THREAT_TOOLTIP_MAX));
+                break;
+            }
+            ret.append("<br>").append(String.format(labels.getString(one.isAssumed()
+                    ? "THREAT.TOOLTIP.ASSUMED" : "THREAT.TOOLTIP.SEEN"),
+                    one.getArmyName(), one.getNationName(), one.getTurns(), one.getAssumedTroop()));
+        }
+        //the absence of a mark is not a promise, and the one place to say so is where the mark is
+        ret.append("<br><i>").append(labels.getString("THREAT.TOOLTIP.CAVEAT")).append("</i>");
+        return ret.append("</html>").toString();
+    }
+
+    private static final int THREAT_TOOLTIP_MAX = 6;
 
     /** The hex map the {@code ;SCC;} proximity rule walks, or null when the rule is off for this game. */
     private static SortedMap<String, Local> sizeCapLocais() {

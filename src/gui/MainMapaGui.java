@@ -651,6 +651,14 @@ public final class MainMapaGui extends javax.swing.JPanel implements Serializabl
     }
 
     /**
+     * The edge of the ground a hostile force can reach next turn, and the turn after. Nulls clear it.
+     */
+    public void setThreatOverlay(java.awt.Shape soon, java.awt.Shape later) {
+        mapIcon.setThreatOverlay(soon, later);
+        this.mapaLabel.repaint();
+    }
+
+    /**
      * Movement paths of characters two different players are both sending into the same empty hex; a
      * marker slides along the end of each toward that hex.
      */

@@ -17,6 +17,7 @@ import control.services.FiltroConverter;
 import gui.TabBase;
 import gui.services.CityLoyaltyTableCellRenderer;
 import gui.services.CitySizeCapTableCellRenderer;
+import gui.services.CityThreatTableCellRenderer;
 import gui.services.IAcaoGui;
 import gui.services.LoyaltyDeltaTableCellRenderer;
 import gui.subtabs.SubTabBaseList;
@@ -57,6 +58,7 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
     private Cenario cenario;
     private CityLoyaltyTableCellRenderer clcr;
     private CitySizeCapTableCellRenderer cscr;
+    private CityThreatTableCellRenderer ctcr;
     private LoyaltyDeltaTableCellRenderer ldcr;
 
     /**
@@ -252,6 +254,8 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         ldcr = new LoyaltyDeltaTableCellRenderer();
         //size column: amber when a neighbouring big city caps this one's growth (;SCC;).
         cscr = new CitySizeCapTableCellRenderer();
+        //threat column: red when a hostile force reaches this city next turn, amber the turn after.
+        ctcr = new CityThreatTableCellRenderer();
 
         TableModel model = cidadeControl.getMainTableModel((GenericoComboObject) comboFiltro.getSelectedItem());
         this.setMainModel(model);
@@ -285,6 +289,9 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         }
         if (cscr != null) {
             jtMainLista.getColumnModel().getColumn(jtMainLista.getColumn(labels.getString("TAMANHO")).getModelIndex()).setCellRenderer(cscr);
+        }
+        if (ctcr != null) {
+            jtMainLista.getColumnModel().getColumn(jtMainLista.getColumn(labels.getString("THREAT.COLUMN")).getModelIndex()).setCellRenderer(ctcr);
         }
         this.updateGui();
         this.doTagHide();

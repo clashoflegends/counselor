@@ -302,6 +302,20 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
             group.add(item);
             popup.add(item);
         }
+        // Threat reach lives here rather than on a toolbar button of its own: this menu is already
+        // "what the map draws", and a standing layer the player turns on while planning a defence
+        // and off again does not earn permanent toolbar space. It is a checkbox, not one of the
+        // three styles - it is an extra layer, not a different way of drawing the same one.
+        popup.addSeparator();
+        final javax.swing.JCheckBoxMenuItem threat = new javax.swing.JCheckBoxMenuItem(
+                labels.getString("MAP.THREAT.REACH"));
+        threat.setToolTipText(labels.getString("MAP.THREAT.REACH.HINT"));
+        threat.setSelected(settingsManager.getConfig(
+                control.MapaControler.THREAT_SETTING, "0").equals("1"));
+        threat.setEnabled(!settingsManager.isConfig(business.MapaManager.MAP_OVERLAY_STYLE,
+                business.MapaManager.OVERLAY_STYLE_CIRCLE, business.MapaManager.OVERLAY_STYLE_ANIMATED));
+        threat.addActionListener(e -> wc.doThreatReach(threat.isSelected()));
+        popup.add(threat);
         popup.show(jbOverlayStyle, 0, jbOverlayStyle.getHeight());
     }
 

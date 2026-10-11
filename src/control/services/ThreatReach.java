@@ -183,6 +183,39 @@ public final class ThreatReach implements Serializable {
         }
     }
 
+    /**
+     * The picture for the turn file currently open, or null before anything has asked for one.
+     *
+     * <b>Computed lazily and kept, not recomputed per redraw</b>, which is the one place this parts
+     * company with {@code ScoutFootprint} and {@code MoveConvergence}. Those two answer questions
+     * about the PLAYER'S OWN orders and have to be refreshed every time he saves one. This answers a
+     * question about where the enemy is standing, which the EGF fixes for the whole planning session
+     * - and it is the expensive one, a flood per hostile army over the whole map.
+     * <p>
+     * Lazy rather than computed at load, because opening an EGF is already the slowest thing the
+     * client does and nobody should pay for a map layer they may never switch on.
+     * <p>
+     * <b>Cleared when a new game is opened</b>, in {@code MapaControler.initialize}. A kept Threat
+     * holds an Exercito and the map keys on Local, and either one reaches the whole previous World
+     * graph - the same leak the other two snapshots are cleared for.
+     */
+    private static volatile Coverage current = null;
+
+    public static void setCurrent(Coverage coverage) {
+        current = coverage;
+    }
+
+    /** The cached picture, computing it on the first ask. Never null. */
+    public static Coverage getOrCompute(Collection<Exercito> armies, Jogador observer,
+            SortedMap<String, Local> locais, Cenario cenario, int armyMoveMaxPoints) {
+        Coverage ret = current;
+        if (ret == null) {
+            ret = compute(armies, observer, locais, cenario, armyMoveMaxPoints);
+            current = ret;
+        }
+        return ret;
+    }
+
     private ThreatReach() {
     }
 
@@ -261,6 +294,59 @@ public final class ThreatReach implements Serializable {
         if (origin == null) {
             return;
         }
+        for (Map.Entry<Run, HashMap<Local, ArmyPath>> run
+                : floodsFor(army, locais, cenario, budget * MAX_TURNS).entrySet()) {
+            final String assumed = run.getKey().assumedTroop;
+            for (Map.Entry<Local, ArmyPath> hit : run.getValue().entrySet()) {
+                if (hit.getKey() == null || hit.getValue() == null || hit.getKey() == origin) {
+                    continue;
+                }
+                final int turns = hit.getValue().getCost() <= budget ? 1 : MAX_TURNS;
+                record(byHex, hit.getKey(), new Threat(army, turns, assumed));
+            }
+            // the hex it is standing on is reachable by definition, and a city under an army's nose
+            // is the one the player most needs flagged
+            record(byHex, origin, new Threat(army, 1, assumed));
+        }
+    }
+
+    /**
+     * Every hex this one army can reach within {@code limit} points, cheapest path per hex.
+     *
+     * <b>Public because {@code MapaControler.printTagArmyRange} needs it.</b> That feature draws the
+     * reach of whatever army is selected in the Armies tab, and the tab's filter combo offers All
+     * first and Enemies further down - so it can be pointed at an army with no visible composition,
+     * and before this existed it drew the cost-1 circle described in this class's javadoc. Routing it
+     * through here is what fixes that, and keeps the two from ever answering differently.
+     * <p>
+     * The BUDGET stays the caller's business. This answers "how far, for this many points"; the
+     * threat picture asks with {@link #budgetPerTurn}'s worst case, while the Armies tab asks with
+     * the plain-move allowance, which is the honest answer for the player's own army.
+     */
+    public static Map<Local, ArmyPath> rangeOf(Exercito army, SortedMap<String, Local> locais,
+            Cenario cenario, int limit) {
+        final Map<Local, ArmyPath> ret = new HashMap<>();
+        if (army == null || locais == null || cenario == null
+                || exercitoFacade.getLocal(army) == null) {
+            return ret;
+        }
+        for (HashMap<Local, ArmyPath> reach : floodsFor(army, locais, cenario, limit).values()) {
+            for (Map.Entry<Local, ArmyPath> hit : reach.entrySet()) {
+                final ArmyPath seen = ret.get(hit.getKey());
+                if (seen == null || hit.getValue().getCost() < seen.getCost()) {
+                    //the union over troop types: whichever of them gets here fastest
+                    ret.put(hit.getKey(), hit.getValue());
+                }
+            }
+        }
+        return ret;
+    }
+
+    /** One flood per {@link Run}, each built from the same assumptions. */
+    private static Map<Run, HashMap<Local, ArmyPath>> floodsFor(Exercito army,
+            SortedMap<String, Local> locais, Cenario cenario, int limit) {
+        final Map<Run, HashMap<Local, ArmyPath>> ret = new HashMap<>();
+        final Local origin = exercitoFacade.getLocal(army);
         final boolean visible = !army.getPelotoes().isEmpty();
         for (Run run : runsFor(army, cenario, visible)) {
             final MovimentoExercito movEx = new MovimentoExercito();
@@ -281,21 +367,10 @@ public final class ThreatReach implements Serializable {
             // server ever exported a true here, taking it at face value would halve the reach of
             // the armies we know least about.
             movEx.setEvasivo(visible && army.isMovimentacaoEvasiva());
-            movEx.setLimiteMovimento(budget * MAX_TURNS);
-            final HashMap<Local, ArmyPath> reach
-                    = exercitoFacade.calculateArmyRangeHexes(locais, movEx);
-            reach.remove(origin);
-            for (Map.Entry<Local, ArmyPath> hit : reach.entrySet()) {
-                if (hit.getKey() == null || hit.getValue() == null) {
-                    continue;
-                }
-                final int turns = hit.getValue().getCost() <= budget ? 1 : MAX_TURNS;
-                record(byHex, hit.getKey(), new Threat(army, turns, run.assumedTroop));
-            }
-            // the hex it is standing on is reachable by definition, and a city under an army's nose
-            // is the one the player most needs flagged
-            record(byHex, origin, new Threat(army, 1, run.assumedTroop));
+            movEx.setLimiteMovimento(limit);
+            ret.put(run, exercitoFacade.calculateArmyRangeHexes(locais, movEx));
         }
+        return ret;
     }
 
     private static void record(Map<Local, List<Threat>> byHex, Local hex, Threat threat) {
