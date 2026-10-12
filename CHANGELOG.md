@@ -1,6 +1,6 @@
 # What's New in Counselor
 
-## UNRELEASED - next build
+## 11-OCT-2026 - v2.1.934
 
 ### See who can reach your cities, and how soon
 
@@ -43,12 +43,15 @@
 - **On opening a turn, the map centres on the list you are actually on.** It used to centre on your capital whatever tab you landed on, so if you reopened on Characters your first character was often off screen entirely.
 - **That also made order ranges look broken.** Plan a move and the range outline was drawn correctly - around a hex you could not see. It was there all along.
 
-### The window comes back the right size when your screens change
+### Your window remembers every desk you work at
 
-- **Dock your laptop at night, open the Counselor on the laptop alone in the morning, and the window no longer comes back too big for the screen.** It remembered the size of the monitor it was closed on.
-- **A window left on a monitor that is no longer plugged in** comes back on the screen you do have, centred, instead of opening somewhere you cannot see or drag it to.
-- **If your screens have not changed, nothing moves.** A window already sitting comfortably where you left it is not touched, including one on a second monitor that is still attached.
-- **Each setup now remembers its own window.** The Counselor keeps the size and position separately for your last three screen arrangements, so docking and undocking no longer overwrite each other - re-dock and the window goes back where you had it at the desk, not where you left it on the laptop.
+*The Counselor now keeps a separate window size and position for each of your screen setups.*
+
+- **Dock, undock, plug in a projector - every arrangement gets its own memory.** The last three are kept. Set the Counselor up the way you like it at the desk and the way you like it on the laptop, and each comes back the way you left it.
+- **Stretch it across two monitors and it stays stretched.** A window that is already sitting comfortably where you put it is never moved or resized.
+- **A window saved on a screen you no longer have comes back on one you do**, centred and whole, instead of opening past the edge where you cannot reach it.
+- **Too big for the screen in front of you? It is fitted to that screen** - shrunk to fit, pulled back inside the edges, and never shrunk so far that you cannot grab the title bar.
+- **It all happens on its own.** Nothing to set up, nothing to switch on.
 
 ## 09-OCT-2026 - v2.1.933
 
