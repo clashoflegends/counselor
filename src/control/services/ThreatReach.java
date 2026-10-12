@@ -7,6 +7,8 @@ import business.ArmyPath;
 import business.MovimentoExercito;
 import business.facade.ExercitoFacade;
 import business.facade.JogadorFacade;
+import business.combat.HostilityDeriver;
+import business.combat.RelationshipMatrix;
 import business.facade.LocalFacade;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import model.Exercito;
 import model.Jogador;
 import model.Local;
 import model.Nacao;
+import model.Partida;
 import model.Terreno;
 import model.TipoTropa;
 import org.apache.commons.logging.Log;
@@ -207,10 +210,10 @@ public final class ThreatReach implements Serializable {
 
     /** The cached picture, computing it on the first ask. Never null. */
     public static Coverage getOrCompute(Collection<Exercito> armies, Jogador observer,
-            SortedMap<String, Local> locais, Cenario cenario, int armyMoveMaxPoints) {
+            SortedMap<String, Local> locais, Partida partida, int armyMoveMaxPoints) {
         Coverage ret = current;
         if (ret == null) {
-            ret = compute(armies, observer, locais, cenario, armyMoveMaxPoints);
+            ret = compute(armies, observer, locais, partida, armyMoveMaxPoints);
             current = ret;
         }
         return ret;
@@ -226,17 +229,19 @@ public final class ThreatReach implements Serializable {
      * touches the model.
      */
     public static Coverage compute(Collection<Exercito> armies, Jogador observer,
-            SortedMap<String, Local> locais, Cenario cenario, int armyMoveMaxPoints) {
+            SortedMap<String, Local> locais, Partida partida, int armyMoveMaxPoints) {
         final Map<Local, List<Threat>> byHex = new HashMap<>();
+        final Cenario cenario = partida == null ? null : partida.getCenario();
         if (armies == null || locais == null || cenario == null) {
             return new Coverage(byHex);
         }
         final int budget = budgetPerTurn(armyMoveMaxPoints);
+        final RelationshipMatrix relations = relationsFor(armies, observer, partida);
         for (Exercito army : armies) {
             // One unreadable army must never cost the whole picture. A half-built threat map that
             // silently omits the army next door is worse than one that logs and carries on.
             try {
-                if (!isHostile(army, observer)) {
+                if (!isHostile(army, observer, relations)) {
                     continue;
                 }
                 addArmy(byHex, army, locais, cenario, budget);
@@ -249,19 +254,75 @@ public final class ThreatReach implements Serializable {
     }
 
     /**
+     * The relationship table for every nation with an army on the board, or null when it cannot be
+     * built.
+     *
+     * {@code HostilityDeriver} is the shared answer to "will these two fight" and it is the one that
+     * knows about TEAM FLAGS. That matters here: {@code Jogador.isJogadorAliado} decides an alliance
+     * from {@code nacaoAlvo.getRelacionamento(mine)} - the OTHER nation view of me - and the EGF
+     * carries a foreign nation row only when it is positive and aimed at the player. In a locked-team
+     * game those rows may say nothing at all, while {@code Nacao.getTeamFlag} ships for every nation
+     * and settles the whole table by construction ({@code NacaoControl.doCarregaRelacionamentosFresh}:
+     * same team ALLY, different team SWORN_ENEMY). Without it every TEAMMATE army parked near the
+     * player cities would come back red.
+     */
+    private static RelationshipMatrix relationsFor(Collection<Exercito> armies, Jogador observer,
+            Partida partida) {
+        try {
+            final List<Nacao> nacoes = new ArrayList<>();
+            for (Exercito army : armies) {
+                if (army != null && army.getNacao() != null && !nacoes.contains(army.getNacao())) {
+                    nacoes.add(army.getNacao());
+                }
+            }
+            for (Nacao mine : observer.getNacoes().values()) {
+                if (!nacoes.contains(mine)) {
+                    nacoes.add(mine);
+                }
+            }
+            return new HostilityDeriver().deriveNations(partida, nacoes, observer);
+        } catch (RuntimeException ex) {
+            //a threat picture with a cruder hostility test beats no threat picture
+            log.warn("Relationship matrix unavailable, falling back to the ally test: " + ex);
+            return null;
+        }
+    }
+
+    /**
      * Whose armies count.
      *
-     * Direction matters and is always {@code mine.isInimigo(theirs)} - the reverse is unanswerable on
-     * the client, because the EGF carries a foreign nation's relationship only when it is positive
-     * and aimed at the player.
+     * <b>Everything that is not a declared friend.</b> NOT {@code RelationshipMatrix.isHostile},
+     * which asks whether two nations will FIGHT and so needs a negative relationship: at NEUTRAL it
+     * answers no, and a neutral nation can march on a city next turn as easily as a sworn enemy can.
+     * The question here is not "are we at war" but "can that reach me", so the bar is FRIEND or
+     * better and everything below it counts.
      * <p>
-     * An army with NO nation counts too, which is the one place this deliberately parts company with
-     * the Armies tab's own "enemies" filter: that filter wraps the whole test in
-     * {@code catch (NullPointerException)} and drops such an army silently. An unscouted army can
-     * arrive exactly that way, and dropping the ones we know least about is backwards for a threat
-     * display.
+     * Read off the player OWN row ({@code mine -> theirs}) and not the OR of both directions. His own
+     * rows are the complete ones; the reverse direction arrives only when a foreign nation has
+     * declared something positive, so reading it could only ever clear a threat the client cannot
+     * actually prove is cleared.
+     * <p>
+     * The matrix rather than {@code Jogador.isJogadorAliado} because of TEAM FLAGS. That method
+     * decides an alliance from {@code nacaoAlvo.getRelacionamento(mine)}, the other nation view of
+     * me, which in a locked-team game may be empty - while {@code HostilityDeriver} folds in
+     * {@code getTeamFlag}, which ships for every nation in every EGF. Without it every TEAMMATE army
+     * parked near the player cities would come back red. The fallback, for when the matrix cannot be
+     * built at all, is the cruder test the Armies tab filter uses.
+     * <p>
+     * An army with NO nation counts either way, and that is the one place this deliberately parts
+     * company with that filter: it wraps the whole test in {@code catch (NullPointerException)} and
+     * drops such an army silently. An unscouted army can arrive exactly that way, and dropping the
+     * ones we know least about is backwards for a threat display.
+     * <p>
+     * A NEUTRAL nation counts as hostile. That is a choice, not an oversight: neutral is where an NPC
+     * horde and a nation that simply has not declared yet both sit, and neither is a reason to leave a
+     * city unmarked.
      */
     public static boolean isHostile(Exercito army, Jogador observer) {
+        return isHostile(army, observer, null);
+    }
+
+    static boolean isHostile(Exercito army, Jogador observer, RelationshipMatrix relations) {
         if (army == null || observer == null) {
             return false;
         }
@@ -269,10 +330,18 @@ public final class ThreatReach implements Serializable {
         if (nacao == null) {
             return true;
         }
-        if (observer.isNacao(nacao) || jogadorFacade.isAlly(nacao, observer)) {
+        if (observer.isNacao(nacao)) {
             return false;
         }
-        return true;
+        if (relations != null) {
+            for (Nacao mine : observer.getNacoes().values()) {
+                if (relations.getValor(mine, nacao) >= RelationshipMatrix.FRIEND) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return !jogadorFacade.isAlly(nacao, observer);
     }
 
     /**
@@ -294,19 +363,25 @@ public final class ThreatReach implements Serializable {
         if (origin == null) {
             return;
         }
-        for (Map.Entry<Run, HashMap<Local, ArmyPath>> run
-                : floodsFor(army, locais, cenario, budget * MAX_TURNS).entrySet()) {
-            final String assumed = run.getKey().assumedTroop;
-            for (Map.Entry<Local, ArmyPath> hit : run.getValue().entrySet()) {
-                if (hit.getKey() == null || hit.getValue() == null || hit.getKey() == origin) {
+        for (Run run : runsFor(army, cenario, !army.getPelotoes().isEmpty())) {
+            // TWO floods, one per turn, rather than one at the doubled budget classified by cost.
+            // A LANDING costs whatever points are left under the limit (ExercitoFacade:704-707), so
+            // its total always EQUALS the limit, whatever the limit is - at a doubled budget every
+            // landing would come out over one turn worth of points, and a fleet one hex off the
+            // player port would be drawn as two turns away. Under-warning a coastal city is the one
+            // direction this must never go.
+            final Map<Local, ArmyPath> soon = flood(army, run, origin, locais, budget);
+            final Map<Local, ArmyPath> later = flood(army, run, origin, locais, budget * MAX_TURNS);
+            for (Local hex : later.keySet()) {
+                if (hex == null || hex == origin) {
                     continue;
                 }
-                final int turns = hit.getValue().getCost() <= budget ? 1 : MAX_TURNS;
-                record(byHex, hit.getKey(), new Threat(army, turns, assumed));
+                record(byHex, hex, new Threat(army, soon.containsKey(hex) ? 1 : MAX_TURNS,
+                        run.assumedTroop));
             }
-            // the hex it is standing on is reachable by definition, and a city under an army's nose
-            // is the one the player most needs flagged
-            record(byHex, origin, new Threat(army, 1, assumed));
+            // the hex it is standing on is reachable by definition, and a city under an army nose is
+            // the one the player most needs flagged
+            record(byHex, origin, new Threat(army, 1, run.assumedTroop));
         }
     }
 
@@ -330,8 +405,10 @@ public final class ThreatReach implements Serializable {
                 || exercitoFacade.getLocal(army) == null) {
             return ret;
         }
-        for (HashMap<Local, ArmyPath> reach : floodsFor(army, locais, cenario, limit).values()) {
-            for (Map.Entry<Local, ArmyPath> hit : reach.entrySet()) {
+        final Local origin = exercitoFacade.getLocal(army);
+        for (Run run : runsFor(army, cenario, !army.getPelotoes().isEmpty())) {
+            for (Map.Entry<Local, ArmyPath> hit
+                    : flood(army, run, origin, locais, limit).entrySet()) {
                 final ArmyPath seen = ret.get(hit.getKey());
                 if (seen == null || hit.getValue().getCost() < seen.getCost()) {
                     //the union over troop types: whichever of them gets here fastest
@@ -342,35 +419,29 @@ public final class ThreatReach implements Serializable {
         return ret;
     }
 
-    /** One flood per {@link Run}, each built from the same assumptions. */
-    private static Map<Run, HashMap<Local, ArmyPath>> floodsFor(Exercito army,
-            SortedMap<String, Local> locais, Cenario cenario, int limit) {
-        final Map<Run, HashMap<Local, ArmyPath>> ret = new HashMap<>();
-        final Local origin = exercitoFacade.getLocal(army);
+    /** One flood, built from the same assumptions for every caller. */
+    private static Map<Local, ArmyPath> flood(Exercito army, Run run, Local origin,
+            SortedMap<String, Local> locais, int limit) {
         final boolean visible = !army.getPelotoes().isEmpty();
-        for (Run run : runsFor(army, cenario, visible)) {
-            final MovimentoExercito movEx = new MovimentoExercito();
-            movEx.addTropasAll(run.troops);
-            movEx.setOrigem(origin);
-            movEx.setPorAgua(run.byWater);
-            // SUPPLY. An unscouted army exports comida 0, i.e. starving, which would cost it a
-            // third of its speed through the x4/3 unfed penalty - a placeholder quietly
-            // UNDER-stating reach. It does not, and the reason is worth knowing rather than
-            // guarding against twice: ExercitoFacade.getComidaConsumo sums upkeep over the
-            // PLATOONS, and an unscouted army has none, so consumption is 0, 0 >= 0 holds and
-            // isComida already answers fed. That is an accident of the formula, not a decision,
-            // so ThreatReachTest pins it - if consumption is ever estimated from the size band
-            // instead, this silently gets slower and that test is what says so.
-            movEx.setComida(exercitoFacade.isComida(army));
-            // EVASIVE movement doubles every hex. The flag is real on an army we can see and a
-            // placeholder on one we cannot, and unlike supply nothing else makes it safe: if the
-            // server ever exported a true here, taking it at face value would halve the reach of
-            // the armies we know least about.
-            movEx.setEvasivo(visible && army.isMovimentacaoEvasiva());
-            movEx.setLimiteMovimento(limit);
-            ret.put(run, exercitoFacade.calculateArmyRangeHexes(locais, movEx));
-        }
-        return ret;
+        final MovimentoExercito movEx = new MovimentoExercito();
+        movEx.addTropasAll(run.troops);
+        movEx.setOrigem(origin);
+        movEx.setPorAgua(run.byWater);
+        // SUPPLY. An unscouted army exports comida 0, i.e. starving, which would cost it a third of
+        // its speed through the x4/3 unfed penalty - a placeholder quietly UNDER-stating reach. It
+        // does not, and the reason is worth knowing rather than guarding against twice:
+        // ExercitoFacade.getComidaConsumo sums upkeep over the PLATOONS, and an unscouted army has
+        // none, so consumption is 0, 0 >= 0 holds and isComida already answers fed. That is an
+        // accident of the formula, not a decision, so ThreatReachTest pins it - if consumption is
+        // ever estimated from the size band instead, this silently gets slower and that test says so.
+        movEx.setComida(exercitoFacade.isComida(army));
+        // EVASIVE movement doubles every hex. The flag is real on an army we can see and a
+        // placeholder on one we cannot, and unlike supply nothing else makes it safe: if the server
+        // ever exported a true here, taking it at face value would halve the reach of the armies we
+        // know least about.
+        movEx.setEvasivo(visible && army.isMovimentacaoEvasiva());
+        movEx.setLimiteMovimento(limit);
+        return exercitoFacade.calculateArmyRangeHexes(locais, movEx);
     }
 
     private static void record(Map<Local, List<Threat>> byHex, Local hex, Threat threat) {

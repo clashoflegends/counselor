@@ -44,11 +44,24 @@ class ThreatReachLiveWorldTest {
 
     private static Coverage reach(WorldFacadeCounselor wfc) {
         return ThreatReach.compute(listFactory.listExercitos().values(), wfc.getJogadorAtivo(),
-                wfc.getLocais(), wfc.getCenario(),
+                wfc.getLocais(), wfc.getPartida(),
                 wfc.getCenarioArmyMoveMaxPoints());
     }
 
-    /** The whole pass over a real world: it must complete, and it must not take a visible pause. */
+    /**
+     * The whole pass over a real world: it must complete, and it must not take a visible pause.
+     *
+     * <b>Measured on a production turn file</b>, {@code game_917_2.fabriziopaese.rr.egf} - a 13-player
+     * Game of Thrones game, 3,071 hexes, 23 armies of which 9 are hostile and 2 unscouted. A cold
+     * compute took <b>71ms</b>, warm runs 34 to 37ms, and it marked 143 hexes of which 73 are inside
+     * one turn. That is cheap enough to sit on the EGF-open path, which is where it actually runs:
+     * {@code TabCidadesGui} builds its table model in its constructor and the Threat column asks for
+     * the picture there.
+     * <p>
+     * The ceiling below is deliberately far above that. It is not a performance budget, it is a
+     * tripwire for an accidental return to the empty-troop cost of 1 a hex, which floods the WHOLE
+     * map for every army and would blow straight through it.
+     */
     @Test
     void computingThreatReachOverARealWorldDoesNotThrow() throws Exception {
         final WorldFacadeCounselor wfc = TestWorld.load();
@@ -58,9 +71,7 @@ class ThreatReachLiveWorldTest {
         final long millis = System.currentTimeMillis() - start;
 
         assertNotNull(found);
-        //the picture is built once per EGF load and cached, so this is generous on purpose: it is a
-        //tripwire for an accidental return to the cost-1 circle, which floods the whole map per army
-        assertTrue(millis < 20000, "threat reach took " + millis + "ms over the whole world");
+        assertTrue(millis < 3000, "threat reach took " + millis + "ms over the whole world");
     }
 
     /**
@@ -86,7 +97,7 @@ class ThreatReachLiveWorldTest {
             }
             assertTrue(ThreatReach.isHostile(army, outsider), "an outsider is hostile to everyone");
             final Coverage one = ThreatReach.compute(new ArrayList<>(List.of(army)),
-                    outsider, wfc.getLocais(), wfc.getCenario(),
+                    outsider, wfc.getLocais(), wfc.getPartida(),
                     wfc.getCenarioArmyMoveMaxPoints());
             assertEquals(oracleHexes(wfc, army, budget), one.getHexesWithin(1),
                     army.getNome() + ": the turn-1 band must be the Judge's own flood");

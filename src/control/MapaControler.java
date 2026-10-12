@@ -284,7 +284,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         try {
             final ThreatReach.Coverage coverage = ThreatReach.getOrCompute(
                     listFactory.listExercitos().values(), getJogadorAtivo(),
-                    listFactory.listLocais(), WorldFacadeCounselor.getInstance().getCenario(),
+                    listFactory.listLocais(), WorldFacadeCounselor.getInstance().getPartida(),
                     WorldFacadeCounselor.getInstance().getCenarioArmyMoveMaxPoints());
             if (coverage.isEmpty()) {
                 getTabGui().setThreatOverlay(null, null);

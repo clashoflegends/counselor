@@ -19,6 +19,7 @@ import model.Habilidade;
 import model.Jogador;
 import model.Local;
 import model.Nacao;
+import model.Partida;
 import model.Pelotao;
 import model.Raca;
 import model.Terreno;
@@ -48,17 +49,23 @@ class ThreatReachTest {
 
         private final SortedMap<String, Local> locais = new TreeMap<>();
         private final Cenario cenario = new Cenario();
+        private final Partida partida = new Partida();
         private final Terreno plain = terreno("P", "Plain", false);
         private final Terreno water = terreno("A", "Water", true);
         private final Terreno mountain = terreno("M", "Mountain", false);
+        /** Shore. MovimentoExercito.isNavegavel only lets a fleet step ashore onto terrain "L"
+         * (or an ancoravel hex), so a landing test needs one - a plain coast is not navigable. */
+        private final Terreno shore = terreno("L", "Shore", false);
         private final Jogador me = new Jogador();
         private final Nacao mine = nacao("MINE");
         private final Nacao theirs = nacao("THEM");
 
         Fixture() {
+            partida.setCenario(cenario);
             cenario.getTerrenos().put(plain.getCodigo(), plain);
             cenario.getTerrenos().put(water.getCodigo(), water);
             cenario.getTerrenos().put(mountain.getCodigo(), mountain);
+            cenario.getTerrenos().put(shore.getCodigo(), shore);
             for (int col = 1; col <= 12; col++) {
                 for (int row = 1; row <= 12; row++) {
                     hex(String.format("%02d%02d", col, row), plain);
@@ -122,7 +129,7 @@ class ThreatReachTest {
         }
 
         Coverage run(Exercito... armies) {
-            return ThreatReach.compute(Arrays.asList(armies), me, locais, cenario, 14);
+            return ThreatReach.compute(Arrays.asList(armies), me, locais, partida, 14);
         }
     }
 
@@ -251,6 +258,36 @@ class ThreatReachTest {
         assertFalse(f.run(fleet).getThreats(f.locais.get("0509")).isEmpty(),
                 "ExercitoFacade.isEsquadra reads ;TTN; from a habilidades map that arrives empty, "
                 + "so the fleet would otherwise vanish and every coastal city look safe");
+    }
+
+    /**
+     * <b>A fleet one hex off a port threatens it NEXT turn, not the turn after.</b>
+     *
+     * The landing rule in {@code ExercitoFacade.calculateArmyRangeHexes} (lines 704-707) overwrites
+     * the cost of stepping ashore with {@code max(1, limit - prevCost)}, so a landing total always
+     * EQUALS the limit, whatever the limit happens to be. Classifying one flood run at twice the
+     * budget by its cost therefore pushed every landing over the one-turn line, and every coastal
+     * city came back amber however close the fleet was parked. Two floods, one per turn, is the fix.
+     *
+     * This is why {@link ThreatReachLiveWorldTest} cannot be the only check: the fixture turn file
+     * holds one countable army and it is a land army, so no sea flood is ever compared against the
+     * oracle.
+     */
+    @Test
+    void aFleetOneHexOffThePortThreatensItNextTurn() {
+        final Fixture f = new Fixture();
+        for (int row = 1; row <= 12; row++) {
+            f.hex(String.format("%02d%02d", 6, row), f.water);
+        }
+        f.hex("0505", f.shore);
+        final TipoTropa ship = troop("SHIP", true, "", new Terreno[]{f.water, f.shore},
+                new int[]{2, 2});
+        giveRoster(f.theirs, ship);
+        //anchored one water hex away from the shore at column 5
+        final Exercito fleet = f.unscouted("Desconhecido", "0605", f.theirs, 0, 3);
+
+        assertEquals(1, f.run(fleet).getSoonest(f.locais.get("0505")),
+                "it is one step ashore; amber here is an under-warning on a coastal city");
     }
 
     // ----- what to assume about an army nobody has counted -----
@@ -524,13 +561,13 @@ class ThreatReachTest {
         ThreatReach.setCurrent(null);
 
         final Coverage first = ThreatReach.getOrCompute(Arrays.asList(enemy), f.me, f.locais,
-                f.cenario, 14);
+                f.partida, 14);
         assertSame(first, ThreatReach.getOrCompute(Arrays.asList(enemy), f.me, f.locais,
-                f.cenario, 14), "the second ask must not pay for the flood again");
+                f.partida, 14), "the second ask must not pay for the flood again");
 
         ThreatReach.setCurrent(null);
         assertNotSame(first, ThreatReach.getOrCompute(Arrays.asList(enemy), f.me, f.locais,
-                f.cenario, 14), "and a new game must not inherit the old one's picture");
+                f.partida, 14), "and a new game must not inherit the old one's picture");
         ThreatReach.setCurrent(null);
     }
 
@@ -566,7 +603,7 @@ class ThreatReachTest {
     void nothingIsComputedWithoutAWorld() {
         assertTrue(ThreatReach.compute(null, null, null, null, 14).isEmpty());
         assertTrue(ThreatReach.compute(new ArrayList<>(), new Jogador(), new TreeMap<>(),
-                new Cenario(), 14).isEmpty());
+                new Partida(), 14).isEmpty(), "a Partida with no scenario answers nothing");
     }
 
     /** One unreadable army must not cost the picture of all the others. */

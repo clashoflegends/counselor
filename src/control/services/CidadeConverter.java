@@ -253,7 +253,7 @@ public class CidadeConverter implements Serializable {
             final ThreatReach.Coverage coverage = ThreatReach.getOrCompute(
                     listFactory.listExercitos().values(),
                     WorldFacadeCounselor.getInstance().getJogadorAtivo(),
-                    listFactory.listLocais(), WorldFacadeCounselor.getInstance().getCenario(),
+                    listFactory.listLocais(), WorldFacadeCounselor.getInstance().getPartida(),
                     WorldFacadeCounselor.getInstance().getCenarioArmyMoveMaxPoints());
             final Local hex = cidade.getLocal();
             return new CityThreat(coverage.getSoonest(hex), coverage.getThreats(hex));
