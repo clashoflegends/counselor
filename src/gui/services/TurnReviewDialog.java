@@ -25,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JCheckBox;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -37,6 +38,7 @@ import model.Personagem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
+import persistenceCommons.SettingsManager;
 
 /**
  * "Review turn": one list of everything worth a second look before the orders go out.
@@ -66,9 +68,24 @@ public final class TurnReviewDialog extends JDialog {
 
     private static final Log log = LogFactory.getLog(TurnReviewDialog.class);
 
+    /**
+     * Whether the open-slot rows are shown. Persisted, because a player who turns them off wants
+     * them off next turn too - and the whole point of hiding them is that they are the rows he has
+     * already decided not to read.
+     */
+    public static final String SHOW_OPEN_SLOTS = "reviewShowOpenSlots";
+
     private final transient BundleManager labels;
     private final transient MainDadosGui dados;
+    /** Every finding the pass produced. */
     private final transient List<Finding> findings;
+    /** The subset currently on screen. The table reads THIS, never {@link #findings}. */
+    private final transient List<Finding> visible = new ArrayList<>();
+    private transient JLabel summary;
+    private transient JTable table;
+    private final transient int orderCount;
+    private final transient int actorCount;
+    private final transient boolean failed;
 
     private TurnReviewDialog(Window parent, MainDadosGui dados, BundleManager labels,
             List<Finding> findings, int orderCount, int actorCount, boolean failed) {
@@ -76,28 +93,19 @@ public final class TurnReviewDialog extends JDialog {
         this.labels = labels;
         this.dados = dados;
         this.findings = findings;
+        this.orderCount = orderCount;
+        this.actorCount = actorCount;
+        this.failed = failed;
         AppIcon.applyTo(this);
         setTitle(tx("REVIEW.TITLE", "Review turn"));
 
-        final JTable table = buildTable();
+        applyFilter(showOpenSlots());
+        this.table = buildTable();
         final JScrollPane scroll = new JScrollPane(table);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         scroll.setPreferredSize(new Dimension(760, 360));
 
-        final String summaryText;
-        if (failed) {
-            summaryText = tx("REVIEW.FAILED",
-                    "The review could not be completed, so this list is not a clean bill of health.");
-        } else if (findings.isEmpty()) {
-            summaryText = String.format(
-                    tx("REVIEW.EMPTY", "Nothing to flag. %s orders across %s actors."),
-                    orderCount, actorCount);
-        } else {
-            summaryText = String.format(
-                    tx("REVIEW.COUNT", "%s to look at, across %s orders and %s actors."),
-                    findings.size(), orderCount, actorCount);
-        }
-        final JLabel summary = new JLabel(summaryText);
+        this.summary = new JLabel(summaryText());
         summary.setBorder(BorderFactory.createEmptyBorder(8, 12, 2, 12));
 
         final JLabel hint = new JLabel(tx("REVIEW.HINT",
@@ -105,9 +113,26 @@ public final class TurnReviewDialog extends JDialog {
         hint.setBorder(BorderFactory.createEmptyBorder(0, 12, 8, 12));
         hint.setEnabled(false);
 
+        final JCheckBox showSlots = new JCheckBox(tx("REVIEW.FILTER.OPENSLOTS",
+                "Show actors with nothing entered"), showOpenSlots());
+        showSlots.setToolTipText(tx("REVIEW.FILTER.OPENSLOTS.HINT",
+                "Early in a turn almost every actor is unplanned, and those rows bury the ones worth reading."));
+        showSlots.setBorder(BorderFactory.createEmptyBorder(0, 12, 6, 12));
+        showSlots.addActionListener(e -> {
+            SettingsManager.getInstance().setConfig(SHOW_OPEN_SLOTS,
+                    showSlots.isSelected() ? "1" : "0");
+            SettingsManager.getInstance().doConfigSave(SHOW_OPEN_SLOTS);
+            applyFilter(showSlots.isSelected());
+            ((AbstractTableModel) table.getModel()).fireTableDataChanged();
+            summary.setText(summaryText());
+        });
+
         final JPanel north = new JPanel(new BorderLayout());
         north.add(summary, BorderLayout.NORTH);
-        north.add(hint, BorderLayout.SOUTH);
+        final JPanel below = new JPanel(new BorderLayout());
+        below.add(showSlots, BorderLayout.NORTH);
+        below.add(hint, BorderLayout.SOUTH);
+        north.add(below, BorderLayout.SOUTH);
 
         final JButton close = new JButton(tx("FECHAR", "Close"));
         close.addActionListener(e -> dispose());
@@ -201,6 +226,84 @@ public final class TurnReviewDialog extends JDialog {
         return ret;
     }
 
+    private static boolean showOpenSlots() {
+        //default OFF: at the start of a turn nearly every actor is unplanned, so these rows are the
+        //bulk of the list and the ones the player is least likely to need told about
+        return "1".equals(SettingsManager.getInstance().getConfig(SHOW_OPEN_SLOTS, "0"));
+    }
+
+    /**
+     * An "I have not planned this one yet" row, as opposed to something that will go wrong.
+     *
+     * Both kinds count: {@code OPEN_PACKAGE} is the same statement about a nation with budget left,
+     * and hiding one while keeping the other would read as a bug.
+     */
+    public static boolean isOpenSlot(TurnReview.Kind kind) {
+        return kind == TurnReview.Kind.OPEN_SLOT || kind == TurnReview.Kind.OPEN_PACKAGE;
+    }
+
+    /**
+     * Which of the four summary lines applies.
+     *
+     * Split out and public so the one rule that matters can be tested without a display: <b>never
+     * say "nothing to flag" while something is hidden</b>. This dialog's whole job is to answer
+     * whether the turn is ready, and a filter that empties the list must say the list was filtered -
+     * otherwise it answers "I looked and found nothing" when the truth is "you asked me not to show
+     * you the only thing I found".
+     */
+    public static String summaryKey(int visible, int hidden, boolean failed) {
+        if (failed) {
+            return "REVIEW.FAILED";
+        }
+        if (visible > 0) {
+            return "REVIEW.COUNT";
+        }
+        return hidden > 0 ? "REVIEW.ONLYOPEN" : "REVIEW.EMPTY";
+    }
+
+    private void applyFilter(boolean withOpenSlots) {
+        visible.clear();
+        for (Finding f : findings) {
+            if (withOpenSlots || !isOpenSlot(f.getKind())) {
+                visible.add(f);
+            }
+        }
+    }
+
+    private int hiddenCount() {
+        return findings.size() - visible.size();
+    }
+
+    /**
+     * The line above the table.
+     *
+     * <b>"Nothing to flag" is never printed while rows are hidden.</b> This dialog's only job is to
+     * say whether the turn is ready, so a filter that empties the list must say the list was
+     * filtered - otherwise the feature would be answering "I looked and found nothing" when the true
+     * answer is "you asked me not to show you the only thing I found".
+     */
+    private String summaryText() {
+        final int hidden = hiddenCount();
+        switch (summaryKey(visible.size(), hidden, failed)) {
+            case "REVIEW.FAILED":
+                return tx("REVIEW.FAILED", "The review could not be completed, so this list is not "
+                        + "a clean bill of health.");
+            case "REVIEW.ONLYOPEN":
+                return String.format(tx("REVIEW.ONLYOPEN",
+                        "Nothing to flag except %s actors with nothing entered yet."), hidden);
+            case "REVIEW.EMPTY":
+                return String.format(
+                        tx("REVIEW.EMPTY", "Nothing to flag. %s orders across %s actors."),
+                        orderCount, actorCount);
+            default:
+                final String ret = String.format(
+                        tx("REVIEW.COUNT", "%s to look at, across %s orders and %s actors."),
+                        visible.size(), orderCount, actorCount);
+                return hidden == 0 ? ret : ret + " " + String.format(
+                        tx("REVIEW.HIDDEN", "(%s unplanned actors hidden.)"), hidden);
+        }
+    }
+
     // ---- table ----------------------------------------------------------------------------------
 
     private JTable buildTable() {
@@ -248,7 +351,7 @@ public final class TurnReviewDialog extends JDialog {
         if (view < 0) {
             return;
         }
-        final Finding f = findings.get(table.convertRowIndexToModel(view));
+        final Finding f = visible.get(table.convertRowIndexToModel(view));
         if (f.getActor() == null) {
             return; // a converging-hex row belongs to nobody in particular
         }
@@ -295,7 +398,7 @@ public final class TurnReviewDialog extends JDialog {
 
         @Override
         public int getRowCount() {
-            return findings.size();
+            return visible.size();
         }
 
         @Override
@@ -310,7 +413,7 @@ public final class TurnReviewDialog extends JDialog {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            final Finding f = findings.get(rowIndex);
+            final Finding f = visible.get(rowIndex);
             switch (columnIndex) {
                 case 0:
                     return f.getLevel() == TurnReview.Level.WARN ? "!" : "i";
@@ -360,7 +463,7 @@ public final class TurnReviewDialog extends JDialog {
                 boolean hasFocus, int row, int column) {
             final Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
                     row, column);
-            final Finding f = findings.get(table.convertRowIndexToModel(row));
+            final Finding f = visible.get(table.convertRowIndexToModel(row));
             if (!isSelected) {
                 if (f.getLevel() == TurnReview.Level.WARN) {
                     c.setBackground(LafTint.AMBER.bg());

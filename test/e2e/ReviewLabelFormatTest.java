@@ -1,6 +1,8 @@
 package e2e;
 
+import control.services.TurnReview;
 import control.services.TurnReview.Kind;
+import gui.services.TurnReviewDialog;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
@@ -139,6 +141,57 @@ class ReviewLabelFormatTest {
         for (String key : new String[]{"REVIEW.TITLE", "REVIEW.TOOLBAR", "REVIEW.TOOLTIP",
             "REVIEW.HINT", "REVIEW.COL.ACTOR", "REVIEW.COL.SLOT", "REVIEW.COL.MESSAGE"}) {
             assertEquals(0, specifiers(get(key)), key + " must take no arguments");
+        }
+    }
+
+    /** The open-slot filter's own lines, in every bundle. */
+    @Test
+    void theFilterLinesFormatInEveryLanguage() {
+        for (String text : everyTranslationOf("REVIEW.ONLYOPEN")) {
+            assertEquals(1, specifiers(text), "a count of hidden actors: " + text);
+            assertDoesNotThrow(() -> String.format(text, 12), text);
+        }
+        for (String text : everyTranslationOf("REVIEW.HIDDEN")) {
+            assertEquals(1, specifiers(text), "a count of hidden actors: " + text);
+            assertDoesNotThrow(() -> String.format(text, 12), text);
+        }
+        for (String key : new String[]{"REVIEW.FILTER.OPENSLOTS", "REVIEW.FILTER.OPENSLOTS.HINT"}) {
+            for (String text : everyTranslationOf(key)) {
+                assertEquals(0, specifiers(text), key + " takes no arguments: " + text);
+            }
+        }
+    }
+
+    /**
+     * <b>"Nothing to flag" is never shown while the filter is hiding something.</b>
+     *
+     * The dialog exists to answer whether the turn is ready. A filter that empties the list has to
+     * say the list was filtered, or the answer "I looked and found nothing" is given when the truth
+     * is "you asked me not to show you the only thing I found". This is the same class of error as
+     * a failed review rendering as a clean one, which this feature has now had twice.
+     */
+    @Test
+    void anEmptyListNeverReadsAsCleanWhileRowsAreHidden() {
+        assertEquals("REVIEW.ONLYOPEN", TurnReviewDialog.summaryKey(0, 7, false));
+        assertEquals("REVIEW.EMPTY", TurnReviewDialog.summaryKey(0, 0, false));
+        assertEquals("REVIEW.COUNT", TurnReviewDialog.summaryKey(3, 7, false));
+        assertEquals("REVIEW.FAILED", TurnReviewDialog.summaryKey(0, 0, true),
+                "a review that could not finish outranks every other line");
+        assertEquals("REVIEW.FAILED", TurnReviewDialog.summaryKey(5, 7, true));
+    }
+
+    /**
+     * Both halves of "nothing entered yet" hide together.
+     *
+     * {@code OPEN_PACKAGE} is the same statement about a nation with budget left; hiding one kind
+     * while keeping the other would read as a bug, and nothing else may be swept up with them.
+     */
+    @Test
+    void theFilterHidesBothUnplannedKindsAndNothingElse() {
+        for (Kind kind : Kind.values()) {
+            final boolean expected = kind == Kind.OPEN_SLOT || kind == Kind.OPEN_PACKAGE;
+            assertEquals(expected, TurnReviewDialog.isOpenSlot(kind),
+                    kind + " on the wrong side of the filter");
         }
     }
 }

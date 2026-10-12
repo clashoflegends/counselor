@@ -9,7 +9,7 @@
 - **Every city of yours now says how many turns away the nearest hostile force is.** Red means it can be standing on you next turn, amber the turn after. Sort the column and your front line comes to the top.
 - **The tooltip names them** - which army, whose, and how soon.
 - **Armies you have not scouted are counted too, at their worst.** You cannot see what is in them, so the Counselor assumes the fastest troops that nation could field and says which it assumed. It also assumes they are fed and not moving evasively, and that they will force-march, because all of those make them faster and the point of the column is not to be pleasantly surprised.
-- **The map layer outlines the same ground**, one turn and two, so you can see where a border is thin before you commit an army somewhere else.
+- **The map layer outlines the ground a hostile force reaches next turn**, so you can see where a border is thin before you commit an army somewhere else. The two-turn answer stays in the Cities column, where it is attached to a city you can do something about - as a map band it covered a third of the world and told you nothing.
 - **No mark is not a promise.** An army you have never seen is not in your turn file at all, so the Counselor marks danger it can prove and stays quiet otherwise - the same way the city growth cap works.
 - **The second turn is a ceiling for an army on foot, and a real answer for a fleet.** Leftover movement does not carry over between turns, so a land force shown as two turns away might take longer. A fleet is worked out properly: it can land this turn and march inland the next, which is what an invasion looks like.
 - **Nobody is assumed to be creeping.** An army that moved evasively last turn is counted at full speed, because all it has to do is order a normal move next turn.
@@ -29,6 +29,7 @@
 - **One list of everything worth a second look**, instead of five warnings that each appeared once, somewhere else, and were gone. Open action slots, cities that cannot grow, meet-ups that will miss, and two of you walking into the same empty hex.
 - **It names every actor you left unplanned, not just one of them.** The old message was overwritten each time it found another, so with five characters half-planned you heard about one.
 - **New: it spots most rendezvous that will not happen.** Order a character to move somewhere and join one of your leaders there, and if that leader is going to end the turn somewhere else, the review says so. The move still happens; the joining does not, and until now the only way to find out was the turn result. Of every order in the game, this is the one most often thrown out before it is even attempted.
+- **Actors you have not got to yet are hidden by default.** Early in a turn that is almost everyone, and those rows buried the ones worth reading. One tick box brings them back, and the Counselor remembers how you left it.
 - **Double click any line to jump straight to it**, the same way quick search does.
 - **Nothing here blocks or changes anything.** It is a second pair of eyes, not a gate: you can send a turn with every line still on the list.
 

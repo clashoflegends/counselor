@@ -297,11 +297,18 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
                 return;
             }
             if (threatBands == null || threatBandsFor != coverage) {
-                //the two-turn set CONTAINS the one-turn set, so the bands are drawn as two outlines
-                //of nested regions rather than two disjoint rings - HexRangeOutline returns one
-                //contour per connected region plus one per hole, which is exactly right for that
-                threatBands = new Shape[]{HexRangeOutline.build(coverage.getHexesWithin(1)),
-                    HexRangeOutline.build(coverage.getHexesWithin(ThreatReach.MAX_TURNS))};
+                //ONE BAND on the map, the ground a hostile force reaches NEXT turn.
+                //
+                //The two-turn band was drawn too and measured 632 to 1,138 hexes of a 3,071-hex map
+                //on real 13-player files - up to 37% of the world outlined in amber. Every hex of it
+                //is honestly reachable, which is exactly why it was useless: a border that encloses
+                //a third of the map tells a player nothing about where to put an army. The two-turn
+                //answer is still computed and still shown per city in the Cities tab, where it is
+                //attached to something the player can act on.
+                //
+                //The second slot stays in the API rather than being deleted: ScaledMapIcon already
+                //handles a null band, and putting it back is one expression.
+                threatBands = new Shape[]{HexRangeOutline.build(coverage.getHexesWithin(1)), null};
                 threatBandsFor = coverage;
             }
             getTabGui().setThreatOverlay(threatBands[0], threatBands[1]);
