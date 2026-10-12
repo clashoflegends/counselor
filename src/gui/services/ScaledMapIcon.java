@@ -105,13 +105,13 @@ public class ScaledMapIcon implements Icon {
     private List<Shape> scoutOverlap = Collections.emptyList();
     // Converging movement paths; the marker position along each is derived from the phase at paint
     // time, so what is stored is the path itself, not a precomputed marker.
+    private List<Shape> convergePaths = Collections.emptyList();
+    private List<Rectangle> convergeTailBoxes = Collections.emptyList();
     // Threat reach: the ground a hostile force can be standing on in one turn, and in two.
     // Outlines rather than a wash - a fill over a third of the map would bury the terrain the
     // player is reading, and the region can be thousands of hexes.
     private Shape threatSoon = null;
     private Shape threatLater = null;
-    private List<Shape> convergePaths = Collections.emptyList();
-    private List<Rectangle> convergeTailBoxes = Collections.emptyList();
     private double zoom = 1.0;
 
     public void setBase(Image base) {
@@ -215,8 +215,10 @@ public class ScaledMapIcon implements Icon {
             if (actions != null) {
                 g2.drawImage(actions, 0, 0, c);
             }
-            // under the annotations: this is context for everything else on the map, not a mark
-            // on one order, and it must never obscure a scout ring or a movement path
+            // under the VECTOR annotations: this is context for the whole map, not a mark on one
+            // order, so the scout rings and the converging-move markers draw over it. It does not
+            // get under the order paths - those are in the actions bitmap, composited just above,
+            // so a band crossing one draws over it.
             paintThreat(g2);
             paintScouts(g2);
             paintConverging(g2);

@@ -23,7 +23,9 @@ import java.util.List;
  * your own front line) useless.
  *
  * Sorts soonest first, with the unthreatened rows last rather than first: {@code 0} would otherwise
- * sort ahead of {@code 1} and bury the rows the player opened the column for.
+ * sort ahead of {@code 1} and bury the rows the player opened the column for. That is the ASCENDING
+ * contract; a second click reverses it and puts the blank rows on top, which is what reversing a
+ * sort means and is left alone.
  *
  * @author jmoura
  */

@@ -9,6 +9,7 @@ import business.ImageManager;
 import control.MapaControler;
 import control.WorldControler;
 import control.facade.WorldFacadeCounselor;
+import control.support.DispatchManager;
 import gui.components.JLabelGradient;
 import gui.services.ComponentFactory;
 import gui.services.EgfDropHandler;
@@ -312,8 +313,11 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         threat.setToolTipText(labels.getString("MAP.THREAT.REACH.HINT"));
         threat.setSelected(settingsManager.getConfig(
                 control.MapaControler.THREAT_SETTING, "0").equals("1"));
-        threat.setEnabled(!settingsManager.isConfig(business.MapaManager.MAP_OVERLAY_STYLE,
-                business.MapaManager.OVERLAY_STYLE_CIRCLE, business.MapaManager.OVERLAY_STYLE_ANIMATED));
+        // Left ENABLED under the classic style rather than greyed. Greying it while it still
+        // showed ticked told the player the layer was on, gave him no way to untick it and no
+        // reason why; refreshThreatOverlay suppresses the drawing under that style anyway, so the
+        // tick keeps meaning "I want this" and switching back to a vector style brings it straight
+        // back.
         threat.addActionListener(e -> wc.doThreatReach(threat.isSelected()));
         popup.add(threat);
         popup.show(jbOverlayStyle, 0, jbOverlayStyle.getHeight());
@@ -918,6 +922,19 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         int splitWid = SysApoio.parseInt(SettingsManager.getInstance().getConfig("splitSize", "660"));
         this.splitMainPanel.setDividerLocation(splitWid);
         doMinimizeMap();
+        // Build the vector overlays for the turn that was just opened.
+        //
+        // They are refreshed on ACTIONS_MAP_REDRAW, and NOTHING sends that at load - every sender is
+        // an order action or a map toggle. That was invisible while the only overlays were the scout
+        // footprints and the converging-move markers, because both are drawn from the player's OWN
+        // orders and a freshly opened turn has none. Threat reach is drawn from where the ENEMY is
+        // standing, so it is the first overlay with something to say the moment the file opens, and
+        // without this it stayed blank - with its menu item ticked - until the player happened to
+        // save an order or flip another map toggle.
+        //
+        // Last in iniciaConfig on purpose: MainMapaGui's constructor is what calls setTabGui, so the
+        // map controller has no tab to draw into before that line above.
+        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
     }
 
     public void doMinimizeMap() {

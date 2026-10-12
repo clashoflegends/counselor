@@ -8,6 +8,7 @@ import control.services.ThreatReach.Coverage;
 import control.services.ThreatReach.Threat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,8 +54,15 @@ class ThreatReachTest {
         private final Terreno plain = terreno("P", "Plain", false);
         private final Terreno water = terreno("A", "Water", true);
         private final Terreno mountain = terreno("M", "Mountain", false);
-        /** Shore. MovimentoExercito.isNavegavel only lets a fleet step ashore onto terrain "L"
-         * (or an ancoravel hex), so a landing test needs one - a plain coast is not navigable. */
+        /**
+         * Shore. {@code MovimentoExercito.isNavegavel} lets a fleet step ashore onto terrain "L" or
+         * onto any {@code isAncoravel} hex, so a landing test needs one of those.
+         *
+         * In production {@code terreno_cenario} marks BOTH "L" and "P" as {@code fl_ancoravel='S'},
+         * so plains are landable too and real fleets come ashore on them. This fixture is stricter
+         * than the game on purpose: it makes the landing site unambiguous, so a test about what
+         * happens AFTER a landing cannot accidentally be about where one is possible.
+         */
         private final Terreno shore = terreno("L", "Shore", false);
         private final Jogador me = new Jogador();
         private final Nacao mine = nacao("MINE");
@@ -295,13 +303,17 @@ class ThreatReachTest {
     /**
      * The union over non-dominated troop types, not one "fastest" type.
      *
-     * The two here are incomparable on purpose, and not only on price. The runner crosses plains at
-     * 2 and mountains at 12; the climber is the other way round AND carries {@code ;TTM;}, without
-     * which {@code getCustoMovimentacaoTerra} refuses mountain-to-mountain outright however many
-     * points an army has. So the runner reaches plains the climber never will, and the climber walks
-     * into the middle of a range the runner cannot enter at any price. Pick either one alone and the
-     * reach is under-stated on the terrain the other is built for, which is the one direction a
-     * threat display must never go.
+     * The two here are incomparable on purpose: the runner crosses plains at 2 and mountains at 12,
+     * the climber the other way round. So the runner reaches plains the climber never will, and the
+     * climber reaches into a range the runner cannot afford. Pick either one alone and the reach is
+     * under-stated on the terrain the other is built for, which is the one direction a threat
+     * display must never go.
+     * <p>
+     * The mountain hexes here are out of the runner's reach on PRICE, not on permission. An earlier
+     * version of this test gave the climber {@code ;TTM;} and asserted that mountain-to-mountain was
+     * "refused at any price" - it was not, and the assertion passed on cost alone, because
+     * {@code MovimentoExercito.moveMountain} defaults to true and nothing was setting it. It is now
+     * set explicitly; see {@link #mountainCrossingIsAllowedOnPurpose}.
      */
     @Test
     void theAssumedReachIsTheUnionOverTroopsNoOtherTroopBeatsEverywhere() {
@@ -312,7 +324,7 @@ class ThreatReachTest {
         }
         final TipoTropa runner = troop("RUNNER", false, "", new Terreno[]{f.plain, f.mountain},
                 new int[]{2, 12});
-        final TipoTropa climber = troop("CLIMBER", false, ";TTM;",
+        final TipoTropa climber = troop("CLIMBER", false, "",
                 new Terreno[]{f.plain, f.mountain}, new int[]{6, 4});
         giveRoster(f.theirs, runner, climber);
 
@@ -329,9 +341,9 @@ class ThreatReachTest {
         assertTrue(both.containsAll(runnerOnly) && both.containsAll(climberOnly),
                 "the union must contain everything either type reaches on its own");
         assertTrue(climberOnly.contains(f.locais.get("0805")),
-                "fixture check: only the ;TTM; troop gets into the second mountain column");
+                "fixture check: only the cheap-on-mountains troop can afford the second column");
         assertFalse(runnerOnly.contains(f.locais.get("0805")),
-                "fixture check: mountain to mountain without ;TTM; is refused at any price");
+                "fixture check: 2 + 12 + 12 is 26, past a 16-point turn");
         assertTrue(both.size() > runnerOnly.size(), "the climber adds mountain hexes the runner cannot");
         assertTrue(both.size() > climberOnly.size(), "the runner adds plains the climber cannot");
     }
@@ -348,6 +360,9 @@ class ThreatReachTest {
 
         final Coverage found = f.run(f.unscouted("Desconhecido", "0505", f.theirs, 2, 0));
 
+        //asserted non-empty first: the loop below is vacuously true on an empty list, which is
+        //exactly what a regression that stopped flooding anything would produce
+        assertFalse(found.getThreats(f.locais.get("0507")).isEmpty());
         for (Threat threat : found.getThreats(f.locais.get("0507"))) {
             assertEquals("QUICK", threat.getAssumedTroop(),
                     "SLOW is beaten on every terrain, so it buys nothing and should not be flooded");
@@ -421,6 +436,182 @@ class ThreatReachTest {
         assertEquals(1, f.run(enemy).getSoonest(f.locais.get("0510")),
                 "believing the flag would double every hex and push this into the second turn");
     }
+
+    /**
+     * Two troops with the SAME cost everywhere are one flood, not two.
+     *
+     * Taken literally each dominates the other, so both are "beaten", the filter returned an empty
+     * list and the catch-all fell back to flooding every type. That is the common case rather than
+     * an edge one: the standard roster {@code ;cp;cl;ip;il;ar;me;wm;} is two identical classes, so
+     * seven floods ran where two would do - on the EDT, on every EGF open.
+     */
+    @Test
+    void troopsThatCostTheSameEverywhereAreFloodedOnce() {
+        final Fixture f = new Fixture();
+        final TipoTropa horseA = troop("HORSE-A", false, "", new Terreno[]{f.plain, f.mountain},
+                new int[]{2, 12});
+        final TipoTropa horseB = troop("HORSE-B", false, "", new Terreno[]{f.plain, f.mountain},
+                new int[]{2, 12});
+        final TipoTropa foot = troop("FOOT", false, "", new Terreno[]{f.plain, f.mountain},
+                new int[]{3, 5});
+        giveRoster(f.theirs, horseA, horseB, foot);
+
+        final List<Threat> at = f.run(f.unscouted("Desconhecido", "0505", f.theirs, 2, 0))
+                .getThreats(f.locais.get("0506"));
+
+        final Set<String> assumed = new HashSet<>();
+        for (Threat one : at) {
+            assumed.add(one.getAssumedTroop());
+        }
+        assertEquals(2, assumed.size(),
+                "one of the identical pair plus the foot troop, not all three: " + assumed);
+        assertTrue(assumed.contains("FOOT"), "the foot troop is cheaper on mountains, so it stays");
+    }
+
+    /**
+     * A troop with no entry for a terrain is the FASTEST thing on it, not the slowest.
+     *
+     * {@code ExercitoFacade.getCustoMovimentoBase} initialises its result to 1 and swallows the NPE
+     * from the missing lookup, so in the real flood a gap costs 1 a hex. The dominance vector used
+     * to substitute a large sentinel instead, reasoning that missing should read as impassable - and
+     * that is backwards twice: the sentinel sits in the troop's OWN slot, where a large number makes
+     * it easier to beat, so the filter dropped precisely the troop that would have gone furthest.
+     */
+    @Test
+    void aTroopWithNoEntryForATerrainIsNotDroppedAsIfItWereSlow() {
+        final Fixture f = new Fixture();
+        for (int row = 1; row <= 12; row++) {
+            f.hex(String.format("%02d%02d", 6, row), f.mountain);
+            f.hex(String.format("%02d%02d", 7, row), f.mountain);
+        }
+        //identical on plains; GHOST has no mountain entry at all, so the flood crosses it at 1
+        final TipoTropa plodder = troop("PLODDER", false, "", new Terreno[]{f.plain, f.mountain},
+                new int[]{3, 12});
+        final TipoTropa ghost = troop("GHOST", false, "", new Terreno[]{f.plain},
+                new int[]{3});
+        giveRoster(f.theirs, plodder, ghost);
+
+        final Set<Local> both = f.run(f.unscouted("Desconhecido", "0505", f.theirs, 2, 0))
+                .getHexesWithin(1);
+        giveRoster(f.theirs, plodder);
+        final Set<Local> plodderOnly = f.run(f.unscouted("P", "0505", f.theirs, 2, 0))
+                .getHexesWithin(1);
+
+        assertTrue(both.size() > plodderOnly.size(),
+                "GHOST crosses the range for 1 a hex and must not be filtered out as if it could not");
+    }
+
+    /**
+     * Mountain-to-mountain is allowed, deliberately and explicitly.
+     *
+     * {@code MovimentoExercito.moveMountain} defaults to TRUE and both Judge call sites set it from
+     * the army; nothing here was setting it, so the permissive default was in force by accident and
+     * the {@code ;TTM;} branch of {@code getCustoMovimentacaoTerra} never ran. It is now set on
+     * purpose: a client cannot see the scenario rule or a mountain-walking item, and drawing a range
+     * as impassable when it is not is an under-warning.
+     */
+    @Test
+    void mountainCrossingIsAllowedOnPurpose() {
+        final Fixture f = new Fixture();
+        for (int row = 1; row <= 12; row++) {
+            f.hex(String.format("%02d%02d", 5, row), f.mountain);
+        }
+        //cheap on mountains and carrying no ;TTM;: only the movement flag can let it through
+        final TipoTropa climber = troop("CLIMBER", false, "", new Terreno[]{f.plain, f.mountain},
+                new int[]{3, 3});
+        giveRoster(f.theirs, climber);
+
+        assertEquals(1, f.run(f.unscouted("Desconhecido", "0505", f.theirs, 2, 0))
+                .getSoonest(f.locais.get("0507")),
+                "two mountain hexes along the range, 6 points, inside one turn");
+    }
+
+    // ----- what the client must not believe -----
+
+    /**
+     * The evasive flag is never believed, <b>not even on an army whose platoons we can count</b>.
+     *
+     * It is not a property of the army. {@code ExercitoControl} writes "NORMAL" when one is raised
+     * and {@code OrdemBaseMovParent} overwrites it from the trailing {@code ev}/{@code nr} parameter
+     * of whatever move was ordered; the server stores that in {@code exercito.tp_movimentacao} and
+     * the client reads it back. So it records LAST turn's order, and an enemy that crept evasively
+     * only has to type {@code nr} to move at full speed next turn. Charging it double was an
+     * under-warning on exactly the armies the player has counted and trusts the column about.
+     */
+    @Test
+    void aCountedArmysEvasiveFlagIsNotBelievedEither() {
+        final Fixture f = new Fixture();
+        final TipoTropa foot = troop("FOOT", false, "", new Terreno[]{f.plain, f.mountain},
+                new int[]{3, 12});
+        final Exercito crept = f.army("Seen", "0505", f.theirs, foot);
+        crept.setMovimentacaoEvasiva(true);
+
+        assertEquals(1, f.run(crept).getSoonest(f.locais.get("0510")),
+                "five hexes at 3 is 15, inside a 16-point turn - unless the flag is believed");
+    }
+
+    /**
+     * A fleet whose owner's RACE has no ship still has a naval reach.
+     *
+     * Ships are granted by nation POWERS, not by race: {@code ;PCC;}, {@code ;PTC;}, {@code ;PKR;},
+     * {@code ;XDG;}, {@code ;XRR;} and {@code ;XSL;} all hand out hulls, and the standard
+     * seven-troop roster carries no {@code ;TTN;} at all. The fallback to the scenario catalogue
+     * used to fire only when the WHOLE roster was empty, so for most nations the sea filter came
+     * back empty, no sea Run was created, and an unscouted fleet drew no naval threat whatever.
+     */
+    @Test
+    void anUnscoutedFleetOfAShiplessRaceStillSails() {
+        final Fixture f = new Fixture();
+        for (int row = 1; row <= 12; row++) {
+            f.hex(String.format("%02d%02d", 5, row), f.water);
+        }
+        final TipoTropa foot = troop("FOOT", false, "", new Terreno[]{f.plain, f.mountain},
+                new int[]{3, 12});
+        final TipoTropa ship = troop("SHIP", true, "", new Terreno[]{f.water, f.shore},
+                new int[]{2, 2});
+        //the race can field no ship; the scenario catalogue can
+        giveRoster(f.theirs, foot);
+        f.cenario.getTipoTropas().put(ship.getCodigo(), ship);
+        f.cenario.getTipoTropas().put(foot.getCodigo(), foot);
+
+        assertEquals(1, f.run(f.unscouted("Desconhecido", "0505", f.theirs, 0, 3))
+                .getSoonest(f.locais.get("0508")),
+                "every coastal city read clean while this came back with no sea run at all");
+    }
+
+    /**
+     * The invasion: land this turn, march inland the next.
+     *
+     * Two rules in the shared flood hid this. A landing spends every remaining point, so a landing
+     * hex always totals exactly the limit and nothing can follow it; and a land flood refuses to
+     * start on water, which is where the fleet is. So the two-turn band for a fleet was "sail twice
+     * as far, then land", never "land, then march", and a city a short march inland was marked
+     * nothing at all.
+     */
+    @Test
+    void aFleetLandsThisTurnAndMarchesInlandTheNext() {
+        final Fixture f = new Fixture();
+        for (int row = 1; row <= 12; row++) {
+            f.hex(String.format("%02d%02d", 6, row), f.water);
+        }
+        f.hex("0505", f.shore);
+        final TipoTropa ship = troop("SHIP", true, "", new Terreno[]{f.water, f.shore},
+                new int[]{2, 2});
+        final TipoTropa foot = troop("FOOT", false, "", new Terreno[]{f.plain, f.shore, f.mountain},
+                new int[]{3, 3, 12});
+        giveRoster(f.theirs, ship, foot);
+        final Exercito fleet = f.unscouted("Desconhecido", "0605", f.theirs, 2, 3);
+
+        final Coverage found = f.run(fleet);
+
+        assertEquals(1, found.getSoonest(f.locais.get("0505")), "it is one step ashore");
+        assertEquals(MAX_TURNS, found.getSoonest(f.locais.get("0405")),
+                "and one plains hex inland is a short march the turn after");
+        assertEquals(MAX_TURNS, found.getSoonest(f.locais.get("0305")),
+                "two inland, 6 points, still well inside one turn of marching");
+    }
+
+    private static final int MAX_TURNS = ThreatReach.MAX_TURNS;
 
     // ----- the budget -----
 
@@ -589,6 +780,35 @@ class ThreatReachTest {
         assertTrue(ThreatReach.isHostile(orphan, f.me));
     }
 
+    /**
+     * A player holding several nations: a treaty signed by one must not clear the threat for all.
+     *
+     * The test over the player's own nations was an OR, so a player whose nation A had a treaty with
+     * X and whose nation B was at war with X lost X from the whole picture - including from every
+     * one of nation B's cities. Four or more nations per player is an ordinary case.
+     */
+    @Test
+    void aTreatySignedByOneOfMyNationsDoesNotCoverTheOthers() {
+        final Fixture f = new Fixture();
+        final Nacao second = nacao("MINE2");
+        f.me.addNacao(second);
+        //HostilityDeriver reads a nation's own row only when it can prove it complete, which for a
+        //client means the observer owns it - so the owner has to be set or the treaty is invisible
+        f.mine.setOwner(f.me);
+        second.setOwner(f.me);
+        //mine has a treaty with them; second has nothing
+        f.mine.getRelacionamentos().put(f.theirs, 2);
+
+        final TipoTropa foot = troop("FOOT", false, "", new Terreno[]{f.plain, f.mountain},
+                new int[]{3, 12});
+        giveRoster(f.theirs, foot);
+        final Exercito theirArmy = f.unscouted("Desconhecido", "0505", f.theirs, 2, 0);
+
+        //the path production takes, through HostilityDeriver
+        assertFalse(f.run(theirArmy).getThreats(f.locais.get("0506")).isEmpty(),
+                "second has no treaty with them, so its cities are still at risk");
+    }
+
     @Test
     void myOwnArmiesAreNotAThreatToMe() {
         final Fixture f = new Fixture();
@@ -597,6 +817,28 @@ class ThreatReachTest {
 
         assertFalse(ThreatReach.isHostile(f.army("Mine", "0505", f.mine, foot), f.me));
         assertTrue(f.run(f.army("Mine", "0505", f.mine, foot)).isEmpty());
+    }
+
+    /**
+     * An army with no size band at all still marks the hex it is standing on.
+     *
+     * Both bands at zero means "not even estimated", not "nothing there" - 11 rows out of 277,953
+     * in {@code ex_exercito}. The origin was recorded INSIDE the per-flood loop, so with no floods
+     * the army vanished from the picture entirely, including from the hex it was sitting on.
+     */
+    @Test
+    void anArmyWithNoSizeBandStillMarksWhereItStands() {
+        final Fixture f = new Fixture();
+        final TipoTropa foot = troop("FOOT", false, "", new Terreno[]{f.plain, f.mountain},
+                new int[]{3, 12});
+        giveRoster(f.theirs, foot);
+
+        final Coverage found = f.run(f.unscouted("Desconhecido", "0505", f.theirs, 0, 0));
+
+        assertEquals(1, found.getSoonest(f.locais.get("0505")),
+                "a city under its nose is the one the player most needs flagged");
+        assertFalse(found.getThreats(f.locais.get("0506")).isEmpty(),
+                "and an unestimated army is still an army: it gets the land assumption");
     }
 
     @Test

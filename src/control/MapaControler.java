@@ -109,6 +109,8 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         ScoutFootprint.setCurrent(null);
         MoveConvergence.setCurrent(null);
         ThreatReach.setCurrent(null);
+        threatBands = null;
+        threatBandsFor = null;
         exercitoFacade = new ExercitoFacade();
         final Cenario cenario = WorldFacadeCounselor.getInstance().getCenario();
         mapaManager = new MapaManager(cenario, form);
@@ -265,8 +267,12 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
      * questions about the player's own orders and go stale the moment he saves one. This answers one
      * about where the enemy is standing, which the EGF fixes for the whole planning session, so
      * {@code ThreatReach.getOrCompute} works it out on the first ask and keeps it until a new game
-     * is opened. It is also by far the most expensive of the three - a flood per hostile army over
-     * the whole map - which is the other reason it is not on the save path.
+     * is opened.
+     * <p>
+     * This method IS on the save path - {@code ACTIONS_MAP_REDRAW} is what {@code OrdemControler}
+     * fires on every order save - so the two band outlines are memoised beside the coverage rather
+     * than rebuilt each time. Without that, every save paid for two full scans of the hex map, two
+     * new sets, and two {@code HexRangeOutline} walks over a region that can be thousands of hexes.
      * <p>
      * The classic map style gets none of it, same as the other two: that style is the map as it was
      * before any of these markers existed.
@@ -290,11 +296,15 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
                 getTabGui().setThreatOverlay(null, null);
                 return;
             }
-            //the two-turn set CONTAINS the one-turn set, so the bands are drawn as two outlines of
-            //nested regions rather than two disjoint rings - HexRangeOutline returns one contour per
-            //connected region plus one per hole, which is exactly right for that
-            getTabGui().setThreatOverlay(HexRangeOutline.build(coverage.getHexesWithin(1)),
-                    HexRangeOutline.build(coverage.getHexesWithin(ThreatReach.MAX_TURNS)));
+            if (threatBands == null || threatBandsFor != coverage) {
+                //the two-turn set CONTAINS the one-turn set, so the bands are drawn as two outlines
+                //of nested regions rather than two disjoint rings - HexRangeOutline returns one
+                //contour per connected region plus one per hole, which is exactly right for that
+                threatBands = new Shape[]{HexRangeOutline.build(coverage.getHexesWithin(1)),
+                    HexRangeOutline.build(coverage.getHexesWithin(ThreatReach.MAX_TURNS))};
+                threatBandsFor = coverage;
+            }
+            getTabGui().setThreatOverlay(threatBands[0], threatBands[1]);
         } catch (RuntimeException ex) {
             log.warn("Threat overlay skipped: " + ex);
             getTabGui().setThreatOverlay(null, null);
@@ -303,6 +313,16 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
 
     /** Toolbar toggle, persisted like {@code drawScoutOnMap}. Default OFF: it is a specialist view. */
     public static final String THREAT_SETTING = "drawThreatReach";
+
+    /**
+     * The two band outlines, kept for as long as the coverage they were built from.
+     *
+     * Identity-compared against that coverage rather than cached behind a boolean: a new game
+     * installs a new Coverage and these have to go with it, and a Shape built from the previous
+     * world's hexes is the same leak the snapshots themselves are cleared for.
+     */
+    private Shape[] threatBands = null;
+    private ThreatReach.Coverage threatBandsFor = null;
 
     public ImageIcon printMapaGeral() {
         return new ImageIcon(mapaManager.printMapaGeral(listFactory.listLocais().values(), listFactory.listPersonagens(), getJogadorAtivo()));
@@ -363,7 +383,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         this.getTabGui().addMovementTagCumulative(pos[0], pos[1], movimento.getCustoMovimento(), movimento.getLimiteMovimento());
     }
 
-    public void addMovementTag(HashMap<Local, ArmyPath> movimentos) {
+    public void addMovementTag(Map<Local, ArmyPath> movimentos) {
         for (Local local : movimentos.keySet()) {
             //calcula posicao no grafico a partir da coordenada do local
             int[] pos = mapaManager.doCoordToPosition(local);
@@ -524,8 +544,19 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
      * <p>
      * The BUDGET stays the plain-move allowance. Forced March and Move Navy would buy two more
      * points, but this answers "where can it move", which for the player's own army is the move he is
-     * about to order; the worst case belongs to the threat picture, which is asking a different
-     * question.
+     * about to order; the worst case belongs to the threat picture, which asks a different question.
+     * <p>
+     * <b>Two other things changed when this moved, and both show on the player's own armies.</b>
+     * <ol>
+     * <li>The old code passed {@code setEvasivo(false)} unconditionally. Evasive movement doubles
+     * every hex, so an army set to move evasively was drawn with about twice the range it has. It
+     * now uses the army's own flag.</li>
+     * <li>The old code picked ONE medium from whether the army was standing on water. An army
+     * holding both land troops and ships now gets both floods unioned, so a fleet in a port shows
+     * where it could sail as well as where it could march. It cannot do both in one turn, so for a
+     * single order this over-states - deliberately, because the same call answers "how far could
+     * that reach me" for the threat layer, where under-stating is the costly error.</li>
+     * </ol>
      */
     public void printTagArmyRange(Exercito exercito) {
         final Local local = exercitoFacade.getLocal(exercito);
@@ -533,7 +564,7 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
                 WorldFacadeCounselor.getInstance().getCenario(),
                 WorldFacadeCounselor.getInstance().getCenarioArmyMoveMaxPoints());
         range.remove(local);
-        addMovementTag(new HashMap<>(range));
+        addMovementTag(range);
     }
 
     public void printTagRange(Local local, int range) {

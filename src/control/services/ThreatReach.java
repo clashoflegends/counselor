@@ -58,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jmoura
  */
-public final class ThreatReach implements Serializable {
+public final class ThreatReach {
 
     private static final Log log = LogFactory.getLog(ThreatReach.class);
 
@@ -143,6 +143,11 @@ public final class ThreatReach implements Serializable {
         private final Map<Local, List<Threat>> byHex;
 
         Coverage(Map<Local, List<Threat>> byHex) {
+            for (List<Threat> at : byHex.values()) {
+                //soonest first, once, so a row can lead with the worst news without the renderer
+                //sorting a shared list on every paint
+                Collections.sort(at);
+            }
             this.byHex = byHex;
         }
 
@@ -167,8 +172,10 @@ public final class ThreatReach implements Serializable {
             if (ret == null) {
                 return Collections.emptyList();
             }
-            Collections.sort(ret);
-            return ret;
+            //read-only, and sorted once when the picture was built. This is called from a table cell
+            //renderer - once per cell per repaint - and it used to sort the STORED list in place and
+            //hand back a live reference to it every time.
+            return Collections.unmodifiableList(ret);
         }
 
         /** The soonest turn anything reaches this hex, or 0 for nothing. */
@@ -195,8 +202,13 @@ public final class ThreatReach implements Serializable {
      * question about where the enemy is standing, which the EGF fixes for the whole planning session
      * - and it is the expensive one, a flood per hostile army over the whole map.
      * <p>
-     * Lazy rather than computed at load, because opening an EGF is already the slowest thing the
-     * client does and nobody should pay for a map layer they may never switch on.
+     * <b>Lazy, but in practice it always runs.</b> Nothing is computed until something asks - and the
+     * Cities tab always asks, because the Threat column is unconditional and {@code TabCidadesGui}
+     * builds its model in its constructor. So every player pays for it on every EGF open whether or
+     * not he has ever switched the map layer on, and that layer's own setting does not gate it. That
+     * is a deliberate trade and the number behind it is 71ms on a 13-player game with 3,071 hexes and
+     * 9 hostile armies, which is lost in the noise of opening a turn file - but it is a measurement
+     * on ONE file, and a game with ten times the hostile armies has not been measured.
      * <p>
      * <b>Cleared when a new game is opened</b>, in {@code MapaControler.initialize}. A kept Threat
      * holds an Exercito and the map keys on Local, and either one reaches the whole previous World
@@ -334,14 +346,27 @@ public final class ThreatReach implements Serializable {
             return false;
         }
         if (relations != null) {
+            // EVERY own nation must be on friendly terms before this is cleared. An OR over them
+            // meant a player holding two nations, one with a treaty with X and one at war with X,
+            // lost X from the whole picture - including from the cities of the nation at war with
+            // it. Four or more nations per player is an ordinary case here.
             for (Nacao mine : observer.getNacoes().values()) {
-                if (relations.getValor(mine, nacao) >= RelationshipMatrix.FRIEND) {
-                    return false;
+                if (relations.getValor(mine, nacao) < RelationshipMatrix.FRIEND) {
+                    return true;
                 }
             }
-            return true;
+            return !observer.getNacoes().isEmpty();
         }
-        return !jogadorFacade.isAlly(nacao, observer);
+        // Fallback, for when the matrix cannot be built at all. Per own nation for the same reason
+        // the matrix path is: Jogador.isJogadorAliado ORs over the player's nations, so a treaty
+        // signed by one of them cleared the threat for all of them. Same DIRECTION it uses though -
+        // theirs towards mine - because that is the one the EGF exports, and only when positive.
+        for (Nacao mine : observer.getNacoes().values()) {
+            if (nacao.getRelacionamento(mine) < RelationshipMatrix.FRIEND) {
+                return true;
+            }
+        }
+        return !observer.getNacoes().isEmpty();
     }
 
     /**
@@ -351,11 +376,14 @@ public final class ThreatReach implements Serializable {
      * {@code ArmyPath}, so a single run answers both turns: at or under one budget is turn 1, over it
      * is turn 2. Running twice would do the same work twice.
      * <p>
-     * <b>Turn 2 is an upper bound and the UI says so.</b> Movement points do not carry over between
-     * turns, so the exact two-turn reach is a second flood seeded from every hex turn 1 ends on.
-     * {@code calculateArmyRangeHexes} is single-source and belongs to the Judge
-     * ({@code Ordem851MoveNpcArmy} calls it), so this takes the doubled budget instead. That can only
-     * over-state, which is the direction this whole class leans.
+     * <b>Turn 2 for a LAND force is an upper bound and the UI says so.</b> Movement points do not
+     * carry over between turns, so the exact two-turn reach is a second flood seeded from every hex
+     * turn 1 ends on. {@code calculateArmyRangeHexes} is single-source and belongs to the Judge
+     * ({@code Ordem851MoveNpcArmy} calls it), so a land force takes the doubled budget instead,
+     * which can only over-state.
+     * <p>
+     * <b>For a fleet the doubled budget does not over-state, it MISSES</b>, and
+     * {@link #addMarchAfterLanding} is why that needed its own pass rather than a bigger number.
      */
     private static void addArmy(Map<Local, List<Threat>> byHex, Exercito army,
             SortedMap<String, Local> locais, Cenario cenario, int budget) {
@@ -363,6 +391,16 @@ public final class ThreatReach implements Serializable {
         if (origin == null) {
             return;
         }
+        // The hex it is standing on is reachable by definition, and a city under an army's nose is
+        // the one the player most needs flagged.
+        //
+        // Outside the run loop, though runsFor now always returns at least one run, so this is belt
+        // and braces rather than the fix: the bug was an army with BOTH size bands at zero producing
+        // no runs at all, so the loop body never executed and it vanished from the picture
+        // completely - including from the hex it was sitting on. What actually closes that is the
+        // land fallback in runsFor, and anArmyWithNoSizeBandStillMarksWhereItStands is what fails if
+        // either half is removed.
+        record(byHex, origin, new Threat(army, 1, null));
         for (Run run : runsFor(army, cenario, !army.getPelotoes().isEmpty())) {
             // TWO floods, one per turn, rather than one at the doubled budget classified by cost.
             // A LANDING costs whatever points are left under the limit (ExercitoFacade:704-707), so
@@ -379,9 +417,9 @@ public final class ThreatReach implements Serializable {
                 record(byHex, hex, new Threat(army, soon.containsKey(hex) ? 1 : MAX_TURNS,
                         run.assumedTroop));
             }
-            // the hex it is standing on is reachable by definition, and a city under an army nose is
-            // the one the player most needs flagged
-            record(byHex, origin, new Threat(army, 1, run.assumedTroop));
+            if (run.byWater) {
+                addMarchAfterLanding(byHex, army, cenario, locais, budget, soon.keySet());
+            }
         }
     }
 
@@ -422,7 +460,6 @@ public final class ThreatReach implements Serializable {
     /** One flood, built from the same assumptions for every caller. */
     private static Map<Local, ArmyPath> flood(Exercito army, Run run, Local origin,
             SortedMap<String, Local> locais, int limit) {
-        final boolean visible = !army.getPelotoes().isEmpty();
         final MovimentoExercito movEx = new MovimentoExercito();
         movEx.addTropasAll(run.troops);
         movEx.setOrigem(origin);
@@ -435,13 +472,100 @@ public final class ThreatReach implements Serializable {
         // accident of the formula, not a decision, so ThreatReachTest pins it - if consumption is
         // ever estimated from the size band instead, this silently gets slower and that test says so.
         movEx.setComida(exercitoFacade.isComida(army));
-        // EVASIVE movement doubles every hex. The flag is real on an army we can see and a
-        // placeholder on one we cannot, and unlike supply nothing else makes it safe: if the server
-        // ever exported a true here, taking it at face value would halve the reach of the armies we
-        // know least about.
-        movEx.setEvasivo(visible && army.isMovimentacaoEvasiva());
+        // EVASIVE movement doubles every hex, and the flag is NEVER believed - not even on an army
+        // whose platoons we can count.
+        //
+        // It is not a property of the army, it is a record of the order it issued LAST turn:
+        // ExercitoControl sets "NORMAL" when an army is raised, OrdemBaseMovParent overwrites it
+        // from the trailing ev/nr parameter of whatever move was ordered, and the server stores it
+        // in exercito.tp_movimentacao for the client to read back. An enemy that crept evasively
+        // last turn only has to type nr to move at full speed next turn, so charging it double was
+        // an UNDER-warning on exactly the armies the player has counted and trusts the column about.
+        // A scouted stack five plains hexes from a capital came out beyond both bands.
+        //
+        // False is also what printTagArmyRange hardcoded before it shared this flood, so the Armies
+        // tab keeps the range it has always drawn.
+        movEx.setEvasivo(false);
+        // MOUNTAINS. getCustoMovimentacaoTerra refuses mountain-to-mountain without a road unless
+        // the MOVEMENT allows it or every troop carries ;TTM;, and that movement flag defaults to
+        // TRUE - so leaving it unset was allowing it for everyone by accident. Both Judge call sites
+        // set it from the army; this sets it so the worst case is a decision instead, because a
+        // client cannot see the scenario rule or a mountain-walking item and drawing a range as
+        // impassable when it is not would under-warn.
+        //
+        // No test can fail on this line alone - it writes the value the field already held - so it
+        // is intent, not a guard. mountainCrossingIsAllowedOnPurpose pins the BEHAVIOUR, which is
+        // what would break if the default ever changed underneath.
+        movEx.setMoveMountain(true);
         movEx.setLimiteMovimento(limit);
         return exercitoFacade.calculateArmyRangeHexes(locais, movEx);
+    }
+
+    /**
+     * March inland from wherever the fleet can put troops ashore this turn.
+     *
+     * <b>Without this the turn-2 band for a fleet is "sail twice as far, then land", never "land,
+     * then march"</b> - and the second is the invasion. Two rules in the shared flood conspire:
+     * {@code ExercitoFacade} spends EVERY remaining point on the step ashore, so a landing hex
+     * always totals exactly the limit and nothing can follow it; and the matching land flood returns
+     * empty immediately, because a land army is not allowed to start on water and the fleet's origin
+     * IS a water hex. So a hostile fleet two hexes off the coast marked the port and left a city
+     * three plains hexes inland - well inside one turn's march - unmarked altogether. That is the
+     * case a coastal player opens this column for.
+     * <p>
+     * One land flood per landing hex, at ONE turn's budget, recorded at turn 2: the Judge has no
+     * restriction here either, turn 1 is Move Navy and turn 2 is a plain move or a Forced March. The
+     * troops are the army's own where we can count them, and its owner's assumed LAND roster where
+     * we cannot - {@code MilestoneCalculos} gives every army a land band, so a fleet is assumed to
+     * be carrying something.
+     * <p>
+     * Capped, and the cap is an admitted under-warning: a fleet with a very long turn-1 reach can
+     * touch more shore than is worth flooding from, and a bounded, logged truncation beats an
+     * unbounded cost on the EGF-open path. The landing hexes are sorted so the cap is deterministic
+     * rather than whatever order the hash map happened to produce.
+     */
+    private static void addMarchAfterLanding(Map<Local, List<Threat>> byHex, Exercito army,
+            Cenario cenario, SortedMap<String, Local> locais, int budget, Collection<Local> reached) {
+        final List<Local> shore = new ArrayList<>();
+        for (Local hex : reached) {
+            if (hex != null && hex.getTerreno() != null && !hex.getTerreno().isAgua()) {
+                shore.add(hex);
+            }
+        }
+        if (shore.isEmpty()) {
+            return;
+        }
+        Collections.sort(shore);
+        if (shore.size() > MAX_LANDINGS) {
+            log.warn(String.format("%s can land on %d hexes; marching inland from the first %d only.",
+                    army.getNome(), shore.size(), MAX_LANDINGS));
+        }
+        final List<Run> ashore = landRunsFor(army, cenario);
+        final int limit = Math.min(shore.size(), MAX_LANDINGS);
+        for (int ii = 0; ii < limit; ii++) {
+            for (Run run : ashore) {
+                for (Local hex : flood(army, run, shore.get(ii), locais, budget).keySet()) {
+                    if (hex != null) {
+                        record(byHex, hex, new Threat(army, MAX_TURNS, run.assumedTroop));
+                    }
+                }
+            }
+        }
+    }
+
+    /** Bounds the inland march: see {@link #addMarchAfterLanding}. */
+    private static final int MAX_LANDINGS = 24;
+
+    /** What the fleet puts ashore: its own land troops, or the owner's assumed land roster. */
+    private static List<Run> landRunsFor(Exercito army, Cenario cenario) {
+        final List<Run> ret = new ArrayList<>(2);
+        final List<TipoTropa> own = exercitoFacade.getTipoTropasTerra(army);
+        if (!own.isEmpty()) {
+            ret.add(new Run(own, false, null));
+            return ret;
+        }
+        addAssumedRuns(ret, assumedRoster(army, cenario), cenario, false);
+        return ret;
     }
 
     private static void record(Map<Local, List<Threat>> byHex, Local hex, Threat threat) {
@@ -493,30 +617,44 @@ public final class ThreatReach implements Serializable {
             return ret;
         }
         final Collection<TipoTropa> roster = assumedRoster(army, cenario);
-        if (army.getTamanhoExercito() > 0) {
-            addAssumedRuns(ret, roster, cenario, false);
-        }
         if (army.getTamanhoEsquadra() > 0) {
             addAssumedRuns(ret, roster, cenario, true);
         }
-        if (ret.isEmpty()) {
-            //nothing is known and nothing can be assumed: say nothing rather than guess a circle
-            log.warn(String.format("No roster to assume for %s; no threat computed.", army.getNome()));
+        if (army.getTamanhoExercito() > 0 || ret.isEmpty()) {
+            //Both bands at zero means "not even estimated", not "nothing there" - 11 rows across
+            //277,953 in ex_exercito. An army that is on the map is an army, so it gets the land
+            //assumption rather than vanishing from the picture entirely.
+            addAssumedRuns(ret, roster, cenario, false);
         }
         return ret;
     }
 
     private static void addAssumedRuns(List<Run> out, Collection<TipoTropa> roster, Cenario cenario,
             boolean byWater) {
-        final List<TipoTropa> eligible = new ArrayList<>();
-        for (TipoTropa troop : roster) {
-            if (troop != null && troop.isBarcos() == byWater) {
-                eligible.add(troop);
-            }
+        List<TipoTropa> eligible = ofMedium(roster, byWater);
+        if (eligible.isEmpty()) {
+            // The race roster is only half of what a nation can field: SHIPS are granted by nation
+            // POWERS, not by race. ;PCC;, ;PTC;, ;PKR;, ;XDG;, ;XRR; and ;XSL; all hand out hulls,
+            // and the standard seven-troop roster (;cp;cl;ip;il;ar;me;wm;) carries no ;TTN; at all -
+            // so for most nations the race list has no ship in it and this filter came back empty.
+            // There was no second fallback, so the sea Run was never created and an unscouted FLEET
+            // drew no naval threat whatever: every coastal city read clean. Falling back per medium
+            // rather than only when the whole roster is empty is what closes that.
+            eligible = ofMedium(cenario.getTipoTropas().values(), byWater);
         }
         for (TipoTropa troop : nonDominated(eligible, cenario)) {
             out.add(new Run(Collections.singletonList(troop), byWater, troop.getNome()));
         }
+    }
+
+    private static List<TipoTropa> ofMedium(Collection<TipoTropa> troops, boolean byWater) {
+        final List<TipoTropa> ret = new ArrayList<>();
+        for (TipoTropa troop : troops) {
+            if (troop != null && troop.isBarcos() == byWater) {
+                ret.add(troop);
+            }
+        }
+        return ret;
     }
 
     /**
@@ -543,66 +681,72 @@ public final class ThreatReach implements Serializable {
      *
      * <b>Not "the fastest troop".</b> Speed is terrain-dependent and rides habilidades -
      * {@code ;TTF;} and {@code ;TTR;} halve road cost, {@code ;T2M;} and {@code ;TM2;} halve
-     * mountains, and {@code isMoveMountain} decides whether mountain-to-mountain is possible at all.
-     * A type chosen by one scalar is slower than some other type on some terrain, and the reach
-     * computed from it would UNDER-state on exactly those paths. The union over the non-dominated
-     * types is the real worst case over compositions this owner could actually field.
-     * <p>
-     * Cheap: rosters run 4 to 7 types over 5 to 10 terrains, so this is a few hundred lookups and
-     * leaves 1 to 3 types to flood.
+     * mountains. A type chosen by one scalar is slower than some other type on some terrain, and the
+     * reach computed from it would UNDER-state on exactly those paths. The union over the
+     * non-dominated types is the real worst case over compositions this owner could field.
+     *
+     * Cheap: rosters run 4 to 7 types over 5 to 10 terrains, so this is a few hundred lookups, and
+     * after tie-breaking the standard roster collapses to two floods.
      */
     static List<TipoTropa> nonDominated(List<TipoTropa> troops, Cenario cenario) {
         if (troops.size() <= 1) {
             return troops;
         }
         final List<Terreno> terrains = new ArrayList<>(cenario.getTerrenos().values());
-        final Map<TipoTropa, int[]> vectors = new HashMap<>();
+        final List<int[]> vectors = new ArrayList<>(troops.size());
         for (TipoTropa troop : troops) {
-            vectors.put(troop, costVector(troop, terrains));
+            vectors.add(costVector(troop, terrains));
         }
         final List<TipoTropa> ret = new ArrayList<>(troops.size());
-        for (TipoTropa troop : troops) {
+        for (int ii = 0; ii < troops.size(); ii++) {
             boolean beaten = false;
-            for (TipoTropa other : troops) {
-                if (other != troop && dominates(vectors.get(other), vectors.get(troop))) {
-                    beaten = true;
-                    break;
+            for (int jj = 0; jj < troops.size() && !beaten; jj++) {
+                if (ii == jj || !dominates(vectors.get(jj), vectors.get(ii))) {
+                    continue;
                 }
+                // TIES. Two troops with IDENTICAL vectors each dominate the other, so taken
+                // literally both are beaten and the whole list came back empty - which then fell
+                // through to the catch-all below and flooded EVERY type. That is not an edge case:
+                // the standard roster ;cp;cl;ip;il;ar;me;wm; is two identical classes (cp=cl, and
+                // ip=il=ar=me=wm), so seven floods ran where two would do. Keep the first member of
+                // each class and drop the rest.
+                if (dominates(vectors.get(ii), vectors.get(jj)) && jj > ii) {
+                    continue;
+                }
+                beaten = true;
             }
             if (!beaten) {
-                ret.add(troop);
+                ret.add(troops.get(ii));
             }
         }
+        //unreachable now that ties are broken by index - the first member of a maximal class always
+        //survives - but a dominance bug must never silence the whole threat, so it is kept
         return ret.isEmpty() ? troops : ret;
     }
 
     /**
-     * This troop's cost on every terrain, off road and on, plus its mountain-crossing flag.
+     * This troop's cost on every terrain, off road and on.
      *
-     * The terrain lookup is checked for a MISSING entry rather than left to
-     * {@code getCustoMovimentoBase}, whose loop is wrapped in {@code catch (NullPointerException)}
-     * and would return its initial 1 - a troop with no entry for a terrain would then look like the
-     * fastest thing on the map and dominate everything that can really walk there. Missing reads as
-     * impassable here, which is the safe direction for a DOMINANCE test: it keeps the troop in play
-     * rather than letting it silently remove the real contenders.
+     * <b>It calls the same function the flood calls, with no guard of its own.</b> An earlier
+     * version substituted a large sentinel for a terrain the troop has no entry for, reasoning that
+     * missing should read as impassable. That was backwards twice over:
+     * {@code getCustoMovimentoBase} swallows the resulting NPE and keeps its initial 1, so in the
+     * REAL flood a missing entry is the CHEAPEST thing on the map; and in {@code dominates} a large
+     * number in a troop's own slot makes that troop easier to beat, not harder, so the sentinel
+     * dropped exactly the troop that would have gone furthest. The vector has to be the flood's cost
+     * function or the filter is answering a different question from the one that matters.
      */
     private static int[] costVector(TipoTropa troop, List<Terreno> terrains) {
-        final int[] ret = new int[terrains.size() * 2 + 1];
+        final int[] ret = new int[terrains.size() * 2];
         int ii = 0;
         for (Terreno terreno : terrains) {
             for (boolean road : new boolean[]{false, true}) {
-                final Integer base = troop.getMovimentoTerreno().get(terreno);
-                ret[ii++] = base == null || base == 0 ? IMPASSABLE
-                        : exercitoFacade.getCustoMovimentoBase(
-                                Collections.singletonList(troop), terreno, road, troop.isBarcos());
+                ret[ii++] = exercitoFacade.getCustoMovimentoBase(
+                        Collections.singletonList(troop), terreno, road, troop.isBarcos());
             }
         }
-        //a troop that can cross mountain to mountain is never beaten by one that cannot
-        ret[ii] = troop.isMoveMountain() ? 0 : 1;
         return ret;
     }
-
-    private static final int IMPASSABLE = 9999;
 
     /** True when {@code a} is at least as cheap as {@code b} everywhere. */
     private static boolean dominates(int[] a, int[] b) {

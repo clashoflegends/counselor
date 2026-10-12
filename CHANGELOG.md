@@ -11,11 +11,16 @@
 - **Armies you have not scouted are counted too, at their worst.** You cannot see what is in them, so the Counselor assumes the fastest troops that nation could field and says which it assumed. It also assumes they are fed and not moving evasively, and that they will force-march, because all of those make them faster and the point of the column is not to be pleasantly surprised.
 - **The map layer outlines the same ground**, one turn and two, so you can see where a border is thin before you commit an army somewhere else.
 - **No mark is not a promise.** An army you have never seen is not in your turn file at all, so the Counselor marks danger it can prove and stays quiet otherwise - the same way the city growth cap works.
-- **The second turn is a ceiling, not a forecast.** Leftover movement does not carry over between turns, so anything shown as two turns away might take longer.
+- **The second turn is a ceiling for an army on foot, and a real answer for a fleet.** Leftover movement does not carry over between turns, so a land force shown as two turns away might take longer. A fleet is worked out properly: it can land this turn and march inland the next, which is what an invasion looks like.
+- **Nobody is assumed to be creeping.** An army that moved evasively last turn is counted at full speed, because all it has to do is order a normal move next turn.
+- **Your teammates are not threats.** In a locked-team game the alliance is read from the team itself, so a teammate camped next to your city no longer lights up red.
 
 ### Army movement ranges no longer cross the ocean
 
 - **Click an enemy army in the Armies tab and the shaded range is now shaped like the terrain.** For an army you have not scouted it used to be a perfect circle that ignored water, rivers and mountains and reached about three times too far, because an army with no visible troops was being costed as if every hex were flat and free.
+- **An army of yours that is set to move evasively now shows the range it really has**, which is about half the one it used to draw - evasive movement costs double per hex and the shading was ignoring that.
+- **An army carrying ships shows where it could sail as well as where it could march.**
+- **The Cities tab sort order and column widths reset once** on this upgrade, because the new Threat column changes the table. Set them again and they stick.
 
 ### Review your whole turn before you send it
 

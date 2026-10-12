@@ -18,7 +18,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import javax.swing.ComboBoxModel;
 import model.ActorAction;
@@ -219,7 +221,9 @@ public class CidadeConverter implements Serializable {
 
     private static Object[][] getCidadesAsArray(List listaExibir) {
         if (listaExibir.isEmpty()) {
-            Object[][] ret = {{"", "", "", false, false, "", "", "", "", "", "", "", "", ""}};
+            //all strings: the two booleans used to land on the Local and Threat columns, which
+            //render a value they do not understand as the literal text "false"
+            Object[][] ret = {{"", "", "", "", "", "", "", "", "", "", "", "", "", ""}};
             return (ret);
         } else {
             int ii = 0;
@@ -239,9 +243,11 @@ public class CidadeConverter implements Serializable {
     /**
      * How soon a hostile force could be standing on this city.
      *
-     * Reads {@code ThreatReach}'s cached picture rather than computing anything, so the column and
-     * the map layer can never disagree, and the first table build after an EGF opens is the one that
-     * pays for the flood.
+     * Goes through {@code ThreatReach.getOrCompute}, so the column and the map layer always read one
+     * picture and can never disagree. <b>This is the call that usually builds it</b>: the column is
+     * unconditional and {@code TabCidadesGui} builds its model in its constructor, so the first table
+     * build after an EGF opens is what pays for the flood - measured at 71ms on a 13-player game with
+     * 3,071 hexes and 9 hostile armies, and it is not gated on the map layer's own setting.
      *
      * Own cities only - see {@link CityThreat}.
      */
@@ -275,22 +281,57 @@ public class CidadeConverter implements Serializable {
         if (threat == null || !threat.isThreatened()) {
             return null;
         }
+        final List<ThreatReach.Threat> forces = soonestPerArmy(threat.getThreats());
         final StringBuilder ret = new StringBuilder("<html>");
         ret.append(String.format(labels.getString("THREAT.TOOLTIP.TITLE"), threat.getTurns()));
         int shown = 0;
-        for (ThreatReach.Threat one : threat.getThreats()) {
+        for (ThreatReach.Threat one : forces) {
             if (shown++ >= THREAT_TOOLTIP_MAX) {
                 ret.append("<br>").append(String.format(labels.getString("THREAT.TOOLTIP.MORE"),
-                        threat.getThreats().size() - THREAT_TOOLTIP_MAX));
+                        forces.size() - THREAT_TOOLTIP_MAX));
                 break;
             }
             ret.append("<br>").append(String.format(labels.getString(one.isAssumed()
                     ? "THREAT.TOOLTIP.ASSUMED" : "THREAT.TOOLTIP.SEEN"),
-                    one.getArmyName(), one.getNationName(), one.getTurns(), one.getAssumedTroop()));
+                    esc(one.getArmyName()), esc(one.getNationName()), one.getTurns(),
+                    esc(one.getAssumedTroop())));
         }
         //the absence of a mark is not a promise, and the one place to say so is where the mark is
         ret.append("<br><i>").append(labels.getString("THREAT.TOOLTIP.CAVEAT")).append("</i>");
         return ret.append("</html>").toString();
+    }
+
+    /**
+     * One line per ARMY, carrying its soonest arrival.
+     *
+     * {@code ThreatReach} records a finding per FLOOD, and one army is flooded more than once in two
+     * ordinary cases: an unscouted one whose owner's roster leaves two or three non-dominated troop
+     * types, and a visible one holding both land troops and ships. Printed raw, a single stack became
+     * two lines with different turn counts - a player counting lines would read two forces converging
+     * on his city - and the six-line cap filled up with copies while the "and N more" count counted
+     * floods rather than armies.
+     */
+    private static List<ThreatReach.Threat> soonestPerArmy(List<ThreatReach.Threat> raw) {
+        final Map<Exercito, ThreatReach.Threat> byArmy = new LinkedHashMap<>();
+        for (ThreatReach.Threat one : raw) {
+            final ThreatReach.Threat seen = byArmy.get(one.getArmy());
+            if (seen == null || one.getTurns() < seen.getTurns()) {
+                byArmy.put(one.getArmy(), one);
+            }
+        }
+        return new ArrayList<>(byArmy.values());
+    }
+
+    /**
+     * Swing renders these tooltips as HTML and a nation name is whatever a player typed at signup, so
+     * "Dagger &amp; Crown" would lose everything after the ampersand and a name holding a {@code <}
+     * would swallow the rest of the tooltip.
+     */
+    private static String esc(String text) {
+        if (text == null) {
+            return "";
+        }
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     private static final int THREAT_TOOLTIP_MAX = 6;

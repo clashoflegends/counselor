@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import model.Exercito;
 import model.Jogador;
+import model.Nacao;
 import model.Local;
 import model.TipoTropa;
 import org.junit.jupiter.api.Test;
@@ -71,28 +72,58 @@ class ThreatReachLiveWorldTest {
         final long millis = System.currentTimeMillis() - start;
 
         assertNotNull(found);
+        //not just "it ran": a regression that marks NOTHING would otherwise sail through this, and
+        //silence is the one failure mode a threat display must never have
+        assertFalse(found.isEmpty(), "a world with hostile armies in it must mark something");
+        assertFalse(found.getHexesWithin(1).isEmpty(), "and some of it within one turn");
+        assertTrue(found.getHexesWithin(ThreatReach.MAX_TURNS).size()
+                >= found.getHexesWithin(1).size(), "the two-turn band contains the one-turn band");
         assertTrue(millis < 3000, "threat reach took " + millis + "ms over the whole world");
     }
 
     /**
      * <b>The oracle.</b> For an army we can count, the turn-1 band must be exactly the hexes
-     * {@code calculateArmyRangeHexes} returns at one budget, called the way
-     * {@code MapaControler.printTagArmyRange} calls it - except for the budget, which is the Judge's
-     * worst case rather than its plain-move value.
+     * {@code calculateArmyRangeHexes} returns at one budget.
+     *
+     * The comparison is built to match {@code ThreatReach.flood}: the Judge's worst-case budget, the
+     * evasive flag ignored, mountain crossing allowed. Armies holding BOTH land troops and ships are
+     * skipped, because {@code ThreatReach} unions both mediums for those and a single-medium oracle
+     * cannot speak to the union. The skip is counted and reported, so this cannot quietly become a
+     * test of nothing.
+     * <p>
+     * <b>What it does and does not prove.</b> It pins the WRAPPER - run selection, the two-flood
+     * band classification, the origin hex - against the shared flood on real terrain. It does not
+     * pin the flood's own inputs, because it sets the same ones; those are pinned by
+     * {@link ThreatReachTest}, where each is verified by being broken.
      */
     @Test
     void aVisibleArmysTurnOneBandMatchesTheJudgesOwnFlood() throws Exception {
         final WorldFacadeCounselor wfc = TestWorld.load();
         final int budget = ThreatReach.budgetPerTurn(wfc.getCenarioArmyMoveMaxPoints());
         //A player's own EGF holds his own armies in full and everyone else's as fog, so the active
-        //player has no VISIBLE hostile army to check the wrapper against. An observer who owns
-        //nothing is hostile to everything, which puts the one army in this file that can be counted
-        //through the same code path. The oracle is about the flood, not about whose side it is on.
+        //player has no VISIBLE hostile army to check the wrapper against. This observer owns one
+        //nation that belongs to no team in this game, so every army in the file reads hostile to it
+        //and the armies that CAN be counted go through the same code path. The oracle is about the
+        //flood, not about whose side anyone is on.
+        //
+        //It owns a nation rather than none: hostility is "every own nation is friendly or better",
+        //so an observer owning nothing has nothing to be unfriendly with and clears everyone.
+        final Nacao noTeam = new Nacao();
+        noTeam.setCodigo("ZZZZ");
+        noTeam.setNome("Outsider");
+        noTeam.setTeamFlag("ZZZZ");
         final Jogador outsider = new Jogador();
+        outsider.addNacao(noTeam);
 
         int checked = 0;
+        int skippedMixed = 0;
         for (Exercito army : listFactory.listExercitos().values()) {
             if (army.getPelotoes().isEmpty() || exercitoFacade.getLocal(army) == null) {
+                continue;
+            }
+            if (!exercitoFacade.getTipoTropasTerra(army).isEmpty()
+                    && !exercitoFacade.getTipoTropasAgua(army).isEmpty()) {
+                skippedMixed++;
                 continue;
             }
             assertTrue(ThreatReach.isHostile(army, outsider), "an outsider is hostile to everyone");
@@ -105,7 +136,8 @@ class ThreatReachLiveWorldTest {
         }
         //a vacuous pass is the failure mode this test exists to avoid: TurnReviewLiveWorldTest was
         //written against this same fixture and found zero planned orders in it
-        assertTrue(checked > 0, "fixture holds no army we can count; this proved nothing");
+        assertTrue(checked > 0, "fixture holds no single-medium army we can count; this proved "
+                + "nothing (" + skippedMixed + " skipped for holding both troops and ships)");
     }
 
     /** {@code printTagArmyRange}'s own call, with the worst-case budget substituted. */
@@ -117,7 +149,10 @@ class ThreatReachLiveWorldTest {
                 ? exercitoFacade.getTipoTropasAgua(army) : exercitoFacade.getTipoTropasTerra(army);
         movEx.addTropasAll(troops);
         movEx.setComida(exercitoFacade.isComida(army));
-        movEx.setEvasivo(army.isMovimentacaoEvasiva());
+        //the same worst case ThreatReach.flood takes: the evasive flag is last turn's ORDER and is
+        //never believed, and mountain crossing is allowed because the client cannot see the rule
+        movEx.setEvasivo(false);
+        movEx.setMoveMountain(true);
         movEx.setOrigem(local);
         movEx.setPorAgua(water);
         movEx.setLimiteMovimento(budget);
@@ -155,6 +190,51 @@ class ThreatReachLiveWorldTest {
             }
         }
         assertTrue(wet.isEmpty(), "land-only forces reaching water: " + wet);
+    }
+
+    /**
+     * The assumed roster respects terrain COST, not merely terrain permission.
+     *
+     * {@link #noLandThreatReachesAcrossWater} alone proves less than it looks:
+     * {@code getCustoMovimentacaoTerra} rejects a water destination independently of price, so that
+     * test passes even if the whole cost model collapsed back to 1 point a hex. This is the
+     * assertion that notices - an unscouted army costed from a real roster must reach materially
+     * less ground than the same army costed with an empty troop list, which is the defect this
+     * class exists to close.
+     */
+    @Test
+    void anAssumedRosterReachesFarLessGroundThanAnEmptyTroopListWould() throws Exception {
+        final WorldFacadeCounselor wfc = TestWorld.load();
+        final int budget = ThreatReach.budgetPerTurn(wfc.getCenarioArmyMoveMaxPoints());
+
+        int checked = 0;
+        for (Exercito army : listFactory.listExercitos().values()) {
+            if (!army.getPelotoes().isEmpty() || exercitoFacade.getLocal(army) == null
+                    || army.getTamanhoEsquadra() > 0) {
+                continue;
+            }
+            final int assumed = ThreatReach.rangeOf(army, wfc.getLocais(), wfc.getCenario(),
+                    budget).size();
+
+            //the old behaviour: hand the shared cost model nothing and every hex costs 1
+            final MovimentoExercito empty = new MovimentoExercito();
+            empty.setOrigem(exercitoFacade.getLocal(army));
+            empty.setPorAgua(false);
+            empty.setComida(true);
+            empty.setLimiteMovimento(budget);
+            final int circle = exercitoFacade.calculateArmyRangeHexes(wfc.getLocais(), empty).size();
+
+            assertTrue(assumed > 0, army.getNome() + " must still have a reach");
+            //A quarter smaller, not half: the margin depends entirely on the terrain around the
+            //army and on how fast the assumed roster is. On this fixture the measured ratio is
+            //150 hexes against 251, i.e. 0.60. A collapse back to one point a hex would put it at
+            //1.0, which is the thing being watched for.
+            assertTrue(assumed * 4 < circle * 3, String.format(
+                    "%s: assumed roster reaches %d hexes, the cost-1 circle %d - the roster is not "
+                    + "being costed", army.getNome(), assumed, circle));
+            checked++;
+        }
+        assertTrue(checked > 0, "fixture holds no unscouted land army; this proved nothing");
     }
 
     /** An assumed reach must name the troop it assumed, or the UI cannot say it is a guess. */
