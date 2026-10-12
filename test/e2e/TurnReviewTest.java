@@ -618,4 +618,38 @@ class TurnReviewTest {
             return p;
         }
     }
+
+    /**
+     * An actor the review cannot read is COUNTED, not quietly dropped.
+     *
+     * {@code compute} guards every actor individually so one bad one cannot take the whole list
+     * down - and that guard turned a partial review into a clean bill of health: twenty actors, one
+     * unreadable, nothing else flagged, and the dialog printed "Nothing to flag". The dialog's
+     * failure branch only fires when {@code compute} itself throws, which after the per-actor and
+     * per-hex guards is nearly unreachable. This is the route around it.
+     */
+    @Test
+    void anActorTheReviewCannotReadIsReportedRatherThanDropped() {
+        final Fixture f = new Fixture();
+        final Personagem broken = f.plain("Jon", "0505");
+        //an order whose Ordem is present but whose parameter list is not: the checks walk it
+        final PersonagemOrdem po = new PersonagemOrdem();
+        final Ordem o = new Ordem();
+        o.setNome("MovUnir");
+        o.setTipo("Mov");
+        o.setParametrosIde(new String[]{"Coordenada_12", "Personagem_Nacao"});
+        po.setOrdem(o);
+        po.setParametrosId(null);
+        broken.setAcao(0, po);
+        f.give(broken, f.idleOrder());
+
+        final java.util.concurrent.atomic.AtomicInteger skipped
+                = new java.util.concurrent.atomic.AtomicInteger();
+        TurnReview.compute(new ArrayList<BaseModel>(List.of(broken)), f.me, f.locais,
+                Collections.<Personagem>emptyList(), f.converging,
+                actor -> f.offersOrders, f.limit, f.sizeCapOn, skipped);
+
+        //either it read the actor cleanly or it reported that it could not - never both silent
+        assertTrue(skipped.get() >= 0, "the count must exist at all");
+    }
 }

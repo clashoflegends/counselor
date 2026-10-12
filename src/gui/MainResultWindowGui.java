@@ -934,7 +934,17 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         //
         // Last in iniciaConfig on purpose: MainMapaGui's constructor is what calls setTabGui, so the
         // map controller has no tab to draw into before that line above.
-        DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+        //
+        // Guarded. iniciaConfig runs INSIDE doOpenFile's try, before currentResultsFile is set and
+        // before the saved orders are reloaded, so an exception escaping here would be caught far
+        // away as "unexpected error" with the new world already painted and the client still
+        // pointing at the previous file. The overlays are a drawing; they give up on themselves
+        // rather than on the open.
+        try {
+            DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+        } catch (RuntimeException ex) {
+            LOG.warn("Load-time overlay refresh failed: " + ex);
+        }
     }
 
     public void doMinimizeMap() {

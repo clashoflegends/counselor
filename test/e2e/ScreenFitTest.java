@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -119,5 +120,41 @@ class ScreenFitTest {
         final Rectangle got = ScreenFit.fit(new Rectangle(10, 10, 40, 30), laptopOnly());
         assertTrue(got.width >= 640 && got.height >= 480, "too small to resize or drag: " + got);
         assertWithin(got, LAPTOP);
+    }
+
+    /**
+     * A window the player deliberately stretched across two monitors comes back as they left it.
+     *
+     * Everything else in {@code fit} forces the window onto ONE screen, which is right for a window
+     * that has outgrown its display and wrong for this one: it overlaps each monitor by less than
+     * its own area, so {@code pickScreen} returns whichever it covers more and the clamp cuts it to
+     * that monitor's width. Nothing about the display set changed, so nothing should move - and the
+     * player would have had to re-stretch it on every single launch.
+     */
+    @Test
+    void aWindowSpanningTwoMonitorsIsLeftAlone() {
+        final Rectangle spanning = new Rectangle(0, 0, 3800, 1000);
+
+        assertEquals(spanning, ScreenFit.fit(spanning, List.of(LAPTOP, EXTERNAL)),
+                "it is wholly on screen; the single-screen clamp must not touch it");
+    }
+
+    /** But one hanging off the far edge is still pulled back. */
+    @Test
+    void aWindowHangingPastTheLastMonitorIsStillPulledBack() {
+        final Rectangle overhanging = new Rectangle(0, 0, 5000, 1000);
+
+        final Rectangle got = ScreenFit.fit(overhanging, List.of(LAPTOP, EXTERNAL));
+
+        assertTrue(got.width < overhanging.width, "the part past the right-hand edge is invisible");
+    }
+
+    /** And a window in the gap between two mismatched monitors is not "wholly visible". */
+    @Test
+    void aWindowOverAGapBetweenMismatchedMonitorsIsRefitted() {
+        //EXTERNAL is 1400 tall, LAPTOP 1040: a tall window spanning both hangs into dead space
+        final Rectangle intoTheGap = new Rectangle(1000, 0, 3000, 1300);
+
+        assertNotEquals(intoTheGap, ScreenFit.fit(intoTheGap, List.of(LAPTOP, EXTERNAL)));
     }
 }

@@ -12,6 +12,8 @@ import java.awt.Toolkit;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Makes a remembered window rectangle fit the screens the machine has RIGHT NOW.
@@ -38,6 +40,8 @@ import java.util.List;
  */
 public final class ScreenFit implements Serializable {
 
+    private static final Log log = LogFactory.getLog(ScreenFit.class);
+
     /** Below this a window is not usefully resizable or draggable, whatever the screen allows. */
     static final int MIN_WIDTH = 640;
     static final int MIN_HEIGHT = 480;
@@ -60,6 +64,19 @@ public final class ScreenFit implements Serializable {
     public static Rectangle fit(Rectangle saved, List<Rectangle> screens) {
         if (saved == null || screens == null || screens.isEmpty()) {
             return saved;
+        }
+        if (saved.width >= MIN_WIDTH && saved.height >= MIN_HEIGHT
+                && isWhollyVisible(saved, screens)) {
+            // ALREADY FINE, SO LEAVE IT. Everything below forces the window onto ONE screen, which
+            // is right for a window that has outgrown the display it is on and wrong for one the
+            // player deliberately stretched across two: that window overlaps each monitor by less
+            // than its own area, pickScreen returns whichever it overlaps more, and the clamp below
+            // cuts it to that monitor's width. Every launch, for as long as they keep re-stretching
+            // it. "If your screens have not changed, nothing moves" has to mean this case too.
+            //
+            // Gated on the minimum size as well as on visibility: a window saved too small to drag
+            // or resize is wholly visible too, and it still needs growing.
+            return new Rectangle(saved);
         }
         final Rectangle screen = pickScreen(saved, screens);
         final Rectangle ret = new Rectangle(saved);
@@ -84,6 +101,26 @@ public final class ScreenFit implements Serializable {
         ret.x = Math.max(ret.x, screen.x);
         ret.y = Math.max(ret.y, screen.y);
         return ret;
+    }
+
+    /**
+     * True when every pixel of the rectangle lands on some attached screen.
+     *
+     * Summed by intersection area rather than by testing containment in a single screen, because the
+     * whole point is the window that spans two. The screens are the USABLE rectangles, so a window
+     * stretched across a gapless pair sums exactly to its own area; one hanging over an edge, into a
+     * gap between mismatched monitors, or behind the taskbar does not, and falls through to the
+     * clamp.
+     */
+    static boolean isWhollyVisible(Rectangle saved, List<Rectangle> screens) {
+        long covered = 0;
+        for (Rectangle screen : screens) {
+            final Rectangle part = screen.intersection(saved);
+            if (!part.isEmpty()) {
+                covered += (long) part.width * part.height;
+            }
+        }
+        return covered >= (long) saved.width * saved.height;
     }
 
     /** True when the rectangle is visible on any attached screen at all. */
@@ -123,16 +160,25 @@ public final class ScreenFit implements Serializable {
             final GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
             final GraphicsDevice primary = env.getDefaultScreenDevice();
             for (GraphicsDevice device : env.getScreenDevices()) {
-                final Rectangle usable = usableBounds(device.getDefaultConfiguration());
-                if (device == primary) {
-                    ret.add(0, usable);
-                } else {
-                    ret.add(usable);
+                // PER DEVICE. This catch used to wrap the whole loop, so one display that could not
+                // be queried - an RDP session, a driver hiccup, a lid closing mid-shutdown -
+                // discarded EVERY screen. fit() then stopped clamping at all, and WindowSlots wrote
+                // the geometry into a "none" arrangement that had eaten one of the player's three
+                // slots.
+                try {
+                    final Rectangle usable = usableBounds(device.getDefaultConfiguration());
+                    if (device == primary) {
+                        ret.add(0, usable);
+                    } else {
+                        ret.add(usable);
+                    }
+                } catch (RuntimeException e) {
+                    log.warn("Screen bounds unreadable, skipping that display: " + e);
                 }
             }
         } catch (RuntimeException e) {
-            //headless (java.awt.HeadlessException is a RuntimeException) or a display that cannot be
-            //queried: an empty list makes fit() leave the saved geometry alone
+            //headless (java.awt.HeadlessException is a RuntimeException): an empty list makes fit()
+            //leave the saved geometry alone
             return new ArrayList<>();
         }
         return ret;

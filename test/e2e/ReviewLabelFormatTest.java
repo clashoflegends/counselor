@@ -42,10 +42,39 @@ class ReviewLabelFormatTest {
         return ret;
     }
 
+    private static final String[] LANGS = {"", "pt", "es", "it", "ca"};
+
     private static String get(String key) {
         final String ret = labels.getString(key);
         assertTrue(ret != null && !ret.startsWith("N/A (Missing Translation"),
                 key + " is missing from labels.properties - did the bundled jar get resynced?");
+        return ret;
+    }
+
+    /**
+     * The same key in every bundle the client ships.
+     *
+     * {@code BundleManager} resolves the JVM default - English on CI and on the maintainer's
+     * machine - so checking through it tested one of the five files that five translators edit.
+     * {@code LabelsIntegrityTest} is a partial backstop but runs against PbmCommons SOURCE rather
+     * than the jar the Counselor loads, and it does not catch a conversion-type change: a
+     * translator turning {@code %s} into {@code %d} throws {@code IllegalFormatConversionException}
+     * on a String argument. These labels are formatted inside {@code getValueAt} during PAINT, so
+     * any of those is a crash-exit rather than a bad row.
+     */
+    private static java.util.List<String> everyTranslationOf(String key) {
+        final java.util.List<String> ret = new java.util.ArrayList<>();
+        for (String lang : LANGS) {
+            try {
+                final java.util.ResourceBundle rb = java.util.ResourceBundle.getBundle("labels",
+                        lang.isEmpty() ? java.util.Locale.ROOT : java.util.Locale.of(lang));
+                assertTrue(rb.containsKey(key), key + " missing from labels"
+                        + (lang.isEmpty() ? "" : "_" + lang) + ".properties");
+                ret.add(rb.getString(key));
+            } catch (java.util.MissingResourceException ex) {
+                throw new AssertionError("labels" + lang + " not on the classpath", ex);
+            }
+        }
         return ret;
     }
 
@@ -73,30 +102,32 @@ class ReviewLabelFormatTest {
         return "REVIEW." + kind.name();
     }
 
-    /** Every kind, so adding one without a label or an argument count fails here. */
+    /** Every kind, in every bundle, so adding one without a label or an argument count fails here. */
     @Test
     void everyFindingKindFormatsWithTheArgumentsItIsGiven() {
         for (Kind kind : Kind.values()) {
-            final String text = get(keyFor(kind));
             final int wanted = argsFor(kind);
-            assertEquals(wanted, specifiers(text),
-                    keyFor(kind) + " must take exactly " + wanted + " arguments: " + text);
-            final Object[] args = new Object[wanted];
-            java.util.Arrays.fill(args, "x");
-            assertDoesNotThrow(() -> String.format(text, args), keyFor(kind));
+            for (String text : everyTranslationOf(keyFor(kind))) {
+                assertEquals(wanted, specifiers(text),
+                        keyFor(kind) + " must take exactly " + wanted + " arguments: " + text);
+                final Object[] args = new Object[wanted];
+                java.util.Arrays.fill(args, "x");
+                assertDoesNotThrow(() -> String.format(text, args), keyFor(kind) + ": " + text);
+            }
         }
     }
 
     /** The two summary lines, which take counts rather than names. */
     @Test
     void theSummaryLinesTakeTheirCounts() {
-        final String empty = get("REVIEW.EMPTY");
-        assertEquals(2, specifiers(empty), "orders and actors: " + empty);
-        assertDoesNotThrow(() -> String.format(empty, 0, 0));
-
-        final String count = get("REVIEW.COUNT");
-        assertEquals(3, specifiers(count), "findings, orders and actors: " + count);
-        assertDoesNotThrow(() -> String.format(count, 3, 20, 12));
+        for (String empty : everyTranslationOf("REVIEW.EMPTY")) {
+            assertEquals(2, specifiers(empty), "orders and actors: " + empty);
+            assertDoesNotThrow(() -> String.format(empty, 0, 0), empty);
+        }
+        for (String count : everyTranslationOf("REVIEW.COUNT")) {
+            assertEquals(3, specifiers(count), "findings, orders and actors: " + count);
+            assertDoesNotThrow(() -> String.format(count, 3, 20, 12), count);
+        }
     }
 
     /**

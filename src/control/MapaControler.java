@@ -546,17 +546,18 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
      * points, but this answers "where can it move", which for the player's own army is the move he is
      * about to order; the worst case belongs to the threat picture, which asks a different question.
      * <p>
-     * <b>Two other things changed when this moved, and both show on the player's own armies.</b>
-     * <ol>
-     * <li>The old code passed {@code setEvasivo(false)} unconditionally. Evasive movement doubles
-     * every hex, so an army set to move evasively was drawn with about twice the range it has. It
-     * now uses the army's own flag.</li>
-     * <li>The old code picked ONE medium from whether the army was standing on water. An army
-     * holding both land troops and ships now gets both floods unioned, so a fleet in a port shows
-     * where it could sail as well as where it could march. It cannot do both in one turn, so for a
-     * single order this over-states - deliberately, because the same call answers "how far could
-     * that reach me" for the threat layer, where under-stating is the costly error.</li>
-     * </ol>
+     * <b>Evasive movement is still ignored here, exactly as it always was.</b> The old code passed
+     * {@code setEvasivo(false)} and so does {@code ThreatReach.flood}. That is deliberate and not an
+     * oversight: the flag records the move the army was ORDERED to make last turn, not a standing
+     * property, so honouring it would halve the drawn range of an army that only has to order a
+     * normal move to go at full speed.
+     * <p>
+     * <b>One thing did change for the player's own armies.</b> The old code picked ONE medium from
+     * whether the army was standing on water. An army holding both land troops and ships now gets
+     * both floods unioned, so a fleet in a port shows where it could sail as well as where it could
+     * march. It cannot do both in one turn, so for a single order that over-states - deliberately,
+     * because the same call answers "how far could that reach me" for the threat layer, where
+     * under-stating is the costly error.
      */
     public void printTagArmyRange(Exercito exercito) {
         final Local local = exercitoFacade.getLocal(exercito);

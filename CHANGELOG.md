@@ -18,8 +18,8 @@
 ### Army movement ranges no longer cross the ocean
 
 - **Click an enemy army in the Armies tab and the shaded range is now shaped like the terrain.** For an army you have not scouted it used to be a perfect circle that ignored water, rivers and mountains and reached about three times too far, because an army with no visible troops was being costed as if every hex were flat and free.
-- **An army of yours that is set to move evasively now shows the range it really has**, which is about half the one it used to draw - evasive movement costs double per hex and the shading was ignoring that.
 - **An army carrying ships shows where it could sail as well as where it could march.**
+- **A fleet sitting in port now shades the sea lanes it can actually use**, instead of a circle over land and water alike. A fleet with no navigable water next to it shades nothing, which is the honest answer.
 - **The Cities tab sort order and column widths reset once** on this upgrade, because the new Threat column changes the table. Set them again and they stick.
 
 ### Review your whole turn before you send it

@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import model.Cidade;
 import model.Jogador;
 import model.Local;
@@ -145,6 +146,23 @@ public final class TurnReview implements Serializable {
             SortedMap<String, Local> locais, Collection<Personagem> world,
             Map<Local, List<String>> converging, ActorOffersOrders ordensQtCheck,
             int nationPackagesLimit, boolean hasCitySizeCap) {
+        return compute(actors, observer, locais, world, converging, ordensQtCheck,
+                nationPackagesLimit, hasCitySizeCap, new AtomicInteger());
+    }
+
+    /**
+     * As above, reporting how many actors could not be read.
+     *
+     * <b>The count is not diagnostics, it is the answer.</b> This pass guards every actor
+     * individually so one bad one cannot take the list down, and that guard turned a partial review
+     * into a clean bill of health: twenty actors, one skipped, nothing else flagged, and the dialog
+     * printed "Nothing to flag". The whole point of the dialog is to say whether the turn is ready,
+     * so "I could not look at all of it" has to reach the player.
+     */
+    public static List<Finding> compute(Collection<BaseModel> actors, Jogador observer,
+            SortedMap<String, Local> locais, Collection<Personagem> world,
+            Map<Local, List<String>> converging, ActorOffersOrders ordensQtCheck,
+            int nationPackagesLimit, boolean hasCitySizeCap, AtomicInteger skipped) {
         final List<Finding> ret = new ArrayList<>();
         if (actors != null) {
             for (BaseModel actor : actors) {
@@ -160,6 +178,12 @@ public final class TurnReview implements Serializable {
                     //A review is a convenience; never let one bad actor take the list down. LOGGED,
                     //not swallowed: a silent catch here is what hid a broken test fixture, and silent
                     //catches in Swing handlers are this codebase's most repeated bug.
+                    //
+                    //COUNTED as well as logged. Skipping an actor quietly and then printing
+                    //"Nothing to flag" tells the player his turn is clean when part of it was never
+                    //examined - which is the exact outcome this dialog's failure branch exists to
+                    //prevent, reached by a route that branch does not cover.
+                    skipped.incrementAndGet();
                     log.warn(String.format("Skipping unreadable actor %s in turn review: %s",
                             actor.getNome(), ex));
                 }

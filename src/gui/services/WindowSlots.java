@@ -58,9 +58,12 @@ public final class WindowSlots implements Serializable {
      * An empty screen list - headless - yields a signature of its own rather than matching any real
      * arrangement, so a headless run can never overwrite a real slot.
      */
+    /** The signature for a display set that could not be read at all. Never written to a slot. */
+    public static final String NO_SCREENS = "none";
+
     public static String signature(List<Rectangle> screens) {
         if (screens == null || screens.isEmpty()) {
-            return "none";
+            return NO_SCREENS;
         }
         final StringBuilder ret = new StringBuilder();
         ret.append(screens.size());
@@ -97,6 +100,14 @@ public final class WindowSlots implements Serializable {
      * across sessions.
      */
     public static void save(Store store, String base, String signature, Rectangle bounds) {
+        if (signature == null || signature.isEmpty() || NO_SCREENS.equals(signature)) {
+            // Never let an unreadable display set evict a real arrangement. The javadoc said this
+            // could not happen because only a headless run produces "none"; it also happens when
+            // ScreenFit cannot read a display, and the eviction is by least-recently-used, so the
+            // arrangement a player uses least often - the one they most rely on remembering - is
+            // exactly the one that goes.
+            return;
+        }
         if (bounds == null || bounds.width <= 0 || bounds.height <= 0) {
             return;
         }

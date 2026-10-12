@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -147,5 +149,39 @@ class WindowSlotsTest {
         WindowSlots.save(store, BASE, sigLaptop(), new Rectangle(10, 10, 0, 600));
         WindowSlots.save(store, BASE, sigLaptop(), null);
         assertNull(WindowSlots.load(store, BASE, sigLaptop()));
+    }
+
+    /**
+     * A display set that could not be read must never consume one of the three slots.
+     *
+     * The javadoc said only a headless run produces this signature, so it could not overwrite a real
+     * arrangement. It is also produced whenever {@code ScreenFit} cannot query a display - an RDP
+     * session, a driver hiccup, a lid closing mid-shutdown - and eviction is least-recently-used, so
+     * the arrangement the player uses least often is exactly the one it takes.
+     */
+    @Test
+    void anUnreadableDisplaySetNeverEvictsARealArrangement() {
+        final MapStore store = new MapStore();
+        WindowSlots.save(store, "Main", "A", new Rectangle(0, 0, 100, 100));
+        WindowSlots.save(store, "Main", "B", new Rectangle(0, 0, 200, 200));
+        WindowSlots.save(store, "Main", "C", new Rectangle(0, 0, 300, 300));
+
+        WindowSlots.save(store, "Main", WindowSlots.NO_SCREENS, new Rectangle(0, 0, 400, 400));
+
+        assertNotNull(WindowSlots.load(store, "Main", "A"), "the oldest real slot must survive");
+        assertNotNull(WindowSlots.load(store, "Main", "B"));
+        assertNotNull(WindowSlots.load(store, "Main", "C"));
+    }
+
+    /** An empty or null signature is the same case and is ignored just as firmly. */
+    @Test
+    void anEmptySignatureIsNotStored() {
+        final MapStore store = new MapStore();
+        WindowSlots.save(store, "Main", "A", new Rectangle(0, 0, 100, 100));
+
+        WindowSlots.save(store, "Main", "", new Rectangle(0, 0, 400, 400));
+        WindowSlots.save(store, "Main", null, new Rectangle(0, 0, 500, 500));
+
+        assertNotNull(WindowSlots.load(store, "Main", "A"));
     }
 }

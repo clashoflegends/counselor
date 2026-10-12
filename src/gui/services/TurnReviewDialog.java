@@ -161,10 +161,16 @@ public final class TurnReviewDialog extends JDialog {
                     orders += a.getAcoes().size();
                 }
             }
+            final java.util.concurrent.atomic.AtomicInteger skipped
+                    = new java.util.concurrent.atomic.AtomicInteger();
             found = TurnReview.compute(actorList, wfc.getJogadorAtivo(), wfc.getLocais(),
                     wfc.listPersonagens().values(), convergingNames(),
                     actor -> cenarioFacade.hasOrdens(wfc.getPartida(), actor),
-                    wfc.getNationPackagesLimit(), wfc.hasCitySizeCap());
+                    wfc.getNationPackagesLimit(), wfc.hasCitySizeCap(), skipped);
+            //A partial review is not a clean one. compute() guards each actor so one bad one cannot
+            //take the list down, and without this that guard let twenty actors with one unreadable
+            //among them render as "Nothing to flag".
+            failed = skipped.get() > 0;
         } catch (RuntimeException ex) {
             // A review is a convenience. It must never be the reason a player cannot finish a turn -
             // but it must not claim the turn is clean either. The empty list and the failure are
