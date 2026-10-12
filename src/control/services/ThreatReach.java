@@ -537,7 +537,9 @@ public final class ThreatReach {
         }
         Collections.sort(shore);
         if (shore.size() > MAX_LANDINGS) {
-            log.warn(String.format("%s can land on %d hexes; marching inland from the first %d only.",
+            //Still an honest notice rather than silence - this is a known under-warning - but at a
+            //cap set from real fleets it should be rare, and a line per fleet per load was not.
+            log.info(String.format("%s can land on %d hexes; marching inland from the first %d only.",
                     army.getNome(), shore.size(), MAX_LANDINGS));
         }
         final List<Run> ashore = landRunsFor(army, cenario);
@@ -553,8 +555,22 @@ public final class ThreatReach {
         }
     }
 
-    /** Bounds the inland march: see {@link #addMarchAfterLanding}. */
-    private static final int MAX_LANDINGS = 24;
+    /**
+     * Bounds the inland march: see {@link #addMarchAfterLanding}.
+     *
+     * <b>Set from what real fleets actually do.</b> The first value was 24, picked out of the air.
+     * On two live Game of Thrones files (906 turn 3 and 901 turn 11) fourteen fleets tripped it in a
+     * single load, touching 25, 26, 28, 30, 33, 40, 44, 45, 48, 51, 59 and 60 shore hexes - so the
+     * cap was truncating the majority of them, which is an under-warning on exactly the coastal
+     * cities this pass exists to cover, and it filled the log doing it. 64 clears every fleet in
+     * both files.
+     * <p>
+     * It is NOT a performance lever, which is worth knowing before anyone tunes it again: on game
+     * 901 turn 11 - 207 armies, 25 of them unscouted - a cold compute measured 989ms at 24, 966ms
+     * at 64 and 1,098ms at 96, and the hex counts were identical at all three. The second that pass
+     * costs is the per-army floods, not the landings.
+     */
+    private static final int MAX_LANDINGS = 64;
 
     /** What the fleet puts ashore: its own land troops, or the owner's assumed land roster. */
     private static List<Run> landRunsFor(Exercito army, Cenario cenario) {

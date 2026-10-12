@@ -134,7 +134,7 @@ public final class TurnReviewDialog extends JDialog {
         below.add(hint, BorderLayout.SOUTH);
         north.add(below, BorderLayout.SOUTH);
 
-        final JButton close = new JButton(tx("FECHAR", "Close"));
+        final JButton close = new JButton(tx("REVIEW.CLOSE", "Close"));
         close.addActionListener(e -> dispose());
         final JPanel buttons = new JPanel();
         buttons.add(close);
