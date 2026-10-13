@@ -40,7 +40,24 @@ public final class UpdateDownloader {
     private static final String LATEST_RELEASE_API = "https://api.github.com/repos/clashoflegends/counselor/releases/latest";
     private static final Pattern ASSET_URL = Pattern.compile("\"browser_download_url\"\\s*:\\s*\"(https://[^\"]+)\"");
 
+    /**
+     * One download at a time, process-wide. Two concurrent runs write the same
+     * {@code Downloads/<name>.part} and, on portable-jar, both {@code deleteRecursive} the same
+     * {@code .update} staging dir and unzip into it - so the second can delete what the first is
+     * still extracting, and run.bat would swap that half-written dir in on the next launch.
+     *
+     * The guard lives here rather than in a caller because there are now three ways in (the toast,
+     * the About box button, and the crash-exit path) and a caller-side flag only protects itself.
+     */
+    private static final java.util.concurrent.atomic.AtomicBoolean IN_FLIGHT =
+            new java.util.concurrent.atomic.AtomicBoolean(false);
+
     private UpdateDownloader() {
+    }
+
+    /** True while a download is running - lets a UI offering the button show it as busy. */
+    public static boolean isDownloading() {
+        return IN_FLIGHT.get();
     }
 
     /** Begin the download+reveal flow. Call on the EDT (e.g. from the toast click). */
@@ -57,6 +74,10 @@ public final class UpdateDownloader {
         if (assetPredicateFor(distro) == null) {
             // dev / jpackage / unknown distro: no single installer asset applies - just open the page.
             openReleasesPage();
+            return;
+        }
+        if (!IN_FLIGHT.compareAndSet(false, true)) {
+            log.info("Update download already running - ignoring the repeat request.");
             return;
         }
         final BusyGlass busy = BusyGlass.show(parent, tx(labels, "UPDATE.DOWNLOAD.START", "Downloading update..."));
@@ -76,6 +97,7 @@ public final class UpdateDownloader {
 
             @Override
             protected void done() {
+                IN_FLIGHT.set(false); // first, so an early return below can never strand the guard
                 if (busy != null) {
                     busy.dismiss();
                 }
@@ -223,17 +245,27 @@ public final class UpdateDownloader {
                 openReleasesPage(); // msi (SignPath-deferred) / deb / windows-portable / dev / unknown
                 return false;
             }
-            String url = pickAssetUrl(distro);
-            if (url == null) {
-                openReleasesPage();
+            if (!IN_FLIGHT.compareAndSet(false, true)) {
+                // A download the player started is already staging; crashing into the same .update
+                // dir would be the one way to leave a half-written bundle for run.bat to swap in.
+                log.info("Update download already running - not staging again on the crash path.");
                 return false;
             }
-            File file = downloadTo(url);
-            boolean installed = installOrStage(distro, file);
-            if (!installed) {
-                openReleasesPage();
+            try {
+                String url = pickAssetUrl(distro);
+                if (url == null) {
+                    openReleasesPage();
+                    return false;
+                }
+                File file = downloadTo(url);
+                boolean installed = installOrStage(distro, file);
+                if (!installed) {
+                    openReleasesPage();
+                }
+                return installed;
+            } finally {
+                IN_FLIGHT.set(false);
             }
-            return installed;
         } catch (Throwable ex) {
             log.warn("Crash-exit update failed; opening releases page: " + ex);
             openReleasesPage();

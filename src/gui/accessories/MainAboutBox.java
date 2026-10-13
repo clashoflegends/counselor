@@ -433,6 +433,9 @@ public class MainAboutBox extends TabBase implements Serializable {
         final String known = UpdateChecker.getAvailableVersion();
         if (known != null) {
             showNewer(known);
+            if (UpdateDownloader.isDownloading()) {
+                showDownloading(); // reopened mid-download: say so rather than offer a dead button
+            }
         } else {
             showCheckable("");
         }
@@ -445,6 +448,7 @@ public class MainAboutBox extends TabBase implements Serializable {
             // portable-jar and dmg it installs for the next launch, which is the restart the
             // player was going to make anyway.
             UpdateDownloader.start(mainGui != null ? mainGui : this, labels);
+            showDownloading(); // the busy glass dims the MAIN window, not this dialog
             return;
         }
         bUpdate.setEnabled(false); // also keeps a hammered button inside GitHub's unauthenticated rate limit
@@ -509,6 +513,17 @@ public class MainAboutBox extends TabBase implements Serializable {
         }
         bUpdate.setEnabled(true);
         lUpdateStatus.setText("");
+    }
+
+    /**
+     * Download running. The button stays down for the rest of this dialog's life: UpdateDownloader
+     * reports its own outcome by toast on the main window and has no completion callback, and a
+     * repeat click is refused at source anyway. Reopening About picks up the current state.
+     */
+    private void showDownloading() {
+        bUpdate.setEnabled(false);
+        lUpdateStatus.setText(tx("UPDATE.DOWNLOAD.START", "Downloading update..."));
+        repack();
     }
 
     /** The dialog was packed around the short initial text, so a longer answer would be clipped. */
