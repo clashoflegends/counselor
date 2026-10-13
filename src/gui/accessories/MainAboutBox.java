@@ -11,6 +11,9 @@
 package gui.accessories;
 
 import business.ImageManager;
+import control.services.UpdateChecker;
+import control.services.UpdateDownloader;
+import gui.MainResultWindowGui;
 import gui.TabBase;
 import gui.components.ButtonLink;
 import java.awt.BorderLayout;
@@ -18,6 +21,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Image;
+import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -27,8 +31,11 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
@@ -44,10 +51,25 @@ public class MainAboutBox extends TabBase implements Serializable {
     private static final Log log = LogFactory.getLog(MainAboutBox.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
+    /** The main window, so a download started from here anchors its busy glass and toast on the
+     *  window that outlives this modeless dialog, and so the title bar can be kept in step. May be
+     *  null (then the dialog is its own anchor and nothing outside it is updated). */
+    private final transient MainResultWindowGui mainGui;
+
+    private JButton bUpdate;
+    private JLabel lUpdateStatus;
+    /** True once a check has found a newer release: the button then downloads instead of checking. */
+    private boolean offerDownload = false;
+
     /**
      * Creates new form MainAboutBox
      */
     public MainAboutBox() {
+        this(null);
+    }
+
+    public MainAboutBox(MainResultWindowGui mainGui) {
+        this.mainGui = mainGui;
         initComponents();
         config();
     }
@@ -338,7 +360,6 @@ public class MainAboutBox extends TabBase implements Serializable {
         lModeratorTitle.setText(labels.getString("ABOUT.MODERATOR.TITLE"));
         lFacebookTitle.setText(labels.getString("ABOUT.FACEBOOK.TITLE"));
 
-        lNewVersion.setVisible(false); // shown only if the update check found a newer version (below)
         try {
             GroupLayout parLayout = (GroupLayout) jPanel1.getLayout();
             ButtonLink webAdmin = new ButtonLink(labels.getString("ABOUT.WEBADMIN.LINK"), labels.getString("ABOUT.WEBADMIN.LINK"));
@@ -352,16 +373,10 @@ public class MainAboutBox extends TabBase implements Serializable {
             ButtonLink facebookLink = new ButtonLink(labels.getString("ABOUT.FACEBOOK.LINK"), labels.getString("ABOUT.FACEBOOK.LINK"));
             parLayout.replace(lFacebookLink, facebookLink);
 
-            // New-version indicator: clickable "download" link to the latest release, shown only when
-            // the update check found a newer version; the placeholder stays hidden otherwise.
-            final String newVer = control.services.UpdateChecker.getAvailableVersion();
-            if (newVer != null) {
-                ButtonLink update = new ButtonLink(
-                        String.format(labels.getString("ABOUT.UPDATE.LINK"), newVer),
-                        control.services.UpdateChecker.getLatestReleaseUrl());
-                update.setIcon(updateIcon());
-                parLayout.replace(lNewVersion, update);
-            }
+            // The update story now lives in its own full-width row at the bottom (buildUpdateRow),
+            // not in this slot: wedged between the "Counselor Version:" label and its value, a
+            // button plus a sentence of status had nowhere to go.
+            lNewVersion.setVisible(false);
 
             // Icon above title
             Image img = ImageManager.getInstance().getIconApp();
@@ -386,6 +401,8 @@ public class MainAboutBox extends TabBase implements Serializable {
         JPanel pathPanel = new JPanel();
         pathPanel.setLayout(new BoxLayout(pathPanel, BoxLayout.Y_AXIS));
         pathPanel.setBorder(BorderFactory.createEmptyBorder(2, 10, 8, 10));
+        pathPanel.add(buildUpdateRow());
+        pathPanel.add(Box.createVerticalStrut(8));
         pathPanel.add(makePathRow("Config file:", configPath, new File(configPath), false));
         pathPanel.add(Box.createVerticalStrut(4));
         pathPanel.add(makePathRow("Logs folder:", logDirPath, new File(logDirPath), true));
@@ -393,6 +410,121 @@ public class MainAboutBox extends TabBase implements Serializable {
         this.setLayout(new BorderLayout());
         this.add(jPanel1, BorderLayout.CENTER);
         this.add(pathPanel, BorderLayout.SOUTH);
+    }
+
+    /**
+     * The "check for updates" row. One button, because the two things a player wants here are the
+     * same gesture a moment apart: ask, then fetch. It starts as a check, and becomes a download
+     * once a newer release is known - including when the startup check already found one, so the
+     * dialog never asks the player to re-ask a question that has an answer.
+     */
+    private JPanel buildUpdateRow() {
+        JPanel row = new JPanel();
+        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        row.setOpaque(false);
+        bUpdate = new JButton();
+        bUpdate.addActionListener(e -> onUpdateButton());
+        lUpdateStatus = new JLabel("");
+        lUpdateStatus.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
+        row.add(bUpdate);
+        row.add(lUpdateStatus);
+        row.add(Box.createHorizontalGlue()); // keep the button left-aligned with the path rows below
+        final String known = UpdateChecker.getAvailableVersion();
+        if (known != null) {
+            showNewer(known);
+        } else {
+            showCheckable("");
+        }
+        return row;
+    }
+
+    private void onUpdateButton() {
+        if (offerDownload) {
+            // The full download+stage flow the toast uses, not merely the releases page: on
+            // portable-jar and dmg it installs for the next launch, which is the restart the
+            // player was going to make anyway.
+            UpdateDownloader.start(mainGui != null ? mainGui : this, labels);
+            return;
+        }
+        bUpdate.setEnabled(false); // also keeps a hammered button inside GitHub's unauthenticated rate limit
+        lUpdateStatus.setText(tx("ABOUT.UPDATE.CHECKING", "Checking..."));
+        new SwingWorker<UpdateChecker.Result, Void>() {
+            @Override
+            protected UpdateChecker.Result doInBackground() {
+                return UpdateChecker.checkNow(); // never throws; 5s connect + 5s read, off the EDT
+            }
+
+            @Override
+            protected void done() {
+                UpdateChecker.Result r = null;
+                try {
+                    r = get();
+                } catch (Exception ex) {
+                    log.warn("Update check failed: " + ex);
+                }
+                applyResult(r);
+            }
+        }.execute();
+    }
+
+    private void applyResult(UpdateChecker.Result r) {
+        final boolean newer = r != null && r.isNewer();
+        if (newer && mainGui != null) {
+            // Title bar and status bar agree with the dialog. No toast: this dialog is already
+            // showing the answer, and it sits over the window the toast would appear in.
+            mainGui.setUpdateAvailable(r.getLatestVersion(), false);
+        }
+        if (!isDisplayable()) {
+            return; // the dialog is modeless - the player may have closed it while we were asking
+        }
+        if (newer) {
+            showNewer(r.getLatestVersion());
+        } else if (r != null && r.getStatus() == UpdateChecker.Status.CURRENT) {
+            showCheckable(String.format(tx("ABOUT.UPDATE.CURRENT", "You have the latest version (%s)."),
+                    r.getLocalVersion()));
+        } else {
+            showCheckable(tx("ABOUT.UPDATE.FAILED", "Could not check for updates - try again later."));
+        }
+        repack();
+    }
+
+    /** Button asks, label reports the last answer (empty before the first ask). */
+    private void showCheckable(String status) {
+        offerDownload = false;
+        bUpdate.setText(tx("ABOUT.UPDATE.CHECK", "Check for updates"));
+        bUpdate.setIcon(null);
+        bUpdate.setEnabled(true);
+        lUpdateStatus.setText(status);
+    }
+
+    /** Button fetches. The version is in the button text, so the label stays out of its way. */
+    private void showNewer(String version) {
+        offerDownload = true;
+        bUpdate.setText(String.format(labels.getString("ABOUT.UPDATE.LINK"), version));
+        try {
+            bUpdate.setIcon(updateIcon());
+        } catch (RuntimeException ex) {
+            log.warn("Update icon unavailable: " + ex); // cosmetic only - never lose the button over it
+        }
+        bUpdate.setEnabled(true);
+        lUpdateStatus.setText("");
+    }
+
+    /** The dialog was packed around the short initial text, so a longer answer would be clipped. */
+    private void repack() {
+        revalidate();
+        repaint();
+        final Window w = SwingUtilities.getWindowAncestor(this);
+        if (w != null) {
+            w.pack();
+        }
+    }
+
+    /** A missing key must not become a FATAL in the log or "N/A (Missing Translation..." on screen. */
+    private static String tx(String key, String fallback) {
+        final String s = labels.getString(key);
+        return (s == null || s.startsWith("N/A (Missing Translation")) ? fallback : s;
     }
 
     /** Friendly name for the SysApoio.getDistro() code (the launcher's -Dclash.distro). */

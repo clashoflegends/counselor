@@ -1012,13 +1012,25 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
      * shown in title + status bar.
      */
     public void setUpdateAvailable(String version) {
+        setUpdateAvailable(version, true);
+    }
+
+    /**
+     * As above, with the toast suppressed. The About box's "check for updates" button already
+     * shows the result and its own download action, and its dialog sits over this window - a toast
+     * underneath it would be both redundant and half hidden. The title and status bar still update,
+     * so the main window agrees with what the dialog says.
+     */
+    public void setUpdateAvailable(String version, boolean toast) {
         this.updateVersion = (version == null) ? "" : version;
         if (!this.updateVersion.isEmpty()) {
             String msg = String.format(labels.getString("UPDATE.AVAILABLE"), this.updateVersion);
             setStatusMsg(msg);
-            String toastMsg = String.format(labels.getString("UPDATE.AVAILABLE.CLICK"), this.updateVersion);
-            gui.services.Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this), toastMsg, null,
-                    () -> control.services.UpdateDownloader.start(this, labels));
+            if (toast) {
+                String toastMsg = String.format(labels.getString("UPDATE.AVAILABLE.CLICK"), this.updateVersion);
+                gui.services.Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this), toastMsg, null,
+                        () -> control.services.UpdateDownloader.start(this, labels));
+            }
         }
         refreshWindowTitle();
     }

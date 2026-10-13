@@ -466,7 +466,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         java.awt.Window owner = javax.swing.SwingUtilities.getWindowAncestor(this.getGui());
         JDialog dAbout = new JDialog(owner, java.awt.Dialog.ModalityType.MODELESS);
         AppIcon.applyTo(dAbout);
-        MainAboutBox stAbout = new MainAboutBox();
+        MainAboutBox stAbout = new MainAboutBox(this.getGui());
         dAbout.add(stAbout);
         dAbout.setTitle(labels.getString("MENU.ABOUT"));
         dAbout.setLocationRelativeTo(this.getGui());
