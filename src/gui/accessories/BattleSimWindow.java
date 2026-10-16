@@ -23,10 +23,15 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -88,6 +93,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
     private final transient BattleSimControler controler;
+    private final java.util.Map<String, Action> commands = new java.util.LinkedHashMap<>();
+    private boolean pendingEditorsValid = true;
 
     /**
      * The roster, with a tooltip that explains the battle-result mark on each row.
@@ -292,6 +299,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     /** The army form and the split above the platoon table, for the one-time fit below. */
     private JPanel armyForm;
     private JSplitPane armySplit;
+    private JPanel platoonPanel;
+    private JPanel platoonCommands;
     private JScrollPane armyScroll;
     private int armyFormHeight = 0;
     private boolean armySplitFitted = false;
@@ -324,11 +333,18 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                     || event.getType() != TableModelEvent.UPDATE) {
                 return;
             }
+            // Clear synchronously: a queued refresh must not erase a newer Run result.
+            controler.clearResult();
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (!refreshing) {
-                        doEdited(false);
+                        commitSpinners(false);
+                        if (pendingEditorsValid) {
+                            doRefresh(false);
+                        } else {
+                            refreshRunControls();
+                        }
                     }
                 }
             });
@@ -471,8 +487,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      *            army as the player selects it.
      */
     private static JSpinner spinner(int value, int min, Integer max, int step) {
-        return new JSpinner(new SpinnerNumberModel(Integer.valueOf(value), Integer.valueOf(min),
+        final JSpinner spinner = new JSpinner(new SpinnerNumberModel(Integer.valueOf(value), Integer.valueOf(min),
                 max, Integer.valueOf(step)));
+        ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField()
+                .setFocusLostBehavior(javax.swing.JFormattedTextField.PERSIST);
+        return spinner;
     }
 
     /**
@@ -547,92 +566,89 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     // ------------------------------------------------------------------ layout
 
-    /**
-     * The army buttons on the left, Run on the right.
-     *
-     * Run is pushed to the far edge rather than sitting in the row because it is the only button
-     * that does something to the whole scenario; the other three act on one army. Grouping by what
-     * a control affects is the cheapest way to make a toolbar readable.
-     */
+    /** Battle-wide setup and analysis stay above; army commands live beside the roster. */
     private JPanel buildToolbar() {
-        final JPanel ret = new JPanel(new BorderLayout());
+        final JPanel ret = new JPanel(new BorderLayout(4, 0));
         ret.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
+        final JPanel setup = new JPanel(new gui.services.WrapLayout(FlowLayout.LEADING, 4, 0));
 
-        // WRAPPING, and in CENTER rather than LINE_START. BorderLayout hands LINE_START its full
-        // preferred width and still pins LINE_END to the right edge, so below about 912 logical
-        // pixels the two intersected and the army buttons - added first, painted last - hid Run and
-        // Results entirely. The window's own minimum was 860, so that was reachable on any monitor
-        // at any scale just by dragging narrow. CENTER gets what is left over instead, and
-        // WrapLayout is what makes the toolbar grow a second row instead of drawing over itself.
-        final JPanel left = new JPanel(new gui.services.WrapLayout(FlowLayout.LEADING, 4, 0));
-        left.add(button("BATTLESIM.ARMY.ADD", "addArmy"));
-        left.add(button("BATTLESIM.ARMY.CLONE", "cloneArmy"));
-        left.add(button("BATTLESIM.ARMY.REMOVE", "removeArmy"));
-        // With the other ARMY actions, because that is what they act on - and deliberately not
-        // beside the toolbar's Copy, which is the spreadsheet export and a different thing (T-446).
-        left.add(tooltipped(button("BATTLESIM.ARMY.COPYONE", "copyArmy"),
-                "BATTLESIM.ARMY.COPYONE.HINT"));
-        left.add(tooltipped(button("BATTLESIM.ARMY.PASTE", "pasteArmy"),
-                "BATTLESIM.ARMY.PASTE.HINT"));
-        // Fill defaults sits with the army buttons because it EDITS them. It is the
-        // assisted form of the thing ScenarioLoader's note tells the player to do by hand:
-        // type in what he thinks is in an enemy stack.
-        left.add(tooltipped(button("BATTLESIM.FILL", "fill"), "BATTLESIM.FILL.HINT"));
-        left.add(tooltipped(button("BATTLESIM.WHATIF", "whatIf"),
-                "BATTLESIM.WHATIF.HINT"));
-        left.add(tooltipped(button("BATTLESIM.TACTICGRID", "tacticGrid"),
-                "BATTLESIM.TACTICGRID.HINT"));
-        // Diplomacy sits with the army buttons rather than beside Run, because it edits the
-        // scenario like they do. The matrix IS the law for who fights whom (T-418), so this is not
-        // an advanced option tucked away - it is the other half of setting up the battle.
-        left.add(diplomacy);
-        diplomacy.setActionCommand("diplomacy");
-        diplomacy.addActionListener(this);
-        // Reference and export, ported from the old window (T-429, T-430, T-434, T-435). None of
-        // them edits the scenario, which is why they sit apart from the army buttons.
-        //
-        // BATTLESIM.COPY reads "Export via copy" and not "Copy", which is what it said until
-        // 2026-09-29. Three buttons on this toolbar begin with Copy - Copy army, Copy table,
-        // Copy result - and only ONE of them has a Paste beside it. A player who pressed the
-        // familiar Copy and then looked for a paste found none, eight buttons from the pair
-        // that would have served him. Separating the two Copies by position was meant to keep
-        // them from being confused and did the opposite; each button naming its object is what
-        // actually does that. John picked the wording, 2026-09-29: EXPORT says it is data
-        // leaving for another tool, which none of the other buttons claim, and "via copy"
-        // says it lands on the clipboard rather than in a file the player would go looking
-        // for. It also gets its own tooltip: the shared COPIAR.ARMY.ACOES still serves the
-        // OLD window, which has no Copy army to contrast it with.
-        // The clipboard FORMAT is untouched - T-446 is about the bytes, not the label.
-        left.add(tooltipped(button("TATICA", "tactics"), "BATTLESIM.TATICA.HINT"));
-        left.add(button("TROOPCASUALTIES.BORDER.TITLE", "casualties"));
-        left.add(tooltipped(button("BATTLESIM.COPY", "copy"), "BATTLESIM.COPY.HINT"));
-        left.add(tooltipped(button("MENU.ABOUT", "about"), "BATTLESIM.ABOUT.TOOLTIP"));
-        // Clone WINDOW, last in the group and named apart from Clone ARMY two buttons along. They
-        // do different things at different scales and a player who mixes them up loses work.
-        left.add(tooltipped(button("BATTLESIM.CLONE.WINDOW", "cloneWindow"),
-                "BATTLESIM.CLONE.WINDOW.HINT"));
-        copyResult.setActionCommand("copyResult");
-        copyResult.addActionListener(this);
-        copyResult.setEnabled(false);
-        left.add(tooltipped(copyResult, "BATTLESIM.RESULT.COPY.HINT"));
-        left.add(tooltipped(button("BATTLESIM.SAVE", "save"), "BATTLESIM.SAVE.HINT"));
-        left.add(tooltipped(button("BATTLESIM.LOAD", "load"), "BATTLESIM.LOAD.HINT"));
-        ret.add(left, BorderLayout.CENTER);
+        diplomacy.setAction(command("BATTLESIM.DIPLOMACY", "diplomacy", null));
+        setup.add(diplomacy);
+        setup.add(tooltipped(button("BATTLESIM.FILL", "fill"), "BATTLESIM.FILL.HINT"));
 
-        run.setActionCommand("run");
-        run.addActionListener(this);
+        final JMenuBar menus = new JMenuBar();
+        menus.setBorder(BorderFactory.createEmptyBorder());
+        final JMenu analysis = menu("BATTLESIM.MENU.ANALYSIS", 'A');
+        analysis.add(item("BATTLESIM.ANALYSIS.NEED", "whatIf", "BATTLESIM.WHATIF.HINT"));
+        analysis.add(item("BATTLESIM.ANALYSIS.TACTICS", "tacticGrid", "BATTLESIM.TACTICGRID.HINT"));
+        analysis.addSeparator();
+        analysis.add(item("TATICA", "tactics", "BATTLESIM.TATICA.HINT"));
+        analysis.add(item("TROOPCASUALTIES.BORDER.TITLE", "casualties", null));
+        menus.add(analysis);
+
+        final JMenu sharing = menu("BATTLESIM.MENU.SHARE", 'S');
+        sharing.add(item("BATTLESIM.SAVE", "save", "BATTLESIM.SAVE.HINT"));
+        sharing.add(item("BATTLESIM.LOAD", "load", "BATTLESIM.LOAD.HINT"));
+        sharing.addSeparator();
+        sharing.add(item("BATTLESIM.CLONE.WINDOW", "cloneWindow", "BATTLESIM.CLONE.WINDOW.HINT"));
+        sharing.addSeparator();
+        sharing.add(item("BATTLESIM.COPY", "copy", "BATTLESIM.COPY.HINT"));
+        final Action copy = command("BATTLESIM.RESULT.COPY", "copyResult", "BATTLESIM.RESULT.COPY.HINT");
+        copy.setEnabled(false);
+        copyResult.setAction(copy);
+        sharing.add(new JMenuItem(copy));
+        menus.add(sharing);
+
+        final JMenu help = menu("BATTLESIM.MENU.HELP", 'H');
+        help.add(item("MENU.ABOUT", "about", "BATTLESIM.ABOUT.TOOLTIP"));
+        menus.add(help);
+        getRootPane().getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .put(javax.swing.KeyStroke.getKeyStroke("F10"), "battleMenus");
+        getRootPane().getActionMap().put("battleMenus", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                javax.swing.MenuSelectionManager.defaultManager().setSelectedPath(
+                        new javax.swing.MenuElement[]{menus, analysis, analysis.getPopupMenu()});
+            }
+        });
+        setup.add(menus);
+        ret.add(setup, BorderLayout.CENTER);
+
+        run.setAction(command("BATTLESIM.RUN.SIMULATION", "run", null));
+        results.setAction(command("BATTLESIM.RESULTS.OPEN", "results", "BATTLESIM.RESULTS.OPEN.TOOLTIP"));
         run.setEnabled(false);
-        final JPanel right = new JPanel(new FlowLayout(FlowLayout.TRAILING, 4, 0));
-        // Results sits beside Run because it is what pressing Run is FOR. Disabled until there is
-        // something to show, so it never opens an empty pane.
-        results.setActionCommand("results");
-        results.addActionListener(this);
-        results.setToolTipText(labels.getString("BATTLESIM.RESULTS.OPEN.TOOLTIP"));
         results.setEnabled(false);
-        right.add(results);
-        right.add(run);
-        ret.add(right, BorderLayout.LINE_END);
+        final JPanel execute = new JPanel(new FlowLayout(FlowLayout.TRAILING, 4, 0));
+        execute.add(results);
+        execute.add(run);
+        ret.add(execute, BorderLayout.LINE_END);
         return ret;
+    }
+
+    private JMenu menu(String key, char mnemonic) {
+        final JMenu ret = new JMenu(labels.getString(key));
+        ret.setMnemonic(mnemonic);
+        return ret;
+    }
+
+    private JMenuItem item(String key, String name, String hint) {
+        return new JMenuItem(command(key, name, hint));
+    }
+
+    private Action command(String key, String name, String hint) {
+        return commands.computeIfAbsent(name, ignored -> {
+            final Action action = new AbstractAction(labels.getString(key)) {
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    BattleSimWindow.this.actionPerformed(new ActionEvent(event.getSource(),
+                            ActionEvent.ACTION_PERFORMED, name));
+                }
+            };
+            if (hint != null) {
+                action.putValue(Action.SHORT_DESCRIPTION, labels.getString(hint));
+            }
+            return action;
+        });
     }
 
     /**
@@ -654,10 +670,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     }
 
     private JButton button(String key, String command) {
-        final JButton ret = new JButton(labels.getString(key));
-        ret.setActionCommand(command);
-        ret.addActionListener(this);
-        return ret;
+        return new JButton(command(key, command, null));
     }
 
     private JSplitPane buildPanes() {
@@ -701,7 +714,17 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         editor.getVerticalScrollBar().setUnitIncrement(16);
         armyScroll = editor;
         final JSplitPane right = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                editor, buildBottomTabs());
+                editor, buildBottomTabs()) {
+            @Override
+            public void doLayout() {
+                // At short heights reserve a troop row, then let the existing form scroll.
+                // Two full minimums cannot fit in the window's supported minimum height.
+                final int room = getHeight() - getDividerSize() - getBottomComponent().getMinimumSize().height;
+                editor.setMinimumSize(new Dimension(600,
+                        Math.max(96, Math.min(armyFormHeight + 6, room))));
+                super.doLayout();
+            }
+        };
         armySplit = right;
         // SHOWING_CHANGED, not addNotify and not the constructor. doRefresh runs while the window
         // is still being built, when the split has no height yet and resetToPreferredSizes is a
@@ -741,6 +764,15 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         scroll.setBorder(BorderFactory.createTitledBorder(labels.getString("BATTLESIM.ARMIES.TITLE")));
 
         final JPanel ret = new JPanel(new BorderLayout(0, 4));
+        final JPanel armyActions = new JPanel(new gui.services.WrapLayout(FlowLayout.LEADING, 4, 2));
+        armyActions.add(button("BATTLESIM.ARMY.ADD", "addArmy"));
+        armyActions.add(button("BATTLESIM.ARMY.CLONE", "cloneArmy"));
+        armyActions.add(button("BATTLESIM.ARMY.REMOVE", "removeArmy"));
+        armyActions.add(tooltipped(button("BATTLESIM.ARMY.COPYONE", "copyArmy"),
+                "BATTLESIM.ARMY.COPYONE.HINT"));
+        armyActions.add(tooltipped(button("BATTLESIM.ARMY.PASTE", "pasteArmy"),
+                "BATTLESIM.ARMY.PASTE.HINT"));
+        ret.add(armyActions, BorderLayout.NORTH);
         ret.add(scroll, BorderLayout.CENTER);
         ret.add(buildGround(), BorderLayout.SOUTH);
         ret.setPreferredSize(new Dimension(300, 480));
@@ -765,6 +797,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         final JPanel battlefield = new JPanel(new BorderLayout(4, 0));
         battlefield.add(battlefieldText, BorderLayout.CENTER);
         battlefield.add(battlefieldPick, BorderLayout.EAST);
+        battlefieldPick.setText(labels.getString("BATTLESIM.BATTLEFIELD.CHANGE"));
         battlefieldPick.setToolTipText(labels.getString("COORD.PICK.MAP.TT"));
         battlefieldPick.addActionListener(e -> {
             final control.MapaControler map =
@@ -825,16 +858,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         }
         gui.services.Toast.dismissCurrent();
         final boolean edited = commitSpinners();
-        if (platoons.isEditing() && !platoons.getCellEditor().stopCellEditing()) {
-            if (edited) {
-                doRefresh();
-            }
+        if (!pendingEditorsValid) {
             return;
-        }
-        try {
-            cityLoyalty.commitEdit();
-        } catch (java.text.ParseException ignored) {
-            // The existing editor refresh restores the last valid value.
         }
         if (controler.chooseBattlefield(local)) {
             if (diplomacyDialog != null) {
@@ -1016,44 +1041,47 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * Committing to the WRONG army would be worse than losing it.
      */
     private boolean commitSpinners() {
+        return commitSpinners(true);
+    }
+
+    /** Deferred table refreshes must leave any subsequently opened cell editor running. */
+    private boolean commitSpinners(boolean includeTable) {
         if (refreshing) {
             return false;
         }
         final ArmySim army = controler.getSelected();
-        if (army == null) {
-            return false;
-        }
-        // The change listener is silenced and the values written by hand, rather than letting
-        // commitEdit fire it. Its handler ends in a full refresh, which REBUILDS THE ROSTER - and a
-        // roster rebuilt in the middle of a tree-selection event re-selects the old army, so the
-        // click that started all this would be swallowed. Writing here keeps the refresh under the
-        // caller's control, after the selection has finished moving.
+        final int row = includeTable ? platoons.getEditingRow() : -1, col = platoons.getEditingColumn();
+        final Object before = row < 0 ? null : platoons.getValueAt(row, col);
         refreshing = true;
         try {
-            for (JSpinner one : new JSpinner[]{commander, morale, attackBonus, defenseBonus}) {
-                try {
-                    one.commitEdit();
-                } catch (java.text.ParseException ignored) {
-                    // not a number: the next refresh reverts it, which is the right answer
-                }
-            }
+            pendingEditorsValid = gui.services.BattleSimEditorCommit.commit(includeTable ? platoons : null,
+                    commander, morale, attackBonus, defenseBonus, cityLoyalty);
         } finally {
             refreshing = false;
         }
-        if (army.getComandantePericia() == (Integer) commander.getValue()
-                && army.getMoral() == (Integer) morale.getValue()
-                && army.getAttackBonus() == (Integer) attackBonus.getValue()
-                && army.getArmyDefenseBonus() == (Integer) defenseBonus.getValue()) {
-            // nothing was typed. Clicking around the roster to READ the numbers must not count as
-            // an edit, or it would throw the last run's results away every time.
+        if (!pendingEditorsValid) {
             return false;
         }
-        army.setComandante((Integer) commander.getValue());
-        army.setMoral((Integer) morale.getValue());
-        army.setBonusAttack((Integer) attackBonus.getValue());
-        army.setBonusDefense((Integer) defenseBonus.getValue());
-        controler.clearResult();
-        return true;
+        boolean changed = row >= 0 && !java.util.Objects.equals(before, platoons.getValueAt(row, col));
+        if (army != null && (army.getComandantePericia() != (Integer) commander.getValue()
+                || army.getMoral() != (Integer) morale.getValue()
+                || army.getAttackBonus() != (Integer) attackBonus.getValue()
+                || army.getArmyDefenseBonus() != (Integer) defenseBonus.getValue())) {
+            army.setComandante((Integer) commander.getValue());
+            army.setMoral((Integer) morale.getValue());
+            army.setBonusAttack((Integer) attackBonus.getValue());
+            army.setBonusDefense((Integer) defenseBonus.getValue());
+            changed = true;
+        }
+        final Cidade city = controler.getScenario().getCidadeAtiva();
+        if (city != null && city.getLealdade() != (Integer) cityLoyalty.getValue()) {
+            controler.setCityLealdade((Integer) cityLoyalty.getValue());
+            changed = true;
+        }
+        if (changed) {
+            controler.clearResult();
+        }
+        return changed;
     }
 
     /**
@@ -1119,6 +1147,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         platoons.setIntercellSpacing(new Dimension(0, 1));
 
         final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 2));
+        platoonCommands = buttons;
         buttons.add(button("BATTLESIM.PLATOON.ADD", "addPlatoon"));
         buttons.add(tooltipped(button("BATTLESIM.PLATOON.CLONE", "clonePlatoon"),
                 "BATTLESIM.PLATOON.CLONE.HINT"));
@@ -1132,6 +1161,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
         final JPanel ret = new JPanel(new BorderLayout());
         ret.setBorder(BorderFactory.createTitledBorder(labels.getString("BATTLESIM.PLATOON.TITLE")));
+        platoonPanel = ret;
         ret.add(casualtyMode, BorderLayout.NORTH);
         ret.add(new JScrollPane(platoons), BorderLayout.CENTER);
         ret.add(buttons, BorderLayout.SOUTH);
@@ -1741,32 +1771,38 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             refreshEditor();
             refreshGround();
             doFitArmySplit();
-            final int nacoes = controler.getScenario().getNacoes().size();
-            diplomacy.setEnabled(nacoes > 1);
-            diplomacy.setToolTipText(nacoes > 1 ? null
-                    : labels.getString("BATTLESIM.DIPLOMACY.EMPTY"));
-            setLabelWithTooltip(status,
-                    BattleSimConverter.getDerivationText(controler.getScenario()));
-            // R-40: the button's state and the sentence beside it come from the SAME gate, so
-            // they cannot drift into saying different things.
-            run.setEnabled(BattleSimConverter.isRunnable(controler.getScenario()));
-            // One label, two jobs, and they can never both apply: before a run it says why Run is
-            // off (empty when it is on), after one it says what the run did and what it could not
-            // do. Both belong at the edge nearest the button they are about.
-            setLabelWithTooltip(runReason, controler.getLastResult() == null
-                    ? BattleSimConverter.getRunDisabledReason(controler.getScenario())
-                    : BattleSimConverter.getRunResultText(controler.getLastResult()));
-            results.setEnabled(controler.getLastResult() != null);
-            copyResult.setEnabled(controler.getLastResult() != null);
-            doSyncResultTab();
-            // An edit throws the result away, so a pane still showing it would be describing a
-            // battle that no longer matches the window. It goes with the numbers.
-            if (controler.getLastResult() == null && resultDialog != null
-                    && resultDialog.isDisplayable()) {
-                resultDialog.dispose();
-            }
+            refreshRunControls();
         } finally {
             refreshing = false;
+        }
+    }
+
+    /** Update results and readiness without overwriting pending editor text. */
+    private void refreshRunControls() {
+        final int nacoes = controler.getScenario().getNacoes().size();
+        diplomacy.getAction().setEnabled(nacoes > 1);
+        diplomacy.setToolTipText(nacoes > 1 ? null
+                : labels.getString("BATTLESIM.DIPLOMACY.EMPTY"));
+        setLabelWithTooltip(status,
+                BattleSimConverter.getDerivationText(controler.getScenario()));
+        // R-40: the button's state and the sentence beside it come from the SAME gate, so
+        // they cannot drift into saying different things.
+        run.getAction().setEnabled(BattleSimConverter.isRunnable(controler.getScenario()));
+        // One label, two jobs, and they can never both apply: before a run it says why Run is
+        // off (empty when it is on), after one it says what the run did and what it could not
+        // do. Both belong at the edge nearest the button they are about.
+        setLabelWithTooltip(runReason, controler.getLastResult() == null
+                ? BattleSimConverter.getRunDisabledReason(controler.getScenario())
+                : BattleSimConverter.getRunResultText(controler.getLastResult()));
+        results.getAction().setEnabled(controler.getLastResult() != null);
+        copyResult.setEnabled(controler.getLastResult() != null);
+        commands.get("copyResult").setEnabled(controler.getLastResult() != null);
+        doSyncResultTab();
+        // An edit throws the result away, so a pane still showing it would be describing a
+        // battle that no longer matches the window. It goes with the numbers.
+        if (controler.getLastResult() == null && resultDialog != null
+                && resultDialog.isDisplayable()) {
+            resultDialog.dispose();
         }
     }
 
@@ -1829,9 +1865,15 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         attackBonus.setValue(army.getAttackBonus());
         defenseBonus.setValue(army.getArmyDefenseBonus());
         // refit AFTER the text changes: a fleet's caption is three lines where a land army's is two
-        doFitHtmlHeightNow(casualtyMode);
         casualtyMode.setText(BattleSimConverter.getCasualtyModeText(army,
                 control.facade.WorldFacadeCounselor.getInstance().getCenario()));
+        doFitHtmlHeightNow(casualtyMode);
+        if (platoonPanel != null) {
+            platoonPanel.setMinimumSize(new Dimension(280, platoons.getRowHeight()
+                    + PLATOON_HEADER_ROOM + platoonCommands.getPreferredSize().height
+                    + casualtyMode.getPreferredSize().height
+                    + platoonPanel.getInsets().top + platoonPanel.getInsets().bottom));
+        }
         strength.setText(BattleSimConverter.getArmyStrength(army));
         sizeBand.setText(BattleSimConverter.getSizeBandText(army));
         fightsIn.setText(BattleSimConverter.getFightsIn(controler.getParticipation(army)));
@@ -1942,6 +1984,27 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         return ret.toArray();
     }
 
+    /** Revert only the rejected combo choice; preserve invalid numeric text for correction. */
+    private void restoreCombo(Object source) {
+        final ArmySim army = controler.getSelected();
+        final Cidade city = controler.getScenario().getCidade();
+        refreshing = true;
+        try {
+            if (source == terreno) terreno.setSelectedItem(controler.getScenario().getTerreno());
+            else if (source == cityParticipates) cityParticipates.setSelected(controler.getScenario().isCityParticipates());
+            else if (city != null && source == cityOwner) cityOwner.setSelectedItem(city.getNacao());
+            else if (city != null && source == citySize) citySize.setSelectedIndex(city.getTamanho());
+            else if (city != null && source == cityFortification) cityFortification.setSelectedIndex(city.getFortificacao());
+            else if (army != null && source == nacao) nacao.setSelectedItem(army.getNacao());
+            else if (army != null && source == tactic) tactic.setSelectedIndex(indexOfTactic(army.getTatica()));
+            else if (army != null && source == combatLevel) combatLevel.setSelectedItem(army.getCombatLevel());
+            else if (army != null && source == target) target.setSelectedItem(army.getTargetNacao() == null
+                    ? labels.getString("BATTLESIM.TARGET.ALL") : army.getTargetNacao());
+        } finally {
+            refreshing = false;
+        }
+    }
+
     // ------------------------------------------------------------------ events
 
     /**
@@ -1963,6 +2026,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         // BEFORE the selection moves: a number typed and left by clicking here belongs to the army
         // that is still selected for one more moment. See commitSpinners.
         final boolean edited = commitSpinners();
+        if (!pendingEditorsValid) {
+            refreshing = true;
+            try { reselectInRoster(); } finally { refreshing = false; }
+            return;
+        }
         final Object node = roster.getLastSelectedPathComponent();
         if (!(node instanceof DefaultMutableTreeNode)) {
             // a group node, or nothing. The edit above still happened and still cleared the result,
@@ -2004,6 +2072,17 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         // spinners to the combos. valueChanged already has this shape: commit, act, then repaint.
         final boolean edited = commitSpinners();
         final String command = event.getActionCommand();
+        if (!pendingEditorsValid) {
+            restoreCombo(event.getSource());
+            return;
+        }
+        // Command controls can refresh immediately; combo events must first consume their choice.
+        if (edited && !(event.getSource() instanceof JComboBox) && event.getSource() != cityParticipates) {
+            doRefresh(false);
+        }
+        if ("run".equals(command) && !BattleSimConverter.isRunnable(controler.getScenario())) {
+            return;
+        }
         if ("addArmy".equals(command)) {
             controler.doAddArmy();
         } else if ("cloneArmy".equals(command)) {
@@ -2162,27 +2241,15 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         if (refreshing) {
             return;
         }
-        if (event.getSource() == cityLoyalty) {
-            controler.setCityLealdade((Integer) cityLoyalty.getValue());
-            doEdited();
-            return;
+        // This listener can run before JSpinner.DefaultEditor sees an arrow/value change.
+        // Consume the source's new model value, not the text from before that increment.
+        if (event.getSource() instanceof JSpinner) {
+            final JSpinner source = (JSpinner) event.getSource();
+            ((JSpinner.DefaultEditor) source.getEditor()).getTextField().setValue(source.getValue());
         }
-        final ArmySim army = controler.getSelected();
-        if (army == null) {
-            return;
+        final boolean edited = commitSpinners();
+        if (pendingEditorsValid && edited) {
+            doRefresh();
         }
-        final Object src = event.getSource();
-        if (src == commander) {
-            army.setComandante((Integer) commander.getValue());
-        } else if (src == morale) {
-            army.setMoral((Integer) morale.getValue());
-        } else if (src == attackBonus) {
-            army.setBonusAttack((Integer) attackBonus.getValue());
-        } else if (src == defenseBonus) {
-            army.setBonusDefense((Integer) defenseBonus.getValue());
-        } else {
-            return;
-        }
-        doEdited();
     }
 }

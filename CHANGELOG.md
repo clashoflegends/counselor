@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### BattleSim controls organized by task
+
+- Army actions now sit above the roster. Analysis, save/share, and help commands have their own menus; Diplomacy, Fill defaults, Run, and Results stay visible.
+- The battlefield map button now says Change. Press F10 to open the analysis menu from the keyboard.
+- Pending army, city, and troop edits are applied before commands. Invalid numbers stay visible for correction, and continuous table editing keeps its next cell open.
+
 ### Pick where your battle happens
 
 - **Choose a battlefield hex from the map** using the map button in BattleSim's Ground panel. Keep the force you assembled and bring in the destination's city, terrain, and visible armies.
