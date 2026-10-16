@@ -38,7 +38,6 @@ import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.JTree;
 import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -49,10 +48,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeSelectionModel;
 import model.Cidade;
 import model.Local;
 import model.Nacao;
@@ -86,8 +81,7 @@ import persistenceCommons.SettingsManager;
  * tooltip, because a tooltip on a disabled button is unreliable across platforms and this is the one
  * message a player needs when the button does nothing - the complaint that started this rebuild.
  */
-public class BattleSimWindow extends JFrame implements ActionListener, ChangeListener,
-        TreeSelectionListener {
+public class BattleSimWindow extends JFrame implements ActionListener, ChangeListener {
 
     private static final long serialVersionUID = 1L;
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
@@ -114,22 +108,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * machine - so the hover answers in words what the mark says in a picture, and neither depends
      * on the other being legible.
      */
-    private final JTree roster = new JTree() {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public String getToolTipText(java.awt.event.MouseEvent event) {
-            final javax.swing.tree.TreePath path = getPathForLocation(event.getX(), event.getY());
-            if (path == null
-                    || !(path.getLastPathComponent() instanceof DefaultMutableTreeNode)) {
-                return null;
-            }
-            final Object user =
-                    ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-            return user instanceof BattleSimControler.ArmyNode
-                    ? ((BattleSimControler.ArmyNode) user).getHint() : null;
-        }
-    };
+    private final BattleSimRosterTable roster;
     /**
      * Fills the pane when the columns fit, scrolls when they do not.
      *
@@ -408,6 +387,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private BattleSimWindow(BattleSimControler controler, String title,
             control.services.BattleSimVariants variant) {
         this.controler = controler;
+        this.roster = new BattleSimRosterTable(controler, this::selectRosterArmy, this::applyTableDensity);
         this.variant = variant == null ? new control.services.BattleSimVariants(controler.getScenario(), title) : variant;
         setTitle(this.variant.name());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -603,6 +583,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         analysis.add(item("BATTLESIM.VARIANT.CLONE", "cloneWindow", "BATTLESIM.CLONE.WINDOW.HINT"));
         analysis.add(item("BATTLESIM.VARIANT.PIN", "pinRun", null));
         analysis.add(item("BATTLESIM.VARIANT.COMPARE", "compareRuns", null));
+        analysis.add(item("BATTLESIM.RUN.SIMULATION", "run", null));
         analysis.addSeparator();
         analysis.add(item("TATICA", "tactics", "BATTLESIM.TATICA.HINT"));
         analysis.add(item("TROOPCASUALTIES.BORDER.TITLE", "casualties", null));
@@ -646,6 +627,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         execution.add(readiness, BorderLayout.NORTH);
         execution.add(execute, BorderLayout.SOUTH);
         ret.add(execution, BorderLayout.LINE_END);
+        installShortcuts();
         return ret;
     }
 
@@ -847,6 +829,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             final Action action = new AbstractAction(labels.getString(key)) {
                 @Override
                 public void actionPerformed(ActionEvent event) {
+                    final java.awt.AWTEvent current = java.awt.EventQueue.getCurrentEvent();
+                    final boolean keyboard = (event.getModifiers() & (ActionEvent.CTRL_MASK | java.awt.event.InputEvent.CTRL_DOWN_MASK)) != 0
+                            || current instanceof java.awt.event.KeyEvent key && key.isControlDown();
+                    if (keyboard && shortcutKeys().containsKey(name) && !shortcutAllowed()) return;
                     BattleSimWindow.this.actionPerformed(new ActionEvent(event.getSource(),
                             ActionEvent.ACTION_PERFORMED, name));
                 }
@@ -856,6 +842,42 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             }
             return action;
         });
+    }
+
+    private static java.util.Map<String, String> shortcutKeys() {
+        return java.util.Map.of("run", "control ENTER", "cloneWindow", "control shift D",
+                "pinRun", "control shift P", "compareRuns", "control shift B");
+    }
+
+    private boolean shortcutAllowed() {
+        final var focus = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        return !disposed && focus.getActiveWindow() == this
+                && !(focus.getFocusOwner() instanceof javax.swing.text.JTextComponent)
+                && !platoons.isEditing();
+    }
+
+    private void installShortcuts() {
+        shortcutKeys().forEach((name, stroke) -> {
+            final Action action = commands.get(name);
+            final javax.swing.KeyStroke key = javax.swing.KeyStroke.getKeyStroke(stroke);
+            action.putValue(Action.ACCELERATOR_KEY, key);
+            final String shown = javax.swing.KeyStroke.getKeyStroke(stroke).toString().replace("pressed ", "");
+            final Object old = action.getValue(Action.SHORT_DESCRIPTION);
+            action.putValue(Action.SHORT_DESCRIPTION, (old == null ? "" : old + "  ") + shown);
+            getRootPane().getInputMap(javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW).put(key, "battle:" + name);
+            getRootPane().getActionMap().put("battle:" + name, new AbstractAction() {
+                @Override public void actionPerformed(ActionEvent event) {
+                    if (action.isEnabled() && shortcutAllowed()) action.actionPerformed(event);
+                }
+            });
+        });
+    }
+
+    private void applyTableDensity() {
+        platoons.setRowHeight(Math.max(18, platoons.getFontMetrics(platoons.getFont()).getHeight() + (roster.compact() ? 2 : 8)));
+        updatePlatoonMinimum();
+        if (platoonPanel != null) platoonPanel.revalidate();
+        if (armySplit != null) armySplit.revalidate();
     }
 
     /**
@@ -924,6 +946,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 editor, buildBottomTabs()) {
             @Override
             public void doLayout() {
+                if (platoonPanel != null && platoonCommands != null) {
+                    final int width = Math.max(1, getWidth() - 20);
+                    platoonCommands.setSize(width, platoonCommands.getHeight());
+                    casualtyMode.setSize(width, casualtyMode.getHeight());
+                    updatePlatoonMinimum();
+                }
                 // At short heights reserve a troop row, then let the existing form scroll.
                 // Two full minimums cannot fit in the window's supported minimum height.
                 final int room = getHeight() - getDividerSize() - getBottomComponent().getMinimumSize().height;
@@ -950,7 +978,18 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         right.setOneTouchExpandable(true);
         right.setBorder(null);
 
-        final JSplitPane ret = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buildLeft(), right);
+        final JSplitPane ret = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buildLeft(), right) {
+            @Override public void doLayout() {
+                // Reserve the standard troop columns when the screen can fit them beside the roster.
+                final Insets border = getInsets();
+                final int room = Math.max(0, getWidth() - border.left - border.right
+                        - getDividerSize() - getLeftComponent().getMinimumSize().width);
+                final int height = right.getTopComponent().getMinimumSize().height
+                        + right.getBottomComponent().getMinimumSize().height + right.getDividerSize();
+                right.setMinimumSize(new Dimension(Math.min(660, room), height));
+                super.doLayout();
+            }
+        };
         ret.setResizeWeight(0.28);
         ret.setOneTouchExpandable(true);
         ret.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
@@ -958,14 +997,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     }
 
     private JPanel buildLeft() {
-        roster.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        roster.setRootVisible(false);
-        // without this the overridden getToolTipText is never consulted
         javax.swing.ToolTipManager.sharedInstance().registerComponent(roster);
-        roster.setShowsRootHandles(true);
-        roster.addTreeSelectionListener(this);
-
-        roster.setRowHeight(0);     // let the renderer decide, so it scales with the font
 
         final JScrollPane scroll = new JScrollPane(roster);
         scroll.setBorder(BorderFactory.createTitledBorder(labels.getString("BATTLESIM.ARMIES.TITLE")));
@@ -979,9 +1011,35 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 "BATTLESIM.ARMY.COPYONE.HINT"));
         armyActions.add(tooltipped(button("BATTLESIM.ARMY.PASTE", "pasteArmy"),
                 "BATTLESIM.ARMY.PASTE.HINT"));
+        final JButton columns = new JButton(labels.getString("BATTLESIM.ROSTER.COLUMNS"));
+        columns.addActionListener(event -> roster.options().show(columns, 0, columns.getHeight()));
+        armyActions.add(columns);
         ret.add(armyActions, BorderLayout.NORTH);
-        ret.add(scroll, BorderLayout.CENTER);
-        ret.add(buildGround(), BorderLayout.SOUTH);
+        final JPanel ground = buildGround();
+        final JScrollPane groundScroll = new JScrollPane(ground,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        groundScroll.setBorder(null);
+        groundScroll.getVerticalScrollBar().setUnitIncrement(16);
+        final JSplitPane leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scroll, groundScroll) {
+            @Override public void doLayout() {
+                final Insets border = scroll.getInsets();
+                final int horizontal = roster.getScrollableTracksViewportWidth() ? 0
+                        : scroll.getHorizontalScrollBar().getPreferredSize().height;
+                final int rosterFloor = roster.getRowHeight() * 2 + roster.getTableHeader().getPreferredSize().height
+                        + border.top + border.bottom + horizontal + 6;
+                scroll.setMinimumSize(new Dimension(180, rosterFloor));
+                final int groundRoom = Math.max(80, Math.min(ground.getPreferredSize().height,
+                        getHeight() - getDividerSize() - rosterFloor));
+                groundScroll.setMinimumSize(new Dimension(180, groundRoom));
+                groundScroll.setPreferredSize(new Dimension(300, groundRoom));
+                super.doLayout();
+            }
+        };
+        leftSplit.setResizeWeight(1.0);
+        leftSplit.setOneTouchExpandable(true);
+        leftSplit.setBorder(null);
+        ret.add(leftSplit, BorderLayout.CENTER);
+        revealFocusedGroundControls(ground, ground);
         ret.setPreferredSize(new Dimension(300, 480));
         ret.setMinimumSize(new Dimension(240, 240));
         return ret;
@@ -994,8 +1052,28 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * fields on the same left one. The previous version gave each row its own FlowLayout, which
      * left the labels ragged and made four unrelated-looking controls out of four related ones.
      */
+    private static final class GroundPanel extends JPanel implements javax.swing.Scrollable {
+        GroundPanel() { super(new GridBagLayout()); }
+        @Override public Dimension getPreferredScrollableViewportSize() { return getPreferredSize(); }
+        @Override public int getScrollableUnitIncrement(java.awt.Rectangle visible, int orientation, int direction) { return 16; }
+        @Override public int getScrollableBlockIncrement(java.awt.Rectangle visible, int orientation, int direction) { return Math.max(16, visible.height - 16); }
+        @Override public boolean getScrollableTracksViewportWidth() { return true; }
+        @Override public boolean getScrollableTracksViewportHeight() { return false; }
+    }
+
+    private void revealFocusedGroundControls(java.awt.Container container, JPanel ground) {
+        for (java.awt.Component child : container.getComponents()) {
+            child.addFocusListener(new java.awt.event.FocusAdapter() {
+                @Override public void focusGained(java.awt.event.FocusEvent event) {
+                    ground.scrollRectToVisible(SwingUtilities.convertRectangle(child.getParent(), child.getBounds(), ground));
+                }
+            });
+            if (child instanceof java.awt.Container nested) revealFocusedGroundControls(nested, ground);
+        }
+    }
+
     private JPanel buildGround() {
-        final JPanel ret = new JPanel(new GridBagLayout());
+        final JPanel ret = new GroundPanel();
         ret.setBorder(BorderFactory.createTitledBorder(labels.getString("BATTLESIM.GROUND.TITLE")));
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(2, 4, 2, 4);
@@ -1004,6 +1082,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         final JPanel battlefield = new JPanel(new BorderLayout(4, 0));
         battlefield.add(battlefieldText, BorderLayout.CENTER);
         battlefield.add(battlefieldPick, BorderLayout.EAST);
+        battlefield.setMinimumSize(new Dimension(0, battlefield.getPreferredSize().height));
+        battlefieldText.setMinimumSize(new Dimension(0, battlefieldText.getPreferredSize().height));
         battlefieldPick.setText(labels.getString("BATTLESIM.BATTLEFIELD.CHANGE"));
         battlefieldPick.setToolTipText(labels.getString("COORD.PICK.MAP.TT"));
         battlefieldPick.addActionListener(e -> {
@@ -1026,7 +1106,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 gui.services.Toast.dismissCurrent();
             }
         });
-        addRow(ret, gbc, 0, labels.getString("BATTLESIM.BATTLEFIELD"), battlefield);
+        battlefieldText.getAccessibleContext().setAccessibleName(labels.getString("BATTLESIM.BATTLEFIELD"));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1;
+        ret.add(battlefield, gbc);
 
         terreno.setActionCommand("terreno");
         terreno.addActionListener(this);
@@ -1059,6 +1144,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         gbc.gridwidth = 2;
         gbc.insets = new Insets(6, 4, 2, 4);
         ret.add(cityText, gbc);
+        cityText.setMinimumSize(new Dimension(0, cityText.getPreferredSize().height));
+        for (java.awt.Component field : new java.awt.Component[]{terreno, cityOwner, citySize, cityFortification, cityLoyalty}) {
+            field.setMinimumSize(new Dimension(0, field.getMinimumSize().height));
+        }
         return ret;
     }
 
@@ -1352,8 +1441,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     private JPanel buildPlatoonTable() {
         // Right-click Copy / Export to CSV, as the old window had on both its tables (T-431). Only
-        // the platoon table here: the roster is a JTree, and the armies are already covered by the
-        // toolbar's Copy, which exports them WITH their platoons.
+        // The army export includes its platoons; this menu exports the selected army's troop table.
         gui.services.TableExportMenu.install(platoons, "battlesim-platoons");
         platoons.setFillsViewportHeight(true);
         platoons.setRowHeight(Math.max(20, platoons.getRowHeight()));
@@ -1364,7 +1452,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         platoons.setShowGrid(false);
         platoons.setIntercellSpacing(new Dimension(0, 1));
 
-        final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 2));
+        final JPanel buttons = new JPanel(new gui.services.WrapLayout(FlowLayout.LEADING, 4, 2));
         platoonCommands = buttons;
         buttons.add(button("BATTLESIM.PLATOON.ADD", "addPlatoon"));
         buttons.add(tooltipped(button("BATTLESIM.PLATOON.CLONE", "clonePlatoon"),
@@ -1380,9 +1468,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         final JPanel ret = new JPanel(new BorderLayout());
         ret.setBorder(BorderFactory.createTitledBorder(labels.getString("BATTLESIM.PLATOON.TITLE")));
         platoonPanel = ret;
-        ret.add(casualtyMode, BorderLayout.NORTH);
+        final JPanel above = new JPanel(new BorderLayout());
+        above.add(buttons, BorderLayout.NORTH);
+        above.add(casualtyMode, BorderLayout.SOUTH);
+        ret.add(above, BorderLayout.NORTH);
         ret.add(new JScrollPane(platoons), BorderLayout.CENTER);
-        ret.add(buttons, BorderLayout.SOUTH);
+        applyTableDensity();
         // A FLOOR, on the PANEL rather than on the scroll pane inside it, because the thing doing
         // the squeezing is the vertical JSplitPane and a split honours the minimum size of its own
         // direct children. Its resize weight is 0, which sends all SLACK to the table - and, when
@@ -1710,22 +1801,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * highlight at all.
      */
     private void scrollToSelected() {
-        final ArmySim wanted = controler.getSelected();
-        if (wanted == null) {
-            return;
-        }
-        for (int row = 0; row < roster.getRowCount(); row++) {
-            final Object node = roster.getPathForRow(row).getLastPathComponent();
-            if (!(node instanceof DefaultMutableTreeNode)) {
-                continue;
-            }
-            final Object user = ((DefaultMutableTreeNode) node).getUserObject();
-            if (user instanceof BattleSimControler.ArmyNode
-                    && ((BattleSimControler.ArmyNode) user).getArmy() == wanted) {
-                roster.scrollRowToVisible(row);
-                return;
-            }
-        }
+        roster.scrollToSelection();
     }
 
     /** The extension, deliberately nothing an EGF uses. See {@code BattleSimTransfer}. */
@@ -2021,10 +2097,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private void doRefresh(boolean includePlatoons) {
         refreshing = true;
         try {
-            roster.setModel(controler.getRosterModel());
-            for (int ii = 0; ii < roster.getRowCount(); ii++) {
-                roster.expandRow(ii);
-            }
+            roster.refresh();
             reselectInRoster();
             if (includePlatoons) {
                 setPlatoonModel();
@@ -2084,22 +2157,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * an army to a different group.
      */
     private void reselectInRoster() {
-        final ArmySim wanted = controler.getSelected();
-        if (wanted == null) {
-            return;
-        }
-        for (int row = 0; row < roster.getRowCount(); row++) {
-            final Object node = roster.getPathForRow(row).getLastPathComponent();
-            if (!(node instanceof DefaultMutableTreeNode)) {
-                continue;
-            }
-            final Object user = ((DefaultMutableTreeNode) node).getUserObject();
-            if (user instanceof BattleSimControler.ArmyNode
-                    && ((BattleSimControler.ArmyNode) user).getArmy() == wanted) {
-                roster.setSelectionRow(row);
-                return;
-            }
-        }
+        roster.selectArmy(controler.getSelected());
     }
 
     private void refreshEditor() {
@@ -2137,18 +2195,22 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         casualtyMode.setText(BattleSimConverter.getCasualtyModeText(army,
                 control.facade.WorldFacadeCounselor.getInstance().getCenario()));
         doFitHtmlHeightNow(casualtyMode);
-        if (platoonPanel != null) {
-            platoonPanel.setMinimumSize(new Dimension(280, platoons.getRowHeight()
-                    + PLATOON_HEADER_ROOM + platoonCommands.getPreferredSize().height
-                    + casualtyMode.getPreferredSize().height
-                    + platoonPanel.getInsets().top + platoonPanel.getInsets().bottom));
-        }
+        updatePlatoonMinimum();
         strength.setText(BattleSimConverter.getArmyStrength(army));
         sizeBand.setText(BattleSimConverter.getSizeBandText(army));
         fightsIn.setText(BattleSimConverter.getFightsIn(controler.getParticipation(army)));
         source.setText(String.format(labels.getString("BATTLESIM.SOURCE"),
                 BattleSimConverter.getProvenanceName(
                         controler.getScenario().getProvenance(army))));
+    }
+
+    private void updatePlatoonMinimum() {
+        if (platoonPanel == null || platoonCommands == null) return;
+        final Dimension minimum = new Dimension(280, platoons.getRowHeight()
+                + PLATOON_HEADER_ROOM + platoonCommands.getPreferredSize().height
+                + casualtyMode.getPreferredSize().height
+                + platoonPanel.getInsets().top + platoonPanel.getInsets().bottom);
+        if (!minimum.equals(platoonPanel.getMinimumSize())) platoonPanel.setMinimumSize(minimum);
     }
 
     private void refreshGround() {
@@ -2160,7 +2222,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 : scenario.getLocal().getCoordenadas();
         battlefieldText.setText((coordinate == null ? "" : coordinate)
                 + (city == null || city.getNome() == null ? "" : " - " + city.getNome()));
-        battlefieldText.setToolTipText(city == null ? null : city.getNome());
+        battlefieldText.setToolTipText(battlefieldText.getText());
         cityParticipates.setEnabled(city != null);
         cityParticipates.setSelected(scenario.isCityParticipates());
         final boolean editable = scenario.getCidadeAtiva() != null;
@@ -2287,34 +2349,20 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * back over itself; the eighth wrote the tactic, and with the {@code parseInt} bug above that
      * meant merely CLICKING an army set its tactic to -9999.
      */
-    @Override
-    public void valueChanged(TreeSelectionEvent event) {
+    private boolean selectRosterArmy(ArmySim army) {
         if (refreshing) {
-            return;
+            return true;
         }
         // BEFORE the selection moves: a number typed and left by clicking here belongs to the army
         // that is still selected for one more moment. See commitSpinners.
         final boolean edited = commitSpinners();
         if (!pendingEditorsValid) {
-            refreshing = true;
-            try { reselectInRoster(); } finally { refreshing = false; }
-            return;
+            return false;
         }
-        final Object node = roster.getLastSelectedPathComponent();
-        if (!(node instanceof DefaultMutableTreeNode)) {
-            // a group node, or nothing. The edit above still happened and still cleared the result,
-            // so it still has to be painted - returning here left the roster showing the old
-            // strength and a stale result pane until some unrelated refresh came along.
-            if (edited) {
-                doRefresh();
-            }
-            return;
-        }
-        final Object user = ((DefaultMutableTreeNode) node).getUserObject();
-        if (user instanceof BattleSimControler.ArmyNode) {
+        if (army != null) {
             refreshing = true;
             try {
-                controler.setSelected(((BattleSimControler.ArmyNode) user).getArmy());
+                controler.setSelected(army);
                 setPlatoonModel();
                 refreshEditor();
             } finally {
@@ -2326,6 +2374,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             // the player just clicked and the edited one shows its new strength
             doRefresh();
         }
+        return true;
     }
 
     @Override

@@ -23,7 +23,7 @@ class BattleSimVariantsWindowTest {
         final Field field = BattleSimWindow.class.getDeclaredField(name);
         field.setAccessible(true); return field.get(object);
     }
-    private static BattleSimWindow open() throws Exception {
+    static BattleSimWindow open() throws Exception {
         final var world = TestWorld.load();
         final var local = world.getLocais().values().stream().filter(one -> !one.getExercitos().isEmpty()).findFirst().orElseThrow();
         final var controller = new BattleSimControler(local);

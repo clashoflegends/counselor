@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### A compact battle workspace
+
+- The roster now separates army names, layer marks, and soldier/ship counts. Use Columns for morale, land/naval strength, compact rows, and reset; column widths and density are remembered locally.
+- Unknown size bands and quantities remain visible. Nation grouping, hostility details, and selection follow the army when its nation changes.
+- Platoon actions now sit above their table. Ctrl+Enter runs, Ctrl+Shift+D clones a variant, Ctrl+Shift+P pins, and Ctrl+Shift+B compares; these shortcuts leave active text/cell editors and child dialogs alone.
+- Ground scrolls on short screens to keep army selection visible, including 1920x1080 at high display scaling.
+
 ### Compare named battle variants
 
 - Rename and clone a variant from Analysis. Run it, then pin the completed result; compare up to six pinned runs from the same variant family, including changed inputs, separate soldier/ship totals, layer outcomes, and full reports.
