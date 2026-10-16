@@ -95,6 +95,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private final transient BattleSimControler controler;
     private final java.util.Map<String, Action> commands = new java.util.LinkedHashMap<>();
     private boolean pendingEditorsValid = true;
+    private BattleSimReadinessPanel readiness;
+    private javax.swing.JDialog readinessDialog;
+    private javax.swing.JList<ArmySim> readinessList;
+    private javax.swing.JTextArea readinessExplanation;
+    private BattleSimReadinessPanel.Topic readinessTopic;
+    private java.util.Map<ArmySim, business.combat.LayerParticipation> readinessParticipation;
 
     /**
      * The roster, with a tooltip that explains the battle-result mark on each row.
@@ -621,8 +627,195 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         final JPanel execute = new JPanel(new FlowLayout(FlowLayout.TRAILING, 4, 0));
         execute.add(results);
         execute.add(run);
-        ret.add(execute, BorderLayout.LINE_END);
+        final JPanel execution = new JPanel(new BorderLayout(0, 3));
+        readiness = new BattleSimReadinessPanel(labels, this::showReadiness);
+        execution.add(readiness, BorderLayout.NORTH);
+        execution.add(execute, BorderLayout.SOUTH);
+        ret.add(execution, BorderLayout.LINE_END);
         return ret;
+    }
+
+    private void showReadiness(BattleSimReadinessPanel.Topic topic) {
+        final boolean edited = commitSpinners();
+        if (!pendingEditorsValid) return;
+        if (edited) doRefresh(false);
+        final CombatScenario scenario = controler.getScenario();
+        if (topic == BattleSimReadinessPanel.Topic.DIPLOMACY
+                || (topic == BattleSimReadinessPanel.Topic.GATE
+                    && scenario.getRunGate() == business.combat.RunGate.NO_HOSTILE_PAIR
+                    && scenario.getNacoes().size() > 1)) {
+            actionPerformed(new ActionEvent(readiness, ActionEvent.ACTION_PERFORMED, "diplomacy"));
+            return;
+        }
+        if (topic == BattleSimReadinessPanel.Topic.GATE && (scenario.getArmies().isEmpty()
+                || (scenario.getRunGate() == business.combat.RunGate.NO_HOSTILE_PAIR
+                    && scenario.getNacoes().size() <= 1))) {
+            focusCommand(getContentPane(), "addArmy");
+            return;
+        }
+        if (readinessDialog != null) readinessDialog.dispose();
+        readinessTopic = topic;
+        readinessDialog = new javax.swing.JDialog(this, labels.getString("BATTLESIM.READINESS.TITLE"), false);
+        readinessDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        readinessList = new javax.swing.JList<>();
+        readinessList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        readinessList.getAccessibleContext().setAccessibleName(labels.getString("BATTLESIM.READINESS.TITLE"));
+        readinessList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list, Object value,
+                    int index, boolean selected, boolean focused) {
+                final ArmySim army = (ArmySim) value;
+                String text = controler.getScenario().getDisplayName(army);
+                if (readinessTopic == BattleSimReadinessPanel.Topic.NAVY
+                        || readinessTopic == BattleSimReadinessPanel.Topic.ARMY
+                        || readinessTopic == BattleSimReadinessPanel.Topic.CITY) {
+                    final business.combat.CombatLayer layer = business.combat.CombatLayer.valueOf(readinessTopic.name());
+                    final business.combat.LayerParticipation one = readinessParticipation.get(army);
+                    if (one != null) {
+                        final business.combat.LayerParticipation.Reason reason = one.getReason(layer);
+                        text += " - " + labels.getString(reason == business.combat.LayerParticipation.Reason.FIGHTS
+                                ? "BATTLESIM.FIGHTS.YES" : "BATTLESIM.REASON." + reason.name());
+                    }
+                }
+                return super.getListCellRendererComponent(list, text, index, selected, focused);
+            }
+        });
+        final JPanel content = new JPanel(new BorderLayout(4, 6));
+        content.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        final javax.swing.JTextArea explanation = new javax.swing.JTextArea(
+                topic == BattleSimReadinessPanel.Topic.GATE && !scenario.getRunGate().isRunnable()
+                ? BattleSimConverter.getRunDisabledReason(scenario) : labels.getString("BATTLESIM.READINESS.DETAILS"));
+        readinessExplanation = explanation;
+        explanation.setLineWrap(true);
+        explanation.setWrapStyleWord(true);
+        explanation.setEditable(false);
+        explanation.setOpaque(false);
+        explanation.setRows(3);
+        explanation.setFont(readinessList.getFont());
+        content.add(explanation, BorderLayout.NORTH);
+        content.add(new JScrollPane(readinessList), BorderLayout.CENTER);
+        final JButton choose = new JButton(labels.getString("BATTLESIM.READINESS.OPEN"));
+        choose.addActionListener(event -> chooseReadinessArmy());
+        readinessList.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent event) {
+                if (event.getClickCount() == 2) chooseReadinessArmy();
+            }
+        });
+        readinessDialog.getRootPane().setDefaultButton(choose);
+        final JPanel footer = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+        footer.add(choose);
+        content.add(footer, BorderLayout.SOUTH);
+        readinessDialog.setContentPane(content);
+        readinessDialog.pack();
+        readinessDialog.setSize(500, 300);
+        readinessDialog.setLocationRelativeTo(this);
+        refreshReadinessList();
+        readinessDialog.setVisible(true);
+        readinessList.requestFocusInWindow();
+    }
+
+    private java.util.List<ArmySim> readinessTargets(BattleSimReadinessPanel.Topic topic) {
+        final control.services.BattleSimReadiness facts = control.services.BattleSimReadiness.of(controler.getScenario());
+        if (topic == BattleSimReadinessPanel.Topic.MORALE) return facts.unknownMorale();
+        if (topic == BattleSimReadinessPanel.Topic.TROOPS) {
+            return facts.composition().stream().map(control.services.BattleSimReadiness.CompositionIssue::army).toList();
+        }
+        if (topic == BattleSimReadinessPanel.Topic.GATE && !facts.gate().isRunnable()) {
+            final java.util.List<ArmySim> targets = new java.util.ArrayList<>();
+            facts.composition().stream().filter(control.services.BattleSimReadiness.CompositionIssue::empty)
+                    .forEach(issue -> targets.add(issue.army()));
+            for (ArmySim army : controler.getScenario().getArmies()) {
+                if (targets.stream().noneMatch(target -> target == army)) targets.add(army);
+            }
+            return targets;
+        }
+        return controler.getScenario().getArmies();
+    }
+
+    private void refreshReadinessList() {
+        if (readinessDialog == null || readinessList == null || !readinessDialog.isDisplayable()) return;
+        final ArmySim selected = readinessList.getSelectedValue();
+        readinessParticipation = controler.getScenario().getParticipation();
+        final control.services.BattleSimReadiness facts = control.services.BattleSimReadiness.of(controler.getScenario());
+        String explanation = labels.getString("BATTLESIM.READINESS.DETAILS");
+        if (readinessTopic == BattleSimReadinessPanel.Topic.GATE) {
+            explanation = facts.gate().isRunnable() ? labels.getString("BATTLESIM.READINESS.READY")
+                    : BattleSimConverter.getRunDisabledReason(controler.getScenario());
+        } else if (readinessTopic == BattleSimReadinessPanel.Topic.MORALE) {
+            explanation = String.format(labels.getString("BATTLESIM.READINESS.MORALE"), facts.unknownMorale().size())
+                    + " " + explanation;
+        } else if (readinessTopic == BattleSimReadinessPanel.Topic.TROOPS) {
+            explanation = String.format(labels.getString("BATTLESIM.READINESS.TROOPS"), facts.composition().size())
+                    + " " + explanation;
+        }
+        readinessExplanation.setText(explanation);
+        readinessList.setListData(readinessTargets(readinessTopic).toArray(new ArmySim[0]));
+        if (selected != null && readinessTargets(readinessTopic).stream().anyMatch(army -> army == selected)) {
+            readinessList.setSelectedValue(selected, true);
+        } else if (readinessList.getModel().getSize() > 0) {
+            readinessList.setSelectedIndex(0);
+        }
+    }
+
+    private void chooseReadinessArmy() {
+        final ArmySim targetArmy = readinessList.getSelectedValue();
+        final BattleSimReadinessPanel.Topic topic = readinessTopic;
+        readinessDialog.dispose();
+        toFront();
+        SwingUtilities.invokeLater(() -> {
+            if (!isDisplayable() || targetArmy == null) return;
+            final boolean edited = commitSpinners();
+            if (!pendingEditorsValid) return;
+            // Revalidate modeless-dialog targets by identity, including resolved/removed issues.
+            if (readinessTargets(topic).stream().noneMatch(army -> army == targetArmy)) {
+                if (edited) doRefresh(false);
+                return;
+            }
+            controler.setSelected(targetArmy);
+            doRefresh();
+            if (topic == BattleSimReadinessPanel.Topic.MORALE) {
+                final javax.swing.JFormattedTextField field = ((JSpinner.DefaultEditor) morale.getEditor()).getTextField();
+                field.requestFocusInWindow();
+                field.selectAll();
+            } else if (topic == BattleSimReadinessPanel.Topic.TROOPS
+                    || (topic == BattleSimReadinessPanel.Topic.GATE
+                        && control.services.BattleSimReadiness.of(controler.getScenario()).composition().stream()
+                                .anyMatch(issue -> issue.army() == targetArmy && issue.empty()))) {
+                bottomTabs.setSelectedIndex(0);
+                if (platoons.getRowCount() == 0) {
+                    focusCommand(getContentPane(), "addPlatoon");
+                } else {
+                    final boolean empty = control.services.BattleSimReadiness.of(controler.getScenario()).composition()
+                            .stream().filter(issue -> issue.army() == targetArmy)
+                            .anyMatch(control.services.BattleSimReadiness.CompositionIssue::empty);
+                    int row = 0;
+                    if (platoons.getModel() instanceof BattleSimControler.PlatoonTableModel) {
+                        final BattleSimControler.PlatoonTableModel model = (BattleSimControler.PlatoonTableModel) platoons.getModel();
+                        for (int i = 0; i < platoons.getRowCount(); i++) {
+                            if (model.getPlatoon(i).getQtd() > 0
+                                    && business.combat.ScenarioDefaults.isPlaceholder(model.getPlatoon(i))) { row = i; break; }
+                        }
+                    }
+                    final int column = empty ? 2 : 1;
+                    platoons.changeSelection(row, column, false, false);
+                    platoons.editCellAt(row, column);
+                    if (platoons.getEditorComponent() != null) platoons.getEditorComponent().requestFocusInWindow();
+                }
+            } else {
+                combatLevel.requestFocusInWindow();
+                fightsIn.scrollRectToVisible(new java.awt.Rectangle(0, 0, fightsIn.getWidth(), fightsIn.getHeight()));
+            }
+        });
+    }
+
+    private boolean focusCommand(java.awt.Container parent, String command) {
+        for (java.awt.Component component : parent.getComponents()) {
+            if (component instanceof JButton && ((JButton) component).getAction() == commands.get(command)) {
+                return component.requestFocusInWindow();
+            }
+            if (component instanceof java.awt.Container && focusCommand((java.awt.Container) component, command)) return true;
+        }
+        return false;
     }
 
     private JMenu menu(String key, char mnemonic) {
@@ -1779,6 +1972,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     /** Update results and readiness without overwriting pending editor text. */
     private void refreshRunControls() {
+        readiness.refresh(controler.getScenario());
+        refreshReadinessList();
         final int nacoes = controler.getScenario().getNacoes().size();
         diplomacy.getAction().setEnabled(nacoes > 1);
         diplomacy.setToolTipText(nacoes > 1 ? null

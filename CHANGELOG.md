@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Battle readiness at a glance
+
+- Sea, land, and city icons beside Run show initial army eligibility. Separate badges flag unknown morale, empty or unidentified troops, and assumed diplomacy.
+- Click an icon for details or to reach the relevant army editor. The readiness control stays available when Run is blocked; a ready battle can still contain assumptions.
+
 ### BattleSim controls organized by task
 
 - Army actions now sit above the roster. Analysis, save/share, and help commands have their own menus; Diplomacy, Fill defaults, Run, and Results stay visible.
