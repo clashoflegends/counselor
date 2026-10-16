@@ -7,6 +7,7 @@
 - **Choose a battlefield hex from the map** using the map button in BattleSim's Ground panel. Keep the force you assembled and bring in the destination's city, terrain, and visible armies.
 - **Compare different destinations:** choosing another hex replaces its imported defenders while retaining your staged forces and their edits. Terrain and city values remain editable.
 - Saved battles retain the chosen battlefield. New saves use BattleSim format 2; older saves with a battlefield coordinate still open. For older files without one, paste their armies into a battle opened from the map.
+- Fixed army paste and saved-battle loading incorrectly reporting a missing nation when the turn file indexes nations by names or other keys.
 
 ## 11-OCT-2026 - v2.1.934
 
