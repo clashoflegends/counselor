@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Compare named battle variants
+
+- Rename and clone a variant from Analysis. Run it, then pin the completed result; compare up to six pinned runs from the same variant family, including changed inputs, separate soldier/ship totals, layer outcomes, and full reports.
+- Pins are session snapshots: later edits do not change them. They survive closing individual variants and are cleared when the last related battle closes. Saved battle files keep their existing format.
+- Fixed Run staying disabled when a battle initially opened ready to fight.
+
 ### Battle readiness at a glance
 
 - Sea, land, and city icons beside Run show initial army eligibility. Separate badges flag unknown morale, empty or unidentified troops, and assumed diplomacy.

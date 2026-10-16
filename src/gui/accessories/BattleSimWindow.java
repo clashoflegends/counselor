@@ -93,6 +93,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
     private final transient BattleSimControler controler;
+    private final transient control.services.BattleSimVariants variant;
+    private transient control.services.BattleSimRunSnapshot completedSnapshot;
+    private transient business.combat.CombatResult snapshotResult;
+    private transient BattleSimComparisonDialog comparison;
+    private boolean disposed;
     private final java.util.Map<String, Action> commands = new java.util.LinkedHashMap<>();
     private boolean pendingEditorsValid = true;
     private BattleSimReadinessPanel readiness;
@@ -344,7 +349,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (!refreshing) {
+                    if (!refreshing && !disposed) {
                         commitSpinners(false);
                         if (pendingEditorsValid) {
                             doRefresh(false);
@@ -397,8 +402,14 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * while they are compared side by side.
      */
     private BattleSimWindow(BattleSimControler controler, String title) {
+        this(controler, title, null);
+    }
+
+    private BattleSimWindow(BattleSimControler controler, String title,
+            control.services.BattleSimVariants variant) {
         this.controler = controler;
-        setTitle(title);
+        this.variant = variant == null ? new control.services.BattleSimVariants(controler.getScenario(), title) : variant;
+        setTitle(this.variant.name());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
         add(buildToolbar(), BorderLayout.NORTH);
@@ -588,6 +599,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         analysis.add(item("BATTLESIM.ANALYSIS.NEED", "whatIf", "BATTLESIM.WHATIF.HINT"));
         analysis.add(item("BATTLESIM.ANALYSIS.TACTICS", "tacticGrid", "BATTLESIM.TACTICGRID.HINT"));
         analysis.addSeparator();
+        analysis.add(item("BATTLESIM.VARIANT.RENAME", "renameVariant", null));
+        analysis.add(item("BATTLESIM.VARIANT.CLONE", "cloneWindow", "BATTLESIM.CLONE.WINDOW.HINT"));
+        analysis.add(item("BATTLESIM.VARIANT.PIN", "pinRun", null));
+        analysis.add(item("BATTLESIM.VARIANT.COMPARE", "compareRuns", null));
+        analysis.addSeparator();
         analysis.add(item("TATICA", "tactics", "BATTLESIM.TATICA.HINT"));
         analysis.add(item("TROOPCASUALTIES.BORDER.TITLE", "casualties", null));
         menus.add(analysis);
@@ -595,8 +611,6 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         final JMenu sharing = menu("BATTLESIM.MENU.SHARE", 'S');
         sharing.add(item("BATTLESIM.SAVE", "save", "BATTLESIM.SAVE.HINT"));
         sharing.add(item("BATTLESIM.LOAD", "load", "BATTLESIM.LOAD.HINT"));
-        sharing.addSeparator();
-        sharing.add(item("BATTLESIM.CLONE.WINDOW", "cloneWindow", "BATTLESIM.CLONE.WINDOW.HINT"));
         sharing.addSeparator();
         sharing.add(item("BATTLESIM.COPY", "copy", "BATTLESIM.COPY.HINT"));
         final Action copy = command("BATTLESIM.RESULT.COPY", "copyResult", "BATTLESIM.RESULT.COPY.HINT");
@@ -622,8 +636,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
         run.setAction(command("BATTLESIM.RUN.SIMULATION", "run", null));
         results.setAction(command("BATTLESIM.RESULTS.OPEN", "results", "BATTLESIM.RESULTS.OPEN.TOOLTIP"));
-        run.setEnabled(false);
-        results.setEnabled(false);
+        run.getAction().setEnabled(false);
+        results.getAction().setEnabled(false);
         final JPanel execute = new JPanel(new FlowLayout(FlowLayout.TRAILING, 4, 0));
         execute.add(results);
         execute.add(run);
@@ -993,6 +1007,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         battlefieldPick.setText(labels.getString("BATTLESIM.BATTLEFIELD.CHANGE"));
         battlefieldPick.setToolTipText(labels.getString("COORD.PICK.MAP.TT"));
         battlefieldPick.addActionListener(e -> {
+            if (!variant.matches(control.facade.WorldFacadeCounselor.getInstance().getPartida())) {
+                battlefieldPick.setSelected(false);
+                setLabelWithTooltip(status, labels.getString("BATTLESIM.VARIANT.MISMATCH"));
+                return;
+            }
             final control.MapaControler map =
                     control.facade.WorldFacadeCounselor.getInstance().getMapaControler();
             if (map == null) {
@@ -1046,7 +1065,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     /** Same one-shot map picker as order coordinates, accepting both land and water. */
     private void onBattlefieldPick(Local local) {
         battlefieldPick.setSelected(false);
-        if (!isShowing() || local == null) {
+        if (!isShowing() || local == null
+                || !variant.matches(control.facade.WorldFacadeCounselor.getInstance().getPartida())) {
             return;
         }
         gui.services.Toast.dismissCurrent();
@@ -1059,7 +1079,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 diplomacyDialog.dispose();
                 diplomacyDialog = null;
             }
-            setTitle(titleFor(controler.getScenario().getLocal()));
+            setTitle(variant.name() + " - " + local.getCoordenadas());
             setIconImage(scenarioIcon());
             doEdited();
             toFront();
@@ -1070,6 +1090,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     @Override
     public void dispose() {
+        disposed = true;
+        if (comparison != null) comparison.dispose();
+        variant.close();
+        completedSnapshot = null;
+        snapshotResult = null;
         final control.MapaControler map =
                 control.facade.WorldFacadeCounselor.getInstance().getMapaControler();
         if (map != null) {
@@ -1797,7 +1822,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         final business.combat.CombatScenario scenario = controler.getScenario();
         final String hex = scenario == null || scenario.getLocal() == null
                 ? "battle" : scenario.getLocal().getCoordenadas();
-        return "battlesim-" + hex + "-"
+        return variant.name().replaceAll("[^\\p{L}\\p{N}._-]+", "-") + "-" + hex + "-"
                 + java.time.LocalDateTime.now().format(
                         java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
                 + EXTENSION;
@@ -1817,7 +1842,46 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private void doCloneWindow() {
         // No commitSpinners() here: the action dispatcher calls it before reaching any branch, so a
         // second call would find nothing pending and read as a safeguard that is not doing anything.
-        openBeside(this, controler.getScenario().copy());
+        final String name = javax.swing.JOptionPane.showInputDialog(this,
+                labels.getString("BATTLESIM.VARIANT.NAME"), variant.name());
+        if (name == null || name.isBlank()) return;
+        final var fork = variant.fork(name.strip());
+        final BattleSimWindow ret = new BattleSimWindow(new BattleSimControler(fork.scenario()), fork.name(), fork);
+        ret.setSize(getSize());
+        ret.setLocation(getX() + CLONE_OFFSET, getY() + CLONE_OFFSET);
+        ret.setVisible(true);
+    }
+
+    private void doPinRun() {
+        if (completedSnapshot == null || snapshotResult != controler.getLastResult()) return;
+        final var family = variant.family();
+        if (family.pins().stream().anyMatch(pin -> pin.runId().equals(completedSnapshot.runId()))) {
+            showComparison();
+            return;
+        }
+        int replace = -1;
+        if (family.pins().size() == control.services.BattleSimVariants.MAX_PINS) {
+            final String[] choices = new String[family.pins().size()];
+            for (int i = 0; i < choices.length; i++) choices[i] = (i + 1) + ". "
+                    + family.pins().get(i).name() + " - " + family.pins().get(i).time();
+            final Object choice = javax.swing.JOptionPane.showInputDialog(this,
+                    labels.getString("BATTLESIM.VARIANT.REPLACE"), labels.getString("BATTLESIM.VARIANT.PIN"),
+                    javax.swing.JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+            if (choice == null) return;
+            replace = java.util.Arrays.asList(choices).indexOf(choice);
+        }
+        // A second pin of the same run raises comparison rather than duplicating it.
+        if (family.pins().stream().noneMatch(pin -> pin.runId().equals(completedSnapshot.runId()))) {
+            family.pin(completedSnapshot, replace);
+        }
+        showComparison();
+    }
+
+    private void showComparison() {
+        if (comparison == null || !comparison.isDisplayable()) comparison = new BattleSimComparisonDialog(this, variant.family());
+        comparison.refresh();
+        comparison.setVisible(true);
+        comparison.toFront();
     }
 
     /**
@@ -1831,6 +1895,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * using to tell four windows apart would end up the longest thing in the title bar.
      */
     static void openBeside(BattleSimWindow owner, business.combat.CombatScenario scenario) {
+        if (scenario.getPartida() != control.facade.WorldFacadeCounselor.getInstance().getPartida()) {
+            if (owner != null) setLabelWithTooltip(owner.status, labels.getString("BATTLESIM.VARIANT.MISMATCH"));
+            return;
+        }
         final BattleSimWindow ret = new BattleSimWindow(new BattleSimControler(scenario),
                 titleFor(scenario.getLocal()));
         if (owner != null) {
@@ -1972,6 +2040,12 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     /** Update results and readiness without overwriting pending editor text. */
     private void refreshRunControls() {
+        variant.synchronize();
+        if (controler.getLastResult() == null) {
+            snapshotResult = null;
+            completedSnapshot = null;
+        }
+        commands.get("pinRun").setEnabled(completedSnapshot != null && snapshotResult == controler.getLastResult());
         readiness.refresh(controler.getScenario());
         refreshReadinessList();
         final int nacoes = controler.getScenario().getNacoes().size();
@@ -2271,6 +2345,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             restoreCombo(event.getSource());
             return;
         }
+        if (java.util.Set.of("run", "cloneWindow", "pinRun", "whatIf", "tacticGrid", "battlefield").contains(command)
+                && !variant.matches(control.facade.WorldFacadeCounselor.getInstance().getPartida())) {
+            setLabelWithTooltip(status, labels.getString("BATTLESIM.VARIANT.MISMATCH"));
+            return;
+        }
         // Command controls can refresh immediately; combo events must first consume their choice.
         if (edited && !(event.getSource() instanceof JComboBox) && event.getSource() != cityParticipates) {
             doRefresh(false);
@@ -2278,7 +2357,19 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         if ("run".equals(command) && !BattleSimConverter.isRunnable(controler.getScenario())) {
             return;
         }
-        if ("addArmy".equals(command)) {
+        if ("renameVariant".equals(command)) {
+            final String name = javax.swing.JOptionPane.showInputDialog(this,
+                    labels.getString("BATTLESIM.VARIANT.NAME"), variant.name());
+            variant.rename(name);
+            setTitle(variant.name());
+            return;
+        } else if ("pinRun".equals(command)) {
+            doPinRun();
+            return;
+        } else if ("compareRuns".equals(command)) {
+            showComparison();
+            return;
+        } else if ("addArmy".equals(command)) {
             controler.doAddArmy();
         } else if ("cloneArmy".equals(command)) {
             controler.doCloneArmy();
@@ -2357,6 +2448,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             // question the player can ask again after changing a tactic. doRefresh() - NOT
             // doEdited() - because the result must survive the repaint that shows it.
             controler.doRun();
+            snapshotResult = controler.getLastResult();
+            completedSnapshot = control.services.BattleSimRunSnapshot.capture(variant, snapshotResult,
+                    BattleSimResultText.render(controler), labels);
             showResults();
             // doRefresh(false) plus a row update rather than the full refresh: After and Lost are
             // the only cells that changed, and swapping the table's model would clear the row the
