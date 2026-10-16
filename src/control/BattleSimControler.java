@@ -967,6 +967,17 @@ public class BattleSimControler {
         scenario.setTerreno(terreno);
     }
 
+    public boolean chooseBattlefield(Local local) {
+        if (!scenario.chooseBattlefield(local, getUnknownCityOwner())) {
+            return false;
+        }
+        if (!scenario.getArmies().contains(selected)) {
+            selected = scenario.getArmies().isEmpty() ? null : scenario.getArmies().get(0);
+        }
+        clearResult();
+        return true;
+    }
+
     public void setCityParticipates(boolean participates) {
         scenario.setCityParticipates(participates);
     }

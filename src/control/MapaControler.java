@@ -511,6 +511,13 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         this.cityPickCallback = null;
     }
 
+    /** A closing accessory must not cancel a newer picker belonging to another window. */
+    public void cancelCityPick(Consumer<Local> callback) {
+        if (this.cityPickCallback == callback) {
+            this.cityPickCallback = null;
+        }
+    }
+
     /**
      * @return the local
      */

@@ -34,6 +34,7 @@ import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -237,6 +238,10 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private final JCheckBox cityParticipates =
             new JCheckBox(labels.getString("BATTLESIM.CITY.PARTICIPATES"));
     private final JLabel cityText = new JLabel();
+    private final JLabel battlefieldText = new JLabel();
+    private final JToggleButton battlefieldPick =
+            new JToggleButton(gui.services.SvgIcon.themed("map", 16));
+    private final java.util.function.Consumer<Local> battlefieldCallback = this::onBattlefieldPick;
     private final JComboBox<Object> cityOwner = new JComboBox<>();
     /** Loyalty is a percentage and the city model treats it as one. */
     private final JSpinner cityLoyalty = spinner(0, 0, 100, 1);
@@ -757,14 +762,35 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         gbc.insets = new Insets(2, 4, 2, 4);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        final JPanel battlefield = new JPanel(new BorderLayout(4, 0));
+        battlefield.add(battlefieldText, BorderLayout.CENTER);
+        battlefield.add(battlefieldPick, BorderLayout.EAST);
+        battlefieldPick.setToolTipText(labels.getString("COORD.PICK.MAP.TT"));
+        battlefieldPick.addActionListener(e -> {
+            final control.MapaControler map =
+                    control.facade.WorldFacadeCounselor.getInstance().getMapaControler();
+            if (map == null) {
+                battlefieldPick.setSelected(false);
+                return;
+            }
+            if (battlefieldPick.isSelected()) {
+                gui.services.Toast.show(this, labels.getString("COORD.PICK.MAP.HINT"));
+                map.armCityPick(battlefieldCallback);
+            } else {
+                map.cancelCityPick(battlefieldCallback);
+                gui.services.Toast.dismissCurrent();
+            }
+        });
+        addRow(ret, gbc, 0, labels.getString("BATTLESIM.BATTLEFIELD"), battlefield);
+
         terreno.setActionCommand("terreno");
         terreno.addActionListener(this);
-        addRow(ret, gbc, 0, labels.getString("TERRENO"), terreno);
+        addRow(ret, gbc, 1, labels.getString("TERRENO"), terreno);
 
         cityParticipates.setActionCommand("city");
         cityParticipates.addActionListener(this);
         gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.weightx = 1;
         ret.add(cityParticipates, gbc);
 
@@ -777,18 +803,61 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         cityLoyalty.addChangeListener(this);
         cityOwner.setActionCommand("cityOwner");
         cityOwner.addActionListener(this);
-        addRow(ret, gbc, 2, labels.getString("NACAO"), cityOwner);
-        addRow(ret, gbc, 3, labels.getString("TAMANHO"), citySize);
-        addRow(ret, gbc, 4, labels.getString("FORTIFICACOES"), cityFortification);
-        addRow(ret, gbc, 5, labels.getString("LEALDADE"), cityLoyalty);
+        addRow(ret, gbc, 3, labels.getString("NACAO"), cityOwner);
+        addRow(ret, gbc, 4, labels.getString("TAMANHO"), citySize);
+        addRow(ret, gbc, 5, labels.getString("FORTIFICACOES"), cityFortification);
+        addRow(ret, gbc, 6, labels.getString("LEALDADE"), cityLoyalty);
 
         cityText.setFont(cityText.getFont().deriveFont(Font.PLAIN));
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 7;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(6, 4, 2, 4);
         ret.add(cityText, gbc);
         return ret;
+    }
+
+    /** Same one-shot map picker as order coordinates, accepting both land and water. */
+    private void onBattlefieldPick(Local local) {
+        battlefieldPick.setSelected(false);
+        if (!isShowing() || local == null) {
+            return;
+        }
+        gui.services.Toast.dismissCurrent();
+        final boolean edited = commitSpinners();
+        if (platoons.isEditing() && !platoons.getCellEditor().stopCellEditing()) {
+            if (edited) {
+                doRefresh();
+            }
+            return;
+        }
+        try {
+            cityLoyalty.commitEdit();
+        } catch (java.text.ParseException ignored) {
+            // The existing editor refresh restores the last valid value.
+        }
+        if (controler.chooseBattlefield(local)) {
+            if (diplomacyDialog != null) {
+                diplomacyDialog.dispose();
+                diplomacyDialog = null;
+            }
+            setTitle(titleFor(controler.getScenario().getLocal()));
+            setIconImage(scenarioIcon());
+            doEdited();
+            toFront();
+        } else if (edited) {
+            doRefresh();
+        }
+    }
+
+    @Override
+    public void dispose() {
+        final control.MapaControler map =
+                control.facade.WorldFacadeCounselor.getInstance().getMapaControler();
+        if (map != null) {
+            map.cancelCityPick(battlefieldCallback);
+        }
+        super.dispose();
     }
 
     /** One label-and-field row, label right-aligned against the field's left edge. */
@@ -1776,6 +1845,11 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         terreno.setSelectedItem(scenario.getTerreno());
 
         final Cidade city = scenario.getCidade();
+        final String coordinate = scenario.getLocal() == null ? ""
+                : scenario.getLocal().getCoordenadas();
+        battlefieldText.setText((coordinate == null ? "" : coordinate)
+                + (city == null || city.getNome() == null ? "" : " - " + city.getNome()));
+        battlefieldText.setToolTipText(city == null ? null : city.getNome());
         cityParticipates.setEnabled(city != null);
         cityParticipates.setSelected(scenario.isCityParticipates());
         final boolean editable = scenario.getCidadeAtiva() != null;
