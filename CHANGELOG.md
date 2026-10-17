@@ -1,6 +1,6 @@
 # What's New in Counselor
 
-## Unreleased
+## 16-OCT-2026 - v2.1.935
 
 ### A compact battle workspace
 
@@ -33,6 +33,12 @@
 - **Compare different destinations:** choosing another hex replaces its imported defenders while retaining your staged forces and their edits. Terrain and city values remain editable.
 - Saved battles retain the chosen battlefield. New saves use BattleSim format 2; older saves with a battlefield coordinate still open. For older files without one, paste their armies into a battle opened from the map.
 - Fixed army paste and saved-battle loading incorrectly reporting a missing nation when the turn file indexes nations by names or other keys.
+
+### Check for updates when you want
+
+- **Check for updates from About**, without restarting Counselor just to discover a new version. Download it through the same update flow used at startup.
+- Portable JAR and Mac updates still apply on the next launch: checking from About turns two restarts into one. Windows installer and Windows portable users follow the download or installer flow.
+- Repeated update clicks now share one download instead of starting competing copies.
 
 ## 11-OCT-2026 - v2.1.934
 
