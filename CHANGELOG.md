@@ -8,6 +8,7 @@
 - Unknown size bands and quantities remain visible. Nation grouping, hostility details, and selection follow the army when its nation changes.
 - Platoon actions now sit above their table. Ctrl+Enter runs, Ctrl+Shift+D clones a variant, Ctrl+Shift+P pins, and Ctrl+Shift+B compares; these shortcuts leave active text/cell editors and child dialogs alone.
 - Ground scrolls on short screens to keep army selection visible, including 1920x1080 at high display scaling.
+- Fixed a crash when closing BattleSim after opening Diplomacy.
 
 ### Compare named battle variants
 

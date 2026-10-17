@@ -110,4 +110,39 @@ class BattleSimVariantsWindowTest {
             assertTrue(uncaught.isEmpty(), uncaught.toString());
         } finally { Thread.setDefaultUncaughtExceptionHandler(previous); }
     }
+
+    @Test void closingSimWithDiplomacyOpenDoesNotRefreshClosedVariant() throws Exception {
+        checkDiplomacyDisposal(false);
+    }
+
+    @Test void closingSimAfterDiplomacyWasClosedDoesNotRepeatItsRefresh() throws Exception {
+        checkDiplomacyDisposal(true);
+    }
+
+    private static void checkDiplomacyDisposal(boolean closeDialogFirst) throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            BattleSimWindow window = null;
+            try {
+                window = open();
+                ((javax.swing.JButton) field(window, "run")).doClick();
+                command(window, "diplomacy").actionPerformed(new ActionEvent(window, 0, "diplomacy"));
+                final javax.swing.JDialog dialog = (javax.swing.JDialog) field(window, "diplomacyDialog");
+                final BattleSimControler controller = (BattleSimControler) field(window, "controler");
+                assertTrue(dialog.isDisplayable());
+                if (closeDialogFirst) {
+                    dialog.dispose();
+                    assertNull(controller.getLastResult(), "Closing Diplomacy still refreshes a live simulator");
+                    ((javax.swing.JButton) field(window, "run")).doClick();
+                }
+                final var result = controller.getLastResult();
+                assertNotNull(result);
+                window.dispatchEvent(new java.awt.event.WindowEvent(window, java.awt.event.WindowEvent.WINDOW_CLOSING));
+                assertFalse(window.isDisplayable());
+                assertFalse(dialog.isDisplayable());
+                assertSame(result, controller.getLastResult(), "An owned-dialog close cannot edit a disposed simulator");
+                window.dispose();
+            } catch (Exception ex) { throw new RuntimeException(ex); }
+            finally { if (window != null && window.isDisplayable()) window.dispose(); }
+        });
+    }
 }

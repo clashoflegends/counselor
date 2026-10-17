@@ -2076,6 +2076,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     /** @param includePlatoons false when the platoon table is the SOURCE of the edit. */
     private void doEdited(boolean includePlatoons) {
+        if (disposed) return; // Owned dialogs notify during JFrame disposal, after the session closes.
         controler.clearResult();
         doRefresh(includePlatoons);
     }
@@ -2095,6 +2096,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      * editor's "Fights in" line, the city line, the assumption count, Run's reason) still moves.
      */
     private void doRefresh(boolean includePlatoons) {
+        if (disposed) return;
         refreshing = true;
         try {
             roster.refresh();
