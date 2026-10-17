@@ -1,6 +1,6 @@
 # What's New in Counselor
 
-## Unreleased
+## 16-OCT-2026 - v2.1.936
 
 ### Review recruitment before sending orders
 
