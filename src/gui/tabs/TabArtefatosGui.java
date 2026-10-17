@@ -37,6 +37,8 @@ public class TabArtefatosGui extends TabBase implements Serializable {
      */
     public TabArtefatosGui(String titulo, String dica, MapaControler mapaControl) {
         initComponents();
+        // Keep the description read-only while allowing selection and the global Copy menu.
+        listaHistoria.setFocusable(true);
         //Basico
         setIcone("/images/hex_artefato.gif");
         setTitle(titulo);

@@ -1,5 +1,10 @@
 # What's New in Counselor
 
+## Unreleased
+
+- Magic-item descriptions now show numeric power values, including activation percentages, without unresolved placeholders or duplicate chance text.
+- Select and copy descriptions from both the Magic Items tab and a character's magic-item panel.
+
 ## 16-OCT-2026 - v2.1.936
 
 ### Review recruitment before sending orders

@@ -308,7 +308,7 @@ public class ArtefatoConverter implements Serializable {
      */
     private static void doAppendPower(StringBuilder ret, model.Habilidade habilidade, String indent) {
         ret.append('\n').append(indent).append(habilidade.getNome());
-        final String help = getPowerHelp(habilidade.getCodigo());
+        final String help = getPowerHelp(habilidade);
         // Only when it adds something. Most DB.POWER entries for item powers ARE the power's name,
         // and a line repeating the line above it is worse than no line.
         if (help != null && !help.trim().equalsIgnoreCase(String.valueOf(habilidade.getNome()).trim())) {
@@ -373,7 +373,8 @@ public class ArtefatoConverter implements Serializable {
      * the window cannot do without, and wrong for an optional footnote. Codes arrive wrapped as
      * {@code ;IMN;} and the keys are bare.
      */
-    private static String getPowerHelp(String codigo) {
+    private static String getPowerHelp(model.Habilidade habilidade) {
+        final String codigo = habilidade.getCodigo();
         if (codigo == null) {
             return null;
         }
@@ -382,8 +383,12 @@ public class ArtefatoConverter implements Serializable {
             return null;
         }
         try {
-            return java.util.ResourceBundle.getBundle("rulesandhelpothers")
+            final String template = java.util.ResourceBundle.getBundle("rulesandhelpothers")
                     .getString("DB.POWER." + bare);
+            // Power help uses the value carried in the turn file, including nested modifiers.
+            // Replace its string placeholders without interpreting literal percentages in prose.
+            final String value = Integer.toString(habilidade.getValor());
+            return template.replace("%s", value).replace("%S", value).replace("%%", "%");
         } catch (java.util.MissingResourceException ex) {
             return null;
         }

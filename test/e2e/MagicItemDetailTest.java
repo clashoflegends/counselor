@@ -198,6 +198,34 @@ class MagicItemDetailTest {
                 "the modifier belongs under its parent: " + text);
     }
 
+    /** Values come from the model, not the digits in the chance code. */
+    @Test
+    void activationHelpUsesTheStoredValueAndDoesNotRepeatTheName() {
+        for (int chance : new int[]{0, 37, 100}) {
+            final Habilidade healing = power(";HEA;", "Healing Owner");
+            final Habilidade activation = power(";C00;", chance + "% chance to activate");
+            activation.setValor(chance);
+            healing.addHabilidade(activation);
+            final String text = ArtefatoConverter.getDetailText(item("Red Rain", "A sword.", healing));
+
+            assertFalse(text.contains("%s") || text.contains("%%"), text);
+            assertEquals(1, text.split(java.util.regex.Pattern.quote(
+                    chance + "% chance to activate"), -1).length - 1, text);
+        }
+    }
+
+    @Test
+    void numericPowerHelpUsesItsValueBeyondChanceModifiers() {
+        final Habilidade skill = power(";PB40;", "Starting skill");
+        skill.setValor(45);
+        final Habilidade strength = power(";PZWS;", "Ship strength");
+        strength.setValor(80);
+        final String text = ArtefatoConverter.getDetailText(item("Charm", "", skill, strength));
+        assertTrue(text.contains("New characters base skill is 45"), text);
+        assertTrue(text.contains("Warship strength at 80"), text);
+        assertFalse(text.contains("%s") || text.contains("%S"), text);
+    }
+
     /** A rule identical to the power's own name is not printed twice. */
     @Test
     void aRuleThatOnlyRepeatsTheNameIsNotEchoed() {

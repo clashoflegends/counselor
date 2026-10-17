@@ -66,7 +66,7 @@ public class SubTabMagicItems extends TabBase implements Serializable {
         });
 
         detail.setEditable(false);
-        detail.setFocusable(false);
+        detail.setFocusable(true);
         detail.setLineWrap(true);
         detail.setWrapStyleWord(true);
         // The table is themed; a text area left on its own defaults are not, and a white slab under
