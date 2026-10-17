@@ -457,12 +457,6 @@ public final class TurnReviewDialog extends JDialog {
     private String message(Finding f) {
         final Object[] args = f.getArgs();
         switch (f.getKind()) {
-            case RECRUIT_SCOPE:
-                return tx("REVIEW.RECRUIT_SCOPE", "Recruitment demand uses current cities/stocks and SNA effects. Other orders, movement, production and success rolls are not simulated. Gold checks troop purchases only, before action/new-army fees.");
-            case RECRUIT_CONDITIONAL:
-                return tx("REVIEW.RECRUIT_CONDITIONAL", "Muster demand is conditional on success and city eligibility; it competes with ordinary recruitment.");
-            case RECRUIT_INCOMPLETE:
-                return tx("REVIEW.RECRUIT_INCOMPLETE", "Recruitment could not be fully checked for this order/city. Check its inputs and dependencies.");
             case RECRUIT_ELIGIBILITY:
                 return String.format(tx("REVIEW.RECRUIT_ELIGIBILITY", "%s cannot currently recruit %s (race or required facility)."), args);
             case RECRUIT_LIMIT:

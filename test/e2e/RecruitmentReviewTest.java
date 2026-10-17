@@ -31,7 +31,6 @@ class RecruitmentReviewTest {
             race.getTropas().put(troop, 0); game.setCenario(new Cenario());
             game.getCenario().getTipoTropas().put("by name", troop);
             city.setNome("City"); city.setCodigo("city"); city.setNacao(nation); city.setRaca(race); city.setTamanho(3);
-            nation.addCidade(city);
             Local l = new Local(); l.setCodigo("0101"); l.setCidade(city); city.setLocal(l);
             Terreno terrain = new Terreno(); terrain.setCodigo("P"); l.setTerreno(terrain);
             String[] codes = {"CR", "BR", "FE", "AC", "CM", "LE", "MO"};
@@ -59,7 +58,7 @@ class RecruitmentReviewTest {
         assertArrayEquals(new String[]{"City","400","300"},first(rows,Kind.RECRUIT_CAPACITY).getArgs());
         assertSame(actor,first(rows,Kind.RECRUIT_CAPACITY).getActor());
         assertEquals(0,first(rows,Kind.RECRUIT_CAPACITY).getSlot());
-        assertEquals(1,count(rows,Kind.RECRUIT_SCOPE));
+        assertTrue(rows.stream().allMatch(row -> row.getLevel() == control.services.TurnReview.Level.WARN));
     }
 
     @Test void maximumOrdersAreDynamicAndCompeteRatherThanMeaningZero() {
@@ -111,11 +110,12 @@ class RecruitmentReviewTest {
         assertArrayEquals(new String[]{"City","200","100"},first(f.run(),Kind.RECRUIT_PROVISION).getArgs());
     }
 
-    @Test void musterSharesCapacityButIsExplicitlyConditionalAndIncludesFood() {
+    @Test void musterSharesCapacityWithoutRulesOrAutomaticProvisionMessages() {
         Fixture f=new Fixture(); f.city.setTamanho(4); f.city.setEstoque(f.products[4],1000);
         f.order("401","inf"); f.recruit(50,"no","no"); var rows=f.run();
-        assertEquals(1,count(rows,Kind.RECRUIT_CONDITIONAL)); assertEquals(1,count(rows,Kind.RECRUIT_CAPACITY));
-        assertEquals(1,count(rows,Kind.RECRUIT_PROVISION));
+        assertEquals(1,count(rows,Kind.RECRUIT_CAPACITY));
+        assertEquals(0,count(rows,Kind.RECRUIT_PROVISION));
+        assertEquals(1,rows.size());
     }
 
     @Test void goldIncludesDiscountAndCompetingRecruitRequestsAcrossNation() {
@@ -124,27 +124,25 @@ class RecruitmentReviewTest {
         assertArrayEquals(new String[]{"100","99"},first(f.run(),Kind.RECRUIT_GOLD).getArgs());
     }
 
-    @Test void missingStocksAreUnknownRatherThanEmptyAndMalformedOrderDoesNotReserve() {
+    @Test void missingStocksAndUnsupportedOrderDoNotInventFindingsOrReserveMaterials() {
         Fixture f=new Fixture(); ability(f.troop,";TEI10;",10); f.city.getEstoques().remove(f.products[2]);
-        f.recruit(10,"no","no"); assertEquals(1,count(f.run(),Kind.RECRUIT_INCOMPLETE));
-        assertEquals(0,count(f.run(),Kind.RECRUIT_MATERIAL));
-        f.actors.clear(); f.order("411","300","inf","no","no","invalid"); f.recruit(1,"no","no");
-        assertEquals(0,count(f.run(),Kind.RECRUIT_CAPACITY));
-        assertTrue(count(f.run(),Kind.RECRUIT_INCOMPLETE)>0);
+        f.recruit(10,"no","no"); assertTrue(f.run().isEmpty());
+        f.actors.clear(); f.order("411","300","missing","no","no","0"); f.recruit(1,"no","no");
+        assertTrue(f.run().isEmpty());
     }
 
     @Test void noResourceRecruitDoesNotInterpretAllyTargetAsWeaponOrRequireFood() {
         Fixture f=new Fixture(); ability(f.game.getCenario(),";SNR;",1); ability(f.troop,";TTW;",100);
         f.order("411","10","inf","ally-ident");
-        assertEquals(0,count(f.run(),Kind.RECRUIT_MATERIAL)); assertEquals(0,count(f.run(),Kind.RECRUIT_INCOMPLETE));
+        assertTrue(f.run().isEmpty());
         f.order("413","10","inf","no","no","0");
-        assertEquals(1,count(f.run(),Kind.RECRUIT_INCOMPLETE));
+        assertTrue(f.run().isEmpty());
     }
 
     @Test void unavailableTroopsFlagEligibilityAndUnknownTypeIsNotSilentlySubstituted() {
         Fixture f=new Fixture(); ability(f.troop,";TTRP;",1); f.recruit(1,"no","no");
         assertEquals(1,count(f.run(),Kind.RECRUIT_ELIGIBILITY));
-        f.order("411","10","missing","no","no","0"); assertEquals(1,count(f.run(),Kind.RECRUIT_INCOMPLETE));
+        f.order("411","10","missing","no","no","0"); assertEquals(1,f.run().size());
     }
 
     @Test void failedRecruitEligibilityStillCompetesForFoodProvision() {
@@ -166,7 +164,49 @@ class RecruitmentReviewTest {
     }
     @Test void malformedActorDoesNotHideValidCityShortage() {
         Fixture f=new Fixture(); f.actors.add(null); f.recruit(200,"no","no"); f.recruit(200,"no","no");
-        var rows=f.run(); assertEquals(1,count(rows,Kind.RECRUIT_INCOMPLETE));
+        var rows=f.run(); assertEquals(1,rows.size());
         assertEquals(1,count(rows,Kind.RECRUIT_CAPACITY));
+    }
+
+    @Test void blankQuantityAndFoodAreValidAndStillParticipateInCapacityChecks() {
+        Fixture f=new Fixture();
+        f.order("411","","inf","no","no","");
+        assertTrue(f.run().isEmpty(),"a valid basic recruit with no concrete issue needs no message");
+        f.order("411"," ","inf","no","no"," ");
+        var rows=f.run(); assertEquals(1,rows.size());
+        assertArrayEquals(new String[]{"City","600","300"},first(rows,Kind.RECRUIT_CAPACITY).getArgs());
+    }
+
+    @Test void omittedOrNullOptionalFoodDefaultsToNone() {
+        Fixture f=new Fixture();
+        var actor=f.order("411","1","inf","no","no");
+        assertTrue(f.run().isEmpty());
+        actor.getAcoes().get(0).getParametrosId().add(null);
+        assertTrue(f.run().isEmpty());
+    }
+
+    @Test void musterDoesNotInventFoodDemandForAnEarlierBlankRecruitOrder() {
+        Fixture f=new Fixture(); f.city.setTamanho(4); f.city.setEstoque(f.products[4],0);
+        f.order("411","","inf","no","no",""); f.order("401","inf");
+        var rows=f.run(); assertEquals(0,count(rows,Kind.RECRUIT_PROVISION));
+        assertEquals(1,rows.size()); assertEquals(1,count(rows,Kind.RECRUIT_CAPACITY));
+    }
+
+    @Test void foodWarningBelongsToAnActorWhoActuallyRequestedFood() {
+        Fixture f=new Fixture(); f.city.setEstoque(f.products[4],0);
+        var noFood=f.order("411","10","inf","no","no","");
+        var withFood=f.order("411","10","inf","no","no","100");
+        var row=first(f.run(),Kind.RECRUIT_PROVISION);
+        assertSame(withFood,row.getActor()); assertNotSame(noFood,row.getActor());
+        assertEquals(0,row.getSlot()); assertEquals(1,f.run().size());
+    }
+
+    @Test void aMusterWithNoConcreteProblemProducesNoFinding() {
+        Fixture f=new Fixture(); f.city.setTamanho(4); f.city.setEstoque(f.products[4],0);
+        f.order("401","inf"); assertTrue(f.run().isEmpty());
+    }
+    @Test void duplicateCityReferencesDoNotMultiplyMusterDemand() {
+        Fixture f=new Fixture(); f.city.setTamanho(4); f.nation.addCidade(f.city);
+        f.order("401","inf"); assertTrue(f.run().isEmpty());
     }
 }

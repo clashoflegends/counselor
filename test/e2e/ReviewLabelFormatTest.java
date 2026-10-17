@@ -86,10 +86,6 @@ class ReviewLabelFormatTest {
      */
     private static int argsFor(Kind kind) {
         switch (kind) {
-            case RECRUIT_SCOPE:
-            case RECRUIT_CONDITIONAL:
-            case RECRUIT_INCOMPLETE:
-                return 0;
             case RECRUIT_ELIGIBILITY:
             case RECRUIT_GOLD:
                 return 2;

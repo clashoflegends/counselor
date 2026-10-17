@@ -10,10 +10,12 @@ import control.services.TurnReview.Kind;
 import control.services.TurnReview.Level;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import model.Cidade;
 import model.Jogador;
 import model.Local;
@@ -23,12 +25,16 @@ import model.Personagem;
 import model.PersonagemOrdem;
 import model.Produto;
 import model.TipoTropa;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import persistenceCommons.SysApoio;
 
 /** A demand audit against visible stocks, never a simulation of turn execution. */
 public final class RecruitmentReview {
     private RecruitmentReview() { }
     private static final CenarioFacade SCENARIO = new CenarioFacade();
     private static final OrdemFacade ORDERS = new OrdemFacade();
+    private static final Log log = LogFactory.getLog(RecruitmentReview.class);
 
     private static final class Budget {
         final Cidade city;
@@ -37,6 +43,8 @@ public final class RecruitmentReview {
         final int capacity;
         long slots;
         long provision;
+        BaseModel provisionActor;
+        int provisionSlot;
         final long[] recruit = new long[7];
         final long[] weapons = new long[7];
         final long[] armour = new long[7];
@@ -55,7 +63,6 @@ public final class RecruitmentReview {
         Map<Cidade, Budget> cities = new LinkedHashMap<>();
         Map<Nacao, Long> gold = new IdentityHashMap<>();
         Map<Nacao, BaseModel> representatives = new IdentityHashMap<>();
-        BaseModel first = null;
         if (actors == null) return out;
         for (BaseModel actor : actors) {
             try {
@@ -66,7 +73,6 @@ public final class RecruitmentReview {
                     if (order == null || order.getOrdem() == null) continue;
                     String code = order.getOrdem().getCodigo();
                     if (!"411".equals(code) && !"413".equals(code) && !"401".equals(code)) continue;
-                    if (first == null) first = actor;
                     try {
                         if (game == null || game.getCenario() == null) throw new IllegalArgumentException();
                         Nacao nation = actor.getNacao();
@@ -75,10 +81,11 @@ public final class RecruitmentReview {
                         TipoTropa troop = troop(game, parameter(order, muster ? 0 : 1));
                         if (troop == null) throw new IllegalArgumentException();
                         if (muster) {
-                            add(out, Level.INFO, Kind.RECRUIT_CONDITIONAL, actor, entry.getKey());
                             int minimum = nation.hasHabilidade(";PMT;") ? Math.min(4, nation.getHabilidadeValor(";PMT;"))
                                     : nation.hasHabilidadeNacao("0048") ? Math.min(4, nation.getHabilidadeNacaoValor("0048")) : 4;
+                            Set<Cidade> visited = Collections.newSetFromMap(new IdentityHashMap<>());
                             for (Cidade city : nation.getCidades()) {
+                                if (!visited.add(city)) continue;
                                 if (city.getTamanho() >= minimum && !city.isSitiado()) {
                                     audit(out, cities, gold, representatives, actor, entry.getKey(), order,
                                             city, nation, troop, game, true);
@@ -92,20 +99,18 @@ public final class RecruitmentReview {
                                     local.getCidade(), nation, troop, game, false);
                         }
                     } catch (RuntimeException ex) {
-                        // Do not expose raw input/exception text, or turn a partial pass into an all-clear.
-                        add(out, Level.WARN, Kind.RECRUIT_INCOMPLETE, actor, entry.getKey());
+                        skippedInput();
                     }
                 }
             } catch (RuntimeException ex) {
-                add(out, Level.WARN, Kind.RECRUIT_INCOMPLETE, actor, -1);
+                skippedInput();
             }
         }
-        if (first != null) add(out, Level.INFO, Kind.RECRUIT_SCOPE, first, -1);
         for (Budget b : cities.values()) {
             try {
                 finish(out, b, game);
             } catch (RuntimeException ex) {
-                add(out, Level.WARN, Kind.RECRUIT_INCOMPLETE, b.actor, b.slot);
+                skippedInput();
             }
         }
         for (Map.Entry<Nacao, Long> e : gold.entrySet()) {
@@ -129,7 +134,7 @@ public final class RecruitmentReview {
             // Food may still be transferred to an existing army after recruitment fails.
             if (!muster && SCENARIO.hasResourceManagement(game.getCenario())) {
                 Budget b = cities.computeIfAbsent(city, c -> new Budget(c, actor, slot));
-                b.provision += Math.max(0, Integer.parseInt(parameter(order, 4).trim()));
+                provision(b, actor, slot, number(order, 4));
             }
             return;
         }
@@ -138,7 +143,7 @@ public final class RecruitmentReview {
         if (!(factor > 0) || b.capacity < 0) throw new IllegalArgumentException();
         int limit = muster ? b.capacity : Math.min(b.capacity, RecruitmentRules.orderSlots(b.capacity, game, nation));
         int maximum = Math.max(0, (int) (limit / factor));
-        int requested = muster ? 0 : Integer.parseInt(parameter(order, 0).trim());
+        int requested = muster ? 0 : number(order, 0);
         int quantity = requested <= 0 ? maximum : Math.min(requested, maximum);
         if (requested > maximum) {
             add(out, Level.WARN, Kind.RECRUIT_LIMIT, actor, slot, Integer.toString(requested),
@@ -161,12 +166,11 @@ public final class RecruitmentReview {
                     city.getTamanho() >= 4, city.getLocal().getTerreno().isDeserto(),
                     nation.hasHabilidadeNacao("0017"), nation.hasHabilidadeNacao("0018"));
             bill = materials.demand(quantity);
-            if (muster) {
-                provision = Math.multiplyExact(quantity, 4);
-            } else {
+            // Muster automatically takes up to the available food. It is not a player food request.
+            if (!muster) {
                 weapon = ConverterFactory.produtoToInt(parameter(order, 2));
                 armour = ConverterFactory.produtoToInt(parameter(order, 3));
-                provision = Math.max(0, Integer.parseInt(parameter(order, 4).trim()));
+                provision = Math.max(0, number(order, 4));
             }
             if (troop.getFactorWeapon(game.isNewRules()) < 0 || troop.getFactorArmor(game.isNewRules()) < 0)
                 throw new IllegalArgumentException();
@@ -177,7 +181,7 @@ public final class RecruitmentReview {
         if (cost < 0) throw new IllegalArgumentException();
         // Commit a complete quote atomically, so malformed input cannot leave a half-reserved order.
         b.slots += slots;
-        b.provision += provision;
+        provision(b, actor, slot, provision);
         for (int i = 0; i < 7; i++) b.recruit[i] += bill[i];
         if (weapon > 0) b.weapons[weapon - 1] += (long) quantity * troop.getFactorWeapon(game.isNewRules());
         if (armour > 0) b.armour[armour - 1] += (long) quantity * troop.getFactorArmor(game.isNewRules());
@@ -197,7 +201,6 @@ public final class RecruitmentReview {
             if (need == 0) continue;
             if (product == null || !b.city.getEstoques().containsKey(product)
                     || b.city.getEstoques().get(product) == null) {
-                add(out, Level.WARN, Kind.RECRUIT_INCOMPLETE, b.actor, b.slot);
                 continue;
             }
             int stock = b.city.getEstoque(product);
@@ -210,7 +213,8 @@ public final class RecruitmentReview {
                         Long.toString(b.armour[i]), Long.toString(afterRecruit));
             }
             if (i == 4 && b.provision > afterRecruit) add(out, Level.WARN, Kind.RECRUIT_PROVISION,
-                    b.actor, b.slot, b.city.getNome(), Long.toString(b.provision), Long.toString(afterRecruit));
+                    b.provisionActor, b.provisionSlot, b.city.getNome(),
+                    Long.toString(b.provision), Long.toString(afterRecruit));
         }
     }
 
@@ -233,6 +237,28 @@ public final class RecruitmentReview {
         String value = order.getParametrosId().get(index);
         if (value == null) throw new IllegalArgumentException();
         return value;
+    }
+
+    private static int number(PersonagemOrdem order, int index) {
+        // Same valid defaults and numeric normalization as execution: blank quantity = maximum,
+        // blank food = none. Do not reinterpret a valid saved blank as an invalid order.
+        List<String> values = order.getParametrosId();
+        return SysApoio.parseInt(index < values.size() ? values.get(index) : "");
+    }
+
+    private static void provision(Budget budget, BaseModel actor, int slot, int requested) {
+        if (requested <= 0) return;
+        if (budget.provisionActor == null) {
+            budget.provisionActor = actor;
+            budget.provisionSlot = slot;
+        }
+        budget.provision += requested;
+    }
+
+    private static void skippedInput() {
+        // Review reports concrete findings only. Unsupported data is diagnostic, not player homework.
+        // Omit actor names, parameter values and exception text from diagnostics.
+        log.debug("Recruitment review skipped unsupported input");
     }
 
     private static void add(List<Finding> out, Level level, Kind kind, BaseModel actor, int slot, String... args) {
