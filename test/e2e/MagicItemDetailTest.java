@@ -198,6 +198,62 @@ class MagicItemDetailTest {
                 "the modifier belongs under its parent: " + text);
     }
 
+    /** Empty markers add no information beneath a real power and its activation chance. */
+    @Test
+    void anEmptyModifierIsOmittedFromARealPowerChain() {
+        final Habilidade omen = power(";ZZZZ;", "Bad Omen");
+        final Habilidade chance = power(";C00;", "50% chance to activate");
+        chance.setValor(50);
+        chance.addHabilidade(power(";-;", "None"));
+        omen.addHabilidade(chance);
+        final String text = ArtefatoConverter.getDetailText(item("Cloak", "A grey cloak.", omen));
+        assertTrue(text.contains("Bad Omen\n    50% chance to activate"), text);
+        assertFalse(text.contains("None"), text);
+    }
+
+    @Test
+    void anEmptySiblingIsOmittedRegardlessOfItsTranslatedName() {
+        final String text = ArtefatoConverter.getDetailText(item("Cloak", "",
+                power(";-;", "Nenhum"), power(";ZZZZ;", "Bad Omen")));
+        assertTrue(text.contains("Bad Omen"), text);
+        assertFalse(text.contains("Nenhum") || text.contains("None"), text);
+    }
+
+    @Test
+    void explicitNoPowersStillSaysNoneOnce() {
+        final Habilidade none = power(";-;", "None");
+        none.addHabilidade(power(";-;", "None"));
+        final String text = ArtefatoConverter.getDetailText(item("Cloak", "", none));
+        assertTrue(text.contains(labels.getString("ITEM.SECONDARY")), text);
+        assertEquals(1, text.split(java.util.regex.Pattern.quote(
+                labels.getString("DB.POWER.-")), -1).length - 1, text);
+    }
+
+    @Test
+    void meaningfulSecondaryTextTakesPrecedenceOverAnEmptyPower() {
+        final Artefato cloak = item("Cloak", "", power(";-;", "None"));
+        cloak.setSecundario("Hides its wearer.");
+        final String text = ArtefatoConverter.getDetailText(cloak);
+        assertTrue(text.contains("Hides its wearer."), text);
+        assertFalse(text.contains("None"), text);
+    }
+
+    @Test
+    void anEmptyParentDoesNotHideARealDescendant() {
+        final Habilidade none = power(";-;", "None");
+        none.addHabilidade(power(";ZZZZ;", "Bad Omen"));
+        final String text = ArtefatoConverter.getDetailText(item("Cloak", "", none));
+        assertTrue(text.contains("\nBad Omen"), text);
+        assertFalse(text.contains("None"), text);
+    }
+
+    @Test
+    void aRealPowerIsNotHiddenBecauseOfItsDisplayName() {
+        final String text = ArtefatoConverter.getDetailText(item("Cloak", "",
+                power(";ZZZZ;", "None")));
+        assertTrue(text.contains("\nNone"), text);
+    }
+
     /** Values come from the model, not the digits in the chance code. */
     @Test
     void activationHelpUsesTheStoredValueAndDoesNotRepeatTheName() {

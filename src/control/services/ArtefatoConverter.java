@@ -285,14 +285,18 @@ public class ArtefatoConverter implements Serializable {
             return ret.toString();
         }
         ret.append('\n').append("- ").append(labels.getString("ITEM.SECONDARY")).append(":\n");
-        if (secundario != null && artefato.getHabilidades().isEmpty()) {
-            // Only when there are no powers to list. On live data secundario is a SHORT restatement
-            // of the first one - game 906 carries "Bestow Good" beside the power "Bestow Good Luck" -
-            // so printing both reads as a truncation bug rather than as two facts.
-            ret.append('\n').append(secundario);
-        }
+        final StringBuilder powers = new StringBuilder();
         for (model.Habilidade habilidade : artefato.getHabilidades().values()) {
-            doAppendPower(ret, habilidade, "");
+            doAppendPower(powers, habilidade, "");
+        }
+        if (powers.length() > 0) {
+            ret.append(powers);
+        } else if (secundario != null) {
+            // The short secondary text is useful only when there are no real powers to list.
+            ret.append('\n').append(secundario);
+        } else {
+            // An explicit empty-power entry is different from powers absent from the turn file.
+            ret.append('\n').append(labels.getString("DB.POWER.-"));
         }
         return ret.toString();
     }
@@ -307,6 +311,13 @@ public class ArtefatoConverter implements Serializable {
      * once in its parent's map.
      */
     private static void doAppendPower(StringBuilder ret, model.Habilidade habilidade, String indent) {
+        if (";-;".equals(habilidade.getCodigo())) {
+            // Omit empty markers, but preserve any real powers nested beneath one.
+            for (model.Habilidade nested : habilidade.getHabilidades().values()) {
+                doAppendPower(ret, nested, indent);
+            }
+            return;
+        }
         ret.append('\n').append(indent).append(habilidade.getNome());
         final String help = getPowerHelp(habilidade);
         // Only when it adds something. Most DB.POWER entries for item powers ARE the power's name,
