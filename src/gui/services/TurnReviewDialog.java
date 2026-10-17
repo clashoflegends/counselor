@@ -83,6 +83,7 @@ public final class TurnReviewDialog extends JDialog {
     private final transient List<Finding> visible = new ArrayList<>();
     private transient JLabel summary;
     private transient JTable table;
+    private transient javax.swing.JTextArea detail;
     private final transient int orderCount;
     private final transient int actorCount;
     private final transient boolean failed;
@@ -124,6 +125,7 @@ public final class TurnReviewDialog extends JDialog {
             SettingsManager.getInstance().doConfigSave(SHOW_OPEN_SLOTS);
             applyFilter(showSlots.isSelected());
             ((AbstractTableModel) table.getModel()).fireTableDataChanged();
+            updateDetail();
             summary.setText(summaryText());
         });
 
@@ -138,11 +140,22 @@ public final class TurnReviewDialog extends JDialog {
         close.addActionListener(e -> dispose());
         final JPanel buttons = new JPanel();
         buttons.add(close);
+        detail = new javax.swing.JTextArea(4, 60);
+        detail.setEditable(false);
+        detail.setLineWrap(true);
+        detail.setWrapStyleWord(true);
+        detail.setFont(table.getFont());
+        detail.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
+        detail.getAccessibleContext().setAccessibleName(tx("REVIEW.COL.MESSAGE", "What to look at"));
+        table.getSelectionModel().addListSelectionListener(e -> updateDetail());
+        final JPanel south = new JPanel(new BorderLayout());
+        south.add(new JScrollPane(detail), BorderLayout.CENTER);
+        south.add(buttons, BorderLayout.SOUTH);
 
         setLayout(new BorderLayout());
         add(north, BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
-        add(buttons, BorderLayout.SOUTH);
+        add(south, BorderLayout.SOUTH);
         getRootPane().setDefaultButton(close);
         //DISPOSE, not the JDialog default of HIDE: closing with the window X would otherwise leave a
         //hidden dialog holding every actor of this turn, and one per Review the player opened.
@@ -192,6 +205,8 @@ public final class TurnReviewDialog extends JDialog {
                     wfc.listPersonagens().values(), convergingNames(),
                     actor -> cenarioFacade.hasOrdens(wfc.getPartida(), actor),
                     wfc.getNationPackagesLimit(), wfc.hasCitySizeCap(), skipped);
+            found.addAll(control.services.RecruitmentReview.compute(actorList,
+                    wfc.getJogadorAtivo(), wfc.getPartida()));
             //A partial review is not a clean one. compute() guards each actor so one bad one cannot
             //take the list down, and without this that guard let twenty actors with one unreadable
             //among them render as "Nothing to flag".
@@ -306,6 +321,13 @@ public final class TurnReviewDialog extends JDialog {
 
     // ---- table ----------------------------------------------------------------------------------
 
+    private void updateDetail() {
+        int row = table.getSelectedRow();
+        int model = row < 0 || row >= table.getRowCount() ? -1 : table.convertRowIndexToModel(row);
+        detail.setText(model < 0 || model >= visible.size() ? "" : message(visible.get(model)));
+        detail.setCaretPosition(0);
+    }
+
     private JTable buildTable() {
         final JTable ret = new JTable(new Model());
         ret.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -323,6 +345,10 @@ public final class TurnReviewDialog extends JDialog {
                     jumpToSelected(ret);
                 }
             }
+        });
+        ret.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "review-jump");
+        ret.getActionMap().put("review-jump", new AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent event) { jumpToSelected(ret); }
         });
         return ret;
     }
@@ -431,6 +457,26 @@ public final class TurnReviewDialog extends JDialog {
     private String message(Finding f) {
         final Object[] args = f.getArgs();
         switch (f.getKind()) {
+            case RECRUIT_SCOPE:
+                return tx("REVIEW.RECRUIT_SCOPE", "Recruitment demand uses current cities/stocks and SNA effects. Other orders, movement, production and success rolls are not simulated. Gold checks troop purchases only, before action/new-army fees.");
+            case RECRUIT_CONDITIONAL:
+                return tx("REVIEW.RECRUIT_CONDITIONAL", "Muster demand is conditional on success and city eligibility; it competes with ordinary recruitment.");
+            case RECRUIT_INCOMPLETE:
+                return tx("REVIEW.RECRUIT_INCOMPLETE", "Recruitment could not be fully checked for this order/city. Check its inputs and dependencies.");
+            case RECRUIT_ELIGIBILITY:
+                return String.format(tx("REVIEW.RECRUIT_ELIGIBILITY", "%s cannot currently recruit %s (race or required facility)."), args);
+            case RECRUIT_LIMIT:
+                return String.format(tx("REVIEW.RECRUIT_LIMIT", "Requested %s troops; current capacity/per-order limit allows at most %s in %s, before materials/gold."), args);
+            case RECRUIT_CAPACITY:
+                return String.format(tx("REVIEW.RECRUIT_CAPACITY", "%s: combined recruitment demand is %s slots; current capacity is %s (including conditional orders)."), args);
+            case RECRUIT_MATERIAL:
+                return String.format(tx("REVIEW.RECRUIT_MATERIAL", "%s: recruitment requests need %s: %s; current stock %s (including conditional orders)."), args);
+            case RECRUIT_EQUIPMENT:
+                return String.format(tx("REVIEW.RECRUIT_EQUIPMENT", "%s: %s demand for weapons %s, armour %s; %s left after recruitment requests. Equipment may be reduced; troop counts may still fit."), args);
+            case RECRUIT_PROVISION:
+                return String.format(tx("REVIEW.RECRUIT_PROVISION", "%s: requested army food %s; %s left after recruitment requests. Provisioning may be reduced."), args);
+            case RECRUIT_GOLD:
+                return String.format(tx("REVIEW.RECRUIT_GOLD", "Troop purchase requests alone need %s gold; current treasury %s. Action/new-army fees and other income/spending are not included."), args);
             case OPEN_SLOT:
                 return String.format(tx("REVIEW.OPEN_SLOT",
                         "%s has at least one open action slot."), args);

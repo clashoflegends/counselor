@@ -77,7 +77,10 @@ public final class TurnReview implements Serializable {
         /** A MovUnir whose destination is not where the target will end the turn. */
         RENDEZVOUS,
         /** Two players walking into the same empty hex. */
-        CONVERGE
+        CONVERGE,
+        RECRUIT_SCOPE, RECRUIT_CONDITIONAL, RECRUIT_INCOMPLETE, RECRUIT_ELIGIBILITY,
+        RECRUIT_LIMIT, RECRUIT_CAPACITY, RECRUIT_MATERIAL, RECRUIT_EQUIPMENT,
+        RECRUIT_PROVISION, RECRUIT_GOLD
     }
 
     public static final class Finding implements Serializable {

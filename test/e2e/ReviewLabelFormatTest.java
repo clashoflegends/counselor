@@ -86,6 +86,21 @@ class ReviewLabelFormatTest {
      */
     private static int argsFor(Kind kind) {
         switch (kind) {
+            case RECRUIT_SCOPE:
+            case RECRUIT_CONDITIONAL:
+            case RECRUIT_INCOMPLETE:
+                return 0;
+            case RECRUIT_ELIGIBILITY:
+            case RECRUIT_GOLD:
+                return 2;
+            case RECRUIT_LIMIT:
+            case RECRUIT_CAPACITY:
+            case RECRUIT_PROVISION:
+                return 3;
+            case RECRUIT_MATERIAL:
+                return 4;
+            case RECRUIT_EQUIPMENT:
+                return 5;
             case OPEN_SLOT:
             case OPEN_PACKAGE:
                 return 1;                   // the actor's name

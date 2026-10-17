@@ -1,5 +1,14 @@
 # What's New in Counselor
 
+## Unreleased
+
+### Review recruitment before sending orders
+
+- Review now checks recruitment requests against each city's current capacity and stores, including competing commanders, troop multipliers and recruitment-related nation powers.
+- Separate warnings cover materials needed to raise troops, weapons and armour, and food requested for armies. Muster demand is shown as conditional; recruitment can still transfer food after an eligibility failure.
+- Gold warnings compare troop purchases with the current treasury. Action/new-army fees, other orders, movement, production and success rolls are not simulated; incomplete checks are shown explicitly.
+- Select a Review row to read its full explanation below the list. Enter or double-click goes to its actor; the Slot column identifies the order.
+
 ## 16-OCT-2026 - v2.1.935
 
 ### A compact battle workspace
