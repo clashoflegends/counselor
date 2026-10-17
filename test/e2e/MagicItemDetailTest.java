@@ -207,7 +207,7 @@ class MagicItemDetailTest {
         chance.addHabilidade(power(";-;", "None"));
         omen.addHabilidade(chance);
         final String text = ArtefatoConverter.getDetailText(item("Cloak", "A grey cloak.", omen));
-        assertTrue(text.contains("Bad Omen\n    50% chance to activate"), text);
+        assertTrue(text.contains("\n    Bad Omen\n        50% chance to activate"), text);
         assertFalse(text.contains("None"), text);
     }
 
@@ -243,7 +243,7 @@ class MagicItemDetailTest {
         final Habilidade none = power(";-;", "None");
         none.addHabilidade(power(";ZZZZ;", "Bad Omen"));
         final String text = ArtefatoConverter.getDetailText(item("Cloak", "", none));
-        assertTrue(text.contains("\nBad Omen"), text);
+        assertTrue(text.contains("\n    Bad Omen"), text);
         assertFalse(text.contains("None"), text);
     }
 
@@ -251,7 +251,7 @@ class MagicItemDetailTest {
     void aRealPowerIsNotHiddenBecauseOfItsDisplayName() {
         final String text = ArtefatoConverter.getDetailText(item("Cloak", "",
                 power(";ZZZZ;", "None")));
-        assertTrue(text.contains("\nNone"), text);
+        assertTrue(text.contains("\n    None"), text);
     }
 
     /** Values come from the model, not the digits in the chance code. */

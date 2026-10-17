@@ -287,16 +287,16 @@ public class ArtefatoConverter implements Serializable {
         ret.append('\n').append("- ").append(labels.getString("ITEM.SECONDARY")).append(":\n");
         final StringBuilder powers = new StringBuilder();
         for (model.Habilidade habilidade : artefato.getHabilidades().values()) {
-            doAppendPower(powers, habilidade, "");
+            doAppendPower(powers, habilidade, "    ");
         }
         if (powers.length() > 0) {
             ret.append(powers);
         } else if (secundario != null) {
             // The short secondary text is useful only when there are no real powers to list.
-            ret.append('\n').append(secundario);
+            ret.append("\n    ").append(secundario.replace("\n", "\n    "));
         } else {
             // An explicit empty-power entry is different from powers absent from the turn file.
-            ret.append('\n').append(labels.getString("DB.POWER.-"));
+            ret.append("\n    ").append(labels.getString("DB.POWER.-"));
         }
         return ret.toString();
     }

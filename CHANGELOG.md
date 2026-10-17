@@ -5,6 +5,7 @@
 - Magic-item descriptions now show numeric power values, including activation percentages, without unresolved placeholders or duplicate chance text.
 - Select and copy descriptions from both the Magic Items tab and a character's magic-item panel.
 - Hide redundant "None" entries within dormant powers; show "None" once when the item explicitly has no powers or other secondary description.
+- Indent dormant powers beneath their heading, with activation chances and other modifiers one level deeper.
 
 ## 16-OCT-2026 - v2.1.936
 
