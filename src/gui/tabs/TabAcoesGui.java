@@ -34,7 +34,7 @@ public final class TabAcoesGui extends TabBase {
     public TabAcoesGui(String titulo, String dica) {
         initComponents();
         //Basico
-        setIcone("/images/help_icon.gif");
+        setIcone("/images/book.gif");
         setTitle(titulo);
         setDica(dica);
         initConfig();
