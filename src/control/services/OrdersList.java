@@ -28,6 +28,12 @@ public final class OrdersList {
                 && nation.getOwner().getId() == player.getId();
     }
 
+    /** Derived from all loaded PC orders, independent of the browser's current filters. */
+    public static Instant latestOwnCharacterTime(List<Row> rows, model.Jogador player) {
+        return rows.stream().filter(row -> row.actor() instanceof Personagem && ownedBy(row.nation(), player))
+                .map(Row::time).filter(java.util.Objects::nonNull).max(Instant::compareTo).orElse(null);
+    }
+
     public record Row(BaseModel actor, int slot, PersonagemOrdem order, Local location,
                       String coordinates, String searchText) {
         public Instant time() { return order.getRecordedUpdateTime(); }
