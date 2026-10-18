@@ -245,6 +245,16 @@ public class TabNacoesGui extends TabBase implements Serializable, IAcaoGui {
         return jtMainLista;
     }
 
+    @Override public boolean openOrder(baseLib.BaseModel actor, int slot) {
+        if (!(actor instanceof model.Nacao)) return false;
+        clearSearchFilter();
+        comboFiltro.setSelectedIndex(0);
+        boolean found = gui.services.OrderNavigation.select(jtMainLista,
+                nacaoControl.getListaExibida(), actor, slot, stOrdens);
+        if (found && detalhesNacao.indexOfComponent(stOrdens) >= 0) detalhesNacao.setSelectedComponent(stOrdens);
+        return found;
+    }
+
     public final void setMainModel(TableModel model) {
         //clear stuff
         stResults.setText("");

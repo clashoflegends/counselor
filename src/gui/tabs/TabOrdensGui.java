@@ -27,6 +27,7 @@ public class TabOrdensGui extends TabBase implements Serializable {
     private static final Log log = LogFactory.getLog(TabOrdensGui.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
     private OrdemJogadorControler orderSavedControl;
+    private gui.services.OrdersPanel orders;
 
     /**
      * Creates new form TabAcoesGui
@@ -37,7 +38,11 @@ public class TabOrdensGui extends TabBase implements Serializable {
         setIcone("/images/right.gif");
         setTitle(titulo);
         setDica(dica);
-        initConfig();
+        orders = new gui.services.OrdersPanel();
+        removeAll();
+        setLayout(new java.awt.BorderLayout());
+        add(orders, java.awt.BorderLayout.CENTER);
+        orderSavedControl = new OrdemJogadorControler(orders);
     }
 
     /**
@@ -177,8 +182,11 @@ public class TabOrdensGui extends TabBase implements Serializable {
 
     @Override
     public JTable getMainLista() {
-        return jtMainLista;
+        return orders == null ? jtMainLista : orders.table();
     }
+
+    @Override public String getIndexableText(int row) { return orders.searchText(row); }
+    @Override public void clearSearchFilter() { orders.clearFilters(); }
 
     public void setMainModel(TableModel model) {
         this.setHelp("");
@@ -211,16 +219,7 @@ public class TabOrdensGui extends TabBase implements Serializable {
         jtMainLista.setAutoCreateRowSorter(true);
         comboFiltro.setActionCommand("comboFiltro");
         //Cria o Controle da lista de acoes
-        orderSavedControl = new OrdemJogadorControler(this);
-        TableModel model = orderSavedControl.getMainTableModel((String) comboFiltro.getSelectedItem());
-        this.setMainModel(model);
-
-        //adiciona listeners
-        //addDocumentListener(searchField);
-        comboFiltro.setModel(orderSavedControl.getFiltroComboModel());
-        comboFiltro.addActionListener(orderSavedControl);
-        jtMainLista.getSelectionModel().addListSelectionListener(orderSavedControl);
-        jtMainLista.getSelectionModel().addListSelectionListener(orderSavedControl);
+        // Legacy form retained for NetBeans; the experimental panel is built outside generated code.
 
     }
 }

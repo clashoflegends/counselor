@@ -166,6 +166,8 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             // is a WARNING, not a refusal - see confirmSizeCapOverride for why the player keeps the choice.
             return false;
         }
+        control.services.OrderEditTime.stamp(getTabGui().getActor().getPersonagemOrdem(index), po,
+                java.time.Instant.now());
         getTabGui().getActor().doOrderSave(index, po);
         if (SettingsManager.getInstance().isAutoSaveActions()) {
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_AUTOSAVE, this.getTabGui());

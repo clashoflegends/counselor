@@ -898,6 +898,12 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         return jtListaOrdens;
     }
 
+    /** The shared-orders browser must not grant editing through merged nation membership. */
+    public void requireReadOnly() {
+        readOnly = true;
+        doEnableFields();
+    }
+
     private void doDisableFields() {
         //se der erro, coloca um dummy.
         this.cbOrdem.setModel(new javax.swing.DefaultComboBoxModel(new String[]{"                                                "}));

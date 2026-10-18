@@ -152,6 +152,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         registerDispatchManagerForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
         registerDispatchManagerForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL);
         registerDispatchManagerForMsg(DispatchManager.SPLIT_PANE_CHANGED);
+        registerDispatchManagerForMsg(DispatchManager.SHARED_ORDERS_REFRESH);
 
     }
 
@@ -1254,7 +1255,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     po.setOrdem(ordem);
                     po.setParametrosDisplay(comandoDetail.getParametroDisplay());
                     po.setParametrosId(comandoDetail.getParametroId());
-                    po.setUpdateTime(comandoDetail.getUpdateTime());
+                    po.setRecordedUpdateTime(comandoDetail.getRecordedUpdateTime());
 //                    log.fatal(comandoDetail.getUpdateTime().toString());
                     final Nacao nation = WFC.getNacao(comandoDetail.getNacaoCodigo());
                     //atualiza financas e outras dependencias
@@ -1378,9 +1379,69 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
 
     @Override
     public void receiveDispatch(int msgName, Component cmpnt) {
+        if (msgName == DispatchManager.SHARED_ORDERS_REFRESH && cmpnt instanceof JButton button) {
+            refreshSharedOrders(button);
+            return;
+        }
         if (msgName == DispatchManager.ACTIONS_AUTOSAVE && SettingsManager.getInstance().isAutoSaveActions()) {
             doSave(cmpnt, false);
         }
+    }
+
+    /** Read the shared folder off the EDT; commit only fully validated owner sets on the EDT. */
+    private void refreshSharedOrders(JButton button) {
+        if (loadingEgf || currentResultsFile == null || !button.isEnabled()) return;
+        final Partida game = WFC.getPartida();
+        final File folder = currentResultsFile.getParentFile();
+        final String mask = getCommandFileMask();
+        button.setEnabled(false);
+        new SwingWorker<java.util.Map<Integer, Comando>, Void>() {
+            private int failed;
+            @Override protected java.util.Map<Integer, Comando> doInBackground() {
+                java.util.Map<Integer, Comando> commands = new java.util.TreeMap<>();
+                java.util.Set<Integer> duplicates = new java.util.HashSet<>();
+                File[] files = folder.listFiles(PathFactory.getFilterAcoesImport());
+                if (files == null) { failed++; return commands; }
+                for (File file : files) {
+                    if (!file.getName().contains(mask)) continue;
+                    try {
+                        Object read = XmlManager.getInstance().get(file);
+                        if (!(read instanceof Comando command)) { failed++; continue; }
+                        if (command.getJogadorId() == game.getJogadorAtivo().getId()) continue;
+                        // Conflicted copies must not win by filesystem iteration order.
+                        if (commands.putIfAbsent(command.getJogadorId(), command) != null) {
+                            duplicates.add(command.getJogadorId());
+                        }
+                    } catch (Exception ex) { failed++; }
+                }
+                for (int owner : duplicates) { commands.remove(owner); failed++; }
+                return commands;
+            }
+            @Override protected void done() {
+                try {
+                    if (game != WFC.getPartida() || loadingEgf) return;
+                    int loaded = 0;
+                    for (Comando command : get().values()) {
+                        control.services.SharedOrdersRefresh.Prepared prepared;
+                        try {
+                            prepared = control.services.SharedOrdersRefresh.prepare(command, game,
+                                    WFC.getActors(), WFC.getOrdens());
+                            control.services.SharedOrdersRefresh.apply(prepared,
+                                    WFC.getMapPersonagemOrdens(), WFC::getOrderCost);
+                        } catch (RuntimeException ex) { failed++; continue; }
+                        // This action refreshes action slots only; startup packages use the existing Load Actions flow.
+                        loaded++;
+                    }
+                    getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_RELOAD, "");
+                    getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_COUNT);
+                    getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
+                    gui.setStatusMsg(String.format(labels.getString("ORDERS.TAB.REFRESH.DONE"), loaded, failed));
+                    if (failed > 0) Toast.showError(labels.getString("ORDERS.TAB.REFRESH.FAILED"));
+                } catch (Exception ex) {
+                    Toast.showError(labels.getString("ORDERS.TAB.REFRESH.FAILED"));
+                } finally { button.setEnabled(true); }
+            }
+        }.execute();
     }
 
     public void saveWorldFile(World world) {
@@ -1432,7 +1493,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                         comando.addComando(actor, ordemFacade.getOrdem(actor, index),
                                 ordemFacade.getParametrosId(actor, index),
                                 ordemFacade.getParametrosDisplay(actor, index),
-                                ordemFacade.getTimeLastChange(actor, index));
+                                actor.getAcao(index).getRecordedUpdateTime());
                     }
                 }
             }

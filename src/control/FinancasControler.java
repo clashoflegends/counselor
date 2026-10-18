@@ -149,6 +149,9 @@ public class FinancasControler extends ControlBase implements Serializable, Acti
     public void receiveDispatch(int msgName, String idNation) {
         if (msgName == DispatchManager.ACTIONS_RELOAD) {
             NacaoConverter.refreshOrderCostCells(mainTableModel, listaExibida);
+            if (tabGui.getNacaoSelecionada() != null) {
+                tabGui.setProjecaoModel(getProjecaoTableModel(tabGui.getNacaoSelecionada()));
+            }
         }
         if (msgName == DispatchManager.CLEAR_FINANCES_FORECAST) {
             for (Set<PersonagemOrdem> lists : WFC.getMapPersonagemOrdens().values()) {

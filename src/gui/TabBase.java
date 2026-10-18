@@ -420,6 +420,9 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
         return null;
     }
 
+    /** Navigate to an actor's exact action slot, if this is its data tab. */
+    public boolean openOrder(baseLib.BaseModel actor, int slot) { return false; }
+
     /**
      * Extra searchable text for one model row: what this tab's RESULTS panel would show if the player
      * selected that row. Quick search folds it into the row's search text, so the turn narrative is
@@ -457,7 +460,7 @@ public abstract class TabBase extends javax.swing.JRootPane implements Serializa
      * DocumentListener would otherwise re-apply the stale text on the player's next keystroke.
      * No-op for a tab with no search box (TabOrdensGui) or with the box already empty.
      */
-    public final void clearSearchFilter() {
+    public void clearSearchFilter() {
         if (this.mainSearchField != null && !this.mainSearchField.getText().isEmpty()) {
             this.mainSearchField.setText("");
         }

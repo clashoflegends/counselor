@@ -317,6 +317,16 @@ public class TabPersonagensGui extends TabBase implements Serializable, IAcaoGui
         return personagemAtivo;
     }
 
+    @Override public boolean openOrder(baseLib.BaseModel actor, int slot) {
+        if (!(actor instanceof Personagem)) return false;
+        clearSearchFilter();
+        comboFiltro.setSelectedIndex(0);
+        boolean found = gui.services.OrderNavigation.select(jtMainLista,
+                personagemControl.getListaExibida(), actor, slot, stOrdens);
+        if (found) detalhesPersonagem.setSelectedComponent(stOrdens);
+        return found;
+    }
+
     public void setPersonagem(Personagem personagem) {
         this.personagemAtivo = personagem;
     }

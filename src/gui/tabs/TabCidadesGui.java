@@ -275,6 +275,16 @@ public class TabCidadesGui extends TabBase implements Serializable, IAcaoGui {
         return jtMainLista;
     }
 
+    @Override public boolean openOrder(baseLib.BaseModel actor, int slot) {
+        if (!(actor instanceof model.Cidade)) return false;
+        clearSearchFilter();
+        comboFiltro.setSelectedIndex(0);
+        boolean found = gui.services.OrderNavigation.select(jtMainLista,
+                cidadeControl.getListaExibida(), actor, slot, stOrdens);
+        if (found && detalhesCidade.indexOfComponent(stOrdens) >= 0) detalhesCidade.setSelectedComponent(stOrdens);
+        return found;
+    }
+
     public final void setMainModel(TableModel model) {
         stPersonagens.setListModelClear();
         stProdutos.setListModelClear();

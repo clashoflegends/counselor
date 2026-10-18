@@ -71,8 +71,8 @@ public class MainDadosGui extends javax.swing.JPanel implements Serializable {
         if (WorldFacadeCounselor.getInstance().isSpells()) {
             this.addTabBase(new TabFeiticosGui(labels.getString("FEITICOS"), labels.getString("FEITICOS.DISPONIVEL")));
         }
-        if (SettingsManager.getInstance().isConfig("GuiShowLocationsTab", "1", "0")) {
-            this.addTabBase(new TabOrdensGui("Ordens", labels.getString("ORDENS.SAVED")));
+        if (SettingsManager.getInstance().isConfig("EnableOrdersTab", "1", "0")) {
+            this.addTabBase(new TabOrdensGui(gui.services.OrdersPanel.tx("TITLE"), labels.getString("ORDENS.SAVED")));
         }
         restoreAndTrackSelectedTab();
     }
