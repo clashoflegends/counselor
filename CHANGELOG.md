@@ -1,5 +1,13 @@
 # What's New in Counselor
 
+## 28-OCT-2026 - v2.1.939
+
+### Browser upload recovery
+
+- When website browser verification blocks an order upload, show the saved file and offer to open My Games or the orders folder.
+- Explain the separate recovery options for orders submitted on behalf of another player and stand-by orders.
+- Read clear website messages during uploads, token retrieval and order-status checks instead of raw HTML pages.
+
 ## 28-OCT-2026 - v2.1.938
 
 ### Website login recovery
