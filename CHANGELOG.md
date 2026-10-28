@@ -1,5 +1,12 @@
 # What's New in Counselor
 
+## 28-OCT-2026 - v2.1.938
+
+### Website login recovery
+
+- Website verification and error pages can no longer replace your saved website login during token retrieval or order-status checks.
+- Clear corrupted website login text on startup while keeping your token; a successful website response restores the login.
+
 ## 17-OCT-2026 - v2.1.937
 
 ### Clearer magic-item descriptions

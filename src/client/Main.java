@@ -45,6 +45,7 @@ public class Main implements Serializable {
         final SettingsManager sm = SettingsManager.getInstance();
         sm.setConfigurationMode("Client");
         sm.setLanguage(sm.getConfig("language", "en"));
+        persistenceCommons.WebCounselorManager.getInstance().clearInvalidPlayerLogin();
         // Seed crash attribution with the machine's configured player as early as possible, so a crash
         // BEFORE any turn loads (or an "uncaught" with no filename in context) still names who it was.
         // Refined per-game on world load (WorldFacadeCounselor). Empty when no login is configured yet.
