@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.WebCounselorManager;
+import persistenceCommons.WebsiteHtmlException;
 
 /**
  * First-upload prompt that lets the player set their per-player Counselor token (jogador.cd_token).
@@ -208,7 +209,13 @@ public final class TokenSetupDialog extends JDialog {
                     }
                 } catch (Exception ex) {
                     log.warn("Token fetch failed: " + ex);
-                    setStatus(tx("TOKEN.SETUP.FETCH.NET", "Could not reach the website. Try again or paste the token manually."));
+                    Throwable cause = ex instanceof java.util.concurrent.ExecutionException ? ex.getCause() : ex;
+                    if (cause instanceof WebsiteHtmlException html) {
+                        setStatus(labels.getString("WEBSITE.HTML.TITLE"));
+                        WebsiteResponseMessages.show(TokenSetupDialog.this, labels::getString, html.getWebsiteMessage());
+                    } else {
+                        setStatus(tx("TOKEN.SETUP.FETCH.NET", "Could not reach the website. Try again or paste the token manually."));
+                    }
                 }
             }
         }.execute();

@@ -88,6 +88,10 @@ import persistenceCommons.PersistenceException;
 import persistenceCommons.SettingsManager;
 import persistenceCommons.SysApoio;
 import persistenceCommons.WebCounselorManager;
+import gui.services.BrowserUploadFallback;
+import gui.services.WebsiteResponseMessages;
+import persistenceCommons.WebsiteHtmlException;
+import persistenceCommons.WebCounselorManager.UploadResult;
 import persistenceCommons.XmlManager;
 import persistenceLocal.PathFactory;
 import utils.CounterStringInt;
@@ -730,10 +734,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         final PartidaJogadorWebInfo info = doPrepPost(attachment, shadow);
         info.setOnBehalf(onBehalf); // so a gate rejection surfaces the site's message (not the generic error)
         final BusyGlass busy = BusyGlass.show(this.getGui(), labels.getString("ENVIAR.POST.JUDGE"));
-        new SwingWorker<Integer, Void>() {
+        new SwingWorker<UploadResult, Void>() {
             @Override
-            protected Integer doInBackground() throws Exception {
-                return WebCounselorManager.getInstance().doSendViaPost(info);
+            protected UploadResult doInBackground() throws Exception {
+                return WebCounselorManager.getInstance().doSendViaPostResult(info);
             }
 
             @Override
@@ -1568,8 +1572,8 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * on a SwingWorker in doSend(); this is invoked from its done(). Returns true when no further
      * error handling is needed, false to trigger the generic "ENVIAR.ERRO.INSTRUCTIONS" dialog.
      */
-    private boolean handleSendResult(int ret, File attachment, PartidaJogadorWebInfo info) {
-        switch (ret) {
+    private boolean handleSendResult(UploadResult result, File attachment, PartidaJogadorWebInfo info) {
+        switch (result.code()) {
             case WebCounselorManager.OK:
                 // Tailor the confirmation to how the orders were sent: a stand-by set, an on-behalf submit
                 // (name whose orders they are), or a plain self-submit.
@@ -1583,21 +1587,28 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 }
                 log.info(msg);
                 if (SettingsManager.getInstance().isConfig("DebugWebpostTime", "1", "0")) {
-                    log.info(WebCounselorManager.getInstance().getLastResponseString());
+                    log.info(result.message());
                 }
-                this.getGui().setStatusMsg(msg);
+                final String websiteText = result.htmlResponse()
+                        ? "\n" + WebsiteResponseMessages.format(labels::getString, result.message()) : "";
+                this.getGui().setStatusMsg(msg + websiteText.replace('\n', ' '));
                 if (SettingsManager.getInstance().getConfig("SendOrderConfirmationPopUp", "1").equals("1")) {
                     // Non-modal toast instead of a blocking dialog: confirms the post without interrupting work.
                     // Second line sets the receipt expectation (KI-020: the receipt is sent by ServerSync at
                     // Judge-ingest, not in the upload response, so it lands a few minutes later).
                     Toast.show(javax.swing.SwingUtilities.getWindowAncestor(this.getGui()),
-                            msg + "\n" + labels.getString("POST.DONE.RECEIPT"));
+                            msg + "\n" + labels.getString("POST.DONE.RECEIPT") + websiteText);
                 }
                 // The orders just uploaded are now what the server holds -> flip the indicator to SENT
                 // without a round-trip (the hash sent == the current local hash).
                 OrdersHashService.getInstance().markSent(WFC.getTurno());
                 updateOrderSyncIndicator();
                 return true;
+            case WebCounselorManager.ERROR_BROWSER_VERIFICATION:
+            case WebCounselorManager.ERROR_HTML_RESPONSE:
+                this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
+                BrowserUploadFallback.show(this.getGui(), labels::getString, attachment, info, result);
+                return true; // handled; no token reset, sent indicator, retry, or second error dialog
             case WebCounselorManager.ERROR_BADPLAYERTOKEN:
                 // Stored player token is invalid/stale (e.g. regenerated on the site). Clear it and
                 // reopen the setup dialog so the player can set a fresh one, then resubmit.
@@ -1615,14 +1626,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 // On-behalf / stand-by gate rejection: show the site's own message (owner doesn't accept
                 // on-behalf orders, not a teammate, doesn't accept stand-by, bad EGF token, ...) — the client
                 // can't pre-validate it, so surface the server's exact reason instead of a generic error.
-                final String serverMsg = WebCounselorManager.getInstance().getLastResponseString();
+                final String serverMsg = result.message();
                 SysApoio.showDialogError(
                         (serverMsg == null || serverMsg.trim().isEmpty()) ? labels.getString("ERROR") : serverMsg,
                         labels.getString("ENVIAR.ERRO"), this.getGui());
                 this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                 return true; //dont try email
             case WebCounselorManager.ERROR_TURN:
-                final String expectedTurn = String.format(labels.getString("ENVIAR.ERRO.WRONGTURN"), WebCounselorManager.getInstance().getLastResponseString());
+                final String expectedTurn = String.format(labels.getString("ENVIAR.ERRO.WRONGTURN"), result.message());
                 //display alert!
                 SysApoio.showDialogError(expectedTurn, labels.getString("ENVIAR.ERRO"), this.getGui());
                 this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
@@ -1721,12 +1732,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         final int egfToken = nacoes.isEmpty() ? 0 : nacoes.get(0).getCdToken();
         OrdersHashService.getInstance().refreshLocal(WFC);
         new SwingWorker<String, Void>() {
+            private WebsiteHtmlException htmlFailure;
             @Override
             protected String doInBackground() {
                 try {
                     return WebCounselorManager.getInstance().fetchOrdersHash(gameId, turn, egfToken);
                 } catch (Exception ex) {
                     log.warn("Orders-hash fetch failed: " + ex);
+                    if (ex instanceof WebsiteHtmlException html) { htmlFailure = html; }
                     return null;
                 }
             }
@@ -1739,6 +1752,9 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                     // keep whatever was cached; indicator resolves to UNKNOWN
                 }
                 updateOrderSyncIndicator();
+                if (htmlFailure != null && WFC.getPartida().getId() == gameId && WFC.getTurno() == turn) {
+                    WebsiteResponseMessages.show(getGui(), labels::getString, htmlFailure.getWebsiteMessage());
+                }
             }
         }.execute();
     }
