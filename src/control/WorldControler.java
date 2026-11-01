@@ -865,7 +865,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private void doAutoLoadCommands(final File resultsFile) {
         if (isLoadTeamOrders()) {
             //check for the file on the same folder with same name
-            List<File> commandFiles = PathFactory.getInstance().listCommandFile(resultsFile.getParentFile(), getCommandFileMask());
+            List<File> commandFiles = listCommandFilesOldestFirst(resultsFile.getParentFile(), getCommandFileMask());
             for (File ordersFile : commandFiles) {
                 if (ordersFile.exists()) {
                     setComando(ordersFile);
@@ -879,6 +879,14 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 setComando(loadActions);
             }
         }
+    }
+
+    /** Apply newer files last so their actions replace older copies of the same player's orders. */
+    static List<File> listCommandFilesOldestFirst(File folder, String mask) {
+        List<File> commandFiles = PathFactory.getInstance().listCommandFile(folder, mask);
+        commandFiles.sort(java.util.Comparator.comparingLong(File::lastModified)
+                .thenComparing(File::getName));
+        return commandFiles;
     }
 
     /**

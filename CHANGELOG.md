@@ -1,5 +1,11 @@
 # What's New in Counselor
 
+## Unreleased
+
+### Loading orders
+
+- Load order files from a folder oldest first by file modification time, so newer copies take precedence when a player has multiple files.
+
 ## 28-OCT-2026 - v2.1.939
 
 ### Browser upload recovery
