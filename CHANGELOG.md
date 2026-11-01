@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Map tools
+
+- Close the radial menu after selecting a map tool so it no longer covers MarchSim's first step and movement cost. World Builder menus stay open as before.
+
 ### Loading orders
 
 - Load order files from a folder oldest first by file modification time, so newer copies take precedence when a player has multiple files.

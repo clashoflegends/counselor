@@ -117,7 +117,15 @@ public class RmActionListener extends ControlBase implements Serializable, Mouse
             if (currentAction instanceof WorldBuilderRadialActions) {
                 doWorldBuilderActions(rb, actionCommand, (WorldBuilderRadialActions) currentAction);
             } else if (currentAction instanceof MapMenuRadialActions) {
-                doMapMenuActions(rb, actionCommand, (MapMenuRadialActions) currentAction);
+                RadialMenu menu = (RadialMenu) SwingUtilities.getAncestorOfClass(RadialMenu.class, rb);
+                try {
+                    doMapMenuActions(rb, actionCommand, (MapMenuRadialActions) currentAction);
+                } finally {
+                    // Position new windows relative to the visible button before clearing the map overlay.
+                    if (menu != null) {
+                        menu.doHide();
+                    }
+                }
             }
         } catch (NullPointerException ex) {
             log.error(ex);
