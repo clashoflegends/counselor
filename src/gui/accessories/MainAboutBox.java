@@ -16,6 +16,7 @@ import control.services.UpdateDownloader;
 import gui.MainResultWindowGui;
 import gui.TabBase;
 import gui.components.ButtonLink;
+import gui.services.LogSupportEmail;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -406,6 +407,12 @@ public class MainAboutBox extends TabBase implements Serializable {
         pathPanel.add(makePathRow("Config file:", configPath, new File(configPath), false));
         pathPanel.add(Box.createVerticalStrut(4));
         pathPanel.add(makePathRow("Logs folder:", logDirPath, new File(logDirPath), true));
+        pathPanel.add(Box.createVerticalStrut(6));
+        JButton logs = new JButton(labels.getString("ABOUT.LOGS.PREPARE"));
+        logs.addActionListener(e -> LogSupportEmail.prepare(this, logs, labels::getString));
+        JPanel logsRow = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        logsRow.add(logs);
+        pathPanel.add(logsRow);
 
         this.setLayout(new BorderLayout());
         this.add(jPanel1, BorderLayout.CENTER);

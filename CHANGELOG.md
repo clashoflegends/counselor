@@ -1,6 +1,10 @@
 # What's New in Counselor
 
-## Unreleased
+## 01-NOV-2026 - v2.1.940
+
+### Support
+
+- Prepare a ZIP of today's logs and the previous two days from About, then open an email draft to the GM. Attach the ZIP manually; credentials are redacted from exported copies.
 
 ### Map tools
 
@@ -9,6 +13,10 @@
 ### Loading orders
 
 - Load order files from a folder oldest first by file modification time, so newer copies take precedence when a player has multiple files.
+
+### Website (clashlegends.com)
+
+- The homepage no longer loads an unused script.
 
 ## 28-OCT-2026 - v2.1.939
 
