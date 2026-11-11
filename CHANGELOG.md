@@ -1,10 +1,15 @@
 # What's New in Counselor
 
-## 11-NOV-2026
+## 11-NOV-2026 - v2.1.941
 
 ### Final game reports
 
 - Open **View final game report** from the Victory Dashboard to explore Chronicle statistics in your browser. Sign in on the website; reports become available after the game ends.
+
+### Website (clashlegends.com)
+
+- **Results & Stats** in My Games opens the Chronicle directly on its charts, with standings retained for older reports.
+- Chronicle graphs are visible together by default. Explore victory points, score composition, cities, land forces, fleets and treasury, with downloadable data and chart images.
 
 ## 01-NOV-2026 - v2.1.940
 
