@@ -1,5 +1,11 @@
 # What's New in Counselor
 
+## 11-NOV-2026
+
+### Final game reports
+
+- Open **View final game report** from the Victory Dashboard to explore Chronicle statistics in your browser. Sign in on the website; reports become available after the game ends.
+
 ## 01-NOV-2026 - v2.1.940
 
 ### Support

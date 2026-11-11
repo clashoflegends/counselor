@@ -92,6 +92,12 @@ public final class VictoryDashboardDialog extends JDialog {
         final JButton close = new JButton(tx("VDASH.CLOSE", "Close"));
         close.addActionListener(e -> dispose());
         buttons.add(copy);
+        if (a.gameId > 0) {
+            final JButton report = new JButton(tx("VDASH.REPORT", "View final game report"));
+            report.setToolTipText(tx("VDASH.REPORT.HINT", "Opens the website. Sign in; reports are available after the game ends."));
+            report.addActionListener(e -> FinalGameReport.open(this, labels, a.gameId));
+            buttons.add(report);
+        }
         buttons.add(close);
 
         setLayout(new BorderLayout());
