@@ -1,119 +1,27 @@
-/*
- * SubTabDirecaoExercito.java
- *
- * Created on June 13, 2009, 2:31 PM
- */
 package gui.subtabs;
 
-import baseLib.GenericoComboBoxModel;
-import baseLib.GenericoComboObject;
-import business.MovimentoExercito;
-import business.converter.ConverterFactory;
-import business.facade.ExercitoFacade;
-import business.facade.LocalFacade;
-import control.DirecaoExercitoControler;
 import control.MapaControler;
-import control.facade.WorldFacadeCounselor;
 import control.support.ActorInterface;
-import gui.TabBase;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 import model.Local;
 import model.Ordem;
-import model.TipoTropa;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import persistence.local.ListFactory;
-import persistenceCommons.BundleManager;
-import persistenceCommons.SettingsManager;
 
-/**
- *
- * @author gurgel
- */
-public class SubTabDirecaoExercito extends TabBase implements Serializable {
+/** Classic designer-owned movement layout. */
+public class SubTabDirecaoExercito extends ArmyMovementEditorBase {
 
-    private static final Log log = LogFactory.getLog(SubTabDirecaoExercito.class);
-    private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private String direcaoDisplay = "", direcaoTipo = "nr";
-    private List<String> direcoesId = new ArrayList();
-    private DirecaoExercitoControler dirExControl;
-    private Local origem;
-    private Local destino;
-    private final LocalFacade localFacade = new LocalFacade();
-    private Ordem ordem;
-    private ActorInterface actor;
-    private final ListFactory listFactory = new ListFactory();
-    private int moveType = 0;
-    private boolean all = false;
-    private int limiteMovimento = 0;
-
-    /**
-     * Creates new form SubTabDirecaoExercito
-     */
-    public SubTabDirecaoExercito(String vlInicial, ActorInterface actorAtivo, MapaControler mapaControl, Ordem ordemSelecionada, boolean all) {
+    public SubTabDirecaoExercito(String initial, ActorInterface actor, MapaControler map,
+            Ordem order, boolean all) {
         initComponents();
-
-        setAll(all);
-        this.setMapaControler(mapaControl);
-        this.ordem = ordemSelecionada;
-        setDefaultValues();
-        this.actor = actorAtivo;
-        initConfig(actorAtivo.getLocal(), vlInicial);
+        initializeMovement(movementControls(), initial, actor, map, order, all);
     }
 
-    public SubTabDirecaoExercito(Local local, int limitMov, boolean waterMov, MapaControler mapaControl) {
+    public SubTabDirecaoExercito(Local origin, int allowance, boolean water, MapaControler map) {
         initComponents();
-
-        setAll(true);
-        this.setMapaControler(mapaControl);
-        //FIXME: limite varia de acordo com a ordem. Salvar na ordem ou cenario.
-        //FIXME: transformar em parametros no banco de dados.
-        setLimiteMovimento(limitMov);
-        setAgua(waterMov);
-        initConfig(local, "");
+        initializeSimulation(movementControls(), origin, allowance, water, map);
     }
 
-    private void initConfig(Local local, String vlInicial) {
-        //setValorInicial(vlInicial);
-        this.origem = local;
-        this.destino = local;
-        dirExControl = new DirecaoExercitoControler(this);
-        //set combo.model
-        final GenericoComboBoxModel cbmTemp = getTropaModel();
-        jcTipoTropa.setModel(cbmTemp);
-        jcTipoTropa.setVisible(isAll());
-        //set default item - comida
-        final ExercitoFacade ef = new ExercitoFacade();
-        if (WorldFacadeCounselor.getInstance().hasResourceManagement()) {
-            if (actor != null) {
-                setComidaSelected(!ef.isComida(actor.getExercito()));
-            } else {
-                setComidaSelected(false);
-            }
-            doFieldsDisplay();
-        } else {
-            setComidaSelected(false);
-            doFieldsHide();
-        }
-        //set default item - slower troop
-        int slow = -1, index = -1;
-        for (int ii = 0; ii < cbmTemp.getSize(); ii++) {
-            final GenericoComboObject temp = (GenericoComboObject) cbmTemp.getElementAt(ii);
-            final TipoTropa tpTropa = (TipoTropa) temp.getObject();
-            final List<TipoTropa> tropas = new ArrayList<>(2);
-            tropas.add(tpTropa);
-            final int current = ef.getCustoMovimentoBase(tropas, origem.getTerreno(), false, isAgua());
-            if (current > slow) {
-                index = ii;
-                slow = current;
-            }
-        }
-        jcTipoTropa.setSelectedIndex(index);
-        //set initial tag
-        this.doMovementTagsPaint(vlInicial);
-        setListeners();
+    private Controls movementControls() {
+        return new Controls(jbNo, jbNe, jbC, jbL, jbO, jbSe, jbSo, jbApaga, jbBackspace,
+                jlDisplay, jrbNormal, jrbEvasivo, jlDestino, jcbComida, jcTipoTropa, jtbDestinoMapa);
     }
 
     /**
@@ -139,6 +47,8 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
         jlDestino = new javax.swing.JLabel();
         jcbComida = new javax.swing.JCheckBox();
         jcTipoTropa = new javax.swing.JComboBox();
+        jbBackspace = new javax.swing.JButton();
+        jtbDestinoMapa = new javax.swing.JButton();
 
         jbNo.setText(labels.getString("NORTEOESTE.ABREVIADO")); // NOI18N
         jbNo.setActionCommand("nw");
@@ -232,20 +142,38 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
         jcTipoTropa.setToolTipText(labels.getString("MOVER.EXERCITO.TIPOTROPA.TOOLTIP")); // NOI18N
         jcTipoTropa.setActionCommand("tipoTropaChanged");
 
+        jbBackspace.setText("⌫"); // NOI18N
+        jbBackspace.setToolTipText(bundle.getString("MOVER.EXERCITO.BACKSPACE.TOOLTIP")); // NOI18N
+        jbBackspace.setActionCommand("jbBackspace");
+        jbBackspace.setDefaultCapable(false);
+        jbBackspace.setMaximumSize(new java.awt.Dimension(28, 24));
+        jbBackspace.setMinimumSize(new java.awt.Dimension(28, 24));
+        jbBackspace.setName("jbBackspace"); // NOI18N
+        jbBackspace.setPreferredSize(new java.awt.Dimension(28, 24));
+
+        jtbDestinoMapa.setText("⌫"); // NOI18N
+        jtbDestinoMapa.setToolTipText(bundle.getString("MOVER.EXERCITO.BACKSPACE.TOOLTIP")); // NOI18N
+        jtbDestinoMapa.setActionCommand("armyDestinationPick");
+        jtbDestinoMapa.setDefaultCapable(false);
+        jtbDestinoMapa.setMaximumSize(new java.awt.Dimension(30, 20));
+        jtbDestinoMapa.setMinimumSize(new java.awt.Dimension(30, 20));
+        jtbDestinoMapa.setName("armyDestinationPick"); // NOI18N
+        jtbDestinoMapa.setPreferredSize(new java.awt.Dimension(30, 20));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jlDisplay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jcTipoTropa, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jlDestino, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jrbEvasivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jlDisplay, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jrbNormal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jcTipoTropa, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jlDestino, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jtbDestinoMapa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -260,15 +188,23 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jbL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(30, 30, 30)
-                                .addComponent(jbSo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jcbComida)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jbSe, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jrbNormal)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jrbEvasivo))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(50, 50, 50)
-                                .addComponent(jbApaga, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jcbComida, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(30, 30, 30)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jbApaga, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jbBackspace, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jbSo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jbSe, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -287,21 +223,23 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
                     .addComponent(jbSo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jbSe, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jbApaga, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jbApaga, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jbBackspace, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jlDisplay, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                    .addComponent(jlDestino, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
+                    .addComponent(jlDestino, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+                    .addComponent(jtbDestinoMapa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jcbComida)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jcbComida)
+                    .addComponent(jrbNormal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jrbEvasivo, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jcTipoTropa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(1, 1, 1)
-                .addComponent(jrbNormal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jrbEvasivo, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -309,6 +247,7 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton jbApaga;
+    private javax.swing.JButton jbBackspace;
     private javax.swing.JButton jbC;
     private javax.swing.JButton jbL;
     private javax.swing.JButton jbNe;
@@ -322,302 +261,6 @@ public class SubTabDirecaoExercito extends TabBase implements Serializable {
     private javax.swing.JLabel jlDisplay;
     private javax.swing.JRadioButton jrbEvasivo;
     private javax.swing.JRadioButton jrbNormal;
+    private javax.swing.JButton jtbDestinoMapa;
     // End of variables declaration//GEN-END:variables
-
-    public String getDirecoesIdTipo() {
-        //formata string para comando. Separado por ; e com o tipo no final
-        String ret = "";
-        for (String direcao : direcoesId) {
-            ret += direcao + ";";
-        }
-        ret += getDirecaoTipo();
-        return ret;
-    }
-
-    public String getDirecaoDisplay() {
-        return direcaoDisplay + getDirecaoTipo();
-    }
-
-    /**
-     * @param direcao the direcaoId to add
-     */
-    private void addDirecaoId(String direcao) {
-        this.direcoesId.add(direcao);
-    }
-
-    /**
-     * @param direcaoDisplay the direcaoDisplay to set
-     */
-    private void setDirecaoDisplay(String direcaoDisplay) {
-        this.direcaoDisplay = direcaoDisplay;
-    }
-
-    /**
-     * @return the direcaoTipo
-     */
-    private String getDirecaoTipo() {
-        return direcaoTipo;
-    }
-
-    /**
-     * @param aDirecaoTipo the direcaoTipo to set
-     */
-    public void setDirecaoTipo(String aDirecaoTipo) {
-        this.direcaoTipo = aDirecaoTipo;
-    }
-
-    public void doApaga() {
-        this.direcoesId = new ArrayList<>();
-        this.setDirecaoDisplay("");
-        this.destino = this.origem;
-        this.getMapaControler().remMovementTag();
-        this.updateGui();
-    }
-
-    public void doMovementTagAdd(String direcao) {
-        //verifica quem eh o proximo Hex
-        Local proximoDestino = getDestino(destino, direcao);
-        if (proximoDestino == null) {
-            //log.info("Cannot move in this direction.");
-        } else {
-            try {
-                //cria objeto com todas as informacoes;
-                MovimentoExercito movEx = new MovimentoExercito();
-                movEx.setEvasivo(jrbEvasivo.isSelected());
-                if (!isAll()) {
-                    List<TipoTropa> list = new ArrayList<>();
-                    GenericoComboBoxModel model = getTropaModel();
-                    for (GenericoComboObject gco : model.getElementAll()) {
-                        list.add((TipoTropa) gco.getObject());
-                    }
-                    movEx.addTropasAll(list);
-                } else {
-                    GenericoComboObject temp = (GenericoComboObject) jcTipoTropa.getSelectedItem();
-                    movEx.addTropas((TipoTropa) temp.getObject());
-                }
-                movEx.setComida(!jcbComida.isSelected());
-                movEx.setDestino(proximoDestino);
-                movEx.setOrigem(this.destino);
-                movEx.setDirecao(ConverterFactory.direcaoToInt(direcao));
-                //busca a ultima movimentacao valida (sem ficar parado).
-                for (int ii = direcoesId.size() - 1; ii >= 0; ii--) {
-                    String elem = direcoesId.get(ii);
-                    if (!elem.equals("h")) {
-                        int dir = ConverterFactory.getDirecao(ConverterFactory.direcaoToInt(elem) + 3);
-                        movEx.setDirecaoAnterior(ConverterFactory.direcaoToInt(elem) + 3);
-                        // the +3 must be outside the direction...
-                        break;
-                    }
-                }
-                movEx.setLimiteMovimento(this.getLimiteMovimento());
-                movEx.setMoveType(this.getMoveType());
-                //salva o destino
-                this.destino = proximoDestino;
-                //desenha a tag
-                this.getMapaControler().addMovementTag(movEx);
-                //atualiza a GUI
-                this.addDirecaoId(direcao);
-                this.setDirecaoDisplay(this.direcaoDisplay + direcao + ";");
-            } catch (NullPointerException ex) {
-                //no troops of type?
-            }
-            this.updateGui();
-        }
-    }
-
-    private void doMovementTagsPaint(String vlInicial) {
-        final List<String> directions = new ArrayList<>();
-        directions.addAll(ConverterFactory.armyPathToList(vlInicial));
-        for (String elem : directions) {
-            this.doMovementTagAdd(elem);
-        }
-    }
-
-    /**
-     * reinicia o movimento, calculando corretamente os valores.
-     */
-    public void doMovementTagsRepaint() {
-        String temp = this.direcaoDisplay;
-        //apaga todas as tags
-        doApaga();
-        //desenha novamente, considerando novos valores para comida/cavalaria
-        doMovementTagsPaint(temp);
-    }
-
-    private void updateGui() {
-        jlDisplay.setText(getDirecaoDisplay());
-        this.jlDestino.setText(destino.getCoordenadas());
-        if (this.direcaoTipo.equalsIgnoreCase("nr")) {
-            this.jrbNormal.setSelected(true);
-        } else {
-            this.jrbEvasivo.setSelected(true);
-        }
-    }
-
-    private Local getDestino(Local atual, String direcao) {
-        Local hexVizinho;
-        if (direcao.equals("h")) {
-            hexVizinho = atual;
-        } else {
-            hexVizinho = listFactory.getLocal(localFacade.getIdentificacaoVizinho(atual, direcao));
-        }
-        return hexVizinho;
-    }
-
-    /**
-     * @return the agua
-     */
-    private boolean isAgua() {
-        return getMoveType() == MovimentoExercito.BY_WATER;
-    }
-
-    private int getMoveType() {
-        return moveType;
-    }
-
-    private void setMoveType(int moveType) {
-        this.moveType = moveType;
-    }
-
-    /**
-     * @param water the agua to set
-     */
-    private void setAgua(boolean water) {
-        if (water) {
-            //variable costs per terrain on water
-            setMoveType(MovimentoExercito.BY_WATER);
-        } else {
-            //else, variable costs per terrain on land
-            setMoveType(MovimentoExercito.BY_LAND);
-        }
-    }
-
-    /**
-     * @return the limiteMovimento
-     */
-    public int getLimiteMovimento() {
-        return limiteMovimento;
-    }
-
-    /**
-     * @param limiteMovimento the limiteMovimento to set
-     */
-    private void setLimiteMovimento(int limiteMovimento) {
-        this.limiteMovimento = limiteMovimento;
-    }
-
-    /**
-     * @return the all
-     */
-    public final boolean isAll() {
-        return all;
-    }
-
-    /**
-     * @param all the all to set
-     */
-    private void setAll(boolean all) {
-        this.all = all;
-    }
-
-    protected final void doFieldsHide() {
-        jcbComida.setVisible(false);
-        jrbEvasivo.setVisible(false);
-        jrbNormal.setVisible(false);
-    }
-
-    protected final void doFieldsDisplay() {
-        jcbComida.setVisible(true);
-        jrbEvasivo.setVisible(true);
-        jrbNormal.setVisible(true);
-    }
-
-    protected final void setComidaSelected(boolean food) {
-        jcbComida.setSelected(food);
-    }
-
-    private void setListeners() {
-        //add listeners
-        jbNo.addActionListener(dirExControl);
-        jbNe.addActionListener(dirExControl);
-        jbC.addActionListener(dirExControl);
-        jbL.addActionListener(dirExControl);
-        jbO.addActionListener(dirExControl);
-        jbSe.addActionListener(dirExControl);
-        jbSo.addActionListener(dirExControl);
-        jbApaga.addActionListener(dirExControl);
-        jrbEvasivo.addActionListener(dirExControl);
-        jrbNormal.addActionListener(dirExControl);
-        jcTipoTropa.addActionListener(dirExControl);
-        jcbComida.addActionListener(dirExControl);
-    }
-
-    private GenericoComboBoxModel getTropaModel() {
-        if (isAll() || actor == null) {
-            //assume all troops are available
-            return dirExControl.getTropaTipoComboModel(isAgua());
-//        } else if (actor.getExercito() == null) {
-//            //LOM has PCs marching as armies, but at a cost of 1 point
-//            //If the army has no troops, the cost of each move will default to 1.
-//            Collection<TipoTropa> list = new ArrayList<TipoTropa>();
-//            GenericoComboBoxModel model = new GenericoComboBoxModel(list.toArray(new TipoTropa[0]));
-//            return model;
-        } else if (actor.getExercito() == null) {
-            //assume all troops are available
-            return dirExControl.getTropaTipoComboModel(isAgua());
-        } else {
-            return dirExControl.getTropaTipoComboModel(actor.getExercito(), isAgua());
-        }
-    }
-
-    private void setDefaultValues() {
-        if (ordem.hasHabilidade(";AMF;")) {
-            //if fixed cost of 1
-            setMoveType(MovimentoExercito.BY_FIXED);
-        } else if (ordem.hasHabilidade(";AMW;")) {
-            //else, variable costs per terrain on water
-            setMoveType(MovimentoExercito.BY_WATER);
-        } else {
-            //else, variable costs per terrain on land
-            setMoveType(MovimentoExercito.BY_LAND);
-        }
-        if (ordem.hasHabilidade(";AM12;")) {
-            setLimiteMovimento(12);
-            return;
-        }
-        if (ordem.hasHabilidade(";AM14;")) {
-            setLimiteMovimento(14);
-            return;
-        }
-        if (ordem.hasHabilidade(";AM08;")) {
-            setLimiteMovimento(8);
-            return;
-        }
-//        //FIXME: clean up after a while (7/5/2016) once it's in the EGF.
-//        if (ordem.getCodigo().equals("850") && WorldFacadeCounselor.getInstance().hasResourceManagement()) {
-//            setLimiteMovimento(12);
-//            setMoveType(MovimentoExercito.BY_LAND);
-//        } else if (ordem.getCodigo().equals("850") && !WorldFacadeCounselor.getInstance().hasResourceManagement()) {
-//            setLimiteMovimento(14);
-//            setMoveType(MovimentoExercito.BY_LAND);
-//        } else if (ordem.getCodigo().equals("851")) {
-//            setLimiteMovimento(14);
-//            setMoveType(MovimentoExercito.BY_LAND);
-//        } else if (ordem.getCodigo().equals("852")) {
-//            setLimiteMovimento(14);
-//            setMoveType(MovimentoExercito.BY_LAND);
-//        } else if (ordem.getCodigo().equals("860")) {
-//            setLimiteMovimento(14);
-//            setMoveType(MovimentoExercito.BY_LAND);
-//        } else if (ordem.getCodigo().equals("830")) {
-//            setLimiteMovimento(14);
-//            setMoveType(MovimentoExercito.BY_WATER);
-//        } else if (ordem.getCodigo().equals("831")) {
-//            setLimiteMovimento(14);
-//            setMoveType(MovimentoExercito.BY_WATER);
-//        } else {
-//            setLimiteMovimento(0);
-//            setMoveType(MovimentoExercito.BY_LAND);
-//        }
-    }
 }

@@ -506,6 +506,10 @@ public class MapaControler extends ControlBase implements Serializable, ItemList
         this.cityPickCallback = callback;
     }
 
+    public boolean isCityPickArmed(Consumer<Local> callback) {
+        return this.cityPickCallback == callback;
+    }
+
     /** Cancel an armed city pick (e.g. the picker's map toggle was switched off). */
     public void cancelCityPick() {
         this.cityPickCallback = null;

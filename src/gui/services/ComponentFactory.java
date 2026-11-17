@@ -22,6 +22,7 @@ import gui.subtabs.CidadeAlvoPicker;
 import gui.subtabs.SubTabCoordenadas;
 import gui.subtabs.SubTabDirecao;
 import gui.subtabs.SubTabDirecaoExercito;
+import gui.subtabs.SubTabDirecaoExercitoPreview;
 import gui.subtabs.SubTabRelacionamento;
 import gui.subtabs.SubTabTropas;
 import java.awt.Color;
@@ -497,9 +498,11 @@ public class ComponentFactory implements Serializable {
             case DIRECAO_EX: {
                 //Direcao-Ex
                 //PENDING: Fazer uma rosa dos ventos?
-                SubTabDirecaoExercito jpTemp = new SubTabDirecaoExercito(
-                        vlInicialDisplay, this.getActor(), this.getMapaControler(), ordemSelecionada, isAllSelected());
-                cNovo = jpTemp;
+                cNovo = "preview".equals(SettingsManager.getInstance().getConfig("ArmyMovementEditor", "classic"))
+                        ? new SubTabDirecaoExercitoPreview(vlInicialDisplay, getActor(), getMapaControler(),
+                                ordemSelecionada, isAllSelected())
+                        : new SubTabDirecaoExercito(vlInicialDisplay, getActor(), getMapaControler(),
+                                ordemSelecionada, isAllSelected());
                 break;
             }
             case DIRECAO_3: {
@@ -1005,8 +1008,7 @@ public class ComponentFactory implements Serializable {
                 JTextField par = (JTextField) comp;
                 tempId = par.getText();
                 tempDisplay = par.getText();
-            } else if (comp instanceof SubTabDirecaoExercito) {
-                SubTabDirecaoExercito par = (SubTabDirecaoExercito) comp;
+            } else if (comp instanceof ArmyMovementParameters par) {
                 tempId = par.getDirecoesIdTipo();
                 tempDisplay = par.getDirecaoDisplay();
             } else if (comp instanceof SubTabDirecao) {

@@ -6,7 +6,7 @@ package control;
 
 import baseLib.GenericoComboBoxModel;
 import control.services.ExercitoConverter;
-import gui.subtabs.SubTabDirecaoExercito;
+import gui.subtabs.ArmyMovementEditorBase;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
@@ -28,9 +28,9 @@ public class DirecaoExercitoControler implements Serializable, ActionListener {
 
     private static final Log log = LogFactory.getLog(DirecaoExercitoControler.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private final SubTabDirecaoExercito tabGui;
+    private final ArmyMovementEditorBase tabGui;
 
-    public DirecaoExercitoControler(SubTabDirecaoExercito aThis) {
+    public DirecaoExercitoControler(ArmyMovementEditorBase aThis) {
         tabGui = aThis;
     }
 

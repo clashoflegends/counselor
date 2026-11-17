@@ -1,5 +1,19 @@
 # What's New in Counselor
 
+## 17-NOV-2026 - v2.1.942
+
+### Army and fleet routes
+
+- While entering army or fleet directions, press **Backspace** or click **⌫** beside **Erase** to remove the last step without retyping the whole route.
+- Choose a destination with the map button beside the destination coordinates to fill in the lowest-cost route up to 24 movement points. Routing uses the current troops, food and movement settings; the normal per-turn allowance remains visible. Review or edit the directions before saving the order.
+- SAIL requires ships in the actual army. An empty or zero-quantity ship roster no longer substitutes hypothetical ships; use All to simulate sailing instead.
+- Reopening an evasive army movement now preserves its mode and movement costs instead of resetting it to Normal.
+
+### Movement editor preview
+
+- An optional editor adds destination entry, readable directions, cost and allowance feedback, troop assumptions, and icon buttons for removing the last step or clearing the route.
+- To try it, set `ArmyMovementEditor=preview` in your local `properties.config` and restart Counselor. Classic remains the default during feedback; use `ArmyMovementEditor=classic` to return to it.
+
 ## 11-NOV-2026 - v2.1.941
 
 ### Final game reports
