@@ -1,5 +1,9 @@
 # What's New in Counselor
 
+## Unreleased
+
+- The new army movement editor is now the default. Set `ArmyMovementEditor=classic` in your local `properties.config` to use the old editor.
+
 ## 17-NOV-2026 - v2.1.942
 
 ### Army and fleet routes

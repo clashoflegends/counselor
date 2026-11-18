@@ -498,10 +498,10 @@ public class ComponentFactory implements Serializable {
             case DIRECAO_EX: {
                 //Direcao-Ex
                 //PENDING: Fazer uma rosa dos ventos?
-                cNovo = "preview".equals(SettingsManager.getInstance().getConfig("ArmyMovementEditor", "classic"))
-                        ? new SubTabDirecaoExercitoPreview(vlInicialDisplay, getActor(), getMapaControler(),
+                cNovo = "classic".equals(SettingsManager.getInstance().getConfig("ArmyMovementEditor", "preview"))
+                        ? new SubTabDirecaoExercito(vlInicialDisplay, getActor(), getMapaControler(),
                                 ordemSelecionada, isAllSelected())
-                        : new SubTabDirecaoExercito(vlInicialDisplay, getActor(), getMapaControler(),
+                        : new SubTabDirecaoExercitoPreview(vlInicialDisplay, getActor(), getMapaControler(),
                                 ordemSelecionada, isAllSelected());
                 break;
             }

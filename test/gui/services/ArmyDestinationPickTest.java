@@ -83,14 +83,14 @@ class ArmyDestinationPickTest {
     void factorySelectsOneLayoutAndBothLayoutsPreserveCanonicalOrdersAndCosts() throws Exception {
         inWorld(f -> {
             var settings = SettingsManager.getInstance();
-            String previous = settings.getConfig("ArmyMovementEditor", "classic");
+            String previous = settings.getConfig("ArmyMovementEditor", "preview");
             try {
                 for (boolean all : new boolean[]{false, true}) {
                     for (int allowance : new int[]{8, 12, 14}) {
                         Ordem order = new Ordem();
                         order.addHabilidade(ability(String.format(";AM%02d;", allowance)));
                         List<List<String>> results = new ArrayList<>();
-                        for (String layout : List.of("classic", "preview")) {
+                        for (String layout : List.of("classic", "preview", "", "unknown")) {
                             settings.setConfig("ArmyMovementEditor", layout);
                             RecordingMap map = new RecordingMap();
                             ComponentFactory factory = new ComponentFactory();
@@ -99,7 +99,7 @@ class ArmyDestinationPickTest {
                             factory.setAllSelected(all);
                             ArmyMovementEditorBase editor = (ArmyMovementEditorBase) factory.getParametroComponent(
                                     "Direcao_Ex", "ne;h;e;se;ev", "ne;h;e;se;ev", order);
-                            assertEquals("preview".equals(layout), editor instanceof SubTabDirecaoExercitoPreview);
+                            assertEquals(!"classic".equals(layout), editor instanceof SubTabDirecaoExercitoPreview);
                             assertEquals(allowance, editor.getLimiteMovimento());
                             if (all) {
                                 assertTrue(selectTroop(editor, f.cavalry));
@@ -117,7 +117,9 @@ class ArmyDestinationPickTest {
                                     map.steps.stream().map(step -> step.getCustoMovimento() + ":"
                                             + step.getDirecaoAnterior()).toList().toString()));
                         }
-                        assertEquals(results.get(0), results.get(1), "parameter and step parity");
+                        for (List<String> result : results) {
+                            assertEquals(results.get(0), result, "parameter and step parity");
+                        }
                     }
                 }
             } finally {

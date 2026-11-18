@@ -51,8 +51,9 @@
 #MapTiles=2b
 #ShowArmyMovPath=0
 #drawArmyMovPath=0
-# Movement editor preview; applies to the next order editor opened. Classic is the default.
-#ArmyMovementEditor=preview
+# Movement editor; Preview is the default. Set classic to use the old army movement editor.
+# Applies to the next order editor opened.
+#ArmyMovementEditor=classic
 #drawScoutOnMap=0
 #drawPcPath=0
 #KeepPopupOpen=0
