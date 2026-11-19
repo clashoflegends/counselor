@@ -4,6 +4,38 @@
 
 - The new army movement editor is now the default. Set `ArmyMovementEditor=classic` in your local `properties.config` to use the old editor.
 
+## 19-NOV-2026 - Game templates and report updates
+
+### Refreshed maps for new games
+
+- **Updated GoT templates** now cover Dance of Dragons (897), Aegon (853), GoT08 teams (888), GoT13 Gun Boat (880), FFA (854), Battle Royal (877), GoT12 teams (901), and GoT20 two-team (799), Iron Price (890) and four-team (817) games.
+- **Geography has been reconciled:** revised terrain and coastlines, connected rivers and streams, corrected roads, and bridges or fords that match their water crossings. Cities affected by the revised landforms have been repositioned with their dependent setup, and the Red Keep has been added where appropriate. Scenario cities, teams and intentional map-compression differences remain distinct.
+- **Landing marks are visual map guides and do not change movement rules.**
+- These are templates for **new games**; existing campaigns keep their maps. The legacy GoT12 New Rules template remains available until the next rules-standardization phase. Eliminated nations in the refreshed GoT starting setups have been restored to their intended player or AI roles.
+
+### Five game-setting keys to recognize
+
+- **STA:** when enabled in a team game, an eliminated nation's assets pass to its team.
+- **SCC:** limits city-size upgrades near other large cities, with the existing capital, Night's Watch and Greyjoy exceptions.
+- **GIN:** the information network broadcasts major events such as deaths, city captures and large battles; it is suppressed for Death Match and hidden-player games.
+- **GRE:** enables a random early finish near the game's turn limit, with the chance increasing each turn.
+- **STC / STM:** STC forbids city ownership transfers; STM instead permits transfers only for cities up to size 3, subject to the usual requirements.
+- These keys describe **settings**, not five rules enabled in every game. Their allocation depends on the template and requested game type; this map update does not make the planned rules standardization live.
+
+### Website and final reports
+
+- **Chronicle Stats** now includes order outcomes, living character roles, held magic items and startup-package selections alongside the victory-point, city, troop, fleet and treasury histories. Explore available history with filters and download chart images or data.
+- **Newly generated results spreadsheets** distinguish automatic order rejection from success, count only recorded item possession, preserve decimal values and add definitions, filters and frozen headers. The released results exporter adds nation/team army-food sheets; files generated with this version count each army's carried food once. Existing spreadsheets are unchanged.
+- **Final-game email update:** a prominent Chronicle link, recorded winner/team and eliminated player nations appear earlier in the released email layout.
+- **Results & Stats** in My Games and **View final game report** in Counselor take you to the finished game's Chronicle; older reports keep their available views.
+
+### Released game fixes
+
+- **Movement combat:** completed land and naval arrivals can trigger the movement-combat round that was previously missed.
+- **Siege Engines:** selects the siege troop from the nation's roster, including Dance of Dragons Trebuchets.
+- **Detached NPCs:** avoids a crash when a detached character has companion-related guard abilities.
+- **Ultimatum reports:** clearly explain when a nation's population is immune to surrender by Ultimatum.
+
 ## 17-NOV-2026 - v2.1.942
 
 ### Army and fleet routes
