@@ -11,7 +11,7 @@
 - **Updated GoT templates** now cover Dance of Dragons (897), Aegon (853), GoT08 teams (888), GoT13 Gun Boat (880), FFA (854), Battle Royal (877), GoT12 teams (901), and GoT20 two-team (799), Iron Price (890) and four-team (817) games.
 - **Geography has been reconciled:** revised terrain and coastlines, connected rivers and streams, corrected roads, and bridges or fords that match their water crossings. Cities affected by the revised landforms have been repositioned with their dependent setup, and the Red Keep has been added where appropriate. Scenario cities, teams and intentional map-compression differences remain distinct.
 - **Landing marks are now added to maps and allow navies to enter the hex.**
-- These are templates for **new games**; existing campaigns keep their maps. The legacy GoT12 New Rules template remains available until the next rules-standardization phase. Eliminated nations in the refreshed GoT starting setups have been restored to their intended player or AI roles.
+- These are templates for **new games**; existing campaigns keep their maps. The legacy GoT12 New Rules template remains available until the next rules-standardization phase.
 
 ### Five game-setting keys to recognize
 
