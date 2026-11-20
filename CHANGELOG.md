@@ -1,5 +1,9 @@
 # What's New in Counselor
 
+## Unreleased
+
+- Financial forecasts apply free troop upkeep to the cheapest eligible troops across the nation first, matching the updated turn calculation. For nations with only the fast-troop allowance, the forecast is the same whether eligible troops march together or in separate armies.
+
 ## 20-NOV-2026 - v2.1.943
 
 ### Plan naval movement
