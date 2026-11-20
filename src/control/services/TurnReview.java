@@ -80,7 +80,8 @@ public final class TurnReview implements Serializable {
         CONVERGE,
         RECRUIT_ELIGIBILITY,
         RECRUIT_LIMIT, RECRUIT_CAPACITY, RECRUIT_MATERIAL, RECRUIT_EQUIPMENT,
-        RECRUIT_PROVISION, RECRUIT_GOLD
+        RECRUIT_PROVISION, RECRUIT_GOLD,
+        SAIL_CAPACITY, SAIL_CAPACITY_PLANNED, SAIL_CAPACITY_UNCERTAIN
     }
 
     public static final class Finding implements Serializable {

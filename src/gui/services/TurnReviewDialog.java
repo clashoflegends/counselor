@@ -207,6 +207,8 @@ public final class TurnReviewDialog extends JDialog {
                     wfc.getNationPackagesLimit(), wfc.hasCitySizeCap(), skipped);
             found.addAll(control.services.RecruitmentReview.compute(actorList,
                     wfc.getJogadorAtivo(), wfc.getPartida()));
+            found.addAll(control.services.SailingCapacityReview.compute(actorList,
+                    wfc.getJogadorAtivo(), wfc.getPartida(), wfc.getExercitos(), skipped));
             //A partial review is not a clean one. compute() guards each actor so one bad one cannot
             //take the list down, and without this that guard let twenty actors with one unreadable
             //among them render as "Nothing to flag".
@@ -457,6 +459,12 @@ public final class TurnReviewDialog extends JDialog {
     private String message(Finding f) {
         final Object[] args = f.getArgs();
         switch (f.getKind()) {
+            case SAIL_CAPACITY:
+                return String.format(tx("REVIEW.SAIL_CAPACITY", "Current cargo %s exceeds own ship capacity %s plus %s from same-nation garrison ships. Sailing may fail or lose troops."), args);
+            case SAIL_CAPACITY_PLANNED:
+                return String.format(tx("REVIEW.SAIL_CAPACITY_PLANNED", "If the planned troop change succeeds, cargo %s exceeds own ship capacity %s plus %s from same-nation garrison ships. Check %s before sailing; the action may fail or lose troops."), args);
+            case SAIL_CAPACITY_UNCERTAIN:
+                return String.format(tx("REVIEW.SAIL_CAPACITY_UNCERTAIN", "Current cargo %s; own ship capacity %s; same-nation garrison ship capacity %s. Sailing depends on %s. Check capacity if that plan changes or fails; competing changes are not fully forecast."), args);
             case RECRUIT_ELIGIBILITY:
                 return String.format(tx("REVIEW.RECRUIT_ELIGIBILITY", "%s cannot currently recruit %s (race or required facility)."), args);
             case RECRUIT_LIMIT:

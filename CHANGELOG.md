@@ -1,11 +1,18 @@
 # What's New in Counselor
 
-## Unreleased
+## 20-NOV-2026 - v2.1.943
 
+### Plan naval movement
+
+- The new army movement editor is now the default, with destination entry, readable directions, cost and allowance feedback. Set `ArmyMovementEditor=classic` in your local `properties.config` to use the old editor.
 - Navies can enter and anchor on land through a Landing side; movement ends there unless an existing navigable route allows continuation, with normal terrain costs and departure rules unchanged.
 - MovSim, both movement editors, automatic routes and range forecasts follow the same Landing rules; saved directions remain intact when movement stops early.
 
-- The new army movement editor is now the default. Set `ArmyMovementEditor=classic` in your local `properties.config` to use the old editor.
+### Check sailing capacity before submitting
+
+- Actions Review now flags insufficient transport capacity, using troop weights and available same-nation garrison ships.
+- Straightforward earlier recruitment and troop transfers are included, including splitting land troops into a new commander's army. A supported plan that leaves enough capacity produces no capacity finding.
+- Competing recruitment, shared garrison ships and complex troop changes are marked for checking rather than presented as a guaranteed forecast. Review never blocks saving or submitting orders.
 
 ## 19-NOV-2026 - Game templates and report updates
 
