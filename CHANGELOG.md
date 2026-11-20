@@ -13,14 +13,14 @@
 - **Landing marks are now added to maps and allow navies to enter the hex.**
 - These are templates for **new games**; existing campaigns keep their maps. The legacy GoT12 New Rules template remains available until the next rules-standardization phase.
 
-### Five game-setting keys to recognize
+### Five game-setting standars applied to all templates
 
-- **STA:** when enabled in a team game, an eliminated nation's assets pass to its team.
-- **SCC:** limits city-size upgrades near other large cities, with the existing capital, Night's Watch and Greyjoy exceptions.
-- **GIN:** the information network broadcasts major events such as deaths, city captures and large battles; it is suppressed for Death Match and hidden-player games.
-- **GRE:** enables a random early finish near the game's turn limit, with the chance increasing each turn.
-- **STC / STM:** STC forbids city ownership transfers; STM instead permits transfers only for cities up to size 3, subject to the usual requirements.
-- These keys describe **settings**, not five rules enabled in every game. Their allocation depends on the template and requested game type; this map update does not make the planned rules standardization live.
+- when in a team game, an eliminated nation's assets pass to its team.
+- limits city-size upgrades near other large cities, with the existing capital, Night's Watch and Greyjoy exceptions.
+- the information network broadcasts major events such as deaths, city captures and large battles; it is suppressed for Death Match and hidden-player games.
+- enables a random early finish near the game's turn limit, with the chance increasing each turn.
+- either forbids city ownership transfers  or permits transfers only for cities up to size 3- town, subject to the usual requirements.
+- These keys describe **settings**, not five rules enabled in every game. These are not the new rules. Their allocation depends on the template and requested game type; this map update does not make the planned rules standardization live.
 
 ### Website and final reports
 
