@@ -100,7 +100,9 @@ public class SubTabDirecaoExercitoPreview extends ArmyMovementEditorBase {
             default -> labels.getString("ARMY.EDITOR.HOLD");
         }).collect(Collectors.joining("  "));
         jlDisplay.setText(route.isEmpty() ? "-" : route);
-        jlDisplay.setToolTipText(route);
+        jlDisplay.setToolTipText(session.isLandingStopped()
+                ? String.format(labels.getString("ARMY.PATH.LANDING.STOP"), session.destination().getCoordenadas())
+                : route);
         jlCusto.setText(message("ARMY.EDITOR.COST", session.cost(), session.context().allowance()));
         String troops = session.context().troops().stream().map(troop -> troop.getNome())
                 .collect(Collectors.joining(", "));
@@ -119,6 +121,8 @@ public class SubTabDirecaoExercitoPreview extends ArmyMovementEditorBase {
         } else if (feedback == null && session.cost() > session.context().allowance()) {
             feedback = message("ARMY.EDITOR.OVER", session.cost() - session.context().allowance());
             warning = true;
+        } else if (feedback == null && session.isLandingStopped()) {
+            feedback = String.format(labels.getString("ARMY.PATH.LANDING.STOP"), session.destination().getCoordenadas());
         }
         jLabel3.setText(feedback == null ? " " : feedback);
         jLabel3.setToolTipText(feedback);

@@ -201,6 +201,37 @@ class ThreatReachTest {
         nacao.setRaca(raca);
     }
 
+    @Test void landingStopsThisTurnButNavalDepartureIsPossibleNextTurn() {
+        Fixture f = new Fixture();
+        f.locais.clear();
+        f.hex("0204", f.water);
+        Local landing = f.hex("0304", f.mountain); landing.setLanding("6");
+        Local beyond = f.hex("0404", f.water);
+        TipoTropa ship = troop("ship", true, "", new Terreno[]{f.water, f.mountain}, new int[]{2, 5});
+        Exercito fleet = f.army("Fleet", "0204", f.theirs, ship);
+        Coverage coverage = f.run(fleet);
+        assertEquals(1, coverage.getSoonest(landing));
+        assertEquals(2, coverage.getSoonest(beyond));
+        landing.setRio("36");
+        assertEquals(1, f.run(fleet).getSoonest(beyond));
+        landing.setRio("");
+        ship.getMovimentoTerreno().put(f.mountain, 17); // fixture's one-turn ceiling is 16
+        assertEquals(0, f.run(fleet).getSoonest(landing), "an indivisible unaffordable step needs more than time");
+    }
+
+    @Test void landingForecastUsesOnlyPayableTurnBoundariesIncludingOrdinaryShore() {
+        Fixture f = new Fixture(); f.locais.clear();
+        f.hex("0204", f.water);
+        Local shore = f.hex("0304", f.shore);
+        f.hex("0404", f.water);
+        Local landing = f.hex("0504", f.mountain); landing.setLanding("6");
+        TipoTropa ship = troop("ship", true, "", new Terreno[]{f.water, f.shore, f.mountain}, new int[]{2, 5, 5});
+        Exercito fleet = f.army("Fleet", "0204", f.theirs, ship);
+        assertEquals(2, f.run(fleet).getSoonest(landing), "fresh departure after ordinary Shore stop");
+        shore.setRio("3"); ship.getMovimentoTerreno().put(f.shore, 17);
+        assertEquals(0, f.run(fleet).getSoonest(landing), "legacy affordable-looking Shore is not a valid seed");
+    }
+
     // ----- the defect this class exists to close -----
 
     /**

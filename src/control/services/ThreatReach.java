@@ -410,17 +410,33 @@ public final class ThreatReach {
             // direction this must never go.
             final Map<Local, ArmyPath> soon = flood(army, run, origin, locais, budget);
             final Map<Local, ArmyPath> later = flood(army, run, origin, locais, budget * MAX_TURNS);
+            final Set<Local> landingHexes = run.byWater ? business.NavalRange.landingHexes(locais) : Set.of();
             for (Local hex : later.keySet()) {
                 if (hex == null || hex == origin) {
                     continue;
                 }
+                if (!soon.containsKey(hex) && usesLanding(later.get(hex), landingHexes)) continue;
                 record(byHex, hex, new Threat(army, soon.containsKey(hex) ? 1 : MAX_TURNS,
                         run.assumedTroop));
             }
             if (run.byWater) {
+                if (!landingHexes.isEmpty()) {
+                    var forecast = business.NavalRange.forecast(locais,
+                            movement(army, run, origin, budget), landingHexes);
+                    for (Local next : forecast.secondTurn().keySet()) {
+                        if (next == origin) continue;
+                        record(byHex, next, new Threat(army,
+                                forecast.firstTurn().containsKey(next) ? 1 : MAX_TURNS, run.assumedTroop));
+                    }
+                }
                 addMarchAfterLanding(byHex, army, cenario, locais, budget, soon.keySet());
             }
         }
+    }
+
+    private static boolean usesLanding(ArmyPath path, Set<Local> landingHexes) {
+        return landingHexes.contains(path.getStart()) || path.getSteps().stream()
+                .anyMatch(step -> landingHexes.contains(step.getDestino()));
     }
 
     /**
@@ -460,6 +476,10 @@ public final class ThreatReach {
     /** One flood, built from the same assumptions for every caller. */
     private static Map<Local, ArmyPath> flood(Exercito army, Run run, Local origin,
             SortedMap<String, Local> locais, int limit) {
+        return exercitoFacade.calculateArmyRangeHexes(locais, movement(army, run, origin, limit));
+    }
+
+    private static MovimentoExercito movement(Exercito army, Run run, Local origin, int limit) {
         final MovimentoExercito movEx = new MovimentoExercito();
         movEx.addTropasAll(run.troops);
         movEx.setOrigem(origin);
@@ -498,7 +518,7 @@ public final class ThreatReach {
         // what would break if the default ever changed underneath.
         movEx.setMoveMountain(true);
         movEx.setLimiteMovimento(limit);
-        return exercitoFacade.calculateArmyRangeHexes(locais, movEx);
+        return movEx;
     }
 
     /**

@@ -41,6 +41,7 @@ public final class ArmyMovementSession implements ArmyMovementParameters {
     private final Local origin;
     private final LocalFacade localFacade = new LocalFacade();
     private final List<Step> steps = new ArrayList<>();
+    private final List<String> directions = new ArrayList<>();
     private Context context;
 
     public ArmyMovementSession(Map<String, Local> locals, Local origin, Context context) {
@@ -76,9 +77,9 @@ public final class ArmyMovementSession implements ArmyMovementParameters {
             return;
         }
         ArmyMovementSession recalculated = new ArmyMovementSession(locals, origin, context);
-        for (Step step : steps) {
+        for (String direction : directions) {
             // Preserve entered directions even if the new assumptions make their cost infeasible.
-            recalculated.appendStep(step.direction());
+            recalculated.appendStep(direction);
         }
         this.context = context;
         steps.clear();
@@ -92,6 +93,10 @@ public final class ArmyMovementSession implements ArmyMovementParameters {
     private boolean appendStep(String direction) {
         if (direction == null || !ConverterFactory.isDirecaoValid(direction)) {
             return false;
+        }
+        if (isLandingStopped()) {
+            directions.add(direction);
+            return true;
         }
         Local from = destination();
         int directionNumber = ConverterFactory.direcaoToInt(direction);
@@ -113,16 +118,24 @@ public final class ArmyMovementSession implements ArmyMovementParameters {
         }
         int cost = movement.getCustoMovimento();
         steps.add(new Step(direction, movement, cost, cost() + cost));
+        directions.add(direction);
         return true;
+    }
+
+    public boolean isLandingStopped() {
+        return !steps.isEmpty() && steps.get(steps.size() - 1).movement().isLandingStop();
     }
 
     public void clear() {
         steps.clear();
+        directions.clear();
     }
 
     public void removeLast() {
-        if (!steps.isEmpty()) {
-            steps.remove(steps.size() - 1);
+        if (!directions.isEmpty()) {
+            var remaining = new ArrayList<>(directions.subList(0, directions.size() - 1));
+            clear();
+            for (String direction : remaining) appendStep(direction);
         }
     }
 
@@ -144,14 +157,16 @@ public final class ArmyMovementSession implements ArmyMovementParameters {
         }
         steps.clear();
         steps.addAll(replacement.steps);
+        directions.clear();
+        directions.addAll(replacement.directions);
         return true;
     }
 
     @Override
     public String getDirecoesIdTipo() {
         StringBuilder canonical = new StringBuilder();
-        for (Step step : steps) {
-            canonical.append(step.direction()).append(';');
+        for (String direction : directions) {
+            canonical.append(direction).append(';');
         }
         return canonical.append(context.evasive() ? "ev" : "nr").toString();
     }

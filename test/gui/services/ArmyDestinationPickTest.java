@@ -411,6 +411,37 @@ class ArmyDestinationPickTest {
     }
 
     @Test
+    void bothOrderEditorsAndMovSimPreserveInputButDisplayOnlyTheLandingPrefix() throws Exception {
+        inWorld(f -> {
+            Local[] targets = sailingMap(f);
+            Local landing = targets[0]; landing.setTerreno(f.forest); landing.setLanding("63");
+            f.ship.getMovimentoTerreno().put(f.forest, 5);
+            addShips(f, f.ship, 10);
+            for (boolean preview : new boolean[]{false, true}) {
+                RecordingMap map = new RecordingMap();
+                ArmyMovementEditorBase editor = preview
+                        ? new SubTabDirecaoExercitoPreview("E;H;E;nr", f.actor, map, f.order, false)
+                        : new SubTabDirecaoExercito("E;H;E;nr", f.actor, map, f.order, false);
+                assertEquals("E;H;E;nr", editor.getDirecoesIdTipo());
+                assertEquals(1, map.steps.size());
+                assertSame(landing, map.steps.get(0).getDestino());
+                assertEquals(5, map.cost());
+                editor.doMovementTagsRepaint();
+                assertEquals("E;H;E;nr", editor.getDirecoesIdTipo());
+                assertEquals(1, map.steps.size());
+                assertFalse(editor.doMovementRouteTo(targets[1]));
+            }
+            RecordingMap map = new RecordingMap();
+            var simulator = new SubTabDirecaoExercito(f.character.getLocal(), 14, true, map);
+            assertTrue(selectTroop(simulator, f.ship));
+            for (String direction : List.of("e", "h", "e")) simulator.doMovementTagAdd(direction);
+            assertEquals(1, map.steps.size());
+            assertSame(landing, map.steps.get(0).getDestino());
+            assertEquals(5, map.cost());
+        });
+    }
+
+    @Test
     void actualSailingUsesPositiveShipTypesAndIgnoresZeroQuantityShips() throws Exception {
         inWorld(f -> {
             Local[] targets = sailingMap(f);

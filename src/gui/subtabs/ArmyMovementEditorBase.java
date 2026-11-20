@@ -359,6 +359,10 @@ public abstract class ArmyMovementEditorBase extends TabBase implements Serializ
         final boolean shipsAvailable = hasRequiredShips();
         controls.display().setText(shipsAvailable ? getDirecaoDisplay() : labels.getString("ARMY.PATH.NO.SHIPS"));
         controls.display().setToolTipText(shipsAvailable ? null : labels.getString("ARMY.PATH.NO.SHIPS"));
+        if (shipsAvailable && movementSession.isLandingStopped()) {
+            controls.display().setToolTipText(String.format(labels.getString("ARMY.PATH.LANDING.STOP"),
+                    movementSession.destination().getCoordenadas()));
+        }
         if (controls.destination() != null) {
             controls.destination().setText(movementSession.destination().getCoordenadas());
         }

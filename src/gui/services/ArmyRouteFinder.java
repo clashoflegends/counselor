@@ -28,7 +28,7 @@ public final class ArmyRouteFinder {
     }
 
     // River navigation depends on the side from which the previous step entered this hex.
-    private record State(Local local, int arrivalDirection) {
+    private record State(Local local, int arrivalDirection, boolean terminal) {
     }
 
     private record Node(State state, int cost, int steps, long sequence, Node previous,
@@ -65,7 +65,7 @@ public final class ArmyRouteFinder {
                 .thenComparingInt(Node::steps).thenComparingLong(Node::sequence));
         final Map<State, Node> best = new HashMap<>();
         long sequence = 0;
-        final Node first = new Node(new State(start, 0), 0, 0, sequence++, null, null);
+        final Node first = new Node(new State(start, 0, false), 0, 0, sequence++, null, null);
         best.put(first.state(), first);
         queue.add(first);
         while (!queue.isEmpty()) {
@@ -81,6 +81,7 @@ public final class ArmyRouteFinder {
                 Collections.reverse(directions);
                 return Optional.of(new Route(directions, current.cost()));
             }
+            if (current.state().terminal()) continue;
             for (int direction = 1; direction <= 6; direction++) {
                 final Local next = locals.get(facade.getIdentificacaoVizinho(
                         current.state().local(), direction));
@@ -98,7 +99,7 @@ public final class ArmyRouteFinder {
                     continue;
                 }
                 final int total = current.cost() + cost;
-                final State state = new State(next, ConverterFactory.getDirecao(direction + 3));
+                final State state = new State(next, ConverterFactory.getDirecao(direction + 3), step.isLandingStop());
                 final Node old = best.get(state);
                 final int steps = current.steps() + 1;
                 if (old != null && (old.cost() < total

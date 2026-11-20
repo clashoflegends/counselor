@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Navies can enter and anchor on land through a Landing side; movement ends there unless an existing navigable route allows continuation, with normal terrain costs and departure rules unchanged.
+- MovSim, both movement editors, automatic routes and range forecasts follow the same Landing rules; saved directions remain intact when movement stops early.
+
 - The new army movement editor is now the default. Set `ArmyMovementEditor=classic` in your local `properties.config` to use the old editor.
 
 ## 19-NOV-2026 - Game templates and report updates
