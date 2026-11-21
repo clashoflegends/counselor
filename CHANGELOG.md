@@ -1,5 +1,11 @@
 # What's New in Counselor
 
+## 20-NOV-2026 - v2.1.945
+
+### Clear rules settings
+
+- Game settings distinguish **Standard Rules** from **New Trial Rules**, without duplicate inherited labels. Trial games retain the standard recruitment and movement calculations.
+
 ## 20-NOV-2026 - v2.1.944
 
 ### Keep planning without interruptions

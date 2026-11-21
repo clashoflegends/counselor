@@ -79,6 +79,11 @@ public class PartidaConverter implements Serializable {
             lista.add(new String[]{labels.getString("PARTIDA.LABEL.HABGAME"), hab.getNome()});
         }
         for (Habilidade hab : cenario.getHabilidades().values()) {
+            //The game's selected profile is authoritative in settings; retain variant data.
+            if ((partida.hasHabilidade(";GNR;") || partida.hasHabilidade(";GTR;"))
+                    && (hab.getCodigo().equals(";GNR;") || hab.getCodigo().equals(";GTR;"))) {
+                continue;
+            }
             lista.add(new String[]{labels.getString("PARTIDA.LABEL.HABCENARIO"), hab.getNome()});
         }
         Set<Habilidade> habList = new TreeSet<>();
