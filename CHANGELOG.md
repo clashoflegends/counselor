@@ -1,11 +1,21 @@
 # What's New in Counselor
 
-## Unreleased
+## 20-NOV-2026 - v2.1.944
 
-- Order entry no longer asks you to confirm city-growth warnings; they remain in Review. Invalid troop quantities are highlighted in the cell so you can correct them or press Escape.
-- Routine messages no longer interrupt with a dialog. Click the status bar to revisit operation details, download progress and recovery actions. Settings, search, token setup and BattleSim analysis tools stay modeless.
-- Settings reset and diagnostic-file replacement use explicit actions in the operation details instead of confirmation popups.
+### Keep planning without interruptions
+
+- City-growth warnings now stay in Review instead of asking for confirmation while you enter orders. Invalid troop quantities stay highlighted in their cell so you can correct them or press Escape.
+- Routine messages no longer interrupt with a dialog. Click the status bar to revisit operation details, download progress and recovery actions after notifications disappear.
+- Settings, search, token setup and BattleSim analysis tools stay modeless. Settings cancellation preserves unrelated changes; resets and diagnostic-file replacement use explicit actions in the operation details.
+- BattleSim supports inline variant names, direct replacement of pinned comparisons and a persistent warning when unidentified troops make a forecast a lower bound.
+
+### More accurate upkeep forecasts
+
 - Financial forecasts apply free troop upkeep to the cheapest eligible troops across the nation first, matching the updated turn calculation. For nations with only the fast-troop allowance, the forecast is the same whether eligible troops march together or in separate armies.
+
+### Website (clashlegends.com)
+
+- New game requests offer Standard rules or New Trial Rules, which adds the current trial features to the template's rules. Changing the game type keeps your rules choice.
 
 ## 20-NOV-2026 - v2.1.943
 
