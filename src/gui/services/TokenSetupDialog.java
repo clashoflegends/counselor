@@ -24,11 +24,10 @@ import persistenceCommons.WebCounselorManager;
 import persistenceCommons.WebsiteHtmlException;
 
 /**
- * First-upload prompt that lets the player set their per-player Counselor token (jogador.cd_token).
+ * Modeless setup for the player's Counselor token (jogador.cd_token).
  * Two ways to obtain it: fetch automatically (site login + password, never stored) or open the
- * website token page and paste it. Dismissible: [Skip] proceeds without a token, so this NEVER
- * blocks an order upload (the server side is log-only until Phase B). Shown only when no playerToken
- * is stored yet. Returns the saved token, or null if the player skipped.
+ * website token page and paste it. Cancelling leaves the existing token untouched. Uploading
+ * requires a token; saving one does not resume an earlier submission.
  */
 public final class TokenSetupDialog extends JDialog {
 
@@ -40,10 +39,12 @@ public final class TokenSetupDialog extends JDialog {
     private final JTextField tokenField = new JTextField(30);
     private final JLabel statusLabel = new JLabel(" ");
     private final JButton fetchButton;
-    private String result = null;
+    private final java.util.List<java.util.function.Consumer<String>> savedListeners = new java.util.ArrayList<>();
+    private static TokenSetupDialog current;
 
     private TokenSetupDialog(Window parent, BundleManager labels) {
-        super(parent, ModalityType.APPLICATION_MODAL);
+        super(parent, ModalityType.MODELESS);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.labels = labels;
         this.fetchButton = new JButton(tx("TOKEN.SETUP.FETCH.BUTTON", "Fetch"));
         AppIcon.applyTo(this);
@@ -54,13 +55,19 @@ public final class TokenSetupDialog extends JDialog {
         setLocationRelativeTo(parent);
     }
 
-    /** Show the dialog modally. Returns the saved token, or null if skipped. */
-    public static String show(java.awt.Component parent, BundleManager labels) {
+    /** Explicit token setup. Saving never resumes or retries an upload implicitly. */
+    public static void show(java.awt.Component parent, BundleManager labels, java.util.function.Consumer<String> onSaved) {
         Window w = (parent instanceof Window) ? (Window) parent
                 : javax.swing.SwingUtilities.getWindowAncestor(parent);
+        if (current != null && current.isDisplayable()) {
+            if (onSaved != null) current.savedListeners.add(onSaved);
+            current.toFront();
+            return;
+        }
         TokenSetupDialog d = new TokenSetupDialog(w, labels);
+        current = d;
+        if (onSaved != null) d.savedListeners.add(onSaved);
         d.setVisible(true);
-        return d.result;
     }
 
     private void buildContent() {
@@ -159,7 +166,6 @@ public final class TokenSetupDialog extends JDialog {
         JButton cancel = new JButton(tx("TOKEN.SETUP.CANCEL", "Cancel"));
         save.addActionListener(e -> doSave());
         cancel.addActionListener(e -> {
-            result = null; // caller aborts this upload - the token is required to submit
             dispose();
         });
         buttons.add(save);
@@ -198,6 +204,7 @@ public final class TokenSetupDialog extends JDialog {
 
             @Override
             protected void done() {
+                if (!isDisplayable()) return;
                 fetchButton.setEnabled(true);
                 try {
                     String tok = get();
@@ -248,12 +255,19 @@ public final class TokenSetupDialog extends JDialog {
             return;
         }
         SettingsManager.getInstance().setConfigAndSaveToFile("playerToken", tok);
-        result = tok;
+        for (var listener : java.util.List.copyOf(savedListeners)) listener.accept(tok);
         dispose();
     }
 
     private void setStatus(String text) {
         statusLabel.setText(text == null || text.isEmpty() ? " " : text);
+    }
+
+    @Override public void dispose() {
+        savedListeners.clear();
+        passwordField.setText("");
+        if (current == this) current = null;
+        super.dispose();
     }
 
     private String tx(String key, String fallback) {

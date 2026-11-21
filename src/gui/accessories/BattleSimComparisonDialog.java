@@ -39,6 +39,8 @@ final class BattleSimComparisonDialog extends JDialog {
     private final JLabel baselineNotice = new JLabel();
     private List<BattleSimRunSnapshot> pins = List.of();
     private boolean refreshing;
+    private BattleSimRunSnapshot pendingReplacement;
+    private final JButton replace = new JButton(SettingsManager.getInstance().getBundleManager().getString("BATTLESIM.VARIANT.REPLACE"));
     private final Runnable onChanged = this::refresh;
 
     BattleSimComparisonDialog(Frame owner, BattleSimVariants.Family family) {
@@ -59,6 +61,17 @@ final class BattleSimComparisonDialog extends JDialog {
         baseline.setPreferredSize(new Dimension(360, baseline.getPreferredSize().height));
         controls.add(baseline);
         controls.add(remove);
+        controls.add(replace);
+        replace.setEnabled(false);
+        replace.addActionListener(e -> {
+            int index = baseline.getSelectedIndex();
+            if (pendingReplacement != null && index >= 0 && index < family.pins().size()) {
+                BattleSimRunSnapshot snapshot = pendingReplacement;
+                pendingReplacement = null;
+                replace.setEnabled(false);
+                family.pin(snapshot, index);
+            }
+        });
         controls.add(baselineNotice);
         remove.addActionListener(event -> {
             if (baseline.getSelectedIndex() >= 0) {
@@ -85,6 +98,11 @@ final class BattleSimComparisonDialog extends JDialog {
         setSize(Math.min(1160, screen.width * 9 / 10), Math.min(700, screen.height * 8 / 10));
         setLocationRelativeTo(owner);
         refresh();
+    }
+
+    void offerReplacement(BattleSimRunSnapshot snapshot) {
+        pendingReplacement = snapshot;
+        replace.setEnabled(true);
     }
 
     void refresh() {

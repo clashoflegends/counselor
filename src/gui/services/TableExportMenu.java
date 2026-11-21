@@ -87,7 +87,7 @@ public final class TableExportMenu {
             setStatus(labels.getString("EXPORT.SAVED").replace("{0}", target.getName()), table);
         } catch (IOException ex) {
             log.error("CSV export failed", ex);
-            SysApoio.showDialogError(labels.getString("EXPORT.ERROR") + " " + ex.getMessage(), table);
+            Feedback.report(table, labels.getString("EXPORT.ERROR"), ex.getMessage());
         }
     }
 

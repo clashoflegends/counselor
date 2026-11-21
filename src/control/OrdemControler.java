@@ -6,11 +6,7 @@ package control;
 
 import baseLib.GenericoComboObject;
 import business.facade.AcaoFacade;
-import business.facade.CidadeFacade;
-import business.facade.JogadorFacade;
-import business.facade.LocalFacade;
 import business.facade.OrdemFacade;
-import control.facade.WorldFacadeCounselor;
 import control.services.AcaoConverter;
 import control.services.CenarioConverter;
 import control.services.LastTurnOrders;
@@ -28,19 +24,15 @@ import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import model.ActorAction;
-import model.Cidade;
-import model.Local;
 import model.Ordem;
 import model.PersonagemOrdem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import persistence.local.ListFactory;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
 
@@ -56,11 +48,6 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
     private final SubTabOrdem tabGui;
     private final OrdemFacade ordemFacade = new OrdemFacade();
     private final AcaoFacade acaoFacade = new AcaoFacade();
-    private final CidadeFacade cidadeFacade = new CidadeFacade();
-    private final JogadorFacade jogadorFacade = new JogadorFacade();
-    private final ListFactory listFactory = new ListFactory();
-    /** Reset per save gesture, so repeating one order into several slots asks about the same city once. */
-    private boolean sizeCapAsked;
 
     public OrdemControler(SubTabOrdem tabOrdens) {
         this.tabGui = tabOrdens;
@@ -88,11 +75,10 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_COUNT);
     }
 
-    private void doSalvaAction() {
-        sizeCapAsked = false;
+    private boolean doSalvaAction() {
         try {
             if (!doSalvaAction(indexModelOrdem)) {
-                return; //refused: the multi-level copies below would target the same open slot and fail too
+                return false; // retain the current draft, including ALL and invalid quantities
             }
             final int repeats = ordemFacade.getRequirementsMultiLevel(getTabGui().getOrdemQuadro().getOrdem());
             for (int ii = 0; ii < repeats; ii++) {
@@ -101,8 +87,10 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
                 }
             }
             getTabGui().doFindNextActionSlot();
+            return true;
         } catch (NullPointerException ex) {
             //nao fax nada, ordem nao existe
+            return false;
         }
     }
 
@@ -115,8 +103,7 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         if (getTabGui().isReadOnly()) {
             return;
         }
-        doSalvaAction();
-        getTabGui().resetOrdersAllOnSave();
+        if (doSalvaAction()) getTabGui().resetOrdersAllOnSave();
     }
 
     /** Returns false when nothing was saved, which is what stops the slot-filling loops below. */
@@ -161,11 +148,6 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
             }
             return false;
         }
-        if (reportRefusal && !confirmSizeCapOverride(po)) {
-            // ;SCC; says a neighbour is too close for this city to grow. Unlike the two guards above this
-            // is a WARNING, not a refusal - see confirmSizeCapOverride for why the player keeps the choice.
-            return false;
-        }
         control.services.OrderEditTime.stamp(getTabGui().getActor().getPersonagemOrdem(index), po,
                 java.time.Instant.now());
         getTabGui().getActor().doOrderSave(index, po);
@@ -188,7 +170,6 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
      * moved is theirs to correct.
      */
     private void doDoAgainAction() {
-        sizeCapAsked = false;
         if (getTabGui().isReadOnly()) {
             return;
         }
@@ -292,64 +273,6 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
      * A typed target still passes: the pickers are {@code setEditable(true)} for fog of war, and typed text
      * comes back through the {@code ClassCastException} branch as itself, which is not blank.
      */
-    /**
-     * Warns, ONCE per save gesture, that the city this order would grow is currently capped by a
-     * neighbouring big city under {@code ;SCC;}. Returns true to go ahead with the save.
-     *
-     * <b>A warning and not a refusal, on purpose.</b> The blank-parameter guard above refuses because
-     * the Judge is certain to reject; this one is not. The cap depends on somebody ELSE'S city staying
-     * big, and that can stop being true during the very turn being written - the blocker can be
-     * captured, razed, or drop a size on a loyalty flip, all of which the Judge re-reads live at
-     * execution while the client only ever sees last turn. Refusing would take away a legitimate
-     * gamble: take the blocking city first, then grow.
-     *
-     * Own cities only, as everywhere else this rule is evaluated on the client - a foreign nation's
-     * habilidades do not ride in the EGF, so {@code ;PKW;} and {@code ;PIC;} would be missing. See
-     * {@link control.services.CitySizeCap}.
-     *
-     * Not asked on the bulk "Do again" path ({@code reportRefusal == false}): that replays last turn's
-     * orders and summarises the outcome itself, so a modal per order would be worse than useless.
-     */
-    private boolean confirmSizeCapOverride(PersonagemOrdem po) {
-        if (sizeCapAsked) {
-            //already answered yes for this gesture; a no returned false and broke the slot-filling loop
-            return true;
-        }
-        final Local blocker = getSizeCapBlocker(po);
-        if (blocker == null) {
-            return true;
-        }
-        sizeCapAsked = true;
-        final Cidade city = getTabGui().getActor().getLocal().getCidade();
-        final Cidade blockerCity = blocker.getCidade();
-        final int confirm = JOptionPane.showConfirmDialog(getTabGui(),
-                String.format(labels.getString("ORDEM.SIZECAP.CONFIRM"),
-                        cidadeFacade.getNome(city),
-                        blockerCity == null ? labels.getString("?") : cidadeFacade.getNome(blockerCity),
-                        LocalFacade.getCoordenadas(blocker)),
-                labels.getString("ORDEM.SIZECAP.TITLE"),
-                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        return confirm == JOptionPane.YES_OPTION;
-    }
-
-    /**
-     * The hex of the city currently capping this order's target, or null when nothing does - including
-     * when the game has no {@code ;SCC;}, the order does not grow a city, or the actor is not standing
-     * in a city of the player's own.
-     */
-    private Local getSizeCapBlocker(PersonagemOrdem po) {
-        if (!WorldFacadeCounselor.getInstance().hasCitySizeCap() || !acaoFacade.isImproveCitySize(po)) {
-            return null;
-        }
-        final Local hex = getTabGui().getActor().getLocal();
-        final Cidade city = hex == null ? null : hex.getCidade();
-        if (city == null
-                || !jogadorFacade.isMine(city, WorldFacadeCounselor.getInstance().getJogadorAtivo())) {
-            return null;
-        }
-        return cidadeFacade.isCheckCitySizeCapToUpgrade(city, listFactory.listLocais());
-    }
-
     static boolean hasBlankSoleParam(PersonagemOrdem po) {
         if (po == null || po.getOrdem() == null || po.getParametrosId() == null) {
             return false;
@@ -371,9 +294,8 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
     }
 
     private void doRepeatAction() {
-        sizeCapAsked = false;
         try {
-            doSalvaAction(indexModelOrdem);
+            if (!doSalvaAction(indexModelOrdem)) return;
             //find open slot
             int nextActionSlot = getTabGui().getNextActionSlot();
             while (nextActionSlot >= 0) {
@@ -420,8 +342,7 @@ public class OrdemControler extends ControlBase implements Serializable, ActionL
         } else if (actionEvent.getSource() instanceof JButton) {
             JButton button = (JButton) actionEvent.getSource();
             if ("jbOk".equals(button.getActionCommand())) {
-                doSalvaAction();
-                getTabGui().resetOrdersAllOnSave();
+                if (doSalvaAction()) getTabGui().resetOrdersAllOnSave();
             } else if ("jbRepeat".equals(button.getActionCommand())) {
                 doRepeatAction();
             } else if ("jbDoagain".equals(button.getActionCommand())) {

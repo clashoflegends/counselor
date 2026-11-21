@@ -70,8 +70,10 @@ public class TacticGridDialog extends JDialog implements ActionListener {
     private transient TacticSweep.Result result;
 
     public TacticGridDialog(BattleSimWindow owner, BattleSimControler controler) {
-        super(owner, labels.getString("BATTLESIM.TACTICGRID.TITLE"), true);
-        this.controler = controler;
+        super(owner, labels.getString("BATTLESIM.TACTICGRID.TITLE"), false);
+        this.controler = new BattleSimControler(controler.getScenario().copy());
+        int selected = controler.getScenario().getArmies().indexOf(controler.getSelected());
+        if (selected >= 0) this.controler.setSelected(this.controler.getScenario().getArmies().get(selected));
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(8, 8));
         ((JPanel) getContentPane()).setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

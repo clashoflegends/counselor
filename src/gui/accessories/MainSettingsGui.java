@@ -30,6 +30,7 @@ public class MainSettingsGui extends JPanel {
     private final SettingsControler settingsControler;
     private final SettingsManager settingsManager;
     private final File currentResultsFile;
+    private java.util.function.Supplier<File> currentFileSupplier;
 
     public MainSettingsGui(File currentResultsFile) {
 
@@ -47,20 +48,29 @@ public class MainSettingsGui extends JPanel {
         playerTokenLabel.setText(LABELS.getString("SETTINGS.PLAYER.TOKEN")); // overrides the .form placeholder
         playerTokenTextField.setText(settingsManager.getConfig("playerToken", ""));
         playerTokenTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            private String tokenBeforeEditing;
+            @Override public void focusGained(java.awt.event.FocusEvent e) {
+                tokenBeforeEditing = settingsManager.getConfig("playerToken", "");
+                playerTokenTextField.setText(tokenBeforeEditing);
+            }
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
-                settingsManager.setConfigAndSaveToFile("playerToken", playerTokenTextField.getText().trim());
+                String stored = settingsManager.getConfig("playerToken", "");
+                if (tokenBeforeEditing != null && !stored.equals(tokenBeforeEditing)) {
+                    playerTokenTextField.setText(stored); // another modeless setup saved a newer token
+                } else {
+                    settingsManager.setConfigAndSaveToFile("playerToken", playerTokenTextField.getText().trim());
+                }
             }
         });
         // "Fetch from website..." button: reuse the same first-upload dialog (fetch by login+password or
         // paste). TokenSetupDialog.show already persists playerToken on Save; we just sync the visible field.
         fetchTokenButton.setText(LABELS.getString("SETTINGS.PLAYER.TOKEN.FETCH")); // overrides the .form placeholder
         fetchTokenButton.addActionListener(e -> {
-            String tok = gui.services.TokenSetupDialog.show(this, LABELS);
-            if (tok != null && !tok.isEmpty()) {
+            gui.services.TokenSetupDialog.show(this, LABELS, tok -> {
                 playerTokenTextField.setText(tok);
                 refreshPlayerLogin(); // the fetch also captured + stored the canonical login
-            }
+            });
         });
         // Website login (the plogin) captured by the token fetch and stored in properties.config;
         // shown read-only beside the token so a player can confirm which account this Counselor is tied to.
@@ -95,6 +105,14 @@ public class MainSettingsGui extends JPanel {
         maximizeWindowCheckBox.addActionListener(settingsControler);
         tableColumnCheckBox.addActionListener(settingsControler);
         copyActionsPopUpCheckBox.addActionListener(settingsControler);
+        copyActionsPopUpCheckBox.setText(gui.services.Feedback.text("copyDetails"));
+        copyActionsPopUpCheckBox.setSelected(true);
+        copyActionsPopUpCheckBox.setEnabled(false);
+        copyActionsPopUpCheckBox.setToolTipText(gui.services.Feedback.text("details"));
+        copyOrdersCheckBox.setText(gui.services.Feedback.text("copyByActor"));
+        copyOrdersCheckBox.setToolTipText(gui.services.Feedback.text("copyByActor"));
+        sendConfirmPopUpCheckBox.setText(gui.services.Feedback.text("submissionToast"));
+        sendConfirmPopUpCheckBox.setToolTipText(gui.services.Feedback.text("submissionToast"));
         copyOrdersCheckBox.addActionListener(settingsControler);
         keepPopUpCheckBox.addActionListener(settingsControler);
         fogOfWarCheckBox.addActionListener(settingsControler);
@@ -953,8 +971,12 @@ public class MainSettingsGui extends JPanel {
      * @return
      */
     public File getCurrentResultsFile() {
-        return currentResultsFile;
+        return currentFileSupplier == null ? currentResultsFile : currentFileSupplier.get();
     }
+
+    public void followCurrentFile(java.util.function.Supplier<File> supplier) { currentFileSupplier = supplier; }
+
+    public void cancelEdits() { settingsControler.cancelEdits(); }
 
     public void checkDisplayPortraitCheckBox() {
         boolean isEnable = isShowPortraitCheckEnabled();

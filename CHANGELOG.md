@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Order entry no longer asks you to confirm city-growth warnings; they remain in Review. Invalid troop quantities are highlighted in the cell so you can correct them or press Escape.
+- Routine messages no longer interrupt with a dialog. Click the status bar to revisit operation details, download progress and recovery actions. Settings, search, token setup and BattleSim analysis tools stay modeless.
+- Settings reset and diagnostic-file replacement use explicit actions in the operation details instead of confirmation popups.
 - Financial forecasts apply free troop upkeep to the cheapest eligible troops across the nation first, matching the updated turn calculation. For nations with only the fast-troop allowance, the forecast is the same whether eligible troops march together or in separate armies.
 
 ## 20-NOV-2026 - v2.1.943

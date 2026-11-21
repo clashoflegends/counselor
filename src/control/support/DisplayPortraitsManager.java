@@ -17,7 +17,6 @@ import java.io.FileNotFoundException;
 import java.net.ConnectException;
 import java.text.DecimalFormat;
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import persistenceCommons.BundleManager;
 import persistenceCommons.SettingsManager;
@@ -30,6 +29,7 @@ import persistenceCommons.SettingsManager;
 public class DisplayPortraitsManager {
 
     private static DisplayPortraitsManager instance;
+    private boolean downloading;
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
     private DisplayPortraitsManager() {
@@ -68,7 +68,7 @@ public class DisplayPortraitsManager {
 
             confirmAndDownload(panel, propertyChangeListener, downloadService, file.getPath());
         } catch (ConnectException ex) {
-            JOptionPane.showMessageDialog(panel, labels.getString("CONFIG.ERROR.NETWORK"), "downloadPortraits", JOptionPane.ERROR_MESSAGE);
+            gui.services.Feedback.report(panel, labels.getString("CONFIG.READY.DOWNLOAD"), labels.getString("CONFIG.ERROR.NETWORK"));
         } catch (BusinessException ex) {
             // folder selection canceled - nothing to do
         }
@@ -100,7 +100,7 @@ public class DisplayPortraitsManager {
             }
             confirmAndDownload(parent, null, downloadService, folder, confirm);
         } catch (ConnectException ex) {
-            JOptionPane.showMessageDialog(parent, labels.getString("CONFIG.ERROR.NETWORK"), "downloadPortraits", JOptionPane.ERROR_MESSAGE);
+            gui.services.Feedback.report(parent, labels.getString("CONFIG.READY.DOWNLOAD"), labels.getString("CONFIG.ERROR.NETWORK"));
         }
     }
 
@@ -121,14 +121,24 @@ public class DisplayPortraitsManager {
             }
             float fileSize = sizeBytes / (1024f * 1024f);
             DecimalFormat df = new DecimalFormat("####.##");
-            int ret = JOptionPane.showConfirmDialog(parent,
-                    String.format(labels.getString("CONFIG.DOWNLOAD.SIZE.CONFIRM"), df.format(fileSize)),
-                    labels.getString("CONFIG.READY.DOWNLOAD"), JOptionPane.OK_CANCEL_OPTION);
-            if (ret != JOptionPane.OK_OPTION) {
-                return;
-            }
+            gui.services.Feedback.report(parent, labels.getString("CONFIG.READY.DOWNLOAD"),
+                    gui.services.Feedback.actions(String.format(labels.getString("CONFIG.DOWNLOAD.SIZE.CONFIRM"), df.format(fileSize)),
+                            new String[]{gui.services.Feedback.text("download")},
+                            () -> startDownload(url, folder, listener)));
+            return;
         }
+        startDownload(url, folder, listener);
+    }
+
+    private synchronized void startDownload(String url, String folder, PropertyChangeListener listener) {
+        if (downloading) return;
+        downloading = true;
         DownloadProgressWork dpw = new DownloadProgressWork(url, folder);
+        dpw.addPropertyChangeListener(e -> {
+            if ("state".equals(e.getPropertyName()) && e.getNewValue() == javax.swing.SwingWorker.StateValue.DONE) {
+                synchronized (DisplayPortraitsManager.this) { downloading = false; }
+            }
+        });
         if (listener != null) {
             dpw.addPropertyChangeListener(listener);
         }

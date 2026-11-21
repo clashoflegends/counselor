@@ -564,10 +564,26 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     // ------------------------------------------------------------------ layout
 
     /** Battle-wide setup and analysis stay above; army commands live beside the roster. */
+    private final javax.swing.JTextField variantName = new javax.swing.JTextField(16);
+    private final javax.swing.JLabel fillAssumption = new javax.swing.JLabel();
+
     private JPanel buildToolbar() {
         final JPanel ret = new JPanel(new BorderLayout(4, 0));
         ret.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
         final JPanel setup = new JPanel(new gui.services.WrapLayout(FlowLayout.LEADING, 4, 0));
+        variantName.setText(variant.name());
+        variantName.setToolTipText(labels.getString("BATTLESIM.VARIANT.NAME"));
+        variantName.getAccessibleContext().setAccessibleName(labels.getString("BATTLESIM.VARIANT.NAME"));
+        variantName.addActionListener(e -> {
+            if (!variantName.getText().isBlank()) variant.rename(variantName.getText().strip());
+            variantName.setText(variant.name());
+            setTitle(variant.name());
+        });
+        variantName.getInputMap().put(javax.swing.KeyStroke.getKeyStroke("ESCAPE"), "cancelName");
+        variantName.getActionMap().put("cancelName", new javax.swing.AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) { variantName.setText(variant.name()); }
+        });
+        setup.add(variantName);
 
         diplomacy.setAction(command("BATTLESIM.DIPLOMACY", "diplomacy", null));
         setup.add(diplomacy);
@@ -626,6 +642,17 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         readiness = new BattleSimReadinessPanel(labels, this::showReadiness);
         execution.add(readiness, BorderLayout.NORTH);
         execution.add(execute, BorderLayout.SOUTH);
+        fillAssumption.setText(gui.services.Feedback.text("floor"));
+        fillAssumption.setToolTipText(gui.services.Feedback.text("details"));
+        fillAssumption.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        fillAssumption.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent e) {
+                gui.services.Feedback.report(BattleSimWindow.this, labels.getString("BATTLESIM.FILL"),
+                        labels.getString("BATTLESIM.FILL.UNKNOWNTROOPS"));
+                gui.services.Feedback.open(BattleSimWindow.this);
+            }
+        });
+        execution.add(fillAssumption, BorderLayout.CENTER);
         ret.add(execution, BorderLayout.LINE_END);
         installShortcuts();
         return ret;
@@ -1674,11 +1701,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             setLabelWithTooltip(status, String.format(
                     labels.getString("BATTLESIM.ARMY.PASTE.DONE"), armies.size()));
         } catch (business.combat.BattleSimTransfer.TransferException ex) {
-            javax.swing.JOptionPane.showMessageDialog(this,
+            gui.services.Feedback.report(this, labels.getString("BATTLESIM.ARMY.PASTE"),
                     String.format(labels.getString("BATTLESIM.ARMY.PASTE.FAILED"),
-                            labels.getString(ex.getReasonKey()), ex.getOffending()),
-                    labels.getString("BATTLESIM.ARMY.PASTE"),
-                    javax.swing.JOptionPane.WARNING_MESSAGE);
+                            labels.getString(ex.getReasonKey()), ex.getOffending()));
         }
     }
 
@@ -1766,30 +1791,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
                 controler.getScenario().getDisplayName(focus),
                 business.combat.ScenarioDefaults.unknownTroops(focus));
         setLabelWithTooltip(status, where);
-        // ONCE PER WINDOW, and the status bar carries it every time after that.
-        //
-        // John's framing for this button is "set some initial values for a quick check", and
-        // the loop it exists for is fill, look, edit, fill again. A modal on every press taxes
-        // the loop rather than the mistake. But the warning is the honest half of the feature -
-        // a filled army is unidentified troops fighting at 1, so its strength is a FLOOR - and
-        // dropping it would leave the player reading a forecast nobody had qualified. Once is
-        // enough to teach it; the status line and the jumped-to selection say it thereafter.
-        if (!filledWarningShown) {
-            filledWarningShown = true;
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    labels.getString("BATTLESIM.FILL.UNKNOWNTROOPS") + "\n\n" + where,
-                    labels.getString("BATTLESIM.FILL"),
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        }
     }
-
-    /**
-     * Whether this window has already explained what an unidentified army is worth. See doFill.
-     *
-     * Per WINDOW rather than per application: a Clone is a fresh question, often opened days
-     * later or handed to an ally, and the first result it produces deserves the same sentence.
-     */
-    private transient boolean filledWarningShown;
 
     /**
      * Puts the selected army where the player can SEE it, which selecting alone does not.
@@ -1832,10 +1834,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             setLabelWithTooltip(status,
                     String.format(labels.getString("BATTLESIM.SAVE.DONE"), target.getName()));
         } catch (java.io.IOException ex) {
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    String.format(labels.getString("BATTLESIM.SAVE.FAILED"), ex.getMessage()),
-                    labels.getString("BATTLESIM.SAVE.TITLE"),
-                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            gui.services.Feedback.report(this, labels.getString("BATTLESIM.SAVE.TITLE"),
+                    String.format(labels.getString("BATTLESIM.SAVE.FAILED"), ex.getMessage()));
         }
     }
 
@@ -1887,10 +1887,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
 
     /** One refusal dialog, which always names the thing it refused over. */
     private void doLoadFailed(String reason, String offending) {
-        javax.swing.JOptionPane.showMessageDialog(this,
-                String.format(labels.getString("BATTLESIM.LOAD.FAILED"), reason, offending),
-                labels.getString("BATTLESIM.LOAD.TITLE"),
-                javax.swing.JOptionPane.WARNING_MESSAGE);
+        gui.services.Feedback.report(this, labels.getString("BATTLESIM.LOAD.TITLE"),
+                String.format(labels.getString("BATTLESIM.LOAD.FAILED"), reason, offending));
     }
 
     /** Hex and time, so a folder of saved battles is readable without opening them. */
@@ -1918,10 +1916,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
     private void doCloneWindow() {
         // No commitSpinners() here: the action dispatcher calls it before reaching any branch, so a
         // second call would find nothing pending and read as a safeguard that is not doing anything.
-        final String name = javax.swing.JOptionPane.showInputDialog(this,
-                labels.getString("BATTLESIM.VARIANT.NAME"), variant.name());
-        if (name == null || name.isBlank()) return;
-        final var fork = variant.fork(name.strip());
+        final var fork = variant.fork(variant.name() + " 2");
         final BattleSimWindow ret = new BattleSimWindow(new BattleSimControler(fork.scenario()), fork.name(), fork);
         ret.setSize(getSize());
         ret.setLocation(getX() + CLONE_OFFSET, getY() + CLONE_OFFSET);
@@ -1937,14 +1932,9 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
         }
         int replace = -1;
         if (family.pins().size() == control.services.BattleSimVariants.MAX_PINS) {
-            final String[] choices = new String[family.pins().size()];
-            for (int i = 0; i < choices.length; i++) choices[i] = (i + 1) + ". "
-                    + family.pins().get(i).name() + " - " + family.pins().get(i).time();
-            final Object choice = javax.swing.JOptionPane.showInputDialog(this,
-                    labels.getString("BATTLESIM.VARIANT.REPLACE"), labels.getString("BATTLESIM.VARIANT.PIN"),
-                    javax.swing.JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
-            if (choice == null) return;
-            replace = java.util.Arrays.asList(choices).indexOf(choice);
+            showComparison();
+            comparison.offerReplacement(completedSnapshot);
+            return;
         }
         // A second pin of the same run raises comparison rather than duplicating it.
         if (family.pins().stream().noneMatch(pin -> pin.runId().equals(completedSnapshot.runId()))) {
@@ -2097,6 +2087,7 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
      */
     private void doRefresh(boolean includePlatoons) {
         if (disposed) return;
+        fillAssumption.setVisible(business.combat.WhatIfSearch.hasUnidentifiedTroops(controler.getScenario()));
         refreshing = true;
         try {
             roster.refresh();
@@ -2409,10 +2400,8 @@ public class BattleSimWindow extends JFrame implements ActionListener, ChangeLis
             return;
         }
         if ("renameVariant".equals(command)) {
-            final String name = javax.swing.JOptionPane.showInputDialog(this,
-                    labels.getString("BATTLESIM.VARIANT.NAME"), variant.name());
-            variant.rename(name);
-            setTitle(variant.name());
+            variantName.requestFocusInWindow();
+            variantName.selectAll();
             return;
         } else if ("pinRun".equals(command)) {
             doPinRun();

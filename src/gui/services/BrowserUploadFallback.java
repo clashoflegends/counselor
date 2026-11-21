@@ -10,7 +10,6 @@ import java.net.URI;
 import java.util.function.Function;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -32,9 +31,7 @@ public final class BrowserUploadFallback {
         JPanel panel = createPanel(labels, attachment, info, result, new DesktopActions());
         String title = result.code() == WebCounselorManager.ERROR_BROWSER_VERIFICATION
                 ? "UPLOAD.BROWSER.TITLE" : "WEBSITE.HTML.TITLE";
-        JOptionPane.showOptionDialog(parent, panel, labels.apply(title),
-                JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                new Object[]{labels.apply("UPLOAD.BROWSER.CLOSE")}, null);
+        Feedback.report(parent, labels.apply(title), panel);
     }
 
     /** Package-visible so tests exercise the real buttons without launching external applications. */

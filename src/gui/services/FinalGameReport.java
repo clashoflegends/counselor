@@ -3,7 +3,6 @@ package gui.services;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.net.URI;
-import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 import persistenceCommons.BundleManager;
@@ -33,7 +32,7 @@ public final class FinalGameReport {
                 JTextArea text = new JTextArea(labels.getString("VDASH.REPORT.BROWSER") + "\n\n" + uri);
                 text.setEditable(false); text.setLineWrap(true); text.setWrapStyleWord(true);
                 text.setColumns(48); text.setRows(4);
-                JOptionPane.showMessageDialog(parent, text, labels.getString("VDASH.REPORT"), JOptionPane.INFORMATION_MESSAGE);
+                Feedback.report(parent, labels.getString("VDASH.REPORT"), new javax.swing.JScrollPane(text));
             }
         }.execute();
     }

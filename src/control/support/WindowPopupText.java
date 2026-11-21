@@ -21,11 +21,11 @@ import javax.swing.JFrame;
 public class WindowPopupText implements Serializable {
 
     public static void showWindowText(String message, String title, Component relativeTo) {
-        JDialog dPopup = new JDialog(new JFrame(), false);
+        JDialog dPopup = new JDialog(gui.services.Feedback.owner(relativeTo), java.awt.Dialog.ModalityType.MODELESS);
         AppIcon.applyTo(dPopup);
         SubTabTextArea stContent = new SubTabTextArea();
         stContent.setText(message);
-        //monta a floating window 
+        //monta a floating window
         dPopup.setTitle(title);
         dPopup.add(stContent);
         dPopup.pack();
@@ -34,11 +34,11 @@ public class WindowPopupText implements Serializable {
     }
 
     public static void showWindowTable(GenericoTableModel model, String title, Component relativeTo) {
-        JDialog dPopup = new JDialog(new JFrame(), false);
+        JDialog dPopup = new JDialog(gui.services.Feedback.owner(relativeTo), java.awt.Dialog.ModalityType.MODELESS);
         AppIcon.applyTo(dPopup);
         SubTabBaseList stContent = new SubTabBaseList();
         stContent.setListModel(model);
-        //monta a floating window 
+        //monta a floating window
         dPopup.setTitle(title);
         dPopup.add(stContent);
         dPopup.pack();

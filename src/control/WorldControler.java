@@ -25,6 +25,7 @@ import control.support.DispatchManager;
 import control.support.DisplayPortraitsManager;
 import gui.MainResultWindowGui;
 import gui.services.Toast;
+import gui.services.Feedback;
 import gui.accessories.MainAboutBox;
 import gui.accessories.MainSettingsGui;
 import gui.charts.DataSetForChart;
@@ -59,12 +60,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
-import javax.swing.ProgressMonitor;
+
 import model.Cidade;
 import model.Comando;
 import model.ComandoDetail;
@@ -128,7 +128,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private final PersonagemFacade personagemFacade = new PersonagemFacade();
     private static final WorldFacadeCounselor WFC = WorldFacadeCounselor.getInstance();
 
-    private ProgressMonitor progressMonitor;
+    private Feedback.Progress progressMonitor;
 
     public WorldControler(MainResultWindowGui aGui) {
         //initialize file choosers
@@ -405,16 +405,24 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * folder that works. Cancelling leaves the orders in memory, exactly as they were, so they can try again.
      */
     private File doSaveOrdensRetryAs(Comando comando, String missingActionMsg, Component jbTemp) {
-        SysApoio.showDialogError(labels.getString("ORDENS.SALVAS.NAO.RETRY"), this.getGui());
-        if (fcOrders.showSaveDialog(jbTemp) != JFileChooser.APPROVE_OPTION) {
-            this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
-            return null;
-        }
-        final File ret = doFileSave(comando, missingActionMsg);
-        if (ret != null) {
-            log.info(String.format("Saved Server file after a retry[%s]: %s", SysApoio.getPidOs(), ret.getAbsolutePath()));
-        }
-        return ret;
+        String failure = labels.getString("ORDENS.SALVAS.NAO.RETRY");
+        this.getGui().setStatusMsg(failure);
+        Feedback.report(getGui(), failure, scopedActions(failure,
+                new String[]{Feedback.text("retry"), Feedback.text("saveAs")},
+                () -> { doSave((JButton) jbTemp, false); return true; },
+                () -> {
+                    File previous = fcOrders.getSelectedFile();
+                    if (fcOrders.showSaveDialog(jbTemp) == JFileChooser.APPROVE_OPTION) {
+                        saved = true;
+                        doSave((JButton) jbTemp, false); // collect the CURRENT plan, never an old captured command
+                        return true;
+                    } else {
+                        fcOrders.setSelectedFile(previous);
+                        getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
+                        return false;
+                    }
+                }));
+        return null;
     }
 
     private void doSaveWorld(JButton jbTemp) {
@@ -442,7 +450,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.saved = true;
         } catch (BusinessException ex) {
             log.error(ex.getMessage());
-            SysApoio.showDialogError(ex.getMessage(), this.getGui());
+            reportError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             //null means FAILED: the caller decides what to do about it. It used to return the file it had
             //tried to write either way, so a failed save still logged "Saved Server file".
@@ -483,65 +491,94 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         WFC.getMapaControler().doHexViewToggle();
     }
 
-    private void doConfig() throws HeadlessException {
-
-        MainSettingsGui settingPanel = new MainSettingsGui(this.currentResultsFile);
-
-        // Custom 3-button dialog: Save / Reset to Defaults / Cancel. With an explicit options[] the return
-        // value is the button INDEX (0/1/2), or CLOSED_OPTION (-1) when dismissed via the window X.
-        final Object[] buttons = {
-            labels.getString("SETTINGS.BTN.SAVE"),
-            labels.getString("SETTINGS.BTN.RESET"),
-            labels.getString("SETTINGS.BTN.CANCEL")
-        };
-        int option = JOptionPane.showOptionDialog(getGui(), settingPanel, labels.getString("MENU.CONFIG"),
-                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
-                new javax.swing.ImageIcon(getClass().getResource("/images/icon_customize.gif")), buttons, buttons[0]);
-
-        if (option == 0) {   // Save
-            log.debug("Saving settings from option window.");
-
-            Enumeration keys = SettingsManager.getInstance().listConfigs();
-            while (keys.hasMoreElements()) {
-                String key = (String) keys.nextElement();
-                //FIXME Comparation is not working. All settings are saving to file.
-                if (SettingsManager.getInstance().isConfig(key, SettingsManager.getInstance().getConfig(key), "")) {
-                    SettingsManager.getInstance().doConfigSave(key);
+    private javax.swing.JPanel scopedActions(String message, String[] captions, java.util.function.BooleanSupplier... actions) {
+        final Partida context = WFC.getPartida();
+        final int turn = WFC.getTurno();
+        java.util.function.BooleanSupplier[] guarded = new java.util.function.BooleanSupplier[actions.length];
+        for (int i = 0; i < actions.length; i++) {
+            java.util.function.BooleanSupplier action = actions[i];
+            guarded[i] = () -> {
+                if (WFC.getPartida() != context || WFC.getTurno() != turn || loadingEgf) {
+                    Feedback.report(getGui(), Feedback.text("history"), Feedback.text("expired"));
+                    return true;
                 }
-            }
-
-        } else if (option == 1) {   // Reset to Defaults
-            doResetConfigs();
-
-        } else {   // Cancel (button index 2) or window closed (-1)
-            SettingsManager.getInstance().listConfigs();
-            log.debug("Cancel settings option window.");
-
-            Enumeration keys = SettingsManager.getInstance().listConfigs();
-            while (keys.hasMoreElements()) {
-                SettingsManager.getInstance().doConfigRestore((String) keys.nextElement());
-            }
+                return action.getAsBoolean();
+            };
         }
+        return Feedback.choices(message, captions, guarded);
     }
 
+    private void reportError(String message, java.awt.Component parent) {
+        reportError(message, labels.getString("ERROR"), parent);
+    }
+
+    private void reportError(String message, String title, java.awt.Component parent) {
+        Feedback.report(parent, title, message);
+    }
+
+    private JDialog settingsDialog;
+
+    public void cancelPendingSettings() {
+        if (settingsDialog == null || !settingsDialog.isDisplayable()) return;
+        for (Component component : settingsDialog.getContentPane().getComponents()) {
+            if (component instanceof MainSettingsGui form) form.cancelEdits();
+        }
+        settingsDialog.dispose();
+    }
+
+    private void doConfig() throws HeadlessException {
+        if (settingsDialog != null && settingsDialog.isDisplayable()) {
+            settingsDialog.toFront();
+            return;
+        }
+        MainSettingsGui settingPanel = new MainSettingsGui(this.currentResultsFile);
+        settingPanel.followCurrentFile(() -> this.currentResultsFile);
+        JDialog dialog = new JDialog(Feedback.owner(getGui()),
+                labels.getString("MENU.CONFIG"), java.awt.Dialog.ModalityType.MODELESS);
+        settingsDialog = dialog;
+        AppIcon.applyTo(dialog);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        Runnable restore = settingPanel::cancelEdits;
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override public void windowClosing(java.awt.event.WindowEvent e) { restore.run(); }
+        });
+        javax.swing.JPanel buttons = new javax.swing.JPanel();
+        JButton save = new JButton(labels.getString("SETTINGS.BTN.SAVE"));
+        JButton reset = new JButton(labels.getString("SETTINGS.BTN.RESET"));
+        JButton cancel = new JButton(labels.getString("SETTINGS.BTN.CANCEL"));
+        save.addActionListener(e -> {
+            Enumeration keys = SettingsManager.getInstance().listConfigs();
+            while (keys.hasMoreElements()) SettingsManager.getInstance().doConfigSave((String) keys.nextElement());
+            dialog.dispose();
+        });
+        cancel.addActionListener(e -> { restore.run(); dialog.dispose(); });
+        reset.addActionListener(e -> doResetConfigs());
+        buttons.add(save);
+        buttons.add(reset);
+        buttons.add(cancel);
+        dialog.add(settingPanel, java.awt.BorderLayout.CENTER);
+        dialog.add(buttons, java.awt.BorderLayout.SOUTH);
+        dialog.pack();
+        dialog.setLocationRelativeTo(getGui());
+        dialog.setVisible(true);
+    }
     /**
      * Wipe properties.config and rewrite it with the default batch (SysProperties.setPropDefault). Confirmed
      * first because it clears ALL saved settings, including the Counselor token (re-fetchable from the site).
      * Some settings (theme, language) take effect only after a restart.
      */
     private void doResetConfigs() {
-        int confirm = JOptionPane.showConfirmDialog(getGui(),
-                labels.getString("SETTINGS.RESET.CONFIRM"), labels.getString("SETTINGS.RESET.TITLE"),
-                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (confirm != JOptionPane.YES_OPTION) {
-            return;
-        }
-        SettingsManager.getInstance().resetToDefaults();
-        log.info("Settings reset to defaults by the user.");
-        SysApoio.showDialogInfo(labels.getString("SETTINGS.RESET.DONE"),
-                labels.getString("SETTINGS.RESET.TITLE"), getGui());
+        final JDialog context = settingsDialog;
+        Feedback.report(getGui(), labels.getString("SETTINGS.RESET.TITLE"),
+                Feedback.actions(labels.getString("SETTINGS.RESET.CONFIRM"),
+                        new String[]{labels.getString("SETTINGS.BTN.RESET")}, () -> {
+                            if (settingsDialog != context || context == null || !context.isDisplayable()) return;
+                            context.dispose();
+                            SettingsManager.getInstance().resetToDefaults();
+                            getGui().setStatusMsg(labels.getString("SETTINGS.RESET.DONE"));
+                            Toast.show(labels.getString("SETTINGS.RESET.DONE"), null);
+                        }));
     }
-
     /**
      * Transitional method for development purpose. Must be deleted after new methods in SettingsManager would be implemented.
      *
@@ -578,20 +615,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         jtaResultado.copy();
         this.getGui().setStatusMsg(labels.getString("COPIAR.ACOES.STATUS"));
         jtaResultado.select(0, 0);
-        if (SettingsManager.getInstance().getConfig("CopyActionsPopUp", "1").equals("1")) {
-            //scroll pane
-            JScrollPane jsp = new javax.swing.JScrollPane(jtaResultado);
-            //configura jDialog
-            JDialog dAbout = new JDialog(new JFrame(), true);
-            AppIcon.applyTo(dAbout);
-            dAbout.setTitle(labels.getString(titleKey));
-            dAbout.setAlwaysOnTop(true);
-            dAbout.setPreferredSize(new Dimension(600, 400));
-            dAbout.add(jsp);
-            dAbout.setLocationRelativeTo(this.getGui());
-            dAbout.pack();
-            dAbout.setVisible(true);
-        }
+        Feedback.report(getGui(), labels.getString(titleKey), new JScrollPane(jtaResultado));
     }
 
     /** Actor filter for the "My Actions" listing: only the active player's own actors. */
@@ -644,20 +668,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         jtaResultado.copy();
         this.getGui().setStatusMsg(labels.getString("COPIAR.EMAILS.STATUS"));
         jtaResultado.select(0, 0);
-        if (SettingsManager.getInstance().getConfig("CopyEmailListPopUp", "1").equals("1")) {
-            //scroll pane
-            JScrollPane jsp = new javax.swing.JScrollPane(jtaResultado);
-            //configura jDialog
-            JDialog dAbout = new JDialog(new JFrame(), true);
-            AppIcon.applyTo(dAbout);
-            dAbout.setTitle(labels.getString("COPIAR.EMAILS"));
-            dAbout.setAlwaysOnTop(true);
-            dAbout.setPreferredSize(new Dimension(600, 400));
-            dAbout.add(jsp);
-            dAbout.setLocationRelativeTo(this.getGui());
-            dAbout.pack();
-            dAbout.setVisible(true);
-        }
+        Feedback.report(getGui(), labels.getString("COPIAR.EMAILS"), new JScrollPane(jtaResultado));
     }
 
     /**
@@ -667,6 +678,10 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
      * @throws HeadlessException
      */
     private void doSend(JButton jbTemp) throws HeadlessException {
+        doSend(jbTemp, null);
+    }
+
+    private void doSend(JButton jbTemp, Boolean selectedMode) throws HeadlessException {
         /*
          * checa se ja salvou nesta sessao
          * se sim, salva com o mesmo nome sem exibir o dialogo 
@@ -674,8 +689,6 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
          */
         File attachment = doSave(jbTemp, true);
         if (attachment == null) {
-            this.getGui().setStatusMsg(labels.getString("ENVIAR.FALTOU.ARQUIVO"));
-            SysApoio.showDialogError(labels.getString("ENVIAR.FALTOU.ARQUIVO"), this.getGui());
             return;
         }
         /*
@@ -703,32 +716,29 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         final boolean egfTokenPresent = !nacoesAtivo.isEmpty() && nacoesAtivo.get(0).getCdToken() > 0;
         final boolean onBehalf = !senderLogin.isEmpty() && !senderLogin.equalsIgnoreCase(ownerLogin);
         if (onBehalf && egfTokenPresent) {
-            final String ownerKey = ownerLogin.toLowerCase();
-            if (shadowChoiceRemembered.containsKey(ownerKey)) {
-                // Player ticked "don't ask again this session" for this owner earlier — reuse that choice.
+            final String ownerKey = ownerLogin.toLowerCase(java.util.Locale.ROOT);
+            if (selectedMode != null) {
+                shadow = selectedMode;
+            } else if (shadowChoiceRemembered.containsKey(ownerKey)) {
                 shadow = shadowChoiceRemembered.get(ownerKey);
             } else {
-                final javax.swing.JCheckBox dontAsk = new javax.swing.JCheckBox(
+                final Partida context = WFC.getPartida();
+                final int contextTurn = WFC.getTurno();
+                final javax.swing.JCheckBox remember = new javax.swing.JCheckBox(
                         String.format(labels.getString("SHADOW.PROMPT.REMEMBER"), ownerLogin));
-                final Object[] message = {
-                    String.format(labels.getString("SHADOW.PROMPT.MSG"), ownerLogin), dontAsk};
-                final Object[] options = {
-                    labels.getString("SHADOW.OPT.NORMAL"),
-                    labels.getString("SHADOW.OPT.STANDBY"),
-                    labels.getString("TOKEN.SETUP.CANCEL")};
-                final int choice = JOptionPane.showOptionDialog(this.getGui(), message,
-                        labels.getString("SHADOW.PROMPT.TITLE"),
-                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                        options, options[0]); // default = normal on-behalf
-                if (choice != 0 && choice != 1) { // Cancel / closed
-                    this.getGui().setStatusMsg(labels.getString("SAVE.CANCELLED"));
-                    return;
-                }
-                shadow = (choice == 1);
-                if (dontAsk.isSelected()) {
-                    // Remember the DECISION (normal or stand-by) for this owner for the rest of the session.
-                    shadowChoiceRemembered.put(ownerKey, shadow);
-                }
+                java.util.function.Consumer<Boolean> choose = mode -> {
+                    if (loadingEgf || WFC.getTurno() != contextTurn || WFC.getPartida() != context || !ownerLogin.equals(WFC.getPartida().getJogadorAtivo().getLogin()) || !senderLogin.equals(
+                            SettingsManager.getInstance().getConfig("playerLogin", "").trim())) return;
+                    if (remember.isSelected()) shadowChoiceRemembered.put(ownerKey, mode);
+                    doSend(jbTemp, mode); // save and collect the current plan only after the explicit choice
+                };
+                javax.swing.JPanel panel = Feedback.actions(
+                        String.format(labels.getString("SHADOW.PROMPT.MSG"), ownerLogin),
+                        new String[]{labels.getString("SHADOW.OPT.NORMAL"), labels.getString("SHADOW.OPT.STANDBY")},
+                        () -> choose.accept(false), () -> choose.accept(true));
+                panel.add(remember, java.awt.BorderLayout.NORTH);
+                Feedback.report(getGui(), labels.getString("SHADOW.PROMPT.TITLE"), panel);
+                return;
             }
         }
         final PartidaJogadorWebInfo info = doPrepPost(attachment, shadow);
@@ -755,7 +765,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 }
                 if (!ok) {
                     WorldControler.this.getGui().setStatusMsg(labels.getString("ENVIAR.ERRO"));
-                    SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), WorldControler.this.getGui());
+                    reportError(labels.getString("ENVIAR.ERRO.INSTRUCTIONS"), labels.getString("ENVIAR.ERRO"), WorldControler.this.getGui());
                 }
             }
         }.execute();
@@ -772,13 +782,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
         if (!SettingsManager.getInstance().getConfig("playerToken", "").trim().isEmpty()) {
             return true; // already set - WebCounselorManager will send it
         }
-        try {
-            String tok = TokenSetupDialog.show(this.getGui(), labels);
-            return (tok != null && !tok.trim().isEmpty());
-        } catch (Throwable t) {
-            log.warn("Player token prompt failed: " + t);
-            return false; // no token -> abort the upload (posting without it would just 401)
-        }
+        Feedback.report(getGui(), labels.getString("TOKEN.REQUIRED.STATUS"),
+                Feedback.actions(labels.getString("TOKEN.REQUIRED.STATUS"),
+                        new String[]{labels.getString("TOKEN.SETUP.TITLE")},
+                        () -> TokenSetupDialog.show(getGui(), labels, token ->
+                                getGui().setStatusMsg(labels.getString("TOKEN.SETUP.SAVE")))));
+        return false;
     }
 
     /**
@@ -831,13 +840,13 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             } catch (BusinessException ex) {
                 //parse-time failure: file not found, corrupted, or incompatible version (already a player-readable message)
                 log.error("Failed to open results file: " + resultsFile.getName(), ex);
-                SysApoio.showDialogError(ex.getMessage(), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
+                reportError(ex.getMessage(), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
                 this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + resultsFile.getName());
             } catch (RuntimeException ex) {
                 //GUI-build or otherwise unexpected failure: keep the app alive, show a friendly message, log the stack trace
                 log.error("Unexpected error opening results file: " + resultsFile.getName(), ex);
                 persistenceCommons.CrashReporter.report(ex, "egf-open:" + resultsFile.getName());
-                SysApoio.showDialogError(labels.getString("OPEN.ERRO.INESPERADO"), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
+                reportError(labels.getString("OPEN.ERRO.INESPERADO"), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
                 this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + resultsFile.getName());
             } finally {
                 loadingEgf = false;
@@ -922,12 +931,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.saved = false;
         } catch (BusinessException ex) {
             log.error("Failed to autoload results file: " + autoLoad, ex);
-            SysApoio.showDialogError(ex.getMessage(), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
+            reportError(ex.getMessage(), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
             this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + autoLoad);
         } catch (RuntimeException ex) {
             log.error("Unexpected error autoloading results file: " + autoLoad, ex);
             persistenceCommons.CrashReporter.report(ex, "egf-autoload");
-            SysApoio.showDialogError(labels.getString("OPEN.ERRO.INESPERADO"), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
+            reportError(labels.getString("OPEN.ERRO.INESPERADO"), labels.getString("OPEN.ERRO.TITULO"), this.getGui());
             this.getGui().setStatusMsg(labels.getString("OPEN.ERRO.STATUS") + autoLoad);
         }
     }
@@ -1192,25 +1201,18 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             this.getGui().setStatusMsg(String.format("%d %s %s", qtOrdensCarregadas, labels.getString("ORDENS.CARREGADAS"), file.getName()));
             doCountActions();
             if (!errorMsgs.isEmpty()) {
-                String msg = "";
-                for (String line : errorMsgs) {
-                    msg += line + "\n";
-                }
-                if (SettingsManager.getInstance().isConfig("LoadActionsFailToLoadBehavior", "LogOnly", "Display")) {
-                    log.error(String.format("LoadActionsFailToLoadBehavior=LogOnly. Set 'Display' for popup. %d %s %s", errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName()));
-                } else {
-                    SysApoio.showDialogError(String.format("%d %s %s\n%s",
-                            errorMsgs.size(), labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(), msg), this.getGui());
-                }
+                reportError(String.format("%d %s %s\n%s", errorMsgs.size(),
+                        labels.getString("ORDENS.CARREGADAS.FAIL"), file.getName(),
+                        String.join("\n", errorMsgs)), this.getGui());
             }
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
             getDispatchManager().sendDispatchForMsg(DispatchManager.ACTIONS_COUNT);
         } catch (IllegalStateException | PersistenceException ex) {
-            SysApoio.showDialogError(ex.getMessage(), this.getGui());
+            reportError(ex.getMessage(), this.getGui());
             this.getGui().setStatusMsg(ex.getMessage());
             log.info(ex.getMessage());
         } catch (ClassCastException ex) {
-            SysApoio.showDialogError(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName(), this.getGui());
+            reportError(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName(), this.getGui());
             this.getGui().setStatusMsg(labels.getString("ARQUIVO.CORROMPIDO.ACOES") + file.getName());
             log.error(ex.getMessage());
         }
@@ -1622,12 +1624,12 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 // reopen the setup dialog so the player can set a fresh one, then resubmit.
                 SettingsManager.getInstance().setConfigAndSaveToFile("playerToken", "");
                 this.getGui().setStatusMsg(labels.getString("TOKEN.INVALID.STATUS"));
-                SysApoio.showDialogError(labels.getString("TOKEN.INVALID.MSG"), labels.getString("ENVIAR.ERRO"), this.getGui());
+                reportError(labels.getString("TOKEN.INVALID.MSG"), labels.getString("ENVIAR.ERRO"), this.getGui());
                 ensurePlayerToken(); // prompt for a fresh token; the player resubmits after
                 return true; // handled - suppress the generic error dialog and don't email
             case WebCounselorManager.ERROR_GAMECLOSED:
                 //display alert!
-                SysApoio.showDialogError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"), this.getGui());
+                reportError(labels.getString("ENVIAR.ERRO.GAMECLOSED"), labels.getString("ENVIAR.ERRO"), this.getGui());
                 this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                 return true; //dont try email
             case WebCounselorManager.ERROR_SERVERMSG:
@@ -1635,7 +1637,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
                 // on-behalf orders, not a teammate, doesn't accept stand-by, bad EGF token, ...) — the client
                 // can't pre-validate it, so surface the server's exact reason instead of a generic error.
                 final String serverMsg = result.message();
-                SysApoio.showDialogError(
+                reportError(
                         (serverMsg == null || serverMsg.trim().isEmpty()) ? labels.getString("ERROR") : serverMsg,
                         labels.getString("ENVIAR.ERRO"), this.getGui());
                 this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
@@ -1643,11 +1645,11 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
             case WebCounselorManager.ERROR_TURN:
                 final String expectedTurn = String.format(labels.getString("ENVIAR.ERRO.WRONGTURN"), result.message());
                 //display alert!
-                SysApoio.showDialogError(expectedTurn, labels.getString("ENVIAR.ERRO"), this.getGui());
+                reportError(expectedTurn, labels.getString("ENVIAR.ERRO"), this.getGui());
                 this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                 return true; //dont try email
             default:
-                SysApoio.showDialogError(labels.getString("ERROR"), labels.getString("ENVIAR.ERRO"), this.getGui());
+                reportError(labels.getString("ERROR"), labels.getString("ENVIAR.ERRO"), this.getGui());
                 this.getGui().setStatusMsg(String.format(labels.getString("POST.DONE.NOT"), attachment.getName()));
                 return false;
         }
@@ -1849,7 +1851,7 @@ public class WorldControler extends ControlBase implements Serializable, ActionL
     private void doPortraits(JToggleButton button) {
         DisplayPortraitsManager displayPortraitsManager = DisplayPortraitsManager.getInstance();
         if (!displayPortraitsManager.isShowPortraitEnableable()) {
-            progressMonitor = new ProgressMonitor(gui, "Downloading file...", "", 0, 100);
+            progressMonitor = new Feedback.Progress(gui, labels.getString("CONFIG.DOWNLOAD.FILE"));
             progressMonitor.setProgress(0);
             displayPortraitsManager.downloadPortraits(gui, this);
 

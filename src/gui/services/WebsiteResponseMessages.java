@@ -3,7 +3,6 @@ package gui.services;
 import java.awt.Component;
 import java.util.function.Function;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -17,8 +16,7 @@ public final class WebsiteResponseMessages {
     }
 
     public static void show(Component parent, Function<String, String> labels, String message) {
-        JOptionPane.showMessageDialog(parent, content(format(labels, message)),
-                labels.apply("WEBSITE.HTML.TITLE"), JOptionPane.WARNING_MESSAGE);
+        Feedback.report(parent, labels.apply("WEBSITE.HTML.TITLE"), content(format(labels, message)));
     }
 
     static JScrollPane content(String message) {

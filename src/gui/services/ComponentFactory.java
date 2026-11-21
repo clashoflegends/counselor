@@ -1077,7 +1077,8 @@ public class ComponentFactory implements Serializable {
     }
 
     public static DialogTextArea showDialogPopup(String title, String text, Component relativeTo) {
-        DialogTextArea localTextArea = new DialogTextArea(false);
+        DialogTextArea localTextArea = new DialogTextArea(Feedback.owner(relativeTo), false);
+        localTextArea.setAlwaysOnTop(false);
         localTextArea.setText(text);
         localTextArea.setTitle(title);
         //configura jDialog

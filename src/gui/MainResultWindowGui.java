@@ -61,6 +61,21 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
         initComponents();
         applyToolbarIcons(); // swap the .form raster toolbar icons for crisp, theme-aware SVG icons
         doConfigStatusBar();
+        statusLabel.setToolTipText(gui.services.Feedback.text("status"));
+        statusLabel.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        statusLabel.setFocusable(true);
+        statusLabel.getInputMap(javax.swing.JComponent.WHEN_FOCUSED)
+                .put(javax.swing.KeyStroke.getKeyStroke("ENTER"), "messages");
+        statusLabel.getActionMap().put("messages", new javax.swing.AbstractAction() {
+            @Override public void actionPerformed(java.awt.event.ActionEvent e) {
+                gui.services.Feedback.open(MainResultWindowGui.this);
+            }
+        });
+        statusLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent e) {
+                gui.services.Feedback.open(MainResultWindowGui.this);
+            }
+        });
         // Repaint the lavender info/status surfaces theme-aware: dark on a FlatLaf dark theme so they
         // are not light islands (the .form sets lavender at design time; this overrides at runtime).
         // The deadline state later re-sets infoPanel per urgency (lavender/orange via infoNormalBg()).
@@ -987,6 +1002,8 @@ public class MainResultWindowGui extends javax.swing.JPanel implements Serializa
     public void setStatusMsg(String txt) {
         statusLabel.setText(txt);
     }
+
+    public void cancelPendingSettings() { wc.cancelPendingSettings(); }
 
     private String openFileName = "";
     private String updateVersion = "";

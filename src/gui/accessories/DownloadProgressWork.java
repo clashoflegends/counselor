@@ -17,7 +17,6 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
-import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -77,9 +76,8 @@ public class DownloadProgressWork extends SwingWorker<Void, Void> {
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(1));
             DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_RELOAD, "");
         } else {
-            JOptionPane.showMessageDialog(null,
-                    persistenceCommons.SettingsManager.getInstance().getBundleManager().getString("CONFIG.ERROR.ZIP"),
-                    "Portraits", JOptionPane.ERROR_MESSAGE);
+            gui.services.Feedback.report(null, "Portraits",
+                    persistenceCommons.SettingsManager.getInstance().getBundleManager().getString("CONFIG.ERROR.ZIP"));
         }
     }
 

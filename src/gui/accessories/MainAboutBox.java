@@ -373,6 +373,22 @@ public class MainAboutBox extends TabBase implements Serializable {
             parLayout.replace(lModeratorLink, moderatorLink);
             ButtonLink facebookLink = new ButtonLink(labels.getString("ABOUT.FACEBOOK.LINK"), labels.getString("ABOUT.FACEBOOK.LINK"));
             parLayout.replace(lFacebookLink, facebookLink);
+            for (ButtonLink link : new ButtonLink[]{webAdmin, webLink, mailLink, moderatorLink, facebookLink}) {
+                for (java.awt.event.MouseListener listener : link.getMouseListeners()) link.removeMouseListener(listener);
+                link.addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override public void mouseClicked(java.awt.event.MouseEvent e) {
+                        try {
+                            java.net.URI address = java.net.URI.create(link.getToolTipText());
+                            java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+                            if ("mailto".equalsIgnoreCase(address.getScheme())) desktop.mail(address);
+                            else desktop.browse(address);
+                        } catch (Exception ex) {
+                            gui.services.Feedback.report(MainAboutBox.this, labels.getString("BUTTONLINK.ERROR.TITLE"),
+                                    labels.getString("BUTTONLINK.ERROR.SYSTEM") + "\n" + link.getToolTipText());
+                        }
+                    }
+                });
+            }
 
             // The update story now lives in its own full-width row at the bottom (buildUpdateRow),
             // not in this slot: wedged between the "Counselor Version:" label and its value, a

@@ -63,9 +63,18 @@ public final class QuickSearchDialog extends JDialog {
     private final JTextField query = new JTextField();
     private final JList<Entry> results = new JList<>(shown);
     private final JLabel status = new JLabel();
+    private final Object context = control.facade.WorldFacadeCounselor.getInstance().getPartida();
 
     private QuickSearchDialog(Window parent, MainDadosGui dados, BundleManager labels) {
-        super(parent, ModalityType.APPLICATION_MODAL);
+        super(parent, ModalityType.MODELESS);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        javax.swing.Timer contextWatch = new javax.swing.Timer(250, e -> {
+            if (control.facade.WorldFacadeCounselor.getInstance().getPartida() != context) dispose();
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override public void windowClosed(java.awt.event.WindowEvent e) { contextWatch.stop(); }
+        });
+        contextWatch.start();
         this.labels = labels;
         this.dados = dados;
         this.index = QuickSearchIndex.build(dados.getTabbedPane());
@@ -85,6 +94,12 @@ public final class QuickSearchDialog extends JDialog {
         if (dados == null) {
             Toast.show(w, label(labels, "SEARCH.QUICK.NOTURN", "Open a turn file first"));
             return;
+        }
+        for (Window child : w.getOwnedWindows()) {
+            if (child instanceof QuickSearchDialog && child.isDisplayable()) {
+                child.toFront();
+                return;
+            }
         }
         new QuickSearchDialog(w, dados, labels).setVisible(true);
     }
@@ -281,6 +296,7 @@ public final class QuickSearchDialog extends JDialog {
     }
 
     private void jumpToSelected() {
+        if (control.facade.WorldFacadeCounselor.getInstance().getPartida() != context) { dispose(); return; }
         final Entry e = results.getSelectedValue();
         if (e == null) {
             return;
@@ -293,6 +309,7 @@ public final class QuickSearchDialog extends JDialog {
     }
 
     private void doJump(Entry e) {
+        if (control.facade.WorldFacadeCounselor.getInstance().getPartida() != context) return;
         jump(dados, e);
     }
 

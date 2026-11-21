@@ -34,7 +34,7 @@ public class SubTabPopupPortrait extends TabBase implements IPopupTabGui, Serial
 
     private static final Log log = LogFactory.getLog(SubTabPopupPortrait.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private JDialog dPopup = new JDialog(new JFrame(), false);
+    private JDialog dPopup = new JDialog((java.awt.Window) null, java.awt.Dialog.ModalityType.MODELESS);
     private final SubTabTextArea stContent = new SubTabTextArea();
 
     /**

@@ -61,8 +61,8 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
     // may be viewed (list + detail panel + map render) but never edited or saved. Enforced here (edit
     // controls off) AND at the save chokepoints in OrdemControler. Players never hold enemies' orders.
     private boolean readOnly;
-    private JDialog dAjuda = new JDialog(new JFrame(), false);
-    private JDialog dOrdem = new JDialog(new JFrame(), false);
+    private JDialog dAjuda = new JDialog((java.awt.Window) null, java.awt.Dialog.ModalityType.MODELESS);
+    private JDialog dOrdem = new JDialog((java.awt.Window) null, java.awt.Dialog.ModalityType.MODELESS);
     private final SubTabTextArea stAjuda = new SubTabTextArea();
     private final IAcaoGui parentTab;
     private final JogadorFacade jogadorFacade = new JogadorFacade();
@@ -690,6 +690,9 @@ public class SubTabOrdem extends TabBase implements IPopupTabGui, Serializable {
         for (Component parametrosCombo : parametrosCombos) {
             if (!((Component) parametrosCombo).isVisible()) {
                 continue;
+            }
+            if (parametrosCombo instanceof SubTabTropas tropas && !tropas.commitQuantity()) {
+                return null; // keep the invalid draft visible; never save an older quantity silently
             }
             compFactory.getParametros(parametrosCombo, parId, parDisplay);
         }

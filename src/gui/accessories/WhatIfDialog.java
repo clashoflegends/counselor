@@ -90,10 +90,10 @@ public class WhatIfDialog extends JDialog implements ActionListener {
 
     public WhatIfDialog(BattleSimWindow owner, BattleSimControler controler, ArmySim army,
             Pelotao platoon) {
-        super(owner, labels.getString("BATTLESIM.WHATIF.TITLE"), true);
-        this.controler = controler;
-        this.army = army;
-        this.platoon = platoon;
+        super(owner, labels.getString("BATTLESIM.WHATIF.TITLE"), false);
+        this.controler = new BattleSimControler(controler.getScenario().copy());
+        this.army = this.controler.getScenario().getArmies().get(controler.getScenario().getArmies().indexOf(army));
+        this.platoon = this.army.getPelotoes().get(platoon.getCodigo());
         // Ten times what is there now, floored so a tiny platoon still gets a useful range. The
         // player can raise it, and "not within this ceiling" says what it was - the two together
         // are why a default that is merely reasonable is enough.

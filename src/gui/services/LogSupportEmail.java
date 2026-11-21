@@ -28,26 +28,43 @@ public final class LogSupportEmail {
     private LogSupportEmail() {}
 
     public static void prepare(Component parent, JButton button, Function<String, String> labels) {
-        if (!button.isEnabled()) return;
+        chooseArchive(parent, button, labels);
+    }
+
+    private static boolean chooseArchive(Component parent, JButton button, Function<String, String> labels) {
+        if (!button.isEnabled()) return false;
         if (!(Logger.getRootLogger().getAppender("logfile") instanceof FileAppender appender)
                 || appender.getFile() == null) {
             error(parent, labels);
-            return;
+            return false;
         }
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle(labels.apply("ABOUT.LOGS.SAVE"));
         chooser.setFileFilter(new FileNameExtensionFilter("ZIP", "zip"));
         chooser.setAcceptAllFileFilterUsed(false);
         chooser.setSelectedFile(new File("counselor-logs-" + LocalDate.now() + ".zip"));
-        if (chooser.showSaveDialog(parent) != JFileChooser.APPROVE_OPTION) return;
+        if (chooser.showSaveDialog(parent) != JFileChooser.APPROVE_OPTION) return false;
         Path selected = chooser.getSelectedFile().toPath();
         if (!selected.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".zip")) {
             selected = selected.resolveSibling(selected.getFileName() + ".zip");
         }
         final Path destination = selected;
         final boolean replace = Files.exists(destination);
-        if (replace && JOptionPane.showConfirmDialog(parent, labels.apply("ABOUT.LOGS.REPLACE"),
-                labels.apply("ABOUT.LOGS.TITLE"), JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) return;
+        if (replace) {
+            Feedback.report(parent, labels.apply("ABOUT.LOGS.TITLE"),
+                    Feedback.choices(labels.apply("ABOUT.LOGS.REPLACE") + "\n" + destination,
+                            new String[]{Feedback.text("replace"), Feedback.text("saveAs")},
+                            () -> { prepareArchive(parent, button, labels, destination, true, appender); return true; },
+                            () -> chooseArchive(parent, button, labels)));
+            return true;
+        }
+        prepareArchive(parent, button, labels, destination, false, appender);
+        return true;
+    }
+
+    private static void prepareArchive(Component parent, JButton button, Function<String, String> labels,
+            Path destination, boolean replace, FileAppender appender) {
+        if (!button.isEnabled()) return;
         button.setEnabled(false);
         String caption = button.getText();
         button.setText(labels.apply("ABOUT.LOGS.PREPARING"));
@@ -68,7 +85,7 @@ public final class LogSupportEmail {
                     // Open a draft once; the panel keeps retry and manual-copy options available.
                     JButton email = (JButton) panel.getClientProperty("emailButton");
                     email.doClick();
-                    JOptionPane.showMessageDialog(parent, panel, labels.apply("ABOUT.LOGS.TITLE"), JOptionPane.INFORMATION_MESSAGE);
+                    Feedback.report(parent, labels.apply("ABOUT.LOGS.TITLE"), panel);
                 } catch (Exception ex) {
                     LOG.warn("Could not prepare diagnostic log archive.");
                     error(parent, labels);
@@ -81,8 +98,7 @@ public final class LogSupportEmail {
     }
 
     private static void error(Component parent, Function<String, String> labels) {
-        JOptionPane.showMessageDialog(parent, labels.apply("ABOUT.LOGS.FAILED"),
-                labels.apply("ABOUT.LOGS.TITLE"), JOptionPane.ERROR_MESSAGE);
+        Feedback.report(parent, labels.apply("ABOUT.LOGS.TITLE"), labels.apply("ABOUT.LOGS.FAILED"));
     }
 
     static JPanel createPanel(Function<String, String> labels, Archive archive, Actions actions) {

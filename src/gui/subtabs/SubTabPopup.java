@@ -39,7 +39,7 @@ public class SubTabPopup extends TabBase implements IPopupTabGui, IDispatchRecei
 
     private static final Log log = LogFactory.getLog(SubTabPopup.class);
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
-    private JDialog dPopup = new JDialog(new JFrame(), false);
+    private JDialog dPopup = new JDialog((java.awt.Window) null, java.awt.Dialog.ModalityType.MODELESS);
     private final SubTabTextArea stContent = new SubTabTextArea();
     private String guiConfig = "";
 

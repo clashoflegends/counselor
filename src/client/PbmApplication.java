@@ -49,6 +49,26 @@ public class PbmApplication extends Application implements Serializable {
     private final JgFrame frame = new JgFrame(getName());
     private final String configName = "GuiMainWindow";
     private boolean isMaximized = false;
+    private boolean closing;
+
+    @Override protected boolean canExit() {
+        if (!closing && frame.getContentPane() instanceof MainResultWindowGui main) main.cancelPendingSettings();
+        return !closing;
+    }
+
+    @Override protected void waitForBackgroundThreadsToExit() {
+        closing = true;
+        if (waitForBackgroundThreadsToExit(100)) return;
+        frame.setTitle(gui.services.Feedback.text("close"));
+        frame.setEnabled(false);
+        java.awt.SecondaryLoop loop = java.awt.Toolkit.getDefaultToolkit().getSystemEventQueue().createSecondaryLoop();
+        Thread waiter = new Thread(() -> {
+            try { waitForBackgroundThreadsToExit(Long.MAX_VALUE); }
+            finally { SwingUtilities.invokeLater(loop::exit); }
+        }, "Counselor-close-wait");
+        waiter.start();
+        loop.enter(); // keep EDT work alive while the registered workers finish; no popup
+    }
 
     public PbmApplication() {
         super();
@@ -219,6 +239,8 @@ public class PbmApplication extends Application implements Serializable {
 
             @Override
             public void windowClosing(WindowEvent e) {
+                if (closing) return;
+                if (frame.getContentPane() instanceof MainResultWindowGui main) main.cancelPendingSettings();
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.WINDOWS_CLOSING);
                 saveFrameConfigs();
                 exit();

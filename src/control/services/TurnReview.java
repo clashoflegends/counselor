@@ -261,12 +261,11 @@ public final class TurnReview implements Serializable {
     }
 
     /**
-     * The {@code ;SCC;} proximity cap, re-asked at review time.
+     * The {@code ;SCC;} proximity cap, reported without interrupting order entry.
      *
-     * {@code OrdemControler.confirmSizeCapOverride} asks ONCE per save gesture and takes yes for an
-     * answer, and a city can become capped after its order was saved (a neighbour grows, or the player
-     * plans the two in the other order). So this is not a duplicate of that question: it is the state
-     * as it stands now, which is the only state worth reviewing.
+     * A city can become capped after its order was saved (a neighbour grows, or the player plans
+     * the two in the other order). Review evaluates the current plan; saving never asks for consent
+     * to this warning because the blocking city's state can change before execution.
      * <p>
      * <b>{@code hasCitySizeCap} is not optional.</b> {@code CidadeFacade.isCheckCitySizeCapToUpgrade}
      * is pure geometry - it measures the distance to the nearest big city and never looks at whether

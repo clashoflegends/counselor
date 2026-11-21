@@ -26,7 +26,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.ProgressMonitor;
+
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import persistenceCommons.BundleManager;
@@ -40,7 +40,17 @@ import persistenceLocal.PathFactory;
 public class SettingsControler extends ControlBase implements Serializable, ActionListener, ChangeListener, PropertyChangeListener {
 
     private final MainSettingsGui settingsGui;
-    private ProgressMonitor progressMonitor;
+    private gui.services.Feedback.Progress progressMonitor;
+    private final gui.services.SettingsEditSession edits = new gui.services.SettingsEditSession();
+
+    public void cancelEdits() { edits.cancel(); }
+    private void setConfig(String key, String value) {
+        edits.edit(() -> SettingsManager.getInstance().setConfig(key, value));
+    }
+
+    private void setConfigAndSaveToFile(String key, String value) {
+        edits.edit(() -> SettingsManager.getInstance().setConfigAndSaveToFile(key, value));
+    }
     private static final BundleManager labels = SettingsManager.getInstance().getBundleManager();
 
     public SettingsControler(MainSettingsGui jpanel) {
@@ -49,6 +59,10 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        applyAction(e);
+    }
+
+    private void applyAction(ActionEvent e) {
         String actionCommand = e.getActionCommand();
         switch (actionCommand) {
             case "fSaves": {
@@ -57,7 +71,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 int returnVal = fc.showOpenDialog(settingsGui);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
-                    SettingsManager.getInstance().setConfig("saveDir", file.getPath());
+                    setConfig("saveDir", file.getPath());
                     settingsGui.getSaveDirTextField().setText(file.getPath());
                 }
                 break;
@@ -65,13 +79,13 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             case "languageCombo": {
                 JComboBox languageCombo = (JComboBox) e.getSource();
                 String value = ((ComboItem) languageCombo.getSelectedItem()).getValue();
-                SettingsManager.getInstance().setConfig("language", value);
+                setConfig("language", value);
                 break;
             }
             case "themeCombo": {
                 JComboBox themeCombo = (JComboBox) e.getSource();
                 // Saved now; the look-and-feel is installed at startup, so it takes effect on next launch.
-                SettingsManager.getInstance().setConfig("LookAndFeelTheme", ((ComboItem) themeCombo.getSelectedItem()).getValue());
+                setConfig("LookAndFeelTheme", ((ComboItem) themeCombo.getSelectedItem()).getValue());
                 break;
             }
             case "fLoad": {
@@ -80,7 +94,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 int returnVal = fc.showOpenDialog(settingsGui);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
-                    SettingsManager.getInstance().setConfig("loadDir", file.getPath());
+                    setConfig("loadDir", file.getPath());
                     settingsGui.getLoadDirTextField().setText(file.getPath());
                 }
                 break;
@@ -91,7 +105,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 int returnVal = fc.showOpenDialog(settingsGui);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
-                    SettingsManager.getInstance().setConfig("autoLoad", file.getPath());
+                    setConfig("autoLoad", file.getPath());
                     settingsGui.getAutoLoadTextField().setText(file.getPath());
                 }
                 break;
@@ -101,13 +115,16 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 // this session, tell the player to open a results file first (never silently pin a stale path).
                 File current = settingsGui.getCurrentResultsFile();
                 if (current == null) {
-                    persistenceCommons.SysApoio.showDialogError(
-                            labels.getString("SETTINGS.GAME.AUTOLOAD.SETCURRENT.NOFILE"),
-                            labels.getString("MENU.CONFIG"), settingsGui);
+                    if (e.getSource() instanceof javax.swing.JComponent control) {
+                        control.putClientProperty("JComponent.outline", "error");
+                        control.setToolTipText(labels.getString("SETTINGS.GAME.AUTOLOAD.SETCURRENT.NOFILE"));
+                    }
+                    gui.services.Feedback.report(settingsGui, labels.getString("MENU.CONFIG"),
+                            labels.getString("SETTINGS.GAME.AUTOLOAD.SETCURRENT.NOFILE"));
                     break;
                 }
                 String path = current.getAbsolutePath();
-                SettingsManager.getInstance().setConfig("autoLoad", path);
+                setConfig("autoLoad", path);
                 // Reflect + enable in the UI (setSelected does not fire the checkbox listener, so mirror its work).
                 settingsGui.getAutoLoadCheck().setSelected(true);
                 settingsGui.getAutoLoadTextField().setEnabled(true);
@@ -121,7 +138,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 int returnVal = fc.showOpenDialog(settingsGui);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
-                    SettingsManager.getInstance().setConfig("autoLoadActions", file.getPath());
+                    setConfig("autoLoadActions", file.getPath());
                     settingsGui.getAutoLoadActionTextField().setText(file.getPath());
                 }
                 break;
@@ -129,44 +146,44 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
             case "overrideAction": {
                 JCheckBox overCheck = (JCheckBox) e.getSource();
                 int selected = (overCheck.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("OverrideElimination", String.valueOf(selected));
+                setConfig("OverrideElimination", String.valueOf(selected));
                 break;
             }
             case "autoSaveOrders": {
                 JCheckBox overCheck = (JCheckBox) e.getSource();
                 int selected = (overCheck.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("AutoSaveActions", String.valueOf(selected));
+                setConfig("AutoSaveActions", String.valueOf(selected));
                 break;
             }
             case "saveOrdersNoPrompt": {
                 JCheckBox noPromptCheck = (JCheckBox) e.getSource();
                 int selected = (noPromptCheck.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("SaveOrdersNoPrompt", String.valueOf(selected));
+                setConfig("SaveOrdersNoPrompt", String.valueOf(selected));
                 break;
             }
             case "autoSaveOnMapPick": {
                 JCheckBox mapPickCheck = (JCheckBox) e.getSource();
                 int selected = (mapPickCheck.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("AutoSaveOnMapPick", String.valueOf(selected));
+                setConfig("AutoSaveOnMapPick", String.valueOf(selected));
                 break;
             }
             case "showPopUp": {
                 JCheckBox popUpCheck = (JCheckBox) e.getSource();
                 int selected = (popUpCheck.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("SendOrderConfirmationPopUp", String.valueOf(selected));
+                setConfig("SendOrderConfirmationPopUp", String.valueOf(selected));
                 break;
             }
             case "recieveConfirm": {
                 JCheckBox showCheck = (JCheckBox) e.getSource();
                 int selected = (showCheck.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("SendOrderReceiptRequest", String.valueOf(selected));
+                setConfig("SendOrderReceiptRequest", String.valueOf(selected));
                 break;
             }
             case "allFilter": {
                 JRadioButton allCheck = (JRadioButton) e.getSource();
                 int selected = (allCheck.isSelected()) ? 1 : 0;
                 if (selected == 1) {
-                    SettingsManager.getInstance().setConfig("filtro.default", String.valueOf(0));
+                    setConfig("filtro.default", String.valueOf(0));
                 }
                 break;
             }
@@ -174,7 +191,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 JRadioButton ownCheck = (JRadioButton) e.getSource();
                 int selected = (ownCheck.isSelected()) ? 1 : 0;
                 if (selected == 1) {
-                    SettingsManager.getInstance().setConfig("filtro.default", String.valueOf(1));
+                    setConfig("filtro.default", String.valueOf(1));
                 }
                 break;
             }
@@ -182,7 +199,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 JRadioButton alphaCheck = (JRadioButton) e.getSource();
                 int selected = (alphaCheck.isSelected()) ? 1 : 0;
                 if (selected == 1) {
-                    SettingsManager.getInstance().setConfig("SortAllCombos", String.valueOf(1));
+                    setConfig("SortAllCombos", String.valueOf(1));
                 }
                 break;
             }
@@ -190,50 +207,50 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 JRadioButton seqCheck = (JRadioButton) e.getSource();
                 int selected = (seqCheck.isSelected()) ? 1 : 0;
                 if (selected == 1) {
-                    SettingsManager.getInstance().setConfig("SortAllCombos", String.valueOf(0));
+                    setConfig("SortAllCombos", String.valueOf(0));
                 }
                 break;
             }
             case "maxWindow": {
                 JCheckBox maxWindow = (JCheckBox) e.getSource();
                 int selected = (maxWindow.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("maximizeWindowOnStart", String.valueOf(selected));
+                setConfig("maximizeWindowOnStart", String.valueOf(selected));
                 break;
             }
             case "columnAdjust": {
                 JCheckBox columnAdjust = (JCheckBox) e.getSource();
                 int selected = (columnAdjust.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("TableColumnAdjust", String.valueOf(selected));
+                setConfig("TableColumnAdjust", String.valueOf(selected));
                 break;
             }
             case "colorDifficulty": {
                 JCheckBox colorDiff = (JCheckBox) e.getSource();
                 int selected = (colorDiff.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("ColorDifficulty", String.valueOf(selected));
+                setConfig("ColorDifficulty", String.valueOf(selected));
                 break;
             }
             case "copyActions": {
                 JCheckBox copyActions = (JCheckBox) e.getSource();
                 int selected = (copyActions.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("CopyActionsPopUp", String.valueOf(selected));
+                setConfig("CopyActionsPopUp", String.valueOf(selected));
                 break;
             }
             case "copyOrders": {
                 JCheckBox copyOrders = (JCheckBox) e.getSource();
                 int selected = (copyOrders.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("CopyActionsOrder", String.valueOf(selected));
+                setConfig("CopyActionsOrder", String.valueOf(selected));
                 break;
             }
             case "keepPopUp": {
                 JCheckBox keepPopUp = (JCheckBox) e.getSource();
                 int selected = (keepPopUp.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("KeepPopupOpen", String.valueOf(selected));
+                setConfig("KeepPopupOpen", String.valueOf(selected));
                 break;
             }
             case "FogOfWar": {
                 JCheckBox fogOfWar = (JCheckBox) e.getSource();
                 int selected = (fogOfWar.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("fogOfWarType", String.valueOf(selected));
+                setConfig("fogOfWarType", String.valueOf(selected));
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
                 break;
             }
@@ -241,9 +258,9 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 JCheckBox loadActionsOtherNations = (JCheckBox) e.getSource();
                 int selected = (loadActionsOtherNations.isSelected()) ? 1 : 0;
                 if (selected == 0) {
-                    SettingsManager.getInstance().setConfig("LoadActionsOtherNations", "deny");
+                    setConfig("LoadActionsOtherNations", "deny");
                 } else {
-                    SettingsManager.getInstance().setConfig("LoadActionsOtherNations", "allow");
+                    setConfig("LoadActionsOtherNations", "allow");
                 }
                 break;
             }
@@ -251,49 +268,49 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 JCheckBox loadActionsBehavior = (JCheckBox) e.getSource();
                 int selected = (loadActionsBehavior.isSelected()) ? 1 : 0;
                 if (selected == 0) {
-                    SettingsManager.getInstance().setConfig("LoadActionsBehavior", "clean");
+                    setConfig("LoadActionsBehavior", "clean");
                 } else {
-                    SettingsManager.getInstance().setConfig("LoadActionsBehavior", "append");
+                    setConfig("LoadActionsBehavior", "append");
                 }
                 break;
             }
             case "autoMoveAction": {
                 JCheckBox autoMoveAction = (JCheckBox) e.getSource();
                 int selected = (autoMoveAction.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("AutoMoveNextAction", String.valueOf(selected));
+                setConfig("AutoMoveNextAction", String.valueOf(selected));
                 break;
             }
             case "mapTiles": {
                 JComboBox mapTiles = (JComboBox) e.getSource();
                 String value = (String) mapTiles.getSelectedItem();
-                SettingsManager.getInstance().setConfig("MapTiles", value);
+                setConfig("MapTiles", value);
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
                 break;
             }
             case "tagStyle": {
                 JComboBox tagStyle = (JComboBox) e.getSource();
                 String value = (String) tagStyle.getSelectedItem();
-                SettingsManager.getInstance().setConfig("HexTagStyle", value);
+                setConfig("HexTagStyle", value);
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_TAG);
                 break;
             }
             case "hexTagFrame": {
                 JCheckBox hexTagFrame = (JCheckBox) e.getSource();
                 int selected = (hexTagFrame.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("HexTagFrame", String.valueOf(selected));
+                setConfig("HexTagFrame", String.valueOf(selected));
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_TAG);
                 break;
             }
             case "armyPath": {
                 JComboBox tagStyle = (JComboBox) e.getSource();
                 int index = tagStyle.getSelectedIndex();
-                SettingsManager.getInstance().setConfig("ShowArmyMovPath", String.valueOf(index));
+                setConfig("ShowArmyMovPath", String.valueOf(index));
                 break;
             }
             case "pcPath": {
                 JComboBox tagStyle = (JComboBox) e.getSource();
                 int index = tagStyle.getSelectedIndex();
-                SettingsManager.getInstance().setConfig("drawPcPath", String.valueOf(index));
+                setConfig("drawPcPath", String.valueOf(index));
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.ACTIONS_MAP_REDRAW);
                 break;
@@ -309,7 +326,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                     this.settingsGui.getAutoLoadTextField().setEnabled(false);
                     this.settingsGui.getAutoLoadButton().setEnabled(false);
                     this.settingsGui.getAutoLoadTextField().setText("");
-                    SettingsManager.getInstance().setConfig("autoLoad", "");
+                    setConfig("autoLoad", "");
 
                 }
                 break;
@@ -324,14 +341,14 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                     this.settingsGui.getAutoLoadActionTextField().setEnabled(false);
                     this.settingsGui.getAutoLoadActionButton().setEnabled(false);
                     this.settingsGui.getAutoLoadActionTextField().setText("");
-                    SettingsManager.getInstance().setConfig("autoLoadActions", "");
+                    setConfig("autoLoadActions", "");
 
                 }
                 break;
             case "showPortraits": {
                 JCheckBox showPortraits = (JCheckBox) e.getSource();
                 int selected = (showPortraits.isSelected()) ? 1 : 0;
-                SettingsManager.getInstance().setConfig("ShowCharacterPortraits", String.valueOf(selected));
+                setConfig("ShowCharacterPortraits", String.valueOf(selected));
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SWITCH_PORTRAIT_PANEL, String.valueOf(selected));
                 settingsGui.checkDisplayPortraitCheckBox();
                 break;
@@ -343,7 +360,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                     displayPortraitsManager.downloadLatest(settingsGui);
                 } else {
                     // First time -> choose a folder, then download, with the progress bar.
-                    progressMonitor = new ProgressMonitor(settingsGui, labels.getString("CONFIG.DOWNLOAD.FILE"), "", 0, 100);
+                    progressMonitor = new gui.services.Feedback.Progress(settingsGui, labels.getString("CONFIG.DOWNLOAD.FILE"));
                     progressMonitor.setProgress(0);
                     displayPortraitsManager.downloadPortraits(settingsGui, this);
                 }
@@ -351,7 +368,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 break;
             case "autoDownloadPortraits": {
                 JCheckBox autoDl = (JCheckBox) e.getSource();
-                SettingsManager.getInstance().setConfigAndSaveToFile("autoDownloadPortraits",
+                setConfigAndSaveToFile("autoDownloadPortraits",
                         autoDl.isSelected() ? "true" : "false");
                 break;
             }
@@ -362,7 +379,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                     break;
                 }
                 String colorAfter = ColorFactory.getColorBd(c);
-                SettingsManager.getInstance().setConfigAndSaveToFile("MapColorCoordinate", colorAfter);
+                setConfigAndSaveToFile("MapColorCoordinate", colorAfter);
                 JButton source = (JButton) e.getSource();
                 source.setBackground(c);
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
@@ -373,7 +390,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 if (picked == null) {
                     break;
                 }
-                SettingsManager.getInstance().setConfigAndSaveToFile("ColorBarbarian", ColorFactory.getColorBd(picked));
+                setConfigAndSaveToFile("ColorBarbarian", ColorFactory.getColorBd(picked));
                 ((JButton) e.getSource()).setBackground(picked);
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
                 break;
@@ -386,7 +403,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 if (picked == null) {
                     break;
                 }
-                SettingsManager.getInstance().setConfigAndSaveToFile("ColorHexRange", ColorFactory.getColorBd(picked));
+                setConfigAndSaveToFile("ColorHexRange", ColorFactory.getColorBd(picked));
                 ((JButton) e.getSource()).setBackground(picked);
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
                 break;
@@ -397,7 +414,7 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
                 if (picked == null) {
                     break;
                 }
-                SettingsManager.getInstance().setConfigAndSaveToFile("ColorUnknown", ColorFactory.getColorBd(picked));
+                setConfigAndSaveToFile("ColorUnknown", ColorFactory.getColorBd(picked));
                 ((JButton) e.getSource()).setBackground(picked);
                 DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.LOCAL_MAP_REDRAW_RELOAD_TILES);
                 break;
@@ -409,9 +426,13 @@ public class SettingsControler extends ControlBase implements Serializable, Acti
 
     @Override
     public void stateChanged(ChangeEvent ce) {
+        applySpinnerChange(ce);
+    }
+
+    private void applySpinnerChange(ChangeEvent ce) {
         JSpinner jspiner = (JSpinner) ce.getSource();
         int sizeValue = (Integer) jspiner.getValue();
-        SettingsManager.getInstance().setConfig("splitSize", String.valueOf(sizeValue));
+        setConfig("splitSize", String.valueOf(sizeValue));
         DispatchManager.getInstance().sendDispatchForMsg(DispatchManager.SPLIT_PANE_CHANGED, String.valueOf(sizeValue));
     }
 

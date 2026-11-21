@@ -14,7 +14,7 @@ import baseLib.GenericoTableModel;
 import control.TropasSelectionControler;
 import control.services.ExercitoConverter;
 import gui.TabBase;
-import gui.components.IntegerEditor;
+import gui.services.QuantityCellEditor;
 import java.io.Serializable;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -54,7 +54,8 @@ public class SubTabTropas extends TabBase implements Serializable {
         if (model != null) {
             this.jtMainLista.setModel(model);
             //Set up stricter input validation for the integer column at the last column.
-            this.jtMainLista.getColumnModel().getColumn(model.getColumnCount() - 1).setCellEditor(new IntegerEditor(0, 100000));
+            this.jtMainLista.getColumnModel().getColumn(model.getColumnCount() - 1)
+                    .setCellEditor(new QuantityCellEditor(0, 100000, labels.getString("QTD")));
 //            this.jtMainLista.getColumnModel().getColumn(model.getColumnCount() - 1).setCellEditor(new SpinnerEditor(10000));
         } else {
             jtMainLista.setModel(new javax.swing.table.DefaultTableModel(
@@ -136,6 +137,10 @@ public class SubTabTropas extends TabBase implements Serializable {
             }
         }
         return XmlManager.getInstance().toXml(list);
+    }
+
+    public boolean commitQuantity() {
+        return !jtMainLista.isEditing() || jtMainLista.getCellEditor().stopCellEditing();
     }
 
     public String getTropasDisplay() {
