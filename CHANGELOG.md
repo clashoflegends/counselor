@@ -1,5 +1,9 @@
 # What's New in Counselor
 
+## Unreleased
+
+- Fixed a casualty-simulator crash when older results omit troop values for Wasteland terrain.
+
 ## 20-NOV-2026 - v2.1.945
 
 ### Clear rules settings
